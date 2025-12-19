@@ -62,7 +62,13 @@ export function useSessionActivity(onTimeout?: () => void) {
       console.log('Session timeout detected, clearing session data...');
       
       // Clear session-based UI state
-      localStorage.removeItem('seekeatz_chat_messages');
+      try {
+        // Chat is now stored in sessionStorage
+        window.sessionStorage.removeItem('seekeatz_chat_messages');
+        window.sessionStorage.removeItem('seekeatz_chat_lastActivityAt');
+      } catch (e) {
+        console.error('Failed to clear chat sessionStorage on session timeout:', e);
+      }
       localStorage.removeItem('seekeatz_recommended_meals');
       localStorage.removeItem('seekeatz_has_searched');
       localStorage.removeItem('seekeatz_last_search_params');

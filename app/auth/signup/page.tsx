@@ -139,51 +139,51 @@ export default function SignupPage() {
 
   // ⬇️ Everything below is *inside* the function now
   return (
-    <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-3xl font-bold text-black mb-2">
             Create Account
           </h1>
-          <p className="text-gray-400">
+          <p className="text-black">
             Sign up to get started with SeekEatz
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <Label className="text-gray-300 mb-2 block">Email</Label>
+            <Label className="text-black mb-2 block">Email</Label>
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-500" />
               <Input
                 type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-14 pl-12 rounded-2xl bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-cyan-500 focus:ring-cyan-500/20"
+                className="h-14 pl-12 rounded-2xl bg-gray-50 border-gray-300 text-black placeholder:text-gray-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                 autoComplete="email"
               />
             </div>
           </div>
 
           <div>
-            <Label className="text-gray-300 mb-2 block">Password</Label>
+            <Label className="text-black mb-2 block">Password</Label>
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-500" />
               <Input
                 type={showPassword ? "text" : "password"}
                 placeholder="Minimum 8 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="h-14 pl-12 pr-12 rounded-2xl bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-cyan-500 focus:ring-cyan-500/20"
+                className="h-14 pl-12 pr-12 rounded-2xl bg-gray-50 border-gray-300 text-black placeholder:text-gray-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                 autoComplete="new-password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-cyan-500 hover:text-cyan-600 transition-colors"
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -195,18 +195,18 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <Label className="text-gray-300 mb-2 block">
+            <Label className="text-black mb-2 block">
               Confirm Password
             </Label>
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-500" />
               <Input
                 type={showConfirmPassword ? "text" : "password"}
                 placeholder="Re-enter your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="h-14 pl-12 pr-12 rounded-2xl bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-cyan-500 focus:ring-cyan-500/20"
+                className="h-14 pl-12 pr-12 rounded-2xl bg-gray-50 border-gray-300 text-black placeholder:text-gray-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                 autoComplete="new-password"
               />
               <button
@@ -214,7 +214,7 @@ export default function SignupPage() {
                 onClick={() =>
                   setShowConfirmPassword((prev) => !prev)
                 }
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-cyan-500 hover:text-cyan-600 transition-colors"
               >
                 {showConfirmPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -231,7 +231,7 @@ export default function SignupPage() {
               {(error.includes("already exists") || error.includes("already registered")) && (
                 <button
                   onClick={() => router.push("/auth/signin")}
-                  className="text-cyan-400 hover:text-cyan-300 font-medium underline mt-2"
+                  className="text-cyan-600 hover:text-cyan-700 font-medium underline mt-2"
                 >
                   Go to Sign In →
                 </button>
@@ -248,11 +248,11 @@ export default function SignupPage() {
           </Button>
         </form>
 
-        <p className="text-gray-500 text-sm text-center mt-6">
-          Already have an account{" "}
+        <p className="text-black text-sm text-center mt-6">
+          Already have an account?{" "}
           <button
             onClick={() => router.push("/auth/signin")}
-            className="text-cyan-400 hover:text-cyan-300 font-medium"
+            className="text-cyan-600 hover:text-cyan-700 font-medium"
           >
             Sign in
           </button>

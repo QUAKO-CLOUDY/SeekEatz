@@ -81,7 +81,11 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
       
       if (Array.isArray(data)) {
         normalizedResults = data;
+      } else if (data && typeof data === 'object' && Array.isArray(data.meals)) {
+        // New format: { meals, hasMore, nextOffset, searchKey }
+        normalizedResults = data.meals;
       } else if (data && typeof data === 'object' && Array.isArray(data.results)) {
+        // Legacy format support
         normalizedResults = data.results;
       }
       

@@ -41,11 +41,7 @@ export function SimplifiedOnboarding({ onComplete }: Props) {
       target_protein_g: 150,
       target_carbs_g: 200,
       target_fats_g: 65,
-      preferredMealTypes: [],
-      eatingStyles: [],
-      dietaryPreferences: [],
-      activityLevel: 'moderately-active',
-      trainingStyle: 'hybrid'
+      preferredMealTypes: []
     };
 
     // Save onboarding completion to localStorage

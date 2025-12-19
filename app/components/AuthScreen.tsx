@@ -42,7 +42,13 @@ export function AuthScreen({ onSuccess }: Props) {
         
         // Clear session-based UI state on login
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('seekeatz_chat_messages');
+          try {
+            // Chat is now stored in sessionStorage
+            window.sessionStorage.removeItem('seekeatz_chat_messages');
+            window.sessionStorage.removeItem('seekeatz_chat_lastActivityAt');
+          } catch (e) {
+            console.error('Failed to clear chat sessionStorage on login:', e);
+          }
           localStorage.removeItem('seekeatz_recommended_meals');
           localStorage.removeItem('seekeatz_has_searched');
           localStorage.removeItem('seekeatz_last_search_params');

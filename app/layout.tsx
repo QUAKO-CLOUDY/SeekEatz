@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./contexts/ThemeContext"; // <--- Import this
 import { DevHelpers } from "./components/DevHelpers"; // Development helpers
+import { AppContainer } from "./components/AppContainer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -40,12 +41,12 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} bg-gray-100`}>
+      <body className={`${inter.className} bg-slate-100`}>
         <ThemeProvider> {/* <--- Wrap children with this */}
           <DevHelpers /> {/* Development-only helpers (console utilities) */}
-          <main className="max-w-md mx-auto min-h-screen bg-white shadow-2xl overflow-x-hidden">
+          <AppContainer>
             {children}
-          </main>
+          </AppContainer>
         </ThemeProvider>
       </body>
     </html>

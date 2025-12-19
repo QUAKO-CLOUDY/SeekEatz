@@ -157,7 +157,7 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal }: Props) {
       {/* SCROLLABLE CONTENT */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
       {/* TOP SECTION – RINGS + MACROS */}
-      <div className="bg-gradient-to-br from-card via-muted/40 to-card text-foreground p-6 pb-4 relative">
+      <div className="bg-gradient-to-br from-card via-muted/40 to-card text-foreground p-6 pb-4 relative" style={{ paddingTop: `calc(1.5rem + env(safe-area-inset-top, 0px))` }}>
         <div className="flex items-center justify-between mb-6">
           <div>
             <p className="text-muted-foreground mb-1">Daily Tracking</p>

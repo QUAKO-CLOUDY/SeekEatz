@@ -19,6 +19,7 @@ import {
   Check
 } from 'lucide-react';
 import type { Meal } from '../types';
+import { copyToClipboard } from '@/lib/clipboard-utils';
 
 // --- TYPES ---
 type Props = {
@@ -294,6 +295,23 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
     window.open("https://www.ubereats.com", "_blank");
   };
 
+  const handleShare = async () => {
+    // Create share text with meal information
+    const shareText = `${meal.name} from ${meal.restaurant}\n` +
+      `${meal.calories} cal • ${meal.protein}g protein • ${meal.carbs || 0}g carbs • ${meal.fats || 0}g fats`;
+    
+    const success = await copyToClipboard(shareText);
+    
+    if (success) {
+      // You could show a toast notification here
+      // For now, we'll just log success
+      console.log('✅ Meal information copied to clipboard');
+    } else {
+      // You could show an error toast here
+      console.error('❌ Failed to copy meal information');
+    }
+  };
+
   const isManualValid = manualName && manualCals;
 
   return (
@@ -342,7 +360,11 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
               <button onClick={onToggleFavorite} className={`w-10 h-10 backdrop-blur-md rounded-full flex items-center justify-center border ${isFavorite ? 'bg-pink-500/20 text-pink-500 border-pink-500/50' : 'bg-black/40 text-white border-white/10'}`}>
                 <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
               </button>
-              <button className="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10">
+              <button 
+                onClick={handleShare}
+                className="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 hover:bg-black/60 transition-colors"
+                aria-label="Share meal information"
+              >
                 <Share className="w-4 h-4 text-white" />
               </button>
             </div>

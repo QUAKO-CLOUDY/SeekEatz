@@ -41,10 +41,10 @@ export default function WaitlistPage() {
 
   return (
     <main className="min-h-screen bg-white overflow-x-hidden flex justify-center">
-      <div className="w-full max-w-2xl lg:max-w-4xl py-10 lg:py-16 px-4 md:px-6 lg:px-8 mx-auto">
+      <div className="w-full max-w-2xl lg:max-w-4xl py-10 lg:py-16 px-4 md:px-6 lg:px-8 mx-auto space-y-10 lg:space-y-12">
         {/* Header */}
         <header className="mb-6 lg:mb-8">
-          <div className="text-3xl lg:text-4xl font-bold text-gray-900">SeekEatz</div>
+          <div className="text-3xl lg:text-4xl font-semibold text-gray-900">SeekEatz</div>
         </header>
 
         {/* Hero Section */}
@@ -54,7 +54,7 @@ export default function WaitlistPage() {
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 leading-tight break-words">
               Scan menus and instantly see what fits your goals.
               <br />
-              <span className="text-emerald-500">Anytime, Anywhere.</span>
+              <span className="text-cyan-500">Anytime, Anywhere.</span>
             </h1>
             <p className="text-sm sm:text-base text-gray-600 leading-relaxed break-words">
               SeekEatz finds meals near you using verified restaurant nutrition, personalized AI recommendations, and macro-friendly swaps — so you hit your goals without the math.
@@ -74,12 +74,12 @@ export default function WaitlistPage() {
                   placeholder="Enter your email"
                   required
                   aria-label="Email address"
-                  className="flex-1 px-4 py-3 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all text-sm sm:text-base"
+                  className="flex-1 px-4 py-3 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-sm sm:text-base"
                 />
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-6 py-3 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap text-sm sm:text-base"
+                  className="px-6 py-3 bg-cyan-500 text-white font-medium rounded-lg hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap text-sm sm:text-base"
                 >
                   {isLoading ? 'Joining...' : 'Join the Waitlist →'}
                 </button>
@@ -104,7 +104,7 @@ export default function WaitlistPage() {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="mt-10 lg:mt-12 space-y-4 lg:space-y-6">
+        <section id="features" className="space-y-4 lg:space-y-6">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 text-center break-words">
             What SeekEatz Actually Does
           </h2>
@@ -116,7 +116,7 @@ export default function WaitlistPage() {
             {/* Feature 1 */}
             <div className="flex flex-col min-w-0">
               <div className="flex items-start gap-3 mb-2">
-                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-2.5 flex-shrink-0"></div>
+                <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full mt-2.5 flex-shrink-0"></div>
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 break-words">
                   Accurate restaurant nutrition. No crowdsourced or third party data.
                 </h3>
@@ -129,7 +129,7 @@ export default function WaitlistPage() {
             {/* Feature 2 */}
             <div className="flex flex-col min-w-0">
               <div className="flex items-start gap-3 mb-2">
-                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-2.5 flex-shrink-0"></div>
+                <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full mt-2.5 flex-shrink-0"></div>
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 break-words">
                   Personalized meal recommendations near you
                 </h3>
@@ -142,7 +142,7 @@ export default function WaitlistPage() {
             {/* Feature 3 */}
             <div className="flex flex-col min-w-0">
               <div className="flex items-start gap-3 mb-2">
-                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-2.5 flex-shrink-0"></div>
+                <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full mt-2.5 flex-shrink-0"></div>
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 break-words">
                   Smart AI swaps that improve any meal
                 </h3>
@@ -157,7 +157,7 @@ export default function WaitlistPage() {
             {/* Feature 4 */}
             <div className="flex flex-col min-w-0">
               <div className="flex items-start gap-3 mb-2">
-                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-2.5 flex-shrink-0"></div>
+                <div className="w-1.5 h-1.5 bg-cyan-500 rounded-full mt-2.5 flex-shrink-0"></div>
                 <h3 className="text-base sm:text-lg font-semibold text-gray-900 break-words">
                   Diet filters that actually matter
                 </h3>
@@ -172,7 +172,7 @@ export default function WaitlistPage() {
         </section>
 
         {/* Incentive Section */}
-        <section className="mt-10 lg:mt-12 space-y-4 lg:space-y-6">
+        <section className="space-y-4 lg:space-y-6">
           <div className="text-center">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 mb-6 break-words">
               Why Join the Early Access Group?
@@ -180,21 +180,21 @@ export default function WaitlistPage() {
 
             <div className="space-y-3 max-w-xl mx-auto mb-6">
               <div className="flex items-start gap-3 text-left">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></div>
+                <div className="w-2 h-2 rounded-full bg-cyan-500 mt-2 flex-shrink-0"></div>
                 <p className="text-sm sm:text-base text-gray-900 break-words">
                   First 50 users get 3 weeks FREE
                 </p>
               </div>
 
               <div className="flex items-start gap-3 text-left">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></div>
+                <div className="w-2 h-2 rounded-full bg-cyan-500 mt-2 flex-shrink-0"></div>
                 <p className="text-sm sm:text-base text-gray-900 break-words">
                   Get in before the public launch
                 </p>
               </div>
 
               <div className="flex items-start gap-3 text-left">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></div>
+                <div className="w-2 h-2 rounded-full bg-cyan-500 mt-2 flex-shrink-0"></div>
                 <p className="text-sm sm:text-base text-gray-900 break-words">
                   Influence new features and future restaurants
                 </p>
@@ -208,14 +208,14 @@ export default function WaitlistPage() {
         </section>
 
         {/* Credibility / Story Section */}
-        <section className="mt-10 lg:mt-12 space-y-4 lg:space-y-6">
+        <section className="space-y-4 lg:space-y-6">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 text-center break-words">
             Why We Built SeekEatz
           </h2>
 
           <div className="space-y-4">
             <div className="flex items-start gap-4">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></div>
+              <div className="w-2 h-2 rounded-full bg-cyan-500 mt-2 flex-shrink-0"></div>
               <p className="text-sm sm:text-base text-gray-700 leading-relaxed break-words">
                 Most macro apps rely on outdated, generic, or crowdsourced nutrition data.
                 <br />
@@ -224,14 +224,14 @@ export default function WaitlistPage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></div>
+              <div className="w-2 h-2 rounded-full bg-cyan-500 mt-2 flex-shrink-0"></div>
               <p className="text-sm sm:text-base text-gray-700 leading-relaxed break-words">
                 SeekEatz uses verified restaurant nutrition + AI to give you meal options you can trust. Anytime, Anywhere.
               </p>
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></div>
+              <div className="w-2 h-2 rounded-full bg-cyan-500 mt-2 flex-shrink-0"></div>
               <p className="text-sm sm:text-base text-gray-700 leading-relaxed break-words">
                 Built for people who want real results, not another app that forces you to track every bite.
               </p>
@@ -240,7 +240,7 @@ export default function WaitlistPage() {
         </section>
 
         {/* Bottom CTA Section */}
-        <section className="mt-10 lg:mt-12 space-y-4 lg:space-y-6 text-center">
+        <section className="space-y-4 lg:space-y-6 text-center">
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-gray-900 break-words">
             Ready to make eating out easier?
           </h2>
@@ -258,12 +258,12 @@ export default function WaitlistPage() {
                 placeholder="Enter your email"
                 required
                 aria-label="Email address"
-                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all text-sm sm:text-base"
+                className="flex-1 px-4 py-3 rounded-lg border border-gray-300 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all text-sm sm:text-base"
               />
               <button
                 type="submit"
                 disabled={isLoading}
-                className="px-6 py-3 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap text-sm sm:text-base"
+                className="px-6 py-3 bg-cyan-500 text-white font-medium rounded-lg hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all whitespace-nowrap text-sm sm:text-base"
               >
                 {isLoading ? 'Joining...' : 'Join the Waitlist →'}
               </button>

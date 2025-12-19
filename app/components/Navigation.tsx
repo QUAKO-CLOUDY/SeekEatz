@@ -13,7 +13,7 @@ export function Navigation({ currentScreen, onNavigate }: Props) {
   const isAIChatActive = currentScreen === "chat";
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 flex items-end justify-around px-2 pt-0.5 bg-card border-t border-border z-[100]" style={{ paddingBottom: `calc(0.5rem + env(safe-area-inset-bottom, 0px))` }}>
+    <nav className="fixed bottom-0 left-0 right-0 flex items-end justify-around px-2 pt-0.5 bg-card border-t border-border z-[100]" style={{ paddingBottom: `calc(0.25rem + env(safe-area-inset-bottom, 0px))` }}>
       {/* Home */}
       <button
         onClick={() => onNavigate("home")}
@@ -65,10 +65,10 @@ export function Navigation({ currentScreen, onNavigate }: Props) {
       </button>
 
       {/* Center AI Chat FAB */}
-      <div className="flex flex-col items-center -mt-4 flex-1">
+      <div className="flex flex-col items-center flex-1 pb-0.5">
         <button
           onClick={() => onNavigate("chat")}
-          className="relative group mb-0.5"
+          className="relative group"
         >
           {/* Cyan/blue glow layers */}
           <div
@@ -90,8 +90,8 @@ export function Navigation({ currentScreen, onNavigate }: Props) {
 
           {/* Main FAB */}
           <div
-            className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-all ${
-              isAIChatActive ? "scale-110" : "scale-100"
+            className={`relative w-11 h-11 rounded-full flex items-center justify-center transition-all ${
+              isAIChatActive ? "scale-105" : "scale-100"
             }`}
             style={{
               background:
@@ -100,7 +100,7 @@ export function Navigation({ currentScreen, onNavigate }: Props) {
                 "0 4px 20px rgba(6,182,212,0.5), 0 2px 10px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.3)",
             }}
           >
-            <Sparkles className="w-6 h-6 text-white" strokeWidth={2.5} />
+            <Sparkles className="w-5 h-5 text-white" strokeWidth={2.5} />
 
             {/* Active ring pulse */}
             {isAIChatActive && (

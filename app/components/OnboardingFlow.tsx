@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronRight, MapPin, Sparkles, Map } from "lucide-react";
+import { ChevronRight, MapPin, Sparkles, Map, ShieldCheck } from "lucide-react";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/client";
 
@@ -10,12 +10,12 @@ type Props = {
   onComplete: () => void;
 };
 
-const TOTAL_STEPS = 3;
+const TOTAL_STEPS = 4;
 
 export function OnboardingFlow({ onComplete }: Props) {
   const router = useRouter();
   const supabase = createClient();
-  const [step, setStep] = useState(0); // Step 0 = Eat Anywhere, Step 1 = AI Menu Scraper, Step 2 = Location
+  const [step, setStep] = useState(0); // Step 0 = Eat Anywhere, Step 1 = AI Menu Scraper, Step 2 = No Guesswork, Step 3 = Location
 
   // Location state
   const [isRequestingLocation, setIsRequestingLocation] = useState(false);
@@ -33,6 +33,8 @@ export function OnboardingFlow({ onComplete }: Props) {
                   ? "bg-gradient-to-r from-teal-500 to-blue-500"
                   : index === 1
                   ? "bg-gradient-to-r from-purple-500 to-pink-500"
+                  : index === 2
+                  ? "bg-gradient-to-r from-orange-500 to-amber-500"
                   : "bg-gradient-to-r from-green-500 to-emerald-500"
                 : "bg-muted"
             }`}
@@ -119,7 +121,49 @@ export function OnboardingFlow({ onComplete }: Props) {
     );
   }
 
-  // STEP 2: Location Permission (Last step before app access)
+  // STEP 2: No Guesswork
+  if (step === 2) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/20 to-background" />
+        
+        <div className="w-full max-w-md text-center relative z-10">
+          <div className="mb-8 flex justify-center">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full blur-2xl opacity-20 animate-pulse" />
+              <ShieldCheck className="w-20 h-20 text-orange-500 relative" strokeWidth={1.5} />
+            </div>
+          </div>
+
+          <h1 className="text-3xl font-bold text-foreground mb-4">No Guesswork</h1>
+          <p className="text-muted-foreground text-lg mb-12 leading-relaxed">
+          SeekEatz pulls nutrition from real restaurant sources when available — no crowdsourced guesses, no made-up macros.
+          </p>
+
+          <ProgressDots />
+
+          <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setStep(1)}
+              className="h-14 rounded-full border-muted-foreground/20 text-foreground hover:bg-muted flex-1"
+            >
+              Back
+            </Button>
+            <Button
+              onClick={() => setStep(3)}
+              className="h-14 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg shadow-orange-500/20 flex-[2] text-lg"
+            >
+              Next
+              <ChevronRight className="ml-2 w-5 h-5" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // STEP 3: Location Permission (Last step before app access)
   const handleLocationRequest = async () => {
     setIsRequestingLocation(true);
 
@@ -169,73 +213,87 @@ export function OnboardingFlow({ onComplete }: Props) {
 
   const completeOnboarding = async () => {
     try {
-      // Verify user is still authenticated
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (!user || userError) {
-        console.error("User not authenticated after onboarding:", userError);
-        // If somehow not authenticated, redirect to sign-in
-        router.push("/auth/signin");
-        return;
-      }
-
       const now = Date.now();
       
-      // Mark onboarding as complete in database
+      // Try to get user, but treat AuthSessionMissingError as "no user" (signed-out preview)
+      let user = null;
       try {
-        await supabase
-          .from("profiles")
-          .upsert({
-            id: user.id,
-            has_completed_onboarding: true,
-            last_login: new Date(now).toISOString(),
-            updated_at: new Date().toISOString(),
-          }, {
-            onConflict: "id",
-          });
-      } catch (error) {
-        console.warn("Could not update profile:", error);
+        const { data: { user: fetchedUser }, error: userError } = await supabase.auth.getUser();
+        // Only treat as error if it's NOT AuthSessionMissingError (which is expected when signed out)
+        if (userError && userError.message && !userError.message.includes('Auth session missing')) {
+          console.warn("Auth error (non-session):", userError);
+        }
+        // If we got a user, use it; otherwise user stays null (signed-out preview)
+        if (fetchedUser) {
+          user = fetchedUser;
+        }
+      } catch (error: any) {
+        // AuthSessionMissingError is expected when signed out - treat as no user
+        if (error?.message?.includes('Auth session missing') || error?.name === 'AuthSessionMissingError') {
+          // This is expected for signed-out users - continue with guest preview
+          console.log("No auth session (signed-out preview mode)");
+        } else {
+          console.warn("Unexpected auth error:", error);
+        }
+        // Continue with user = null (guest preview)
       }
 
-      // Set all localStorage flags to ensure app recognizes completion
-      localStorage.setItem(`macroMatch_hasCompletedOnboarding_${user.id}`, "true");
-      localStorage.setItem("macroMatch_completedOnboarding", "true");
+      // ALWAYS set onboarding completion flags (for both signed-in and signed-out users)
       localStorage.setItem("hasCompletedOnboarding", "true");
-      localStorage.setItem("onboardingCompleted", "true");
-      localStorage.setItem(`macroMatch_lastLogin_${user.id}`, now.toString());
-      localStorage.setItem("macroMatch_lastLogin", now.toString());
+      localStorage.setItem("onboarded", "true");
+      localStorage.setItem("macroMatch_completedOnboarding", "true");
+      localStorage.setItem("onboardingCompletedTimestamp", now.toString());
       localStorage.removeItem("macroMatch_onboardingQuestionsComplete");
       
       // Clear any saved last screen so user always goes to chat first after onboarding
       localStorage.removeItem("seekeatz_current_screen");
       localStorage.removeItem("seekeatz_nav_history");
 
-      // Wait a moment to ensure all state is saved
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      // If we have a user, also update database and set user-specific flags
+      if (user) {
+        // Mark onboarding as complete in database
+        try {
+          await supabase
+            .from("profiles")
+            .upsert({
+              id: user.id,
+              has_completed_onboarding: true,
+              last_login: new Date(now).toISOString(),
+              updated_at: new Date().toISOString(),
+            }, {
+              onConflict: "id",
+            });
+        } catch (error) {
+          console.warn("Could not update profile:", error);
+        }
 
-      // Verify session one more time before redirecting
-      const { data: { user: verifiedUser } } = await supabase.auth.getUser();
-      
-      if (!verifiedUser) {
-        console.error("Session lost after onboarding completion");
-        router.push("/auth/signin");
-        return;
+        // Set user-specific localStorage flags
+        localStorage.setItem(`macroMatch_hasCompletedOnboarding_${user.id}`, "true");
+        localStorage.setItem(`macroMatch_lastLogin_${user.id}`, now.toString());
+        localStorage.setItem("macroMatch_lastLogin", now.toString());
+      } else {
+        // Signed-out user - set generic lastLogin
+        localStorage.setItem("macroMatch_lastLogin", now.toString());
       }
+
+      // Wait a moment to ensure all state is saved
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
       // Call onComplete callback
       onComplete();
 
-      // Use window.location for a full page reload to ensure session is recognized
-      // This ensures the app properly recognizes the authenticated state
+      // Always redirect to chat after onboarding completion (for both signed-in and signed-out users)
+      // Signed-out users will get preview access, signed-in users get full access
       window.location.href = "/chat";
     } catch (error) {
       console.error("Error completing onboarding:", error);
-      // Still try to redirect to chat - the app will handle auth check
-      router.push("/chat");
+      // Always try to redirect to chat - the app will handle auth check
+      // Don't redirect to signin on error, let the chat page handle it
+      window.location.href = "/chat";
     }
   };
 
-  if (step === 2) {
+  if (step === 3) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/20 to-background" />
@@ -264,13 +322,23 @@ export function OnboardingFlow({ onComplete }: Props) {
               {isRequestingLocation ? "Requesting..." : "Allow Location"}
             </Button>
 
-            <button
-              onClick={handleSkipLocation}
-              disabled={isRequestingLocation}
-              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors disabled:opacity-50"
-            >
-              Not now
-            </button>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setStep(2)}
+                disabled={isRequestingLocation}
+                className="h-14 rounded-full border-muted-foreground/20 text-foreground hover:bg-muted flex-1 disabled:opacity-50"
+              >
+                Back
+              </Button>
+              <button
+                onClick={handleSkipLocation}
+                disabled={isRequestingLocation}
+                className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors disabled:opacity-50 flex-1"
+              >
+                Not now
+              </button>
+            </div>
           </div>
         </div>
       </div>

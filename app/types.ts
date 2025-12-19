@@ -10,12 +10,14 @@ export type UserProfile = {
   diet_type?: string; // Single diet type selection
   dietary_options?: string[]; // Multi-select dietary restrictions/options
   search_distance_miles?: number; // Default search radius in miles (0.5, 1, 2, 5, or 10)
+  preferredMealTypes?: string[]; // Optional array of preferred meal types
 };
 
 export type Meal = {
   id: string;
   name: string;
   restaurant: string;
+  restaurant_name?: string; // For MealCard logo logic (matches Supabase column name)
   calories: number;
   protein: number;
   carbs: number;

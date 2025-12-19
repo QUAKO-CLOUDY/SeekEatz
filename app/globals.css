@@ -76,6 +76,13 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Prevent rubber-band / bounce scrolling on the top-level page
+     while keeping normal scrolling behavior */
+  html,
+  body {
+    overscroll-behavior: none;
+  }
 }
 
 /* Custom Utilities from your Figma Design */

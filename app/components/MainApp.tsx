@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { Navigation, type Screen } from './Navigation';
 import { HomeScreen } from './HomeScreen';
 import { LogScreen } from './LogScreen';
 import { Favorites } from './Favorites';
 import { Settings } from './Settings';
-import { AIChat } from './AIChat';
+import AIChat from './AIChat';
 import { MealDetail } from './MealDetail';
 import { SearchScreen } from './SearchScreen';
 import { OnboardingFlow } from './OnboardingFlow';
@@ -30,7 +30,26 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   
   // Router and Supabase client
   const router = useRouter();
-  const supabase = createClient();
+  const pathname = usePathname();
+  
+  // Client ready check (stable boolean) - must be defined before isChatRoute
+  const isClient = typeof window !== 'undefined';
+  
+  // Create stable Supabase client reference (not recreated every render)
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
+  if (!supabaseRef.current) {
+    supabaseRef.current = createClient();
+  }
+  const supabase = supabaseRef.current;
+  
+  // Check if we're on the /chat route (robust pathname check)
+  // Normalize pathname: remove trailing slashes and query strings for comparison
+  // Handle /chat, /chat/, /chat?foo=bar, etc.
+  // Only compute on client-side to avoid hydration mismatches
+  const normalizedPathname = isClient && pathname 
+    ? pathname.replace(/\/$/, '').split('?')[0] 
+    : '';
+  const isChatRoute = normalizedPathname === '/chat' || initialScreen === 'chat';
   
   // Hydration fix: Track if component is mounted on client
   const [isMounted, setIsMounted] = useState(false);
@@ -59,6 +78,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     target_protein_g: 150,
     target_carbs_g: 200,
     target_fats_g: 70,
+    search_distance_miles: 10,
   });
 
   // Session timeout handler - redirects to login on timeout
@@ -85,8 +105,16 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       if (savedHistory) {
         const parsed = JSON.parse(savedHistory);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setNavHistory(parsed);
-          setCurrentScreen(parsed[parsed.length - 1] as Screen);
+          // Validate and filter to only include valid Screen values
+          const validScreens: Screen[] = ['home', 'log', 'chat', 'favorites', 'settings', 'search'];
+          const filteredHistory = parsed.filter((screen): screen is Screen => 
+            typeof screen === 'string' && validScreens.includes(screen as Screen)
+          ) as Screen[];
+          
+          if (filteredHistory.length > 0) {
+            setNavHistory(filteredHistory);
+            setCurrentScreen(filteredHistory[filteredHistory.length - 1]);
+          }
         }
       } else {
         // Fallback to saved screen if no history
@@ -152,17 +180,32 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         : false;
 
       // Check Supabase session - retry if not found initially (session might still be propagating)
+      // Treat AuthSessionMissingError as "no user" (signed-out preview mode)
       let user = null;
       let retries = 0;
       while (retries < 3 && !user) {
-        const { data: { user: fetchedUser }, error } = await supabase.auth.getUser();
-        if (fetchedUser && !error) {
-          user = fetchedUser;
-          break;
-        }
-        // Wait a bit before retrying (only if we didn't get a user)
-        if (!fetchedUser && retries < 2) {
-          await new Promise(resolve => setTimeout(resolve, 200));
+        try {
+          const { data: { user: fetchedUser }, error } = await supabase.auth.getUser();
+          if (fetchedUser && !error) {
+            user = fetchedUser;
+            break;
+          }
+          // If error is AuthSessionMissingError, treat as no user (expected for signed-out users)
+          if (error && (error.message?.includes('Auth session missing') || error.name === 'AuthSessionMissingError')) {
+            // This is expected for signed-out users - break and continue with user = null
+            break;
+          }
+          // Wait a bit before retrying (only if we didn't get a user and it's not a session missing error)
+          if (!fetchedUser && retries < 2) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+          }
+        } catch (error: any) {
+          // AuthSessionMissingError is expected when signed out - treat as no user
+          if (error?.message?.includes('Auth session missing') || error?.name === 'AuthSessionMissingError') {
+            // This is expected for signed-out users - break and continue with user = null
+            break;
+          }
+          console.warn("Unexpected auth error in MainApp:", error);
         }
         retries++;
       }
@@ -203,8 +246,62 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           // Not onboarded - show onboarding
           return 'onboarding';
         } else if (!user) {
-          // Onboarded but not authenticated - show auth
-          return 'auth';
+          // Onboarded but not authenticated
+          // If we're on the /chat route, allow preview access (don't show auth screen)
+          // The AIChat component will handle the free chat limit and redirect to /auth/signin if needed
+          if (isChatRoute) {
+            // Allow chat preview - show app UI, AIChat will handle limit logic
+            return 'app';
+          }
+          
+          // If onboarding was just completed (recent localStorage flag), give session time to propagate
+          // Check if onboardingCompleted flag was set very recently (within last 5 seconds)
+          const onboardingTimestamp = typeof window !== 'undefined' 
+            ? localStorage.getItem('onboardingCompletedTimestamp')
+            : null;
+          
+          if (onboardingTimestamp) {
+            const timestamp = parseInt(onboardingTimestamp, 10);
+            const timeSinceOnboarding = Date.now() - timestamp;
+            // If onboarding was completed less than 5 seconds ago, wait a bit more for session
+            if (timeSinceOnboarding < 5000) {
+              // Wait a bit and retry getting user
+              setTimeout(async () => {
+                try {
+                  const { data: { user: retryUser }, error: retryError } = await supabase.auth.getUser();
+                  if (retryUser) {
+                    setAppState('app');
+                  } else {
+                    // If error is AuthSessionMissingError, treat as no user (expected for signed-out)
+                    // Only show auth screen if NOT on chat route
+                    if (!isChatRoute && retryError && !retryError.message?.includes('Auth session missing')) {
+                      setAppState('auth');
+                    } else {
+                      // On chat route or session missing (signed-out preview) - show app
+                      setAppState('app');
+                    }
+                  }
+                } catch (error: any) {
+                  // AuthSessionMissingError is expected when signed out - show app for preview
+                  if (error?.message?.includes('Auth session missing') || error?.name === 'AuthSessionMissingError') {
+                    setAppState('app');
+                  } else {
+                    // Other errors - only show auth if NOT on chat route
+                    if (!isChatRoute) {
+                      setAppState('auth');
+                    } else {
+                      setAppState('app');
+                    }
+                  }
+                }
+              }, 1000);
+              // Return current state while waiting
+              return currentState || 'app';
+            }
+          }
+          // Onboarded but not authenticated - show auth (unless on chat route)
+          // On chat route, allow preview access
+          return isChatRoute ? 'app' : 'auth';
         } else {
           // Onboarded and authenticated - show app
           return 'app';
@@ -213,10 +310,12 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     };
 
     initializeApp();
-  }, [supabase, isMounted]);
+  }, [supabase, isMounted, isChatRoute]);
 
   // Set up auth state change listener - this is the primary way we react to sign-in
   useEffect(() => {
+    if (!isClient) return;
+    
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -268,8 +367,15 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         // User is onboarded - switch to app view immediately
         setAppState('app');
       } else if (event === 'SIGNED_OUT') {
-        // User logged out - switch to auth view
-        setAppState('auth');
+        // User logged out
+        // If on chat route, ALWAYS allow preview access (don't show auth screen)
+        // The AIChat component will handle the free chat limit and redirect to /auth/signin if needed
+        if (isChatRoute) {
+          setAppState('app');
+        } else {
+          // Not on chat route - show auth screen
+          setAppState('auth');
+        }
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
         // Session refreshed - make sure we're showing app if user is authenticated
         const userId = session.user.id;
@@ -289,7 +395,15 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, [supabase, isClient, isChatRoute]);
+
+  // Safety guard: If on chat route, never allow appState to be 'auth'
+  useEffect(() => {
+    if (isChatRoute && appState === 'auth') {
+      // Force app state for chat preview access
+      setAppState('app');
+    }
+  }, [isChatRoute, appState]);
 
   useEffect(() => {
     console.log('MainApp mounted, current screen:', currentScreen);
@@ -305,7 +419,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       } else if (currentScreen === 'search') {
         // Navigate to home and update history
         setNavHistory((prev) => {
-          const newHistory = [...prev, 'home'];
+          const newHistory: Screen[] = [...prev, 'home'];
           const limited = newHistory.slice(-10);
           if (typeof window !== 'undefined') {
             localStorage.setItem('seekeatz_nav_history', JSON.stringify(limited));
@@ -398,8 +512,16 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     );
   }
 
-  // Show auth screen
+  // Show auth screen (but NEVER on /chat route - always show app for preview)
   if (appState === 'auth') {
+    // If we're on the /chat route, force app state to allow preview access
+    // This should never happen due to logic above, but add safety check
+    if (isChatRoute) {
+      // Force app state for chat preview
+      setAppState('app');
+      // Return null briefly while state updates, then will render app
+      return null;
+    }
     return <AuthScreen onSuccess={handleAuthSuccess} />;
   }
 
@@ -550,7 +672,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   
   return (
     <div className="flex flex-col h-screen bg-background overflow-hidden">
-      <div className={`flex-1 ${currentScreen === 'home' ? 'overflow-y-auto' : 'overflow-hidden'}`}>
+      <div className="flex-1 relative h-full overflow-hidden">
         {currentScreen === 'home' && (
           <HomeScreen
             userProfile={userProfile}
@@ -575,10 +697,12 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         )}
         {currentScreen === 'chat' && (
           <AIChat
+            userId={undefined}
             userProfile={userProfile}
             onMealSelect={handleMealSelect}
             favoriteMeals={favoriteMeals}
             onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
+            onSignInRequest={() => router.push('/auth/signin')}
           />
         )}
         {currentScreen === 'favorites' && (

@@ -126,6 +126,10 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   const [showOtherDietInput, setShowOtherDietInput] = useState(false);
   const [customDietType, setCustomDietType] = useState<string>('');
   
+  // State for "Other" dietary options input
+  const [showOtherDietaryInput, setShowOtherDietaryInput] = useState(false);
+  const [customDietaryOption, setCustomDietaryOption] = useState<string>('');
+  
   // Notification preferences - local-only for now
   const [mealSuggestions, setMealSuggestions] = useState(false);
   const [dailySummary, setDailySummary] = useState(false);
@@ -162,6 +166,13 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
             const fullName = profile.full_name || user.user_metadata?.full_name || user.email || '';
             setUserFullName(fullName);
             
+            // Load theme preference from Supabase and apply it
+            if (profile.theme_preference && (profile.theme_preference === 'light' || profile.theme_preference === 'dark')) {
+              setTheme(profile.theme_preference);
+              // Also update localStorage to keep them in sync
+              localStorage.setItem('seekeatz-theme', profile.theme_preference);
+            }
+            
             // Convert flat database columns back to UserProfile object
             // Ensure numeric values are numbers or undefined (never null/NaN)
             const safeNumber = (val: any): number | undefined => {
@@ -177,6 +188,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
             const DEFAULT_PROTEIN = 150;
             const DEFAULT_CARBS = 200;
             const DEFAULT_FATS = 70;
+            const DEFAULT_SEARCH_DISTANCE = 10;
 
             const supabaseProfile: Partial<UserProfile> = {
               full_name: profile.full_name || undefined,
@@ -186,11 +198,34 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               target_fats_g: safeNumber(profile.target_fats_g) ?? safeNumber(userProfile.target_fats_g) ?? DEFAULT_FATS,
               diet_type: profile.diet_type || undefined,
               dietary_options: profile.dietary_options || [],
-              search_distance_miles: safeNumber(profile.search_distance_miles) ?? safeNumber(userProfile.search_distance_miles),
+              search_distance_miles: safeNumber(profile.search_distance_miles) ?? safeNumber(userProfile.search_distance_miles) ?? DEFAULT_SEARCH_DISTANCE,
             };
             
             // Merge with current userProfile to preserve any local state
             const updatedProfile = { ...userProfile, ...supabaseProfile } as UserProfile;
+            
+            // If search_distance_miles is not set, default to 10 and save it
+            if (!updatedProfile.search_distance_miles) {
+              updatedProfile.search_distance_miles = 10;
+              // Save the default to the database
+              const dbColumns = profileToDbColumns(updatedProfile);
+              (async () => {
+                try {
+                  await supabase
+                    .from('profiles')
+                    .update({
+                      ...dbColumns,
+                      updated_at: new Date().toISOString(),
+                    })
+                    .eq('id', user.id);
+                  // Also update localStorage
+                  localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+                } catch (error: any) {
+                  console.error('Error saving default search distance:', error);
+                }
+              })();
+            }
+            
             onUpdateProfile(updatedProfile);
             // Update userFullName if we have full_name in the updated profile
             if (updatedProfile.full_name) {
@@ -374,6 +409,39 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
     }
   };
 
+  // Handle "Other" dietary option submit
+  const handleOtherDietaryOptionSubmit = async () => {
+    if (!customDietaryOption.trim()) {
+      setShowOtherDietaryInput(false);
+      return;
+    }
+    
+    const trimmedOption = customDietaryOption.trim();
+    // Check if it's already in the list
+    const currentOptions = userProfile.dietary_options || [];
+    if (currentOptions.includes(trimmedOption)) {
+      // If already selected, deselect it
+      await handleDietaryOptionsChange(trimmedOption, false);
+    } else {
+      // Add the custom option
+      await handleDietaryOptionsChange(trimmedOption, true);
+    }
+    
+    setCustomDietaryOption('');
+    setShowOtherDietaryInput(false);
+  };
+
+  // Handle clicking "Other" button for dietary options
+  const handleOtherDietaryOptionClick = () => {
+    if (showOtherDietaryInput) {
+      // If already showing, submit the custom dietary option
+      handleOtherDietaryOptionSubmit();
+    } else {
+      // Show the input field
+      setShowOtherDietaryInput(true);
+    }
+  };
+
   // Handle search distance change - update Supabase
   // IMPORTANT: This function MUST NOT send any chat messages or trigger AI prompts.
   // Radius changes should only update state and refresh meal results - never post to chat.
@@ -528,29 +596,105 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   // Handle theme change - save to Supabase and localStorage
   const handleThemeChange = async (newTheme: 'light' | 'dark') => {
     try {
-      // Update theme immediately
+      // Update theme immediately (UI updates regardless of Supabase success)
       setTheme(newTheme);
       
       // Note: ThemeContext already saves to localStorage with 'seekeatz-theme' key
 
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-      if (user) {
-        // Save theme preference to Supabase using .update()
-        const { error } = await supabase
-          .from('profiles')
-          .update({
-            theme_preference: newTheme,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', user.id);
-
-        if (error) {
-          console.error('Error saving theme to Supabase:', error);
-        }
+      // Guard: Log and stop early if user is missing
+      if (authError || !user) {
+        console.warn('⚠️ Theme change: User not authenticated');
+        console.warn('   Auth error:', authError);
+        console.warn('   User:', user);
+        console.warn('   Theme value being saved:', newTheme);
+        console.warn('   Saving to localStorage only');
+        return; // Theme already saved to localStorage via setTheme above
       }
-    } catch (error: any) { // The Fix: Add ': any' here
-      console.error('Error saving theme:', error);
+
+      // Use upsert to handle missing row (creates if doesn't exist, updates if exists)
+      const supabaseResponse = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          theme_preference: newTheme,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'id',
+        })
+        .select();
+
+      // Check if no rows were updated/inserted
+      if (!supabaseResponse.error && (!supabaseResponse.data || supabaseResponse.data.length === 0)) {
+        console.error('⚠️ No row updated/inserted - upsert returned empty data array');
+        console.error('   This may indicate RLS is blocking the operation');
+        return;
+      }
+
+      if (supabaseResponse.error) {
+        // Extract all error properties for better debugging
+        const supabaseError = supabaseResponse.error;
+        const errorDetails = {
+          message: supabaseError.message || 'Unknown error',
+          code: supabaseError.code || 'NO_CODE',
+          details: supabaseError.details || null,
+          hint: supabaseError.hint || null,
+          // Include any other properties
+          ...Object.fromEntries(
+            Object.entries(supabaseError).filter(([key]) => 
+              !['message', 'code', 'details', 'hint'].includes(key)
+            )
+          ),
+        };
+
+        console.error('❌ Error saving theme to Supabase:');
+        console.error('   Full error object:', supabaseError);
+        console.error('   Error details:', errorDetails);
+        console.error('   Error message:', supabaseError.message);
+        console.error('   Error code:', supabaseError.code);
+        console.error('   Error details:', supabaseError.details);
+        console.error('   Error hint:', supabaseError.hint);
+
+        // Check for specific error types
+        if (supabaseError.code === '42703' || supabaseError.message?.includes('column') || supabaseError.message?.includes('does not exist')) {
+          console.error('📝 ACTION REQUIRED: Add theme_preference column to profiles table:');
+          console.error('   Column name: theme_preference');
+          console.error('   Type: text or varchar');
+          console.error('   Nullable: true (optional)');
+        } else if (supabaseError.code === '42501' || 
+                   supabaseError.message?.toLowerCase().includes('permission') || 
+                   supabaseError.message?.toLowerCase().includes('policy') ||
+                   supabaseError.message?.toLowerCase().includes('row-level security')) {
+          console.error('❌ RLS POLICY BLOCKING UPDATE');
+          console.error('📝 ACTION REQUIRED: Add/update RLS policy to allow authenticated users to update their own profile:');
+          console.error('   Policy name: Allow users to update own profile');
+          console.error('   Table: profiles');
+          console.error('   Operation: UPDATE/INSERT');
+          console.error('   Expression: auth.uid() = id');
+        } else if (supabaseError.code === 'PGRST116' || supabaseError.message?.includes('No rows')) {
+          console.warn('⚠️ Profile row does not exist, but upsert should have created it. This may indicate an RLS issue.');
+        } else {
+          console.error('❌ UNKNOWN ERROR:', errorDetails);
+        }
+        // Don't throw - theme is already saved to localStorage, so UI works fine
+      } else {
+        // Success - theme saved to Supabase (already saved to localStorage via setTheme above)
+        console.log('✅ Theme preference saved to Supabase');
+      }
+    } catch (exception: any) {
+      // Catch any unexpected exceptions (network errors, etc.)
+      // Renamed to 'exception' to avoid shadowing Supabase error variable
+      console.error('=== EXCEPTION DURING THEME SAVE ===');
+      console.error('Exception type:', typeof exception);
+      console.error('Exception:', exception);
+      if (exception instanceof Error) {
+        console.error('Error message:', exception.message);
+        console.error('Error stack:', exception.stack);
+      } else {
+        console.error('Non-Error exception:', JSON.stringify(exception, null, 2));
+      }
+      // Don't throw - theme is already saved to localStorage, so UI works fine
     }
   };
 
@@ -962,7 +1106,87 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                   </button>
                 );
               })}
+              {/* Other option */}
+              <button
+                onClick={handleOtherDietaryOptionClick}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border-2 ${
+                  showOtherDietaryInput
+                    ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600'
+                    : 'border-border bg-muted/50 hover:bg-muted text-muted-foreground'
+                }`}
+              >
+                Other
+              </button>
             </div>
+            {/* Custom dietary option input */}
+            {showOtherDietaryInput && (
+              <div className="mt-3 flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Enter custom dietary option or restriction..."
+                  value={customDietaryOption}
+                  onChange={(e) => setCustomDietaryOption(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleOtherDietaryOptionSubmit();
+                    } else if (e.key === 'Escape') {
+                      setShowOtherDietaryInput(false);
+                      setCustomDietaryOption('');
+                    }
+                  }}
+                  className="flex-1"
+                  autoFocus
+                />
+                <Button
+                  onClick={handleOtherDietaryOptionSubmit}
+                  size="sm"
+                  className="rounded-full"
+                >
+                  Add
+                </Button>
+                <Button
+                  onClick={() => {
+                    setShowOtherDietaryInput(false);
+                    setCustomDietaryOption('');
+                  }}
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-full"
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
+            {/* Show selected custom dietary options if they're not in the predefined list */}
+            {(() => {
+              const currentOptions = userProfile.dietary_options || [];
+              const customOptions = currentOptions.filter(
+                opt => !dietaryOptionLabels.includes(opt)
+              );
+              if (customOptions.length > 0) {
+                return (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {customOptions.map((option) => {
+                      const isSelected = currentOptions.includes(option);
+                      return (
+                        <button
+                          key={option}
+                          onClick={() => handleDietaryOptionsChange(option, !isSelected)}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border-2 ${
+                            isSelected
+                              ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600'
+                              : 'border-border bg-muted/50 hover:bg-muted text-muted-foreground'
+                          }`}
+                        >
+                          {option} ×
+                        </button>
+                      );
+                    })}
+                  </div>
+                );
+              }
+              return null;
+            })()}
           </div>
 
           {/* Macro Targets */}

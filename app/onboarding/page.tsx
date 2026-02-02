@@ -44,7 +44,7 @@ export default function OnboardingPage() {
         // Profile might not exist yet, or table might not exist
         // Check localStorage as fallback (only for authenticated users)
         if (typeof window !== "undefined") {
-          const localStorageFlag = localStorage.getItem(`macroMatch_hasCompletedOnboarding_${user.id}`);
+          const localStorageFlag = localStorage.getItem(`seekEatz_hasCompletedOnboarding_${user.id}`);
           const onboardingCompleted = localStorage.getItem("onboardingCompleted") === "true";
           
           if (!isDev && (localStorageFlag === "true" || onboardingCompleted)) {

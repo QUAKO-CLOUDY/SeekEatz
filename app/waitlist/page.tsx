@@ -163,7 +163,7 @@ export default function WaitlistPage() {
                 </h3>
               </div>
               <p className="text-sm sm:text-base text-gray-600 leading-relaxed break-words ml-4.5">
-                High-protein, low-carb, dairy-free, vegetarian, allergen-safe, and more.
+                High-protein, low-carb, vegetarian, vegan, pescatarian, and more.
                 <br />
                 Designed for real-world eating.
               </p>

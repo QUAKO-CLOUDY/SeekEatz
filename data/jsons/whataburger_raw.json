@@ -1,0 +1,293 @@
+{
+    "restaurant_name": "Whataburger",
+    "items": [
+      {
+        "name": "Whataburger",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 590,
+          "protein": 29,
+          "carbs": 62,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Double Meat Whataburger",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 835,
+          "protein": 47,
+          "carbs": 62,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Triple Meat Whataburger",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1075,
+          "protein": 65,
+          "carbs": 62,
+          "fat": 63
+        }
+      },
+      {
+        "name": "Jalapeño & Cheese Whataburger",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 680,
+          "protein": 34,
+          "carbs": 63,
+          "fat": 62
+        }
+      },
+      {
+        "name": "Bacon & Cheese Whataburger",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 750,
+          "protein": 39,
+          "carbs": 62,
+          "fat": 37
+        }
+      },
+      {
+        "name": "Avocado Bacon Burger",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 815,
+          "protein": 37,
+          "carbs": 51,
+          "fat": 49
+        }
+      },
+      {
+        "name": "Whataburger Jr.",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 310,
+          "protein": 14,
+          "carbs": 36,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Double Meat Whataburger Jr.",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 420,
+          "protein": 23,
+          "carbs": 36,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Mushroom Swiss Burger",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1095,
+          "protein": 55,
+          "carbs": 59,
+          "fat": 69
+        }
+      },
+      {
+        "name": "Sweet & Spicy Bacon Burger",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1095,
+          "protein": 60,
+          "carbs": 69,
+          "fat": 62
+        }
+      },
+      {
+        "name": "Whataburger Patty Melt",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 950,
+          "protein": 49,
+          "carbs": 45,
+          "fat": 61
+        }
+      },
+      {
+        "name": "Honey BBQ Chicken Strip Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 910,
+          "protein": 38,
+          "carbs": 88,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Cobb Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 540,
+          "protein": 44,
+          "carbs": 21,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Apple & Cranberry Chicken Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 385,
+          "protein": 32,
+          "carbs": 39,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Garden Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 290,
+          "protein": 32,
+          "carbs": 13,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Honey Butter Chicken Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 570,
+          "protein": 15,
+          "carbs": 50,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Biscuit Sandwich with Bacon",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 19,
+          "carbs": 34,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Biscuit and Gravy",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 9,
+          "carbs": 48,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Pancake Platter",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 945,
+          "protein": 13,
+          "carbs": 147,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Biscuit with Bacon",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 395,
+          "protein": 10,
+          "carbs": 34,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Biscuit with Sausage",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 560,
+          "protein": 17,
+          "carbs": 34,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Jalapeño Cheddar Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 330,
+          "protein": 6,
+          "carbs": 30,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 330,
+          "protein": 6,
+          "carbs": 34,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Taquito with Cheese",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 440,
+          "protein": 19,
+          "carbs": 28,
+          "fat": 36
+        }
+      }
+    ]
+  }

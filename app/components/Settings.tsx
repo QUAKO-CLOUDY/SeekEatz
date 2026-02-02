@@ -22,6 +22,7 @@ import { Switch } from './ui/switch';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { useTheme } from '../contexts/ThemeContext';
+import { useChat } from '../contexts/ChatContext';
 import { createClient } from '@/utils/supabase/client';
 import type { UserProfile } from '../types';
 
@@ -45,6 +46,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   const router = useRouter();
   const supabase = createClient();
   const { theme, setTheme, resolvedTheme } = useTheme();
+  const { clearChat } = useChat();
   
   // User data state
   const [userEmail, setUserEmail] = useState<string>('');
@@ -78,7 +80,9 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
 
     // Add optional fields if they exist
     if (profile.full_name) columns.full_name = profile.full_name;
-    if (profile.diet_type) columns.diet_type = profile.diet_type;
+    // Explicitly set diet_type to null if undefined to clear it from the database
+    // Never set a default - only save what the user explicitly chooses
+    columns.diet_type = profile.diet_type ?? null;
     if (profile.dietary_options && profile.dietary_options.length > 0) {
       columns.dietary_options = profile.dietary_options;
     } else {
@@ -196,7 +200,8 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               target_protein_g: safeNumber(profile.target_protein_g) ?? safeNumber(userProfile.target_protein_g) ?? DEFAULT_PROTEIN,
               target_carbs_g: safeNumber(profile.target_carbs_g) ?? safeNumber(userProfile.target_carbs_g) ?? DEFAULT_CARBS,
               target_fats_g: safeNumber(profile.target_fats_g) ?? safeNumber(userProfile.target_fats_g) ?? DEFAULT_FATS,
-              diet_type: profile.diet_type || undefined,
+              // Never set a default diet_type - only load what's in the database (null/undefined means no diet type selected)
+              diet_type: profile.diet_type ? profile.diet_type : undefined,
               dietary_options: profile.dietary_options || [],
               search_distance_miles: safeNumber(profile.search_distance_miles) ?? safeNumber(userProfile.search_distance_miles) ?? DEFAULT_SEARCH_DISTANCE,
             };
@@ -860,6 +865,8 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   const handleLogout = async () => {
     if (confirm('Are you sure you want to log out?')) {
       try {
+        // Clear chat state before signing out
+        clearChat();
         await supabase.auth.signOut();
         // Redirect to sign-in page after successful logout
         router.replace('/auth/signin');
@@ -881,14 +888,8 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
     { id: 'Low Carb', label: 'Low Carb' },
   ];
 
-  // Dietary options/restrictions
+  // Dietary options/restrictions (allergen filters disabled for MVP)
   const dietaryOptionLabels = [
-    'Gluten-free',
-    'Dairy-free',
-    'Nut-free / Peanut-free',
-    'Soy-free',
-    'Egg-free',
-    'Shellfish-free',
     'High Protein',
   ];
 
@@ -996,197 +997,24 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
             </div>
           </div>
 
-          {/* Diet Type Section */}
+          {/* Diet Type Section - Disabled for MVP */}
           <div className="mb-6">
             <Label className="text-sm text-muted-foreground mb-3 block">Diet Type</Label>
-            <div className="grid grid-cols-3 gap-2">
-              {dietTypeOptions.map((option) => {
-                const isSelected = userProfile.diet_type === option.id;
-                return (
-                  <button
-                    key={option.id}
-                    onClick={() => handleDietTypeChange(option.id)}
-                    className={`p-2.5 rounded-xl border-2 transition-all text-xs font-medium ${
-                      isSelected
-                        ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600'
-                        : 'border-border bg-muted/50 hover:bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                );
-              })}
-              {/* Other option */}
-              <button
-                onClick={handleOtherDietTypeClick}
-                className={`p-2.5 rounded-xl border-2 transition-all text-xs font-medium ${
-                  showOtherDietInput
-                    ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600'
-                    : 'border-border bg-muted/50 hover:bg-muted text-muted-foreground'
-                }`}
-              >
-                Other
-              </button>
+            <div className="p-4 rounded-xl border border-border bg-muted/30">
+              <p className="text-xs text-muted-foreground/70 italic">
+                Diet type selection (coming soon — verified only)
+              </p>
             </div>
-            {/* Custom diet type input */}
-            {showOtherDietInput && (
-              <div className="mt-3 flex gap-2">
-                <Input
-                  type="text"
-                  placeholder="Enter custom diet type..."
-                  value={customDietType}
-                  onChange={(e) => setCustomDietType(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleOtherDietTypeSubmit();
-                    } else if (e.key === 'Escape') {
-                      setShowOtherDietInput(false);
-                      setCustomDietType('');
-                    }
-                  }}
-                  className="flex-1"
-                  autoFocus
-                />
-                <Button
-                  onClick={handleOtherDietTypeSubmit}
-                  size="sm"
-                  className="rounded-full"
-                >
-                  Add
-                </Button>
-                <Button
-                  onClick={() => {
-                    setShowOtherDietInput(false);
-                    setCustomDietType('');
-                  }}
-                  variant="ghost"
-                  size="sm"
-                  className="rounded-full"
-                >
-                  Cancel
-                </Button>
-              </div>
-            )}
-            {/* Show selected custom diet type if it's not in the predefined list */}
-            {(() => {
-              const currentDietType = userProfile.diet_type;
-              if (currentDietType && !dietTypeOptions.some(opt => opt.id === currentDietType)) {
-                return (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <button
-                      onClick={() => handleDietTypeChange(currentDietType)}
-                      className="px-3 py-1.5 rounded-full text-xs font-medium transition-all border-2 border-cyan-500 bg-cyan-500/10 text-cyan-600"
-                    >
-                      {currentDietType} ×
-                    </button>
-                  </div>
-                );
-              }
-              return null;
-            })()}
           </div>
 
-          {/* Dietary Options & Restrictions Section */}
+          {/* Dietary Options & Restrictions Section - Disabled for MVP */}
           <div className="mb-6">
             <Label className="text-sm text-muted-foreground mb-3 block">Dietary Options & Restrictions</Label>
-            <div className="flex flex-wrap gap-2">
-              {dietaryOptionLabels.map((label) => {
-                const isSelected = (userProfile.dietary_options || []).includes(label);
-                return (
-                  <button
-                    key={label}
-                    onClick={() => handleDietaryOptionsChange(label, !isSelected)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border-2 ${
-                      isSelected
-                        ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600'
-                        : 'border-border bg-muted/50 hover:bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                );
-              })}
-              {/* Other option */}
-              <button
-                onClick={handleOtherDietaryOptionClick}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border-2 ${
-                  showOtherDietaryInput
-                    ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600'
-                    : 'border-border bg-muted/50 hover:bg-muted text-muted-foreground'
-                }`}
-              >
-                Other
-              </button>
+            <div className="p-4 rounded-xl border border-border bg-muted/30">
+              <p className="text-xs text-muted-foreground/70 italic">
+                Dietary options & restrictions (coming soon — verified only)
+              </p>
             </div>
-            {/* Custom dietary option input */}
-            {showOtherDietaryInput && (
-              <div className="mt-3 flex gap-2">
-                <Input
-                  type="text"
-                  placeholder="Enter custom dietary option or restriction..."
-                  value={customDietaryOption}
-                  onChange={(e) => setCustomDietaryOption(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      handleOtherDietaryOptionSubmit();
-                    } else if (e.key === 'Escape') {
-                      setShowOtherDietaryInput(false);
-                      setCustomDietaryOption('');
-                    }
-                  }}
-                  className="flex-1"
-                  autoFocus
-                />
-                <Button
-                  onClick={handleOtherDietaryOptionSubmit}
-                  size="sm"
-                  className="rounded-full"
-                >
-                  Add
-                </Button>
-                <Button
-                  onClick={() => {
-                    setShowOtherDietaryInput(false);
-                    setCustomDietaryOption('');
-                  }}
-                  variant="ghost"
-                  size="sm"
-                  className="rounded-full"
-                >
-                  Cancel
-                </Button>
-              </div>
-            )}
-            {/* Show selected custom dietary options if they're not in the predefined list */}
-            {(() => {
-              const currentOptions = userProfile.dietary_options || [];
-              const customOptions = currentOptions.filter(
-                opt => !dietaryOptionLabels.includes(opt)
-              );
-              if (customOptions.length > 0) {
-                return (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {customOptions.map((option) => {
-                      const isSelected = currentOptions.includes(option);
-                      return (
-                        <button
-                          key={option}
-                          onClick={() => handleDietaryOptionsChange(option, !isSelected)}
-                          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border-2 ${
-                            isSelected
-                              ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600'
-                              : 'border-border bg-muted/50 hover:bg-muted text-muted-foreground'
-                          }`}
-                        >
-                          {option} ×
-                        </button>
-                      );
-                    })}
-                  </div>
-                );
-              }
-              return null;
-            })()}
           </div>
 
           {/* Macro Targets */}
@@ -1270,21 +1098,16 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
           </div>
 
           {/* Search Distance Section */}
-          <div className="mb-6">
+          <div className="mb-6 opacity-50 pointer-events-none">
             <Label className="text-sm text-muted-foreground mb-3 block">Search Distance</Label>
             <p className="text-xs text-muted-foreground mb-3">Default radius for finding nearby restaurants</p>
             <div className="grid grid-cols-6 gap-2">
               {[1, 2, 5, 10, 15, 20].map((distance) => {
-                const isSelected = userProfile.search_distance_miles === distance;
                 return (
                   <button
                     key={distance}
-                    onClick={() => handleSearchDistanceChange(distance)}
-                    className={`p-2.5 rounded-xl border-2 transition-all text-xs font-medium ${
-                      isSelected
-                        ? 'border-cyan-500 bg-cyan-500/10 text-cyan-600'
-                        : 'border-border bg-muted/50 hover:bg-muted text-muted-foreground'
-                    }`}
+                    disabled
+                    className="p-2.5 rounded-xl border-2 transition-all text-xs font-medium cursor-not-allowed border-border bg-muted/50 text-muted-foreground"
                   >
                     {distance} mi
                   </button>

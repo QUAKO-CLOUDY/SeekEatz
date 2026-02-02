@@ -72,8 +72,8 @@ export function AuthScreen({ onSuccess }: Props) {
         }
 
         // Update localStorage
-        localStorage.setItem(`macroMatch_lastLogin_${data.user.id}`, now.toString());
-        localStorage.setItem("macroMatch_lastLogin", now.toString());
+        localStorage.setItem(`seekEatz_lastLogin_${data.user.id}`, now.toString());
+        localStorage.setItem("seekEatz_lastLogin", now.toString());
 
         // Call onSuccess callback - the auth state change listener will also trigger
         if (onSuccess) {

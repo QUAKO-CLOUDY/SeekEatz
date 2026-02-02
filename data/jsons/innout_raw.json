@@ -1,0 +1,113 @@
+{
+    "restaurant_name": "In-N-Out Burger",
+    "items": [
+      {
+        "name": "Hamburger w/Onion",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 360,
+          "protein": 16,
+          "carbs": 38,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Hamburger w/Mustard & Ketchup instead of spread",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 300,
+          "protein": 16,
+          "carbs": 37,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Hamburger Protein Style",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 210,
+          "protein": 12,
+          "carbs": 9,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Cheeseburger w/Onion",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 430,
+          "protein": 20,
+          "carbs": 40,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Cheeseburger w/Mustard & Ketchup instead of spread",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 380,
+          "protein": 20,
+          "carbs": 39,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Cheeseburger Protein Style",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 280,
+          "protein": 16,
+          "carbs": 10,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Double-Double w/Onion",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 610,
+          "protein": 34,
+          "carbs": 42,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Double-Double w/Mustard & Ketchup instead of spread",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 550,
+          "protein": 34,
+          "carbs": 41,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Double-Double Protein Style",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 460,
+          "protein": 30,
+          "carbs": 12,
+          "fat": 32
+        }
+      }
+    ]
+  }

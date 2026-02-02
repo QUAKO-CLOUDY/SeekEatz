@@ -1,0 +1,449 @@
+{
+    "restaurant_name": "Popeyes",
+    "items": [
+      {
+        "name": "Signature Chicken Wing - Classic or Spicy",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 210,
+          "protein": 13,
+          "carbs": 8,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Signature Chicken Leg - Classic or Spicy",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 160,
+          "protein": 14,
+          "carbs": 5,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Signature Chicken Thigh - Classic or Spicy",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 280,
+          "protein": 14,
+          "carbs": 7,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Signature Chicken Breast - Classic or Spicy",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 380,
+          "protein": 35,
+          "carbs": 16,
+          "fat": 20
+        }
+      },
+      {
+        "name": "3Pc Handcrafted Tenders",
+        "category": "Tenders",
+        "price_estimate": 8.69,
+        "image_url": null,
+        "macros": {
+          "calories": 390,
+          "protein": 35,
+          "carbs": 40,
+          "fat": 19
+        }
+      },
+      {
+        "name": "5Pc Handcrafted Tenders",
+        "category": "Tenders",
+        "price_estimate": 12.39,
+        "image_url": null,
+        "macros": {
+          "calories": 650,
+          "protein": 58,
+          "carbs": 68,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Tenders - Blackened (3 Pieces)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 210,
+          "protein": 37,
+          "carbs": 3,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Tenders - Blackened (5 Pieces)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 360,
+          "protein": 62,
+          "carbs": 5,
+          "fat": 10
+        }
+      },
+      {
+        "name": "6 Classic Boneless Wings",
+        "category": "Wings",
+        "price_estimate": 8.69,
+        "image_url": null,
+        "macros": {
+          "calories": 480,
+          "protein": 27,
+          "carbs": 23,
+          "fat": 34
+        }
+      },
+      {
+        "name": "6 Pc BONELESS Honey BBQ",
+        "category": "Wings",
+        "price_estimate": 8.69,
+        "image_url": null,
+        "macros": {
+          "calories": 660,
+          "protein": 27,
+          "carbs": 72,
+          "fat": 34
+        }
+      },
+      {
+        "name": "6 Pc BONELESS Signature Hot",
+        "category": "Wings",
+        "price_estimate": 8.69,
+        "image_url": null,
+        "macros": {
+          "calories": 1020,
+          "protein": 28,
+          "carbs": 46,
+          "fat": 82
+        }
+      },
+      {
+        "name": "6 Pc BONELESS Sweet 'N Spicy",
+        "category": "Wings",
+        "price_estimate": 8.69,
+        "image_url": null,
+        "macros": {
+          "calories": 720,
+          "protein": 27,
+          "carbs": 79,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Spicy Bone-In Wings (6 Pieces)",
+        "category": "Wings ",
+        "price_estimate": 8.69,
+        "image_url": null,
+        "macros": {
+          "calories": 650,
+          "protein": 38,
+          "carbs": 27,
+          "fat": 44
+        }
+      },
+      {
+        "name": "6 Classic Bone-In Wings",
+        "category": "Wings ",
+        "price_estimate": 8.69,
+        "image_url": null,
+        "macros": {
+          "calories": 860,
+          "protein": 38,
+          "carbs": 77,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Honey Lemon Pepper Bone-In Wings (6 Pieces)",
+        "category": "Wings ",
+        "price_estimate": 8.69,
+        "image_url": null,
+        "macros": {
+          "calories": 860,
+          "protein": 38,
+          "carbs": 77,
+          "fat": 44
+        }
+      },
+      {
+        "name": "6 Pc Bone-In Signature Hot",
+        "category": "Wings ",
+        "price_estimate": 8.69,
+        "image_url": null,
+        "macros": {
+          "calories": 1150,
+          "protein": 39,
+          "carbs": 48,
+          "fat": 89
+        }
+      },
+      {
+        "name": "6 Pc Bone-In Sweet 'N Spicy",
+        "category": "Wings ",
+        "price_estimate": 8.69,
+        "image_url": null,
+        "macros": {
+          "calories": 880,
+          "protein": 38,
+          "carbs": 83,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Popcorn Shrimp (1/4 lb)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 390,
+          "protein": 14,
+          "carbs": 28,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Classic Chicken Sandwich",
+        "category": "Chicken Sandwiches",
+        "price_estimate": 6.59,
+        "image_url": null,
+        "macros": {
+          "calories": 700,
+          "protein": 28,
+          "carbs": 50,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Spicy Chicken Sandwich",
+        "category": "Chicken Sandwiches",
+        "price_estimate": 6.59,
+        "image_url": null,
+        "macros": {
+          "calories": 700,
+          "protein": 28,
+          "carbs": 50,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Bayou Buffalo",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 60,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Bold BBQ",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 70,
+          "protein": 0,
+          "carbs": 16,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Blackened Ranch",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 120,
+          "protein": 0.5,
+          "carbs": 2,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Buttermilk Ranch",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 140,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Mardi Gras Mustard",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 100,
+          "protein": 1,
+          "carbs": 5,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Sweet Heat",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 70,
+          "protein": 0,
+          "carbs": 19,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Tartar",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 140,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Wild Honey Mustard",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 110,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Cocktail Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 40,
+          "protein": 0,
+          "carbs": 9,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Chicken Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 490,
+          "protein": 17,
+          "carbs": 47,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Sausage Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 540,
+          "protein": 13,
+          "carbs": 41,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Egg Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 13,
+          "carbs": 41,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Egg & Sausage Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 690,
+          "protein": 20,
+          "carbs": 43,
+          "fat": 45
+        }
+      },
+      {
+        "name": "Bacon Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 400,
+          "protein": 8,
+          "carbs": 37,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Sausage & Gravy Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 10,
+          "carbs": 42,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Tender - Classic (Kids Meal)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 130,
+          "protein": 12,
+          "carbs": 14,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Leg - Classic (Kids Meal)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 160,
+          "protein": 14,
+          "carbs": 5,
+          "fat": 9
+        }
+      }
+    ]
+  }

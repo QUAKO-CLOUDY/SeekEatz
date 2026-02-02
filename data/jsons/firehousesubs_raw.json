@@ -1,0 +1,2667 @@
+{
+    "restaurant_name": "Firehouse Subs",
+    "items": [
+      {
+        "name": "Cajun Chicken - Large",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1170,
+          "protein": 83,
+          "carbs": 91,
+          "fat": 55
+        }
+      },
+      {
+        "name": "Cajun Chicken - Medium",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 710,
+          "protein": 45,
+          "carbs": 54,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Cajun Chicken - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 23,
+          "carbs": 28,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Club on a Sub - Large",
+        "category": "Entree",
+        "price_estimate": 19.50,
+        "macros": {
+          "calories": 1350,
+          "protein": 79,
+          "carbs": 111,
+          "fat": 71
+        }
+      },
+      {
+        "name": "Club on a Sub - Medium",
+        "category": "Entree",
+        "price_estimate": 13.00,
+        "macros": {
+          "calories": 760,
+          "protein": 40,
+          "carbs": 64,
+          "fat": 40
+        }
+      },
+      {
+        "name": "Club on a Sub - Small",
+        "category": "Hot Specialty Subs",
+        "price_estimate": null,
+        "macros": {
+          "calories": 380,
+          "protein": 20,
+          "carbs": 33,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Engineer - Large",
+        "category": "Hot Specialty Subs",
+        "price_estimate": 19.5,
+        "macros": {
+          "calories": 1120,
+          "protein": 68,
+          "carbs": 102,
+          "fat": 54
+        }
+      },
+      {
+        "name": "Engineer - Medium",
+        "category": "Hot Specialty Subs",
+        "price_estimate": 13.00,
+        "macros": {
+          "calories": 700,
+          "protein": 38,
+          "carbs": 61,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Engineer - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 350,
+          "protein": 19,
+          "carbs": 31,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Firehouse Captain's Club - Large",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1200,
+          "protein": 79,
+          "carbs": 109,
+          "fat": 52
+        }
+      },
+      {
+        "name": "Firehouse Captain's Club - Medium",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 730,
+          "protein": 43,
+          "carbs": 68,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Firehouse Captain's Club - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 22,
+          "carbs": 34,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Hero - Large",
+        "category": "Hot Specialty Subs",
+        "price_estimate": 20.80,
+        "macros": {
+          "calories": 1180,
+          "protein": 68,
+          "carbs": 109,
+          "fat": 56
+        }
+      },
+      {
+        "name": "Hero - Medium",
+        "category": "Hot Specialty Subs",
+        "price_estimate": 14.30,
+        "macros": {
+          "calories": 790,
+          "protein": 48,
+          "carbs": 65,
+          "fat": 37
+        }
+      },
+      {
+        "name": "Hero - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 400,
+          "protein": 24,
+          "carbs": 33,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Hook & Ladder - Large",
+        "category": "Hot Specialty Subs",
+        "price_estimate": 19.5,
+        "macros": {
+          "calories": 1120,
+          "protein": 62,
+          "carbs": 104,
+          "fat": 55
+        }
+      },
+      {
+        "name": "Hook & Ladder - Medium",
+        "category": "Hot Specialty Subs",
+        "price_estimate": 12.35,
+        "macros": {
+          "calories": 710,
+          "protein": 36,
+          "carbs": 64,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Hook & Ladder - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 18,
+          "carbs": 33,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Italian - Large",
+        "category": "Hot Specialty Subs",
+        "price_estimate": 18.85,
+        "macros": {
+          "calories": 1420,
+          "protein": 69,
+          "carbs": 119,
+          "fat": 79
+        }
+      },
+      {
+        "name": "Italian - Medium",
+        "category": "Hot Specialty Subs",
+        "price_estimate": 12.35,
+        "macros": {
+          "calories": 930,
+          "protein": 39,
+          "carbs": 66,
+          "fat": 57
+        }
+      },
+      {
+        "name": "Italian - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 470,
+          "protein": 20,
+          "carbs": 34,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Jamaican Jerk Turkey - Large",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1140,
+          "protein": 62,
+          "carbs": 111,
+          "fat": 55
+        }
+      },
+      {
+        "name": "Jamaican Jerk Turkey - Medium",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 720,
+          "protein": 34,
+          "carbs": 68,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Jamaican Jerk Turkey - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 17,
+          "carbs": 34,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Meatball - Large",
+        "category": "Hot Specialty Subs",
+        "price_estimate": 18.85,
+        "macros": {
+          "calories": 1310,
+          "protein": 58,
+          "carbs": 97,
+          "fat": 80
+        }
+      },
+      {
+        "name": "Meatball - Medium",
+        "category": "Hot Specialty Subs",
+        "price_estimate": 12.35,
+        "macros": {
+          "calories": 830,
+          "protein": 37,
+          "carbs": 59,
+          "fat": 51
+        }
+      },
+      {
+        "name": "Meatball - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 460,
+          "protein": 21,
+          "carbs": 30,
+          "fat": 29
+        }
+      },
+      {
+        "name": "New York Steamer - Large",
+        "category": "Hot Specialty Subs",
+        "price_estimate": 20.8,
+        "macros": {
+          "calories": 1190,
+          "protein": 74,
+          "carbs": 83,
+          "fat": 64
+        }
+      },
+      {
+        "name": "New York Steamer - Medium",
+        "category": "Hot Specialty Subs",
+        "price_estimate": 14.30,
+        "macros": {
+          "calories": 730,
+          "protein": 40,
+          "carbs": 49,
+          "fat": 40
+        }
+      },
+      {
+        "name": "New York Steamer - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 20,
+          "carbs": 25,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Pepperoni Pizza Meatball Sub - Large",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1920,
+          "protein": 79,
+          "carbs": 100,
+          "fat": 137
+        }
+      },
+      {
+        "name": "Pepperoni Pizza Meatball Sub - Medium",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1250,
+          "protein": 51,
+          "carbs": 68,
+          "fat": 88
+        }
+      },
+      {
+        "name": "Pepperoni Pizza Meatball Sub - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 680,
+          "protein": 28,
+          "carbs": 32,
+          "fat": 49
+        }
+      },
+      {
+        "name": "Prime Rib Steak - Large",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1340,
+          "protein": 80,
+          "carbs": 103,
+          "fat": 71
+        }
+      },
+      {
+        "name": "Prime Rib Steak - Medium",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 800,
+          "protein": 44,
+          "carbs": 65,
+          "fat": 43
+        }
+      },
+      {
+        "name": "Prime Rib Steak - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 400,
+          "protein": 22,
+          "carbs": 33,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Smokehouse Beef & Cheddar Brisket - Large",
+        "category": "Entree",
+        "price_estimate": 22.1,
+        "macros": {
+          "calories": 1500,
+          "protein": 55,
+          "carbs": 97,
+          "fat": 102
+        }
+      },
+      {
+        "name": "Smokehouse Beef & Cheddar Brisket - Medium",
+        "category": "Entree",
+        "price_estimate": 15.60,
+        "macros": {
+          "calories": 890,
+          "protein": 31,
+          "carbs": 59,
+          "fat": 59
+        }
+      },
+      {
+        "name": "Smokehouse Beef & Cheddar Brisket - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 450,
+          "protein": 15,
+          "carbs": 30,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Steak & Cheese - Large",
+        "category": "Entree",
+        "price_estimate": 20.8,
+        "macros": {
+          "calories": 1400,
+          "protein": 69,
+          "carbs": 95,
+          "fat": 83
+        }
+      },
+      {
+        "name": "Steak & Cheese - Medium",
+        "category": "Entree",
+        "price_estimate": 14.30,
+        "macros": {
+          "calories": 840,
+          "protein": 38,
+          "carbs": 56,
+          "fat": 51
+        }
+      },
+      {
+        "name": "Steak & Cheese - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 420,
+          "protein": 19,
+          "carbs": 28,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Sweet & Spicy Meatball - Large",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1380,
+          "protein": 59,
+          "carbs": 118,
+          "fat": 79
+        }
+      },
+      {
+        "name": "Sweet & Spicy Meatball - Medium",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 880,
+          "protein": 37,
+          "carbs": 76,
+          "fat": 50
+        }
+      },
+      {
+        "name": "Sweet & Spicy Meatball - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 480,
+          "protein": 21,
+          "carbs": 39,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Turkey Bacon Ranch - Large",
+        "category": "Entree",
+        "price_estimate": 18.85,
+        "macros": {
+          "calories": 1440,
+          "protein": 80,
+          "carbs": 103,
+          "fat": 83
+        }
+      },
+      {
+        "name": "Turkey Bacon Ranch - Medium",
+        "category": "Entree",
+        "price_estimate": 12.35,
+        "macros": {
+          "calories": 830,
+          "protein": 40,
+          "carbs": 61,
+          "fat": 48
+        }
+      },
+      {
+        "name": "Turkey Bacon Ranch - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 420,
+          "protein": 20,
+          "carbs": 32,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Chicken Breast - Large",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1130,
+          "protein": 71,
+          "carbs": 94,
+          "fat": 55
+        }
+      },
+      {
+        "name": "Chicken Breast - Medium",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 740,
+          "protein": 46,
+          "carbs": 57,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Chicken Breast - Small",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 370,
+          "protein": 23,
+          "carbs": 29,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Corned Beef - Large",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1140,
+          "protein": 68,
+          "carbs": 91,
+          "fat": 58
+        }
+      },
+      {
+        "name": "Corned Beef - Medium",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 740,
+          "protein": 45,
+          "carbs": 55,
+          "fat": 39
+        }
+      },
+      {
+        "name": "Corned Beef - Small",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 380,
+          "protein": 23,
+          "carbs": 28,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Ham - Large",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1130,
+          "protein": 56,
+          "carbs": 115,
+          "fat": 55
+        }
+      },
+      {
+        "name": "Ham - Medium",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 740,
+          "protein": 37,
+          "carbs": 71,
+          "fat": 37
+        }
+      },
+      {
+        "name": "Ham - Small",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 370,
+          "protein": 18,
+          "carbs": 36,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Pastrami - Large",
+        "category": "Protein",
+        "price_estimate": 20.8,
+        "macros": {
+          "calories": 1110,
+          "protein": 59,
+          "carbs": 94,
+          "fat": 57
+        }
+      },
+      {
+        "name": "Pastrami - Medium",
+        "category": "Protein",
+        "price_estimate": 14.30,
+        "macros": {
+          "calories": 720,
+          "protein": 39,
+          "carbs": 57,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Pastrami - Small",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 370,
+          "protein": 20,
+          "carbs": 29,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Roast Beef - Large",
+        "category": "Protein",
+        "price_estimate": 20.8,
+        "macros": {
+          "calories": 1140,
+          "protein": 62,
+          "carbs": 91,
+          "fat": 55
+        }
+      },
+      {
+        "name": "Roast Beef - Medium",
+        "category": "Protein",
+        "price_estimate": 14.30,
+        "macros": {
+          "calories": 740,
+          "protein": 41,
+          "carbs": 55,
+          "fat": 37
+        }
+      },
+      {
+        "name": "Roast Beef - Small",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 380,
+          "protein": 21,
+          "carbs": 28,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Turkey - Large",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1040,
+          "protein": 55,
+          "carbs": 97,
+          "fat": 53
+        }
+      },
+      {
+        "name": "Turkey - Medium",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 680,
+          "protein": 36,
+          "carbs": 59,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Turkey - Small",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 340,
+          "protein": 18,
+          "carbs": 30,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Veggie - Large",
+        "category": "Build Your Own Sub",
+        "price_estimate": 18.85,
+        "macros": {
+          "calories": 1070,
+          "protein": 35,
+          "carbs": 99,
+          "fat": 63
+        }
+      },
+      {
+        "name": "Veggie - Medium",
+        "category": "Build Your Own Sub",
+        "price_estimate": 12.35,
+        "macros": {
+          "calories": 730,
+          "protein": 25,
+          "carbs": 60,
+          "fat": 45
+        }
+      },
+      {
+        "name": "Veggie - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 370,
+          "protein": 12,
+          "carbs": 31,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Tuna - Large",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1550,
+          "protein": 71,
+          "carbs": 104,
+          "fat": 97
+        }
+      },
+      {
+        "name": "Tuna - Medium",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 910,
+          "protein": 39,
+          "carbs": 62,
+          "fat": 57
+        }
+      },
+      {
+        "name": "Tuna - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 460,
+          "protein": 20,
+          "carbs": 31,
+          "fat": 28
+        }
+      },
+      {
+        "name": " HooChoppedk & Ladder Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 30,
+          "carbs": 21,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Firehouse Chopped Salad, No Meat",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 10,
+          "carbs": 11,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Firehouse Chopped Salad with Grilled Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 380,
+          "protein": 57,
+          "carbs": 14,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Firehouse Chopped Salad with Ham",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 290,
+          "protein": 30,
+          "carbs": 27,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Firehouse Chopped Salad with Turkey",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 220,
+          "protein": 29,
+          "carbs": 15,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Firehouse Chopped Side Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 60,
+          "protein": 5,
+          "carbs": 5,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Italian Chopped Salad with Grilled Chicken Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 410,
+          "protein": 39,
+          "carbs": 14,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Banana Peppers",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Black Olives Add-On",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 25,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Jalapeno Peppers",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Balsamic Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 0,
+          "carbs": 7,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Honey Mustard Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 2,
+          "carbs": 15,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Italian Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 0,
+          "carbs": 8,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Light Italian Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 90,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Oil & Vinegar",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Peppercorn Ranch",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 2,
+          "carbs": 4,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Broccoli & Cheese Soup, 10 oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 340,
+          "protein": 11,
+          "carbs": 12,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Chicken & Dumpling Soup, 6 oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 5,
+          "carbs": 10,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Chicken & Dumpling Soup, 10 oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 8,
+          "carbs": 17,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Chicken Noodle Soup, 10 oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 8,
+          "carbs": 18,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Chili, 6 oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 180,
+          "protein": 11,
+          "carbs": 13,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Chili, 10 oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 18,
+          "carbs": 22,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Loaded Potato Soup, 6 oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 5,
+          "carbs": 15,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Loaded Potato Soup, 10 oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 380,
+          "protein": 9,
+          "carbs": 23,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Tomato Bisque, 10 oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 220,
+          "protein": 6,
+          "carbs": 19,
+          "fat": 14
+        }
+      },
+      {
+        "name": "5-Cheese Mac & Cheese",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 380,
+          "protein": 17,
+          "carbs": 33,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Brownie",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 430,
+          "protein": 4,
+          "carbs": 61,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Celebration Sugar Cookie",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 320,
+          "protein": 4,
+          "carbs": 42,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Chocolate Chip Cookie",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 310,
+          "protein": 4,
+          "carbs": 44,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Chocolate Mint Cookie",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 310,
+          "protein": 4,
+          "carbs": 43,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Coleslaw",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 1,
+          "carbs": 9,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Crunchy Cheetos",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 310,
+          "protein": 3,
+          "carbs": 26,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Doritos Cool Ranch",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 260,
+          "protein": 3,
+          "carbs": 31,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Doritos Nacho Cheese",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 3,
+          "carbs": 28,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Double Chocolate Chip Cookie",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 3,
+          "carbs": 34,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Fries",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 430,
+          "protein": 2,
+          "carbs": 40,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Fries - Large",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 670,
+          "protein": 3,
+          "carbs": 63,
+          "fat": 48
+        }
+      },
+      {
+        "name": "Fritos",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 320,
+          "protein": 3,
+          "carbs": 32,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Funyuns",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 2,
+          "carbs": 20,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Garlic Bread - Large",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 670,
+          "protein": 13,
+          "carbs": 72,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Garlic Bread - Medium",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 440,
+          "protein": 8,
+          "carbs": 48,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Garlic Bread - Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 220,
+          "protein": 4,
+          "carbs": 24,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Lay's Kettle Cooked 40% Less Fat Jalapeno Cheddar",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 3,
+          "carbs": 26,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Lay's Kettle Cooked 40% Less Fat Original",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 3,
+          "carbs": 27,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Lay's Original",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 3,
+          "carbs": 23,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Lay's Sour Cream and Onion",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 3,
+          "carbs": 23,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Lemon Cookie",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 330,
+          "protein": 4,
+          "carbs": 43,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Macaroni and Cheese",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 490,
+          "protein": 20,
+          "carbs": 39,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Miss Vickie's Hand Picked Jalapeno",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 3,
+          "carbs": 22,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Miss Vickie's Sea Salt and Vinegar",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 2,
+          "carbs": 23,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Miss Vickie's Simply Sea Salt Original",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 3,
+          "carbs": 22,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Miss Vickie's Smokehouse BBQ",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 3,
+          "carbs": 23,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Oatmeal Raisin Cookie",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 290,
+          "protein": 4,
+          "carbs": 45,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Oven Baked Lay's BBQ",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 2,
+          "carbs": 24,
+          "fat": 3.5
+        }
+      },
+      {
+        "name": "Oven Baked Lay's Regular",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 2,
+          "carbs": 26,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Oven Baked Ruffles Cheddar and Sour Cream",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 2,
+          "carbs": 24,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Pickle Spear",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Rice Krispies Treat",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 45,
+          "protein": 0,
+          "carbs": 9,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Sunchips Harvest Cheddar",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 3,
+          "carbs": 29,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Kid's Grilled Cheese",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 440,
+          "protein": 12,
+          "carbs": 32,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Kid's Ham Sub",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 18,
+          "carbs": 30,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Kid's Meatball",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 16,
+          "carbs": 27,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Kid's Roast Beef",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 20,
+          "carbs": 22,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Kid's Turkey Sub",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 220,
+          "protein": 17,
+          "carbs": 24,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Catering Salad Chopped",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 8,
+          "carbs": 8,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Catering Salad Chopped Deluxe Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 16,
+          "carbs": 9,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Catering Salad Chopped Deluxe Ham",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 16,
+          "carbs": 14,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Catering Salad Chopped Deluxe Tuna Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 230,
+          "protein": 13,
+          "carbs": 11,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Catering Salad Chopped Deluxe Turkey",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 16,
+          "carbs": 10,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Catering Salad Platter",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 2,
+          "carbs": 8,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Catering Sub Deluxe Platter",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 450,
+          "protein": 34,
+          "carbs": 50,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Catering Sub Platter",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 430,
+          "protein": 34,
+          "carbs": 51,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Boxed Lunch - Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 520,
+          "protein": 37,
+          "carbs": 56,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Boxed Lunch - Corned Beef",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 550,
+          "protein": 35,
+          "carbs": 54,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Boxed Lunch - Ham",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 560,
+          "protein": 37,
+          "carbs": 70,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Boxed Lunch - Pastrami",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 510,
+          "protein": 33,
+          "carbs": 56,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Boxed Lunch - Roast Beef",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 530,
+          "protein": 39,
+          "carbs": 54,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Boxed Lunch - Turkey",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 490,
+          "protein": 37,
+          "carbs": 58,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Boxed Lunch - Veggie",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 520,
+          "protein": 25,
+          "carbs": 58,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Large Wheat Sub Roll",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 380,
+          "protein": 13,
+          "carbs": 74,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Large White Sub Roll",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 380,
+          "protein": 13,
+          "carbs": 73,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Cheddar Cheese",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 11,
+          "carbs": 2,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Feta Cheese",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 8,
+          "carbs": 0,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Monterey Jack Cheese",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 11,
+          "carbs": 0,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Pepper Jack Cheese",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 9,
+          "carbs": 0,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Provolone Cheese",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 11,
+          "carbs": 2,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Swiss Cheese",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 12,
+          "carbs": 1,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Chicken Breast",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 260,
+          "protein": 46,
+          "carbs": 10,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Meatballs",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 720,
+          "protein": 32,
+          "carbs": 13,
+          "fat": 61
+        }
+      },
+      {
+        "name": "Oven Roasted Chicken",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 320,
+          "protein": 59,
+          "carbs": 5,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Pepper Bacon",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 7,
+          "carbs": 1,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Pepperoni",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 8,
+          "carbs": 1,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Salami",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 7,
+          "carbs": 1,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Sauteed USDA Choice Steak",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 530,
+          "protein": 45,
+          "carbs": 8,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Seared Seasoned Sliced Beef Rib",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 450,
+          "protein": 53,
+          "carbs": 5,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Smoked Honey Ham",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 30,
+          "carbs": 24,
+          "fat": 4.5
+        }
+      },
+      {
+        "name": "Smoked Turkey Breast Roast",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 29,
+          "carbs": 6,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Tuna Salad",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 660,
+          "protein": 45,
+          "carbs": 13,
+          "fat": 46
+        }
+      },
+      {
+        "name": "USDA Choice Beef Brisket",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 430,
+          "protein": 24,
+          "carbs": 0,
+          "fat": 37
+        }
+      },
+      {
+        "name": "USDA Choice Corned Beef Brisket",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 42,
+          "carbs": 0,
+          "fat": 8
+        }
+      },
+      {
+        "name": "USDA Choice Pastrami",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 33,
+          "carbs": 3,
+          "fat": 6
+        }
+      },
+      {
+        "name": "USDA Choice Roast Beef",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 36,
+          "carbs": 0,
+          "fat": 4.5
+        }
+      },
+      {
+        "name": "Au Jus Bell Peppers",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Au Jus Mushrooms",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Avocado",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 2,
+          "carbs": 9,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Black Olives",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Caramelized Onions",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 4,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Cherry Pepper Rings",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Chopped Green Peppers",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Chopped Pickle Spear",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Coleslaw",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 1,
+          "carbs": 12,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Cucumber",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Iceberg Lettuce",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Onion",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 1,
+          "carbs": 4,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Pickle Spear",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sliced Pepperoncini",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Tomato",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 1,
+          "carbs": 4,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Balsamic Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Cajun Mayo",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 290,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Cajun Seasoning",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Captain Sorensen's Datil Pepper Hot Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 40,
+          "protein": 0,
+          "carbs": 11,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Garlic Blend",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 310,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Garlic Mayonnaise",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 280,
+          "protein": 0,
+          "carbs": 4,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Honey Mustard",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 1,
+          "carbs": 6,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Italian Salad Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 45,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Italian Seasoning",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Jerk Mustard",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 0,
+          "carbs": 18,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Light Mayonnaise",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Marinara Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 40,
+          "protein": 2,
+          "carbs": 9,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Mayonnaise",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Peppercorn Ranch Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 1,
+          "carbs": 3,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Spicy Mustard",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sriracha Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 0,
+          "carbs": 6,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sweet Baby Ray's BBQ Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 0,
+          "carbs": 20,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sweet Mustard",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 0,
+          "carbs": 12,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Medium Wheat Sub Roll",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 4,
+          "carbs": 23,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Medium White Sub Roll",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 4,
+          "carbs": 22,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Chicken Breast",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 23,
+          "carbs": 5,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Meatballs",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 450,
+          "protein": 20,
+          "carbs": 8,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Oven Roasted Chicken",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 30,
+          "carbs": 2,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Pepper Bacon",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 4,
+          "carbs": 0,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Pepperoni",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 5,
+          "carbs": 0,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Salami",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 7,
+          "carbs": 1,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Sauteed USDA Choice Steak",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 260,
+          "protein": 22,
+          "carbs": 4,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Seared Seasoned Sliced Beef Rib",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 230,
+          "protein": 27,
+          "carbs": 3,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Smoked Honey Ham",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 20,
+          "carbs": 16,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Smoked Turkey Breast Roast",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 19,
+          "carbs": 4,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Tuna Salad",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 330,
+          "protein": 23,
+          "carbs": 7,
+          "fat": 23
+        }
+      },
+      {
+        "name": "USDA Choice Beef Brisket",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 280,
+          "protein": 16,
+          "carbs": 0,
+          "fat": 25
+        }
+      },
+      {
+        "name": "USDA Choice Corned Beef Brisket",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 28,
+          "carbs": 0,
+          "fat": 5
+        }
+      },
+      {
+        "name": "USDA Choice Pastrami",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 22,
+          "carbs": 2,
+          "fat": 4
+        }
+      },
+      {
+        "name": "USDA Choice Roast Beef",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 24,
+          "carbs": 0,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Balsamic Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Cajun Mayo",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Cajun Seasoning",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Captain Sorensen's Datil Pepper Hot Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 4,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Garlic Blend",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Garlic Mayonnaise",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 90,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Honey Mustard",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 40,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 3.5
+        }
+      },
+      {
+        "name": "Italian Salad Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Italian Seasoning",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Jerk Mustard",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 25,
+          "protein": 0,
+          "carbs": 6,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Light Mayonnaise",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 3.5
+        }
+      },
+      {
+        "name": "Marinara Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 1,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Mayonnaise",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Peppercorn Ranch Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 45,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 4.5
+        }
+      },
+      {
+        "name": "Spicy Mustard",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sriracha Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sweet Baby Ray's BBQ Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 25,
+          "protein": 0,
+          "carbs": 7,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sweet Mustard",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 0,
+          "carbs": 12,
+          "fat": 0
+        }
+      }
+    ]
+  }

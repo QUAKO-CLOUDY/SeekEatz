@@ -1,0 +1,362 @@
+{
+    "restaurant_name": "Panda Express",
+    "items": [
+      {
+        "name": "Chow Mein",
+        "category": "Side",
+        "price_estimate": 5.55,
+        "image_url": null,
+        "macros": {
+          "calories": 600,
+          "protein": 15,
+          "carbs": 94,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Chow Fun",
+        "category": "Side",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 410,
+          "protein": 9,
+          "carbs": 73,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Fried Rice",
+        "category": "A La Carte",
+        "price_estimate": 5.55,
+        "image_url": null,
+        "macros": {
+          "calories": 620,
+          "protein": 13,
+          "carbs": 101,
+          "fat": 19
+        }
+      },
+      
+      {
+        "name": "White Steamed Rice",
+        "category": "A La Carte",
+        "price_estimate": 5.55,
+        "image_url": null,
+        "macros": {
+          "calories": 520,
+          "protein": 10,
+          "carbs": 118,
+          "fat": 0
+        }
+      },
+      
+     
+      {
+        "name": "Eggplant Tofu",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 340,
+          "protein": 7,
+          "carbs": 23,
+          "fat": 24
+        }
+      },
+      
+     
+      {
+        "name": "Black Pepper Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 280,
+          "protein": 13,
+          "carbs": 15,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Kung Pao Chicken",
+        "category": "A La Carte",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories":320,
+          "protein": 17,
+          "carbs": 15,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Grilled Teriyaki Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 275,
+          "protein": 33,
+          "carbs": 14,
+          "fat": 10
+        }
+      },
+      
+      {
+        "name": "Teriyaki Chicken",
+        "category": "A La Carte",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 275,
+          "protein": 33,
+          "carbs": 14,
+          "fat": 10
+        }
+      },
+     
+      {
+        "name": "Mushroom Chicken",
+        "category": "A La Carte",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 220,
+          "protein": 13,
+          "carbs": 10,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Orange Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 26,
+          "carbs": 53,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Potato Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 190,
+          "protein": 8,
+          "carbs": 18,
+          "fat": 10
+        }
+      },
+      {
+        "name": " Bean ChickStringen Breast",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 210,
+          "protein": 12,
+          "carbs": 13,
+          "fat": 12
+        }
+      },
+      {
+        "name": "SweetFire Chicken Breast",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 360,
+          "protein": 15,
+          "carbs": 40,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Sweet & Sour Chicken Breast",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 300,
+          "protein": 10,
+          "carbs": 40,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Beijing Beef",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 480,
+          "protein": 14,
+          "carbs": 46,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Broccoli Beef",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 150,
+          "protein": 9,
+          "carbs": 13,
+          "fat": 7
+        }
+      },
+     
+    
+      {
+        "name": "Honey Walnut Shrimp",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 430,
+          "protein": 13,
+          "carbs": 32,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Golden Treasure Shrimp",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 360,
+          "protein": 14,
+          "carbs": 35,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Steamed Ginger Fish",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 200,
+          "protein": 15,
+          "carbs": 8,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Hot & Sour Soup (Cup)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 120,
+          "protein": 7,
+          "carbs": 14,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Hot & Sour Soup (Bowl)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 170,
+          "protein": 10,
+          "carbs": 20,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Teriyaki Sauce",
+        "category": "Condiments",
+        "price_estimate": 0.00,
+        "image_url": null,
+        "macros": {
+          "calories": 70,
+          "protein": 0,
+          "carbs": 16,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sweet & Sour Sauce",
+        "category": "Condiments",
+        "price_estimate": 0.00,
+        "image_url": null,
+        "macros": {
+          "calories": 70,
+          "protein": 0,
+          "carbs": 21,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Chili Sauce",
+        "category": "Condiments",
+        "price_estimate": 0.00,
+        "image_url": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Soy Sauce",
+        "category": "Condiments",
+        "price_estimate": 0.00,
+        "image_url": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Potsticker Sauce",
+        "category": "Condiments",
+        "price_estimate": 0.00,
+        "image_url": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Hot Mustard",
+        "category": "Condiments",
+        "price_estimate": 0.00,
+        "image_url": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Plum Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 0
+        }
+      }
+    ]
+  }

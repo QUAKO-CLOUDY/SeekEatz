@@ -19,8 +19,7 @@ export default function RootPage() {
         // Check localStorage flags for completed onboarding (only for authenticated users)
         const onboardingCompleted = 
           localStorage.getItem('onboardingCompleted') === 'true' ||
-          localStorage.getItem('hasCompletedOnboarding') === 'true' ||
-          localStorage.getItem('macroMatch_completedOnboarding') === 'true';
+          localStorage.getItem('hasCompletedOnboarding') === 'true';
 
         if (onboardingCompleted) {
           // Authenticated user with completed onboarding - redirect to chat

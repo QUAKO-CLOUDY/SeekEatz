@@ -73,7 +73,7 @@ export async function copyToClipboard(text: string, showUserMessage: boolean = t
   }
 
   // Check if navigator exists and has clipboard API (with proper optional chaining)
-  if (typeof navigator !== 'undefined' && navigator?.clipboard?.writeText) {
+  if (typeof navigator !== 'undefined' && !!navigator.clipboard) {
     try {
       await navigator.clipboard.writeText(text);
       if (showUserMessage) {
@@ -152,12 +152,12 @@ export function isClipboardAvailable(): boolean {
   }
 
   // Check for modern clipboard API (with proper optional chaining)
-  if (typeof navigator !== 'undefined' && navigator?.clipboard?.writeText) {
+  if (typeof navigator !== 'undefined' && !!navigator.clipboard) {
     return true;
   }
 
   // Check for fallback method
-  if (typeof document !== 'undefined' && document.execCommand) {
+  if (typeof document !== 'undefined' && typeof document.execCommand === 'function') {
     return true;
   }
 

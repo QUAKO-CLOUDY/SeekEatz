@@ -16,6 +16,7 @@ import { AuthScreen } from './AuthScreen';
 import type { UserProfile, Meal } from '../types';
 import type { LoggedMeal } from './LogScreen';
 import { useSessionActivity } from '../hooks/useSessionActivity';
+import { useNutrition } from '../contexts/NutritionContext'; // Import to sync loggedMeals with context
 
 type View = 'main' | 'meal-detail';
 
@@ -80,6 +81,13 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     target_fats_g: 70,
     search_distance_miles: 10,
   });
+
+  // Track current user ID
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
+  
+  // Get updateLoggedMeals from NutritionContext to sync state
+  // NutritionProvider is now at root layout level, so this should always work
+  const { updateLoggedMeals } = useNutrition();
 
   // Session timeout handler - redirects to login on timeout
   const handleSessionTimeout = () => {
@@ -165,6 +173,44 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     } catch (e) {
       console.error('Failed to parse userProfile:', e);
     }
+
+    // Load logged meals and reset today's meals if it's a new day
+    try {
+      const saved = localStorage.getItem('seekeatz_logged_meals');
+      const todayStr = new Date().toISOString().split('T')[0];
+      const lastResetDate = localStorage.getItem('seekeatz_last_reset_date');
+      
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          // If it's a new day, filter out all meals from today's date (reset today's log)
+          // Keep all historical meals (dates before today)
+          if (lastResetDate && lastResetDate !== todayStr) {
+            // It's a new day - remove all meals from today's date to reset today's log
+            // Keep all meals from dates before today (historical data)
+            const filteredMeals = parsed.filter((log: LoggedMeal) => {
+              // Keep meals from dates before today (historical)
+              return log.date < todayStr;
+            });
+            setLoggedMeals(filteredMeals);
+            // Update last reset date to today
+            localStorage.setItem('seekeatz_last_reset_date', todayStr);
+          } else {
+            // Same day or first time - keep all meals including today's
+            setLoggedMeals(parsed);
+            // Set last reset date if not set
+            if (!lastResetDate) {
+              localStorage.setItem('seekeatz_last_reset_date', todayStr);
+            }
+          }
+        }
+      } else {
+        // No saved meals - set last reset date to today
+        localStorage.setItem('seekeatz_last_reset_date', todayStr);
+      }
+    } catch (e) {
+      console.error('Failed to parse loggedMeals:', e);
+    }
   }, [isMounted]);
 
   // Initialize app state: Check localStorage for 'onboarded' and Supabase session
@@ -175,8 +221,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       // Check localStorage for onboarding completion
       const isOnboarded = typeof window !== 'undefined' 
         ? localStorage.getItem('onboarded') === 'true' ||
-          localStorage.getItem('hasCompletedOnboarding') === 'true' ||
-          localStorage.getItem('macroMatch_completedOnboarding') === 'true'
+          localStorage.getItem('hasCompletedOnboarding') === 'true'
         : false;
 
       // Check Supabase session - retry if not found initially (session might still be propagating)
@@ -212,6 +257,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       
       // If we have a user but no onboarding flag, check the database
       if (user && !isOnboarded) {
+        setCurrentUserId(user.id); // Track current user ID
         try {
           const { data: profileData } = await supabase
             .from("profiles")
@@ -222,7 +268,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           if (profileData?.has_completed_onboarding) {
             // Set localStorage flags
             if (typeof window !== 'undefined') {
-              localStorage.setItem(`macroMatch_hasCompletedOnboarding_${user.id}`, "true");
+              localStorage.setItem(`seekEatz_hasCompletedOnboarding_${user.id}`, "true");
               localStorage.setItem("hasCompletedOnboarding", "true");
             }
             // User is onboarded - show app
@@ -232,6 +278,13 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         } catch (error) {
           console.warn("Could not check onboarding status:", error);
         }
+      }
+      
+      // Track user ID if user exists
+      if (user) {
+        setCurrentUserId(user.id);
+      } else {
+        setCurrentUserId(undefined);
       }
 
       // Only set state if we haven't already been set by auth state change listener
@@ -324,13 +377,13 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       if (event === 'SIGNED_IN' && session?.user) {
         // User logged in - check onboarding status and switch to app view
         const userId = session.user.id;
+        setCurrentUserId(userId); // Track current user ID
         
         // Check if user has completed onboarding
         const isOnboarded = typeof window !== 'undefined' 
           ? localStorage.getItem('onboarded') === 'true' ||
             localStorage.getItem('hasCompletedOnboarding') === 'true' ||
-            localStorage.getItem('macroMatch_completedOnboarding') === 'true' ||
-            localStorage.getItem(`macroMatch_hasCompletedOnboarding_${userId}`) === 'true'
+            localStorage.getItem(`seekEatz_hasCompletedOnboarding_${userId}`) === 'true'
           : false;
         
         // If not onboarded in localStorage, check database
@@ -345,7 +398,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
             if (profileData?.has_completed_onboarding) {
               // Set localStorage flags
               if (typeof window !== 'undefined') {
-                localStorage.setItem(`macroMatch_hasCompletedOnboarding_${userId}`, "true");
+                localStorage.setItem(`seekEatz_hasCompletedOnboarding_${userId}`, "true");
                 localStorage.setItem("hasCompletedOnboarding", "true");
               }
               // User is onboarded - show app immediately
@@ -368,6 +421,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         setAppState('app');
       } else if (event === 'SIGNED_OUT') {
         // User logged out
+        setCurrentUserId(undefined); // Clear user ID
         // If on chat route, ALWAYS allow preview access (don't show auth screen)
         // The AIChat component will handle the free chat limit and redirect to /auth/signin if needed
         if (isChatRoute) {
@@ -382,8 +436,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         const isOnboarded = typeof window !== 'undefined' 
           ? localStorage.getItem('onboarded') === 'true' ||
             localStorage.getItem('hasCompletedOnboarding') === 'true' ||
-            localStorage.getItem('macroMatch_completedOnboarding') === 'true' ||
-            localStorage.getItem(`macroMatch_hasCompletedOnboarding_${userId}`) === 'true'
+            localStorage.getItem(`seekEatz_hasCompletedOnboarding_${userId}`) === 'true'
           : false;
         
         if (isOnboarded) {
@@ -464,6 +517,18 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       console.error('Failed to save userProfile:', e);
     }
   }, [userProfile, isMounted]);
+
+  // Save logged meals to localStorage and sync with NutritionContext when they change (only after mounted)
+  useEffect(() => {
+    if (!isMounted) return;
+    try {
+      localStorage.setItem('seekeatz_logged_meals', JSON.stringify(loggedMeals));
+      // Sync with NutritionContext
+      updateLoggedMeals(loggedMeals);
+    } catch (e) {
+      console.error('Failed to save loggedMeals:', e);
+    }
+  }, [loggedMeals, isMounted, updateLoggedMeals]);
 
   // ========== ALL HOOKS END HERE - NOW HANDLERS AND CONDITIONAL RENDERS ==========
 
@@ -620,11 +685,26 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
   const handleLogMeal = (meal: Meal) => {
     updateActivity(); // Update activity on meal logging
+    
+    // Debug log
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todayMeals = loggedMeals.filter(log => log.date === todayStr);
+    const todaysConsumed = todayMeals.reduce((sum, log) => sum + log.meal.calories, 0);
+    const targetCalories = userProfile?.target_calories || 0;
+    const remainingIfEatMeal = targetCalories - (todaysConsumed + meal.calories);
+    
+    console.log('[MainApp] Logging meal:', {
+      targetCalories,
+      todaysConsumedCalories: todaysConsumed,
+      mealCalories: meal.calories,
+      remainingIfEatMeal,
+    });
+    
     const loggedMeal: LoggedMeal = {
       id: `log-${Date.now()}-${Math.random()}`,
       meal,
       timestamp: new Date().toISOString(),
-      date: new Date().toISOString().split('T')[0],
+      date: todayStr,
     };
     setLoggedMeals((prev) => [...prev, loggedMeal]);
     setCurrentView('main');
@@ -649,7 +729,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           isFavorite={favoriteMeals.includes(selectedMeal.id)}
           onToggleFavorite={() => handleToggleFavorite(selectedMeal.id, selectedMeal)}
           onBack={handleBack}
-          onLogMeal={() => handleLogMeal(selectedMeal)}
+          onLogMeal={handleLogMeal}
         />
       </div>
     );
@@ -670,63 +750,75 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // Main app with navigation
   console.log('MainApp rendering, screen:', currentScreen, 'view:', currentView);
   
+  // NutritionProvider is now at root layout level, so we don't need to wrap here
+  // However, we can still pass props to update it if needed via context methods
   return (
     <div className="flex flex-col h-screen bg-background overflow-hidden">
-      <div className="flex-1 relative h-full overflow-hidden">
-        {currentScreen === 'home' && (
-          <HomeScreen
-            userProfile={userProfile}
-            onMealSelect={handleMealSelect}
-            favoriteMeals={favoriteMeals}
-            onSearch={() => handleNavigate('search')}
-            onNavigateToChat={(message) => {
-              if (message && typeof window !== 'undefined') {
-                localStorage.setItem('seekeatz_pending_chat_message', message);
-              }
-              handleNavigate('chat');
-            }}
-            onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
-          />
-        )}
-        {currentScreen === 'log' && (
-          <LogScreen
-            userProfile={userProfile}
-            loggedMeals={loggedMeals}
-            onRemoveMeal={handleRemoveMeal}
-          />
-        )}
-        {currentScreen === 'chat' && (
-          <AIChat
-            userId={undefined}
-            userProfile={userProfile}
-            onMealSelect={handleMealSelect}
-            favoriteMeals={favoriteMeals}
-            onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
-            onSignInRequest={() => router.push('/auth/signin')}
-          />
-        )}
-        {currentScreen === 'favorites' && (
-          <Favorites
-            favoriteMeals={favoriteMeals}
-            favoriteMealsData={favoriteMealsData}
-            loggedMeals={loggedMeals}
-            onMealSelect={handleMealSelect}
-            onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
-          />
-        )}
-        {currentScreen === 'settings' && (
-          <Settings
-            userProfile={userProfile}
-            onUpdateProfile={handleUpdateProfile}
-          />
-        )}
+        <div className="flex-1 relative h-full overflow-hidden">
+          {currentScreen === 'home' && (
+            <HomeScreen
+              userProfile={userProfile}
+              onMealSelect={handleMealSelect}
+              favoriteMeals={favoriteMeals}
+              loggedMeals={loggedMeals}
+              onSearch={() => handleNavigate('search')}
+              onNavigateToChat={(message) => {
+                if (message && typeof window !== 'undefined') {
+                  localStorage.setItem('seekeatz_pending_chat_message', message);
+                }
+                handleNavigate('chat');
+              }}
+              onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
+            />
+          )}
+          {currentView === 'meal-detail' && selectedMeal && (
+            <MealDetail
+              meal={selectedMeal}
+              isFavorite={favoriteMeals.includes(selectedMeal.id)}
+              onToggleFavorite={() => handleToggleFavorite(selectedMeal.id, selectedMeal)}
+              onBack={() => setCurrentView('main')}
+              onLogMeal={handleLogMeal}
+            />
+          )}
+          {currentScreen === 'log' && (
+            <LogScreen
+              userProfile={userProfile}
+              loggedMeals={loggedMeals}
+              onRemoveMeal={handleRemoveMeal}
+            />
+          )}
+          {currentScreen === 'chat' && (
+            <AIChat
+              userId={currentUserId}
+              userProfile={userProfile}
+              onMealSelect={handleMealSelect}
+              favoriteMeals={favoriteMeals}
+              onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
+              onSignInRequest={() => router.push('/auth/signin')}
+            />
+          )}
+          {currentScreen === 'favorites' && (
+            <Favorites
+              favoriteMeals={favoriteMeals}
+              favoriteMealsData={favoriteMealsData}
+              loggedMeals={loggedMeals}
+              onMealSelect={handleMealSelect}
+              onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
+            />
+          )}
+          {currentScreen === 'settings' && (
+            <Settings
+              userProfile={userProfile}
+              onUpdateProfile={handleUpdateProfile}
+            />
+          )}
+        </div>
+        
+        <Navigation
+          currentScreen={currentScreen}
+          onNavigate={handleNavigate}
+        />
       </div>
-      
-      <Navigation
-        currentScreen={currentScreen}
-        onNavigate={handleNavigate}
-      />
-    </div>
   );
 }
 

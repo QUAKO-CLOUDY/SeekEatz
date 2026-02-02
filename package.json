@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "bulk-import": "npx tsx scripts/bulk-import.ts"
+    "ingest-data": "npx tsx scripts/ingest-data.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.86",

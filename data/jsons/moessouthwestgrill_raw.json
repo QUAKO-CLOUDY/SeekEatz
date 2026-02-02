@@ -1,0 +1,500 @@
+{
+    "restaurant_name": "Moe's Southwest Grill",
+    "items": [
+      {
+        "name": "Adobo Chicken",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 148,
+          "protein": 19,
+          "carbs": 2,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Chicken",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 23,
+          "carbs": 0,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Steak",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 104,
+          "protein": 15,
+          "carbs": 3,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Pork Carnitas",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 131,
+          "protein": 17,
+          "carbs": 1,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Ground Beef",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 124,
+          "protein": 11,
+          "carbs": 5,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Fish",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 106,
+          "protein": 20,
+          "carbs": 1,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Tofu",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 108,
+          "protein": 10,
+          "carbs": 2,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Black Beans",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 129,
+          "protein": 8,
+          "carbs": 22,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Pinto Beans",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 8,
+          "carbs": 21,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Seasoned Rice",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 3,
+          "carbs": 33,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Cilantro Lime Rice",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 169,
+          "protein": 4,
+          "carbs": 33,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Quinoa",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 84,
+          "protein": 3,
+          "carbs": 14,
+          "fat": 2.8
+        }
+      },
+      {
+        "name": "Shredded Cheese",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 121,
+          "protein": 8,
+          "carbs": 2,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Sour Cream",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 68,
+          "protein": 2,
+          "carbs": 2,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Chipotle Ranch",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 71,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Vinaigrette",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 77,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Corn Pico",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 39,
+          "protein": 1,
+          "carbs": 7,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Pico de Gallo",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 16,
+          "protein": 1,
+          "carbs": 4,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Guacamole",
+        "category": "Sides & Desserts",
+        "price_estimate": 3.99,
+        "macros": {
+          "calories": 53,
+          "protein": 1,
+          "carbs": 4,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Bacon Pieces",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 99,
+          "protein": 10,
+          "carbs": 1,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Moe's Famous Queso",
+        "category": "Sides & Desserts",
+        "price_estimate": 3.99,
+        "macros": {
+          "calories": 136,
+          "protein": 6,
+          "carbs": 6,
+          "fat": 11
+        }
+      },
+      {
+        "name": "12\" Tortilla (Burritos)",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 310,
+          "protein": 8,
+          "carbs": 51,
+          "fat": 8
+        }
+      },
+      {
+        "name": "12\" Whole Grain Tortilla (Burritos)",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 9,
+          "carbs": 48,
+          "fat": 8
+        }
+      },
+      {
+        "name": "10\" Tortilla (Quesadillas)",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 200,
+          "protein": 5,
+          "carbs": 32,
+          "fat": 5
+        }
+      },
+      {
+        "name": "5.5\" Flour Tortilla",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 89,
+          "protein": 2,
+          "carbs": 14,
+          "fat": 2
+        }
+      },
+      {
+        "name": "5.5\" Corn Tortilla",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 53,
+          "protein": 1,
+          "carbs": 11,
+          "fat": 1
+        }
+      },
+      {
+        "name": "5.5\" Crispy Corn Tortilla",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 1,
+          "carbs": 8,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Chips (Nachos)",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 693,
+          "protein": 9,
+          "carbs": 86,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Salad",
+        "category": "Base",
+        "price_estimate": 14.03,
+        "macros": {
+          "calories": 455,
+          "protein": 7,
+          "carbs": 34,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Chopped Romaine",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 17,
+          "protein": 2,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "8\" Flour Tortilla",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 3,
+          "carbs": 20,
+          "fat": 4
+        }
+      },
+      {
+        "name": "6\" Corn Tortilla",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 65,
+          "protein": 1,
+          "carbs": 8,
+          "fat": 4
+        }
+      },
+      {
+        "name": "6\" Flour Tortilla",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 90,
+          "protein": 2,
+          "carbs": 15,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Cup of Guacamole",
+        "category": "Entree",
+        "price_estimate": 6.79,
+        "macros": {
+          "calories": 238,
+          "protein": 5,
+          "carbs": 18,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Bowl of Guacamole",
+        "category": "Entree",
+        "price_estimate": 9.49,
+        "macros": {
+          "calories": 308,
+          "protein": 7,
+          "carbs": 24,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Side of Queso",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 136,
+          "protein": 6,
+          "carbs": 6,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Baja Soup",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 280,
+          "protein": 13,
+          "carbs": 17,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Cup of Spicy Queso",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 626,
+          "protein": 34,
+          "carbs": 29,
+          "fat": 51
+        }
+      },
+      {
+        "name": "Side of Quinoa",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 1,
+          "carbs": 5,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Hot Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 6,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 1
+        }
+      },
+      {
+        "name": "El Guapo",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 9,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Kaiser",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 1,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Tamatillo",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 8,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Space B'Green Us",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 27,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Tres Jalapeño",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 0
+        }
+      }
+    ]
+  }

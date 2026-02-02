@@ -1,0 +1,629 @@
+{
+    "restaurant_name": "Chick-fil-A",
+    "items": [
+      {
+        "name": "Spicy Chicken Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 450,
+          "protein": 19,
+          "carbs": 44,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Chick-fil-A Chicken Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 460,
+          "protein": 19,
+          "carbs": 45,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Chick-fil-A Chick-n-Minis",
+        "category": "Breakfast",
+        "price_estimate": 7.45,
+        "image_url": null,
+        "macros": {
+          "calories": 360,
+          "protein": 20,
+          "carbs": 41,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Egg White Grill",
+        "category": "Breakfast",
+        "price_estimate": 7.95,
+        "image_url": null,
+        "macros": {
+          "calories": 300,
+          "protein": 27,
+          "carbs": 29,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Hash Brown Scramble Burrito",
+        "category": "Breakfast",
+        "price_estimate": 7.95,
+        "image_url": null,
+        "macros": {
+          "calories": 700,
+          "protein": 34,
+          "carbs": 51,
+          "fat": 40
+        }
+      },
+      {
+        "name": "Hash Brown Scramble Bowl",
+        "category": "Breakfast",
+        "price_estimate": 7.95,
+        "image_url": null,
+        "macros": {
+          "calories": 470,
+          "protein": 29,
+          "carbs": 19,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Chicken, Egg & Cheese Biscuit",
+        "category": "Breakfast",
+        "price_estimate": 7.59,
+        "image_url": null,
+        "macros": {
+          "calories": 550,
+          "protein": 27,
+          "carbs": 48,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Bacon, Egg & Cheese Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 420,
+          "protein": 16,
+          "carbs": 38,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Sausage, Egg & Cheese Biscuit",
+        "category": "Breakfast",
+        "price_estimate": 5.19,
+        "image_url": null,
+        "macros": {
+          "calories": 620,
+          "protein": 22,
+          "carbs": 38,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Chicken, Egg & Cheese Muffin",
+        "category": "Breakfast",
+        "price_estimate": 6.19,
+        "image_url": null,
+        "macros": {
+          "calories": 410,
+          "protein": 27,
+          "carbs": 36,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Bacon, Egg & Cheese Muffin",
+        "category": "Breakfast",
+        "price_estimate": 5.45,
+        "image_url": null,
+        "macros": {
+          "calories": 300,
+          "protein": 16,
+          "carbs": 28,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Sausage, Egg & Cheese Muffin",
+        "category": "Breakfast",
+        "price_estimate": 5.19,
+        "image_url": null,
+        "macros": {
+          "calories": 490,
+          "protein": 23,
+          "carbs": 29,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Spicy Deluxe Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 540,
+          "protein": 34,
+          "carbs": 47,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Chick-fil-A Chick-n-Strips",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 310,
+          "protein": 29,
+          "carbs": 16,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Chick-fil-A Nuggets",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 250,
+          "protein": 27,
+          "carbs": 11,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Chick-fil-A Chicken Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 420,
+          "protein": 29,
+          "carbs": 41,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Grilled Nuggets",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 130,
+          "protein": 25,
+          "carbs": 1,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Chick-fil-A Deluxe Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 490,
+          "protein": 32,
+          "carbs": 43,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Spicy Chicken Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 450,
+          "protein": 28,
+          "carbs": 45,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Grilled Chicken Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 390,
+          "protein": 28,
+          "carbs": 45,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Chick-fil-A Grilled Chicken Club Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 520,
+          "protein": 37,
+          "carbs": 45,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Chick-fil-A Cool Wrap",
+        "category": "Entrées",
+        "price_estimate": 10.69,
+        "image_url": null,
+        "macros": {
+          "calories": 350,
+          "protein": 42,
+          "carbs": 29,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Pretzel Cheddar Club Sandwich w/ Chick-fil-A Filet",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 695,
+          "protein": 39,
+          "carbs": 55,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Cobb Salad",
+        "category": "Entree",
+        "price_estimate": 12.39,
+        "image_url": null,
+        "macros": {
+          "calories": 690,
+          "protein": 36,
+          "carbs": 22,
+          "fat": 50
+        }
+      },
+      {
+        "name": "Spicy Southwest Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 680,
+          "protein": 33,
+          "carbs": 27,
+          "fat": 49
+        }
+      },
+      {
+        "name": "Market Salad",
+        "category": "Salads",
+        "price_estimate": 12.69,
+        "image_url": null,
+        "macros": {
+          "calories": 550,
+          "protein": 28,
+          "carbs": 42,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Chilled Grilled Chicken Sub Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 500,
+          "protein": 36,
+          "carbs": 52,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Spicy Chilled Grilled Chicken Sub Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 500,
+          "protein": 34,
+          "carbs": 53,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Barbeque Sauce",
+        "category": "8oz Sauces",
+        "price_estimate": 3.89,
+        "image_url": null,
+        "macros": {
+          "calories": 45,
+          "protein": 0,
+          "carbs": 11,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Chick-fil-A Sauce",
+        "category": "8oz Sauces",
+        "price_estimate": 3.89,
+        "image_url": null,
+        "macros": {
+          "calories": 140,
+          "protein": 0,
+          "carbs": 6,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Garden Herb Ranch Sauce",
+        "category": "8oz Sauces",
+        "price_estimate": 3.89,
+        "image_url": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Honey Mustard Sauce",
+        "category": "8oz Sauces",
+        "price_estimate": 3.89,
+        "image_url": null,
+        "macros": {
+          "calories": 50,
+          "protein": 0,
+          "carbs": 11,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Polynesian Sauce",
+        "category": "8oz Sauces",
+        "price_estimate": 3.89,
+        "image_url": null,
+        "macros": {
+          "calories": 110,
+          "protein": 0,
+          "carbs": 14,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Sweet & Spicy Sriracha Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 45,
+          "protein": 0,
+          "carbs": 11,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Zesty Buffalo Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 25,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Honey Roasted BBQ Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 60,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Avocado Lime Ranch Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 310,
+          "protein": 1,
+          "carbs": 3,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Creamy Salsa Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 290,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Fat-Free Honey Mustard Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 90,
+          "protein": 0,
+          "carbs": 22,
+          "fat": 0
+        }
+      },
+      {
+        "name": "8oz Garden Herb Ranch Sauce",
+        "category": "8oz Sauces",
+        "price_estimate": 3.89,
+        "image_url": null,
+        "macros": {
+          "calories": 280,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Light Balsamic Vinaigrette Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 80,
+          "protein": 0,
+          "carbs": 10,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Light Italian Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 25,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Zesty Apple Cider Vinaigrette Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 230,
+          "protein": 0,
+          "carbs": 16,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Gluten Free Bun",
+        "category": "Entrées",
+        "price_estimate": 2.19,
+        "image_url": null,
+        "macros": {
+          "calories": 180,
+          "protein": 3,
+          "carbs": 37,
+          "fat": 3.5
+        }
+      },
+      {
+        "name": "Grilled Breakfast Filet",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 60,
+          "protein": 13,
+          "carbs": 0,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Chick-fil-A Breakfast Filet",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 160,
+          "protein": 15,
+          "carbs": 8,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Spicy Breakfast Filet",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 150,
+          "protein": 15,
+          "carbs": 7,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Grilled Filet",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 110,
+          "protein": 21,
+          "carbs": 1,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Spicy Filet",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 280,
+          "protein": 23,
+          "carbs": 16,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Chick-fil-A Filet",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 250,
+          "protein": 24,
+          "carbs": 12,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Bacon",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 50,
+          "protein": 4,
+          "carbs": 0,
+          "fat": 3.5
+        }
+      },
+      {
+        "name": "Sausage",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 240,
+          "protein": 11,
+          "carbs": 1,
+          "fat": 22
+        }
+      }
+    ]
+  }

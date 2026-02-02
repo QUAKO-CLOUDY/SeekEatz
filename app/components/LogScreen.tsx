@@ -17,6 +17,7 @@ import { Badge } from "./ui/badge";
 import { CircularProgress } from "./CircularProgress";
 import { useTheme } from "../contexts/ThemeContext";
 import type { UserProfile, Meal } from "../types";
+import { useCalorieTracking } from "../hooks/useCalorieTracking";
 
 export type LoggedMeal = {
   id: string;
@@ -81,6 +82,13 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal }: Props) {
     (log) => log.date === selectedDate
   );
 
+  // Use shared hook for calorie tracking
+  const { targetCalories, todaysConsumedCalories, todaysRemainingCalories } = useCalorieTracking(
+    userProfile,
+    loggedMeals,
+    selectedDate
+  );
+
   const totals = selectedMeals.reduce(
     (acc, log) => ({
       calories: acc.calories + log.meal.calories,
@@ -99,8 +107,9 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal }: Props) {
     return typeof value === 'number' ? value : Number(value) || defaultValue;
   };
 
+  // Use remaining from hook for calories, compute others from totals
   const remaining = {
-    calories: safeGet(userProfile.target_calories, 0) - totals.calories,
+    calories: todaysRemainingCalories,
     protein: safeGet(userProfile.target_protein_g, 0) - totals.protein,
     carbs: safeGet(userProfile.target_carbs_g, 0) - totals.carbs,
     fats: safeGet(userProfile.target_fats_g, 0) - totals.fats,
@@ -250,8 +259,8 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal }: Props) {
             {/* Calories - Outermost Ring - Pink/Purple (matching macro box: pink-400/rose-500) */}
             <CircularProgress
               percentage={
-                safeGet(userProfile.target_calories, 1) > 0
-                  ? (totals.calories / safeGet(userProfile.target_calories, 1)) * 100
+                targetCalories > 0
+                  ? (totals.calories / targetCalories) * 100
                   : 0
               }
               colorStart="#f472b6"
@@ -315,7 +324,7 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal }: Props) {
             <div className="bg-gradient-to-br from-pink-500/20 to-rose-500/20 backdrop-blur-sm rounded-2xl p-3 border border-pink-500/30 text-center [&>p]:!text-black dark:[&>p]:!text-white">
             <Flame className="w-4 h-4 text-pink-400 mx-auto mb-1" />
             <p className="font-semibold" style={{ color: resolvedTheme === 'dark' ? '#ffffff' : '#000000' }}>{totals.calories}</p>
-            <p className="text-pink-400/70 dark:text-pink-300/70 text-sm">/{safeGet(userProfile.target_calories, 0)}</p>
+            <p className="text-pink-400/70 dark:text-pink-300/70 text-sm">/{targetCalories}</p>
           </div>
           <div className="bg-gradient-to-br from-cyan-400/20 to-blue-500/20 backdrop-blur-sm rounded-2xl p-3 border border-cyan-400/30 text-center [&>p]:!text-black dark:[&>p]:!text-white">
             <Zap className="w-4 h-4 text-cyan-400 mx-auto mb-1" />

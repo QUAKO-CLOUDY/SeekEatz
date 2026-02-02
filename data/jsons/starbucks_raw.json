@@ -1,0 +1,269 @@
+{
+    "restaurant_name": "Starbucks",
+    "items": [
+      {
+        "name": "Porridge Made With Water",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 130,
+          "protein": 4,
+          "carbs": 23,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Porridge Made With Semi-Skimmed Milk",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 217,
+          "protein": 10,
+          "carbs": 32,
+          "fat": 5.3
+        }
+      },
+      {
+        "name": "Granola Pot Strawberry",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 215,
+          "protein": 7.6,
+          "carbs": 22,
+          "fat": 9.4
+        }
+      },
+      {
+        "name": "Granola Pot Blueberry",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 239,
+          "protein": 7.6,
+          "carbs": 28,
+          "fat": 9.4
+        }
+      },
+      {
+        "name": "Ham And Cheese Croissant",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 307,
+          "protein": 14.2,
+          "carbs": 25.1,
+          "fat": 16.4
+        }
+      },
+      {
+        "name": "Cheese & Mushroom Croissant",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 324,
+          "protein": 13,
+          "carbs": 26,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Breakfast Panini",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 508,
+          "protein": 22,
+          "carbs": 57,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Chicken & Stuffing Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 537,
+          "protein": 27.6,
+          "carbs": 57,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Lemon Chicken Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 382,
+          "protein": 12,
+          "carbs": 29,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Italian Style Chicken Flatbread",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 407,
+          "protein": 22,
+          "carbs": 51,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Double Egg & Cress Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 442,
+          "protein": 19,
+          "carbs": 43,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Ham & Cheese Toastie",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 442,
+          "protein": 22,
+          "carbs": 57,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Breakfast Toastie",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 484,
+          "protein": 20,
+          "carbs": 52,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Chicken Pesto Toastie",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 522,
+          "protein": 25,
+          "carbs": 54,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Ham & Cheese Panini",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 469,
+          "protein": 27,
+          "carbs": 55,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Sausage Bap",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 453,
+          "protein": 17,
+          "carbs": 45,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Tuna Rustique",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 543,
+          "protein": 30,
+          "carbs": 54,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Mediterranean Focaccia",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 411,
+          "protein": 13,
+          "carbs": 46,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Chorizo, Mozzarella & Red Pepper Romana",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 417,
+          "protein": 21,
+          "carbs": 51,
+          "fat": 13.5
+        }
+      },
+      {
+        "name": "Chicken & Bacon Caesar Wrap",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 540,
+          "protein": 29,
+          "carbs": 46,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Curried Chickpea Wrap",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 488,
+          "protein": 14,
+          "carbs": 62,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Bacon & Eggs Benedict Pretzel Roll",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 421,
+          "protein": 20,
+          "carbs": 43,
+          "fat": 18
+        }
+      }
+    ]
+  }

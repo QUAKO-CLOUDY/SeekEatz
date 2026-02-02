@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Star, Heart, Flame, Zap, TrendingUp, AlertCircle, UtensilsCrossed } from "lucide-react";
-import type { Meal } from "../types"; // Use shared types
+import type { Meal, UserProfile } from "../types"; // Use shared types
+import type { LoggedMeal } from "./LogScreen";
 import { getLogo } from "@/utils/logos";
 
 type Props = {
@@ -12,20 +13,92 @@ type Props = {
   showMatchScore?: boolean;
   onToggleFavorite?: () => void;
   compact?: boolean; // For chat view - smaller, more compact layout
+  userProfile?: UserProfile; // Optional - for displaying remaining calories
+  loggedMeals?: LoggedMeal[]; // Optional - for calculating remaining calories
 };
 
-export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact = false }: Props) {
+export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact = false, userProfile, loggedMeals = [] }: Props) {
+  const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  
+  // Determine if log data is ready (userProfile must exist)
+  const logReady = userProfile !== undefined && userProfile !== null;
+  
+  // Calculate stable dependency key for today's meals (outside useMemo dependency array)
+  const todaysMealsKey = useMemo(() => {
+    if (!logReady) return '0-0';
+    const todaysMeals = loggedMeals.filter(m => m.date === todayStr);
+    const count = todaysMeals.length;
+    const total = todaysMeals.reduce((sum, m) => {
+      const cals = typeof m.meal.calories === 'number' ? m.meal.calories : parseFloat(m.meal.calories) || 0;
+      return sum + (isNaN(cals) ? 0 : Math.round(cals));
+    }, 0);
+    return `${count}-${total}`;
+  }, [loggedMeals, todayStr, logReady]);
+  
+  // Compute caloriesRemainingFromLog once (memoized) - base remaining from log data
+  const caloriesRemainingFromLog = useMemo(() => {
+    if (!logReady || !userProfile) return null;
+    
+    const targetCalories = typeof userProfile.target_calories === 'number' 
+      ? userProfile.target_calories 
+      : parseFloat(userProfile.target_calories as any) || 0;
+    
+    // Calculate today's consumed calories from log
+    const todaysMeals = loggedMeals.filter(loggedMeal => loggedMeal.date === todayStr);
+    const todaysConsumedCalories = todaysMeals.reduce((sum, loggedMeal) => {
+      const calories = typeof loggedMeal.meal.calories === 'number' 
+        ? loggedMeal.meal.calories 
+        : (typeof loggedMeal.meal.calories === 'string' ? parseFloat(loggedMeal.meal.calories) : 0);
+      return sum + (isNaN(calories) ? 0 : Math.round(calories));
+    }, 0);
+    
+    // Base remaining: target - consumed
+    return Math.round(targetCalories - todaysConsumedCalories);
+  }, [logReady, userProfile?.target_calories, todaysMealsKey, todayStr]);
+  
+  // Per meal card: remainingIfEat = caloriesRemainingFromLog - meal.calories
+  const remainingCalories = useMemo(() => {
+    if (!logReady || caloriesRemainingFromLog === null) return null;
+    
+    // Get meal calories (ensure numeric)
+    const mealCalories = Number(meal.calories ?? 0);
+    const safeMealCalories = isNaN(mealCalories) ? 0 : Math.round(mealCalories);
+    
+    // Remaining if this meal is eaten
+    const remainingIfEat = caloriesRemainingFromLog - safeMealCalories;
+    
+    // Dev log
+    if (process.env.NODE_ENV === 'development' && logReady) {
+      console.log('[calories]', {
+        caloriesRemainingFromLog,
+        selectedMealCalories: safeMealCalories,
+        displayRemaining: remainingIfEat,
+        mealName: meal.name
+      });
+    }
+    
+    return remainingIfEat;
+  }, [logReady, caloriesRemainingFromLog, meal.calories, meal.name]);
+
+  // Removed useEffect - using derived values only (no state updates based on dependencies)
   // Extract restaurant name (handle both restaurant_name from Supabase and restaurant from Meal type)
   const restaurantName = (meal as any).restaurant_name || meal.restaurant || "Unknown";
   
-  // State to track if logo failed to load
-  const [logoError, setLogoError] = useState(false);
+  // State to track logo source (with fallback to default.png)
+  const [logoSrc, setLogoSrc] = useState(getLogo(restaurantName));
+  const [logoVersion, setLogoVersion] = useState(Date.now().toString());
   
-  // Reset logo error when meal changes
+  // Reset logo src when meal changes and update version to bust cache
   useEffect(() => {
-    setLogoError(false);
+    const newLogoSrc = getLogo(restaurantName);
+    setLogoSrc(newLogoSrc);
+    // Update version to force browser to reload (especially useful in development)
+    setLogoVersion(Date.now().toString());
   }, [meal.id, restaurantName]);
-  
+
+  // Add cache-busting query parameter to force browser to reload updated logos
+  const logoSrcWithCacheBust = `${logoSrc}?v=${logoVersion}`;
+
   // Check for variable availability
   const hasVariableAvailability = meal.dietary_tags?.some(
     (tag: string) => tag === 'Location Varies' || tag === 'Seasonal'
@@ -36,9 +109,6 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
   const isGrocery = category === 'grocery' || 
                   category === 'Grocery' || 
                   category === 'Hot Bar';
-
-  // Add this line to see what's happening in your browser console
-  console.log(`Restaurant: "${restaurantName}" turns into Path: "${getLogo(restaurantName)}"`);
 
   // Compact mode: horizontal layout matching reference image (340px × 75px)
   if (compact) {
@@ -54,16 +124,21 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
         <div className="flex items-center h-full px-2.5 gap-2">
           {/* Left Logo - Restaurant Logo */}
           <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-700">
-            {!logoError ? (
-              <img 
-                src={getLogo(restaurantName)} 
-                alt={restaurantName}
-                className="w-full h-full object-contain p-1"
-                onError={() => setLogoError(true)}
-              />
-            ) : (
-              <UtensilsCrossed className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-            )}
+            <img 
+              src={logoSrcWithCacheBust} 
+              alt={restaurantName}
+              className="w-full h-full object-contain p-1"
+              onError={(e) => {
+                // Fallback to default.png if logo fails to load
+                if (logoSrc !== '/logos/default.png') {
+                  e.currentTarget.onerror = null; // Prevent infinite loop
+                  setLogoSrc('/logos/default.png');
+                } else {
+                  // If default.png also fails, hide the image
+                  e.currentTarget.style.display = 'none';
+                }
+              }}
+            />
           </div>
 
           {/* Middle - Meal Name and Restaurant */}
@@ -86,6 +161,17 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
               <p className="text-pink-500 dark:text-pink-400 text-[8px] leading-tight">
                 cal
               </p>
+              {!logReady ? (
+                <p className="text-[7px] leading-tight text-muted-foreground">—</p>
+              ) : remainingCalories !== null ? (
+                <p className={`text-[7px] leading-tight ${
+                  remainingCalories >= 0 
+                    ? 'text-green-600 dark:text-green-400' 
+                    : 'text-red-600 dark:text-red-400'
+                }`}>
+                  {remainingCalories >= 0 ? '+' : ''}{remainingCalories}
+                </p>
+              ) : null}
             </div>
 
             {/* Protein */}
@@ -169,27 +255,30 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
       >
         {/* Restaurant Logo - Fills entire image area */}
         <div className="w-full h-full flex items-center justify-center">
-          {!logoError ? (
-            <img 
-              src={getLogo(restaurantName)} 
-              alt={restaurantName}
-              className="w-full h-full object-contain object-center"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                objectPosition: 'center',
-                display: 'block',
-                maxWidth: '100%',
-                maxHeight: '100%'
-              }}
-              onError={() => setLogoError(true)}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <UtensilsCrossed className="w-12 h-12 text-gray-400 dark:text-gray-500" />
-            </div>
-          )}
+          <img 
+            src={logoSrcWithCacheBust} 
+            alt={restaurantName}
+            className="w-full h-full object-contain object-center"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              objectPosition: 'center',
+              display: 'block',
+              maxWidth: '100%',
+              maxHeight: '100%'
+            }}
+            onError={(e) => {
+              // Fallback to default.png if logo fails to load
+              if (logoSrc !== '/logos/default.png') {
+                e.currentTarget.onerror = null; // Prevent infinite loop
+                setLogoSrc('/logos/default.png');
+              } else {
+                // If default.png also fails, hide the image
+                e.currentTarget.style.display = 'none';
+              }
+            }}
+          />
         </div>
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background dark:from-gray-950 via-background/20 dark:via-gray-950/20 to-transparent pointer-events-none" />
@@ -269,6 +358,17 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             </div>
             <p className="text-foreground font-bold">{meal.calories}</p>
             <p className="text-pink-600 dark:text-pink-300/70 text-[10px]">cal</p>
+            {!logReady ? (
+              <p className="text-[9px] mt-0.5 text-muted-foreground">—</p>
+            ) : remainingCalories !== null ? (
+              <p className={`text-[9px] mt-0.5 ${
+                remainingCalories >= 0 
+                  ? 'text-green-600 dark:text-green-400' 
+                  : 'text-red-600 dark:text-red-400'
+              }`}>
+                {remainingCalories >= 0 ? '+' : ''}{remainingCalories} left
+              </p>
+            ) : null}
           </div>
           <div className="bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-md p-2 text-center border border-cyan-400/30">
             <div className="flex items-center justify-center mb-1">

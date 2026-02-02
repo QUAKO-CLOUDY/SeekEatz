@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "./contexts/ThemeContext"; // <--- Import this
+import { NutritionProvider } from "./contexts/NutritionContext"; // <--- Import NutritionProvider
+import { ChatProvider } from "./contexts/ChatContext"; // <--- Import ChatProvider
 import { DevHelpers } from "./components/DevHelpers"; // Development helpers
 import { AppContainer } from "./components/AppContainer";
 
@@ -42,11 +44,15 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} bg-slate-100`}>
-        <ThemeProvider> {/* <--- Wrap children with this */}
-          <DevHelpers /> {/* Development-only helpers (console utilities) */}
-          <AppContainer>
-            {children}
-          </AppContainer>
+        <ThemeProvider> {/* Theme provider - wraps everything */}
+          <NutritionProvider> {/* Nutrition provider - available to all components */}
+            <ChatProvider> {/* Chat provider - persists chat state across navigation */}
+              <DevHelpers /> {/* Development-only helpers (console utilities) */}
+              <AppContainer>
+                {children}
+              </AppContainer>
+            </ChatProvider>
+          </NutritionProvider>
         </ThemeProvider>
       </body>
     </html>

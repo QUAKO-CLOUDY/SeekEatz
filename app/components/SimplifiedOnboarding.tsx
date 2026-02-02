@@ -48,7 +48,7 @@ export function SimplifiedOnboarding({ onComplete }: Props) {
     const now = Date.now();
     localStorage.setItem("userProfile", JSON.stringify(profile));
     localStorage.setItem("hasCompletedOnboarding", "true");
-    localStorage.setItem("macroMatch_lastLogin", now.toString());
+    localStorage.setItem("seekEatz_lastLogin", now.toString());
 
     // Call the onComplete callback
     onComplete(profile);

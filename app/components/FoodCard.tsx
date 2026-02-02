@@ -5,7 +5,7 @@ type MacroMap = {
   calories: number | null;
   protein: number | null;
   carbs: number | null;
-  fat: number | null;
+  fats: number | null; // Use "fats" (plural) to match Meal type
 };
 
 type FoodItem = {
@@ -34,7 +34,14 @@ export default function FoodCard({ item, restaurantName }: Props) {
         alt={restaurantName || 'Restaurant logo'}
         className="h-12 w-12 object-contain flex-shrink-0"
         onError={(e) => {
-          e.currentTarget.style.opacity = '0';
+          // Fallback to default.png if logo fails to load
+          if (e.currentTarget.src !== window.location.origin + '/logos/default.png') {
+            e.currentTarget.onerror = null; // Prevent infinite loop
+            e.currentTarget.src = '/logos/default.png';
+          } else {
+            // If default.png also fails, hide the image
+            e.currentTarget.style.display = 'none';
+          }
         }}
       />
 

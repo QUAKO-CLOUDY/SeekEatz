@@ -1,5 +1,7 @@
 // app/types.ts
 
+import type { Macros } from '@/lib/macro-utils';
+
 export type UserProfile = {
   // Core profile fields - match Supabase profiles table exactly
   full_name?: string;
@@ -11,6 +13,7 @@ export type UserProfile = {
   dietary_options?: string[]; // Multi-select dietary restrictions/options
   search_distance_miles?: number; // Default search radius in miles (0.5, 1, 2, 5, or 10)
   preferredMealTypes?: string[]; // Optional array of preferred meal types
+  goal?: 'lose-fat' | 'build-muscle' | 'maintain'; // Fitness goal: lose weight, build muscle, or maintain
 };
 
 export type Meal = {
@@ -22,6 +25,8 @@ export type Meal = {
   protein: number;
   carbs: number;
   fats: number; // "fats" (plural) as requested
+  // Optional macros object for structured access (preferred)
+  macros?: Macros;
   image: string;
   price?: number;
   description?: string;

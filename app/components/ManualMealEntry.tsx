@@ -5,7 +5,7 @@ import { X, Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { type Meal } from "./MealCard"; // Importing the shared type
+import type { Meal } from "../types";
 
 type Props = {
   onAddMeal: (meal: Meal) => void;

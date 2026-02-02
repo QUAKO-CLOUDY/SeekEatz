@@ -241,9 +241,8 @@ export function OnboardingFlow({ onComplete }: Props) {
       // ALWAYS set onboarding completion flags (for both signed-in and signed-out users)
       localStorage.setItem("hasCompletedOnboarding", "true");
       localStorage.setItem("onboarded", "true");
-      localStorage.setItem("macroMatch_completedOnboarding", "true");
       localStorage.setItem("onboardingCompletedTimestamp", now.toString());
-      localStorage.removeItem("macroMatch_onboardingQuestionsComplete");
+      localStorage.removeItem("seekEatz_onboardingQuestionsComplete");
       
       // Clear any saved last screen so user always goes to chat first after onboarding
       localStorage.removeItem("seekeatz_current_screen");
@@ -253,27 +252,61 @@ export function OnboardingFlow({ onComplete }: Props) {
       if (user) {
         // Mark onboarding as complete in database
         try {
-          await supabase
+          // Load user profile from localStorage if it exists
+          let userProfile = null;
+          try {
+            const savedProfile = localStorage.getItem("userProfile");
+            if (savedProfile) {
+              userProfile = JSON.parse(savedProfile);
+            }
+          } catch (e) {
+            console.warn("Failed to parse userProfile from localStorage:", e);
+          }
+
+          const profileData: any = {
+            id: user.id,
+            has_completed_onboarding: true, // Mark onboarding as complete
+            last_login: new Date(now).toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+
+          // Include user profile data if available
+          if (userProfile) {
+            if (userProfile.goal) profileData.goal = userProfile.goal;
+            if (userProfile.diet_type) profileData.diet_type = userProfile.diet_type;
+            if (userProfile.dietary_options) profileData.dietary_options = userProfile.dietary_options;
+            if (userProfile.target_calories) profileData.calorie_goal = userProfile.target_calories;
+            if (userProfile.target_protein_g) profileData.protein_goal = userProfile.target_protein_g;
+            if (userProfile.target_carbs_g) profileData.carb_limit = userProfile.target_carbs_g;
+            if (userProfile.target_fats_g) profileData.fat_limit = userProfile.target_fats_g;
+            if (userProfile.preferredMealTypes) profileData.preferred_meal_types = userProfile.preferredMealTypes;
+            if (userProfile.search_distance_miles) profileData.search_distance_miles = userProfile.search_distance_miles;
+            // Store full profile as JSON for easy retrieval
+            profileData.user_profile = userProfile;
+          }
+          
+          const { error: profileError } = await supabase
             .from("profiles")
-            .upsert({
-              id: user.id,
-              has_completed_onboarding: true,
-              last_login: new Date(now).toISOString(),
-              updated_at: new Date().toISOString(),
-            }, {
+            .upsert(profileData, {
               onConflict: "id",
             });
+          
+          if (profileError) {
+            console.error("Could not update profile:", profileError);
+          } else {
+            console.log("Profile updated successfully after onboarding with has_completed_onboarding=true");
+          }
         } catch (error) {
-          console.warn("Could not update profile:", error);
+          console.error("Error updating profile:", error);
         }
 
         // Set user-specific localStorage flags
-        localStorage.setItem(`macroMatch_hasCompletedOnboarding_${user.id}`, "true");
-        localStorage.setItem(`macroMatch_lastLogin_${user.id}`, now.toString());
-        localStorage.setItem("macroMatch_lastLogin", now.toString());
+        localStorage.setItem(`seekEatz_hasCompletedOnboarding_${user.id}`, "true");
+        localStorage.setItem(`seekEatz_lastLogin_${user.id}`, now.toString());
+        localStorage.setItem("seekEatz_lastLogin", now.toString());
       } else {
         // Signed-out user - set generic lastLogin
-        localStorage.setItem("macroMatch_lastLogin", now.toString());
+        localStorage.setItem("seekEatz_lastLogin", now.toString());
       }
 
       // Wait a moment to ensure all state is saved
@@ -283,8 +316,8 @@ export function OnboardingFlow({ onComplete }: Props) {
       onComplete();
 
       // Always redirect to chat after onboarding completion (for both signed-in and signed-out users)
-      // Signed-out users will get preview access, signed-in users get full access
-      window.location.href = "/chat";
+      // Signed-out users will get guest trial access (3 uses), signed-in users get full access
+      router.push("/chat");
     } catch (error) {
       console.error("Error completing onboarding:", error);
       // Always try to redirect to chat - the app will handle auth check

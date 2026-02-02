@@ -7,6 +7,8 @@ import { createClient } from "@/utils/supabase/client";
 import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
+import { clearGuestSessionFull } from "@/lib/guest-session";
+import { claimAnonymousData } from "@/lib/claim-anon-data";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -73,8 +75,7 @@ export default function SignInPage() {
         if (typeof window !== 'undefined') {
           try {
             // Chat is now stored in sessionStorage
-            window.sessionStorage.removeItem('seekeatz_chat_messages');
-            window.sessionStorage.removeItem('seekeatz_chat_lastActivityAt');
+            
           } catch (e) {
             console.error('Failed to clear chat sessionStorage on login:', e);
           }
@@ -119,42 +120,85 @@ export default function SignInPage() {
           console.warn("Could not fetch existing profile:", error);
         }
         
-        // Update profile in database
+        // Claim anonymous data (saved_meals, daily_logs, user_favorites)
         try {
+          await claimAnonymousData();
+        } catch (claimError) {
+          console.error('Error claiming anonymous data:', claimError);
+          // Don't block signin flow if claim fails
+        }
+
+        // Clear guest session data since user now has an account
+        if (typeof window !== 'undefined') {
+          try {
+            clearGuestSessionFull(); // Clear all guest session data including trial count
+          } catch (e) {
+            console.warn('Failed to clear guest session data:', e);
+          }
+        }
+
+        // Update profile in database - ensure profile row exists with all required fields
+        try {
+          const profileData: any = {
+            id: userId,
+            email: data.user.email, // Include email field
+            last_login: new Date(now).toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+
+          // Set has_completed_onboarding if user has completed onboarding
+          if (profile || hasCompletedOnboarding) {
+            profileData.has_completed_onboarding = true;
+          }
+
+          // Include profile data if available
+          if (profile) {
+            profileData.user_profile = profile;
+            // Also map individual fields if needed
+            if (profile.goal) profileData.goal = profile.goal;
+            if (profile.diet_type) profileData.diet_type = profile.diet_type;
+            if (profile.dietary_options) profileData.dietary_options = profile.dietary_options;
+            if (profile.target_calories) profileData.calorie_goal = profile.target_calories;
+            if (profile.target_protein_g) profileData.protein_goal = profile.target_protein_g;
+            if (profile.target_carbs_g) profileData.carb_limit = profile.target_carbs_g;
+            if (profile.target_fats_g) profileData.fat_limit = profile.target_fats_g;
+            if (profile.preferredMealTypes) profileData.preferred_meal_types = profile.preferredMealTypes;
+            if (profile.search_distance_miles) profileData.search_distance_miles = profile.search_distance_miles;
+          }
+
           await supabase
             .from("profiles")
-            .upsert({
-              id: userId,
-              last_login: new Date(now).toISOString(),
-              has_completed_onboarding: profile ? true : (hasCompletedOnboarding ? true : undefined),
-              user_profile: profile || undefined,
-              updated_at: new Date().toISOString(),
-            }, {
+            .upsert(profileData, {
               onConflict: "id",
             });
         } catch (error) {
-          console.warn("Could not update profile:", error);
+          console.error("Could not update profile:", error);
+          // Don't block navigation even if profile update fails
         }
 
         // Update localStorage
-        localStorage.setItem(`macroMatch_lastLogin_${userId}`, now.toString());
-        localStorage.setItem("macroMatch_lastLogin", now.toString());
+        localStorage.setItem(`seekEatz_lastLogin_${userId}`, now.toString());
+        localStorage.setItem("seekEatz_lastLogin", now.toString());
         
         // Set onboarding flags if user has completed onboarding
         if (profile || hasCompletedOnboarding) {
-          localStorage.setItem(`macroMatch_hasCompletedOnboarding_${userId}`, "true");
+          localStorage.setItem(`seekEatz_hasCompletedOnboarding_${userId}`, "true");
           localStorage.setItem("hasCompletedOnboarding", "true");
+          localStorage.setItem("onboarded", "true");
           if (profile) {
             localStorage.setItem("userProfile", JSON.stringify(profile));
           }
-          localStorage.removeItem("macroMatch_onboardingQuestionsComplete");
+          localStorage.removeItem("seekEatz_onboardingQuestionsComplete");
         }
         
         // Clear any saved last screen so user always goes to chat first after sign-in
         localStorage.removeItem("seekeatz_current_screen");
         localStorage.removeItem("seekeatz_nav_history");
         
-        // Navigate to chat - the auth state change listener in MainApp will handle the rest
+        // Refresh router to ensure session is updated in all components
+        router.refresh();
+        
+        // Navigate to chat - the auth state change listener will unlock the chat immediately
         router.push("/chat");
       }
     } catch (err) {

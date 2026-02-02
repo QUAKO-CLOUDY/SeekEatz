@@ -1,3 +1,19 @@
+/**
+ * @deprecated This script is deprecated and will not execute.
+ * 
+ * This script was an early importer that:
+ * - Writes rows without import_batch_id (pollutes DB with untracked data)
+ * - Uses legacy data folder (scripts/data instead of data/jsons)
+ * - Does not match our finalized JSON schema
+ * 
+ * Use scripts/ingest-data.ts instead for all data ingestion.
+ */
+
+console.error('❌ bulk-import is deprecated. Use scripts/ingest-data.ts instead.');
+process.exit(1);
+
+// All code below is unreachable but kept for reference
+/*
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
@@ -20,7 +36,9 @@ if (!supabaseUrl || !supabaseKey || !openaiKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 const openai = new OpenAI({ apiKey: openaiKey });
+*/
 
+/* Unreachable code - kept for reference only
 // Helper: Format Restaurant Name (chipotle.json -> Chipotle)
 function getRestaurantName(filename: string): string {
   const nameWithoutExt = filename.replace(/\.json$/i, '');
@@ -190,3 +208,4 @@ async function run() {
 }
 
 run();
+*/

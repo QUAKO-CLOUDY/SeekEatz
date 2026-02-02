@@ -1,0 +1,368 @@
+{
+    "restaurant_name": "Muscle Maker Grill",
+    "items": [
+      {
+        "name": "Classic Burger",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 630,
+          "protein": 37,
+          "carbs": 29,
+          "fat": 38
+        }
+      },
+      {
+        "name": "California Club Burger",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 610,
+          "protein": 34,
+          "carbs": 30,
+          "fat": 65
+        }
+      },
+      {
+        "name": "Mushroom Supreme Burger",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 610,
+          "protein": 36,
+          "carbs": 27,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Jalapeno Burger",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 560,
+          "protein": 35,
+          "carbs": 29,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Recovery Burger",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 640,
+          "protein": 42,
+          "carbs": 22,
+          "fat": 42
+        }
+      },
+      {
+        "name": "MMG Caesar Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 350,
+          "protein": 32,
+          "carbs": 8,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Italiano Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 430,
+          "protein": 53,
+          "carbs": 22,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Asian Sesame Ginger Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 480,
+          "protein": 32,
+          "carbs": 41,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Hollywood Salad (GF)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 32,
+          "carbs": 13,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Impossible Taco Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 630,
+          "protein": 29,
+          "carbs": 39,
+          "fat": 39
+        }
+      },
+      {
+        "name": "MMG Signature Wrap",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 710,
+          "protein": 55,
+          "carbs": 67,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Santa Fe Wrap",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 700,
+          "protein": 49,
+          "carbs": 77,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Rocky Wrap",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 680,
+          "protein": 55,
+          "carbs": 66,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Tex-Mex Fajita Wrap",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 600,
+          "protein": 50,
+          "carbs": 60,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Veggie Wrap",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 470,
+          "protein": 20,
+          "carbs": 66,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Turkey Meatball Wrap",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 670,
+          "protein": 42,
+          "carbs": 73,
+          "fat": 19
+        }
+      },
+      {
+        "name": "BBQ Wrap",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 750,
+          "protein": 68,
+          "carbs": 69,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Arizona Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 570,
+          "protein": 47,
+          "carbs": 59,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Godfather Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 440,
+          "protein": 60,
+          "carbs": 24,
+          "fat": 8
+        }
+      },
+      {
+        "name": "El Mexicana Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 490,
+          "protein": 51,
+          "carbs": 49,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Teriyaki Stir-Fry Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 580,
+          "protein": 37,
+          "carbs": 67,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Impossible Chili Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 28,
+          "carbs": 16,
+          "fat": 21
+        }
+      },
+      {
+        "name": "The Buffalo (Chicken)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 590,
+          "protein": 40,
+          "carbs": 17,
+          "fat": 43
+        }
+      },
+      {
+        "name": "The Buffalo (Steak)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 630,
+          "protein": 38,
+          "carbs": 17,
+          "fat": 47
+        }
+      },
+      {
+        "name": "The Phoenix (Chicken)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 410,
+          "protein": 38,
+          "carbs": 15,
+          "fat": 14
+        }
+      },
+      {
+        "name": "The Phoenix (Steak)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 490,
+          "protein": 42,
+          "carbs": 15,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Keto Recovery Burger",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1030,
+          "protein": 54,
+          "carbs": 6,
+          "fat": 78
+        }
+      },
+      {
+        "name": "Philly Caesar Salad (Chicken)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 380,
+          "protein": 37,
+          "carbs": 12,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Philly Caesar Salad (Steak)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 410,
+          "protein": 35,
+          "carbs": 12,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Keto Hollywood Salad (Chicken)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 510,
+          "protein": 40,
+          "carbs": 12,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Keto Hollywood Salad (Steak)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 540,
+          "protein": 38,
+          "carbs": 12,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Grilled Chicken",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 39,
+          "carbs": 0,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Turkey Meatballs",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 31,
+          "carbs": 23,
+          "fat": 14
+        }
+      }
+    ]
+  }

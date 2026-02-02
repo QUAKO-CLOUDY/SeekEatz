@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { X, Check, Plus } from 'lucide-react';
 import { Button } from './ui/button';
-import type { Meal } from './MealCard'; // Importing from MealCard to keep types consistent
+import type { Meal } from '../types';
 
 type Props = {
   meal: Meal;
@@ -15,12 +15,12 @@ export function LogMealConfirmation({ meal, onConfirm, onCancel }: Props) {
   const [selectedSwaps, setSelectedSwaps] = useState<string[]>([]);
 
   // Define swap options with their macro adjustments
-  // standardized 'fats' to 'fat' to match your Meal type
+  // Use "fats" (plural) to match Meal type
   const swapOptions = [
-    { id: 'extra-protein', label: 'Add Extra Protein', protein: 15, calories: 75, fat: 0, carbs: 0 },
-    { id: 'less-carbs', label: 'Reduce Carbs', carbs: -20, calories: -80, protein: 0, fat: 0 },
-    { id: 'healthy-fats', label: 'Add Healthy Fats', fat: 10, calories: 90, protein: 0, carbs: 0 },
-    { id: 'double-protein', label: 'Double Protein', protein: meal.protein, calories: meal.protein * 4, fat: 0, carbs: 0 },
+    { id: 'extra-protein', label: 'Add Extra Protein', protein: 15, calories: 75, fats: 0, carbs: 0 },
+    { id: 'less-carbs', label: 'Reduce Carbs', carbs: -20, calories: -80, protein: 0, fats: 0 },
+    { id: 'healthy-fats', label: 'Add Healthy Fats', fats: 10, calories: 90, protein: 0, carbs: 0 },
+    { id: 'double-protein', label: 'Double Protein', protein: meal.protein, calories: meal.protein * 4, fats: 0, carbs: 0 },
   ];
 
   const toggleSwap = (swapId: string) => {
@@ -38,7 +38,7 @@ export function LogMealConfirmation({ meal, onConfirm, onCancel }: Props) {
       if (swap) {
         adjustedMeal.protein += swap.protein || 0;
         adjustedMeal.carbs += swap.carbs || 0;
-        adjustedMeal.fats += swap.fat || 0;
+        adjustedMeal.fats += swap.fats || 0;
         adjustedMeal.calories += swap.calories || 0;
       }
     });
@@ -91,7 +91,7 @@ export function LogMealConfirmation({ meal, onConfirm, onCancel }: Props) {
                   <p className="text-gray-400 text-xs">
                     {swap.protein ? `+${swap.protein}g protein ` : ''}
                     {swap.carbs ? `${swap.carbs}g carbs ` : ''}
-                    {swap.fat ? `+${swap.fat}g fats ` : ''}
+                    {swap.fats ? `+${swap.fats}g fats ` : ''}
                     {' • '}
                     {swap.calories > 0 ? '+' : ''}{swap.calories} cal
                   </p>
@@ -137,7 +137,7 @@ export function LogMealConfirmation({ meal, onConfirm, onCancel }: Props) {
                 <p className="text-white font-bold">
                   {meal.fats + selectedSwaps.reduce((sum, id) => {
                     const swap = swapOptions.find(s => s.id === id);
-                    return sum + (swap?.fat || 0);
+                    return sum + (swap?.fats || 0);
                   }, 0)}g
                 </p>
                 <p className="text-gray-400 text-xs">fats</p>

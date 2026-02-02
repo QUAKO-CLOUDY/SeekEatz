@@ -1,0 +1,1039 @@
+{
+    "restaurant_name": "Taziki's Mediterranean Cafe",
+    "items": [
+      {
+        "name": "Falafel Appetizer",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 580,
+          "protein": 17,
+          "carbs": 51,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Hummus Dip",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 350,
+          "protein": 10,
+          "carbs": 28,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Spicy Harissa Hummus Dip",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 350,
+          "protein": 8,
+          "carbs": 23,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Spicy Pimento Cheese",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 620,
+          "protein": 16,
+          "carbs": 4,
+          "fat": 60
+        }
+      },
+      {
+        "name": "Taziki Dip",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 270,
+          "protein": 7,
+          "carbs": 8,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Whipped Feta",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 550,
+          "protein": 13,
+          "carbs": 23,
+          "fat": 47
+        }
+      },
+      {
+        "name": "Chicken Salad & Co.",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 400,
+          "protein": 25,
+          "carbs": 21,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Greek Lemon Chicken Soup with Pita Bread",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 390,
+          "protein": 27,
+          "carbs": 31,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Tomato Basil Soup with Pita Chips",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 260,
+          "protein": 8,
+          "carbs": 35,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Pasta Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 830,
+          "protein": 30,
+          "carbs": 95,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Quinoa Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 570,
+          "protein": 18,
+          "carbs": 64,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Rice Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 500,
+          "protein": 11,
+          "carbs": 44,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Greek Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 7,
+          "carbs": 20,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Greek Salad, Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 4,
+          "carbs": 14,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Mediterranean Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 370,
+          "protein": 11,
+          "carbs": 35,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Mediterranean Salad, Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 200,
+          "protein": 6,
+          "carbs": 22,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Caesar Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 12,
+          "carbs": 16,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Caesar Salad, Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 5,
+          "carbs": 8,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Cobb Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 430,
+          "protein": 26,
+          "carbs": 30,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Watermelon Spinach Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 280,
+          "protein": 8,
+          "carbs": 24,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Watermelon Spinach Salad, Small",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 5,
+          "carbs": 16,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Beef Kebob + Taziki Sauce",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 320,
+          "protein": 32,
+          "carbs": 5,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Beef Kebob, Grilled",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 29,
+          "carbs": 2,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Chicken Kebob + Taziki Sauce",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 45,
+          "carbs": 5,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Chicken Kebob, Grilled",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 280,
+          "protein": 43,
+          "carbs": 2,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Grilled Beef",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 330,
+          "protein": 37,
+          "carbs": 2,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Grilled Chicken, Entree Salads",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 44,
+          "carbs": 2,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Grilled Chicken, Small Salads",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 26,
+          "carbs": 0,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Grilled Lamb",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 380,
+          "protein": 47,
+          "carbs": 1,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Grilled Pork",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 560,
+          "protein": 51,
+          "carbs": 3,
+          "fat": 37
+        }
+      },
+      {
+        "name": "Grilled Salmon",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 530,
+          "protein": 43,
+          "carbs": 4,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Grilled Shrimp",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 290,
+          "protein": 20,
+          "carbs": 5,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Grilled Turkey",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 220,
+          "protein": 22,
+          "carbs": 6,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Shrimp Kebob, Grilled",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 230,
+          "protein": 18,
+          "carbs": 10,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Spicy Chicken",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 44,
+          "carbs": 4,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Turkish Meatballs",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 470,
+          "protein": 27,
+          "carbs": 1,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Balsamic Vinaigrette",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 0,
+          "carbs": 10,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Greek Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 320,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Homemade Caesar Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 3,
+          "carbs": 1,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Olive Oil & Balsamic Vinegar Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 280,
+          "protein": 0,
+          "carbs": 10,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Ranch Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 3,
+          "carbs": 2,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Mediterranean Lamb Burger",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 850,
+          "protein": 38,
+          "carbs": 46,
+          "fat": 58
+        }
+      },
+      {
+        "name": "Southern-Style Lamb Burger",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 970,
+          "protein": 39,
+          "carbs": 43,
+          "fat": 73
+        }
+      },
+      {
+        "name": "Spicy Harissa Chicken Gyro",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 760,
+          "protein": 48,
+          "carbs": 67,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Spicy Pimento Cheese Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1070,
+          "protein": 28,
+          "carbs": 68,
+          "fat": 76
+        }
+      },
+      {
+        "name": "Street Gyro",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1060,
+          "protein": 35,
+          "carbs": 74,
+          "fat": 73
+        }
+      },
+      {
+        "name": "Tomato Basil Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 660,
+          "protein": 22,
+          "carbs": 63,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Turkey and Egg Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1030,
+          "protein": 47,
+          "carbs": 70,
+          "fat": 64
+        }
+      },
+      {
+        "name": "Turkey Club Pita",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1040,
+          "protein": 45,
+          "carbs": 68,
+          "fat": 66
+        }
+      },
+      {
+        "name": "Turkish Meatball Gyro",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 880,
+          "protein": 34,
+          "carbs": 64,
+          "fat": 56
+        }
+      },
+      {
+        "name": "Whipped Feta Lamb Burger",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 960,
+          "protein": 39,
+          "carbs": 46,
+          "fat": 71
+        }
+      },
+      {
+        "name": "Beef Feast",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 580,
+          "protein": 39,
+          "carbs": 11,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Chicken Feast",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 390,
+          "protein": 48,
+          "carbs": 13,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Chicken Kebob Feast",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 420,
+          "protein": 47,
+          "carbs": 13,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Falafel Feast",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 600,
+          "protein": 18,
+          "carbs": 58,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Grilled Veggie Feast",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 340,
+          "protein": 6,
+          "carbs": 24,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Lamb Feast",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 500,
+          "protein": 50,
+          "carbs": 12,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Pork Feast",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 960,
+          "protein": 54,
+          "carbs": 22,
+          "fat": 74
+        }
+      },
+      {
+        "name": "Salmon Feast",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 570,
+          "protein": 44,
+          "carbs": 12,
+          "fat": 39
+        }
+      },
+      {
+        "name": "Shrimp Feast",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 330,
+          "protein": 21,
+          "carbs": 13,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Spicy Harissa Chicken Feast",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 440,
+          "protein": 48,
+          "carbs": 15,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Turkish Meatball Feast",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 610,
+          "protein": 31,
+          "carbs": 13,
+          "fat": 50
+        }
+      },
+      {
+        "name": "Child Feast",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 30,
+          "carbs": 29,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Grilled Cheese Pita",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 430,
+          "protein": 17,
+          "carbs": 45,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Macaroni & Cheese",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 15,
+          "carbs": 20,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Sneaky Taziki",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 320,
+          "protein": 26,
+          "carbs": 25,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Turkey Melt",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 480,
+          "protein": 25,
+          "carbs": 47,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Side of Spicy Harissa Chicken",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 44,
+          "carbs": 4,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Side of Turkey",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 220,
+          "protein": 22,
+          "carbs": 6,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Side of Turkish Meatballs",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 470,
+          "protein": 27,
+          "carbs": 1,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Side of Balsamic Vinaigrette",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 270,
+          "protein": 0,
+          "carbs": 8,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Side of Basil Pesto",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 6,
+          "carbs": 3,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Side of Basil Pesto Aioli",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 3,
+          "carbs": 2,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Side of Caesar Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 3,
+          "carbs": 1,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Side of Chili Oil Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Side of Feta",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 6,
+          "carbs": 1,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Side of Greek Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 320,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Side of Horseradish Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Side of Hummus",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 3,
+          "carbs": 9,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Side of Mayo",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Side of Parmesan",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 10,
+          "carbs": 0,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Side of Pecans",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 180,
+          "protein": 1,
+          "carbs": 6,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Side of Pimento Cheese",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 6,
+          "carbs": 2,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Side of Ranch",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 3,
+          "carbs": 2,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Side of Salsa",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Side of Spicy Harissa Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 90,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Side of Taziki Dip",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 2,
+          "carbs": 2,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Side of Tomato Chutney",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 0,
+          "carbs": 6,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Beef for 4",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1340,
+          "protein": 148,
+          "carbs": 8,
+          "fat": 77
+        }
+      },
+      {
+        "name": "Beef for 6",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 2010,
+          "protein": 222,
+          "carbs": 12,
+          "fat": 116
+        }
+      },
+      {
+        "name": "Chicken Kebob for 4",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1130,
+          "protein": 172,
+          "carbs": 9,
+          "fat": 43
+        }
+      },
+      {
+        "name": "Chicken Kebob for 6",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1700,
+          "protein": 258,
+          "carbs": 14,
+          "fat": 64
+        }
+      },
+      {
+        "name": "Falafel for 4",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1830,
+          "protein": 57,
+          "carbs": 189,
+          "fat": 96
+        }
+      },
+      {
+        "name": "Falafel for 6",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 2750,
+          "protein": 86,
+          "carbs": 283,
+          "fat": 144
+        }
+      }
+    ]
+  }

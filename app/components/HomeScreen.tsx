@@ -6,6 +6,9 @@ import { MealCard } from "./MealCard";
 import type { UserProfile, Meal } from "../types";
 import { getMealImageUrl } from "@/lib/image-utils";
 import { useSessionActivity } from "../hooks/useSessionActivity";
+import { normalizeMacros } from "@/lib/macro-utils";
+import { canUseFeature, incrementUsage } from "@/lib/usage-gate";
+import { useRouter } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -58,6 +61,8 @@ function getGreeting(): string {
   return "Good evening";
 }
 
+import type { LoggedMeal } from './LogScreen';
+
 type Props = {
   userProfile: UserProfile;
   onMealSelect: (meal: Meal) => void;
@@ -65,10 +70,12 @@ type Props = {
   onSearch?: () => void;
   onNavigateToChat?: (message?: string) => void;
   onToggleFavorite?: (mealId: string, meal?: Meal) => void;
+  loggedMeals?: LoggedMeal[];
 };
 
-export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite }: Props) {
+export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite, loggedMeals = [] }: Props) {
   const { updateActivity } = useSessionActivity();
+  const router = useRouter();
   
   // Extract first name from user profile
   const getUserFirstName = () => {
@@ -108,24 +115,45 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     };
   });
 
-  // Initialize direction preferences (above/below for each metric)
-  const [macroDirections, setMacroDirections] = useState<Record<MacroType, Direction>>(() => {
+  // Initialize direction preferences (above/below for calories only)
+  // Protein, carbs, fats are always minimums (no direction toggle)
+  const [macroDirections, setMacroDirections] = useState<Record<"calories", Direction>>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('seekeatz_macro_directions');
       if (saved) {
         try {
-          return JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          // Only keep calories direction
+          return { calories: parsed.calories || "below" };
         } catch (e) {
           console.error('Failed to parse saved macro directions:', e);
         }
       }
     }
-    // Default to 'below' for all metrics (at most X)
+    // Default to 'below' for calories
     return {
       calories: "below",
-      protein: "below",
-      carbs: "below",
-      fats: "below",
+    };
+  });
+
+  // Initialize enabled state for each macro filter (all enabled by default)
+  const [macroEnabled, setMacroEnabled] = useState<Record<MacroType, boolean>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('seekeatz_macro_enabled');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error('Failed to parse saved macro enabled state:', e);
+        }
+      }
+    }
+    // Default to all enabled
+    return {
+      calories: true,
+      protein: true,
+      carbs: true,
+      fats: true,
     };
   });
 
@@ -201,12 +229,14 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     };
   }, []);
   
-  // Track last search parameters (not used for auto-clearing anymore, but kept for reference)
+  // Track last search parameters (including searchKey for pagination)
   const [lastSearchParams, setLastSearchParams] = useState<{
     macroValues: Record<MacroType, number>;
-    macroDirections?: Record<MacroType, Direction>;
+    macroDirections?: Record<"calories", Direction>;
+    macroEnabled?: Record<MacroType, boolean>;
     selectedCuisine: string | null;
     distance?: number;
+    searchKey?: string; // For pagination
   } | null>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('seekeatz_last_search_params');
@@ -249,16 +279,27 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     setMacro(nextMacro);
   };
 
-  const handleDirectionChange = (metric: MacroType, direction: Direction) => {
-    setMacroDirections((prev) => {
-      const updated = { ...prev, [metric]: direction };
+  const handleDirectionChange = (direction: Direction) => {
+    // Only calories has direction (above/below)
+    setMacroDirections({ calories: direction });
+    // Persist to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('seekeatz_macro_directions', JSON.stringify({ calories: direction }));
+    }
+    // Close popover after selection
+    setOpenPopover(null);
+  };
+
+  const handleToggleExclude = (metric: MacroType) => {
+    setMacroEnabled((prev) => {
+      const updated = { ...prev, [metric]: !prev[metric] };
       // Persist to localStorage
       if (typeof window !== 'undefined') {
-        localStorage.setItem('seekeatz_macro_directions', JSON.stringify(updated));
+        localStorage.setItem('seekeatz_macro_enabled', JSON.stringify(updated));
       }
       return updated;
     });
-    // Close popover after selection
+    // Close popover after toggle
     setOpenPopover(null);
   };
 
@@ -284,6 +325,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   // Meals are only updated when the user explicitly clicks "Find meals that match this".
 
   // Convert API result to Meal type
+  // API returns meals with normalized macros: calories, protein, carbs, fats
   const convertToMeal = (item: any): Meal => {
     const category = item.category === 'Grocery' || item.category === 'Hot Bar' 
       ? 'grocery' as const 
@@ -299,24 +341,36 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       item.image_url || item.image
     );
 
-    // Handle fats - check fats_g (database column) first, then other variations
-    const fats = item.fats_g ?? item.fat_g ?? item.fats ?? item.fat ?? 
-                 (item.nutrition_info?.fats_g) ?? 
-                 (item.nutrition_info?.fat_g) ?? 
-                 (item.nutrition_info?.fats) ?? 
-                 (item.nutrition_info?.fat) ?? 0;
+    // Normalize macros from API response
+    // API returns: { calories, protein, carbs, fats } (already normalized)
+    // Also support legacy formats for backward compatibility
+    const macrosData = item.macros || {
+      calories: item.calories,
+      protein: item.protein ?? item.protein_g,
+      carbs: item.carbs ?? item.carbs_g,
+      fats: item.fats ?? item.fat ?? item.fats_g ?? item.fat_g,
+    };
+    
+    const normalizedMacros = normalizeMacros(macrosData);
+    
+    // If normalization fails, use fallback values (shouldn't happen with proper API)
+    const calories = normalizedMacros?.calories ?? item.calories ?? 0;
+    const protein = normalizedMacros?.protein ?? item.protein ?? item.protein_g ?? 0;
+    const carbs = normalizedMacros?.carbs ?? item.carbs ?? item.carbs_g ?? 0;
+    const fats = normalizedMacros?.fats ?? item.fats ?? item.fat ?? item.fats_g ?? item.fat_g ?? 0;
 
     return {
       id: item.id || `meal-${Date.now()}-${Math.random()}`,
       name: mealName,
       restaurant: restaurantName,
       restaurant_name: restaurantName, // Also set restaurant_name for logo logic
-      calories: item.calories || 0,
-      protein: item.protein_g || 0,
-      carbs: item.carbs_g || 0,
-      fats: typeof fats === 'number' ? fats : 0,
+      calories,
+      protein,
+      carbs,
+      fats,
+      macros: normalizedMacros || undefined, // Include normalized macros object if available
       image: imageUrl,
-      price: item.price || null,
+      price: item.price ?? item.price_estimate ?? null,
       description: item.description || '',
       category: category,
       dietary_tags: item.dietary_tags || item.tags || [],
@@ -346,71 +400,11 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     return matches;
   };
 
-  // Filter meals based on user profile (diet_type and dietary_options)
+  // Diet filtering removed - all diet logic disabled
+  // This function is kept for compatibility but returns meals unchanged
   const filterMealsByProfile = (meals: Meal[], profile: UserProfile): Meal[] => {
-    if (!meals || meals.length === 0) return meals;
-    
-    let filtered = [...meals];
-    
-    // Filter by diet_type
-    if (profile.diet_type) {
-      const dietType = profile.diet_type.toLowerCase();
-      const mealTags = (meal: Meal) => (meal.dietary_tags || []).map(tag => tag.toLowerCase());
-      
-      if (dietType === 'vegan') {
-        filtered = filtered.filter(meal => {
-          const tags = mealTags(meal);
-          return tags.includes('vegan') || tags.includes('plant-based');
-        });
-      } else if (dietType === 'vegetarian') {
-        filtered = filtered.filter(meal => {
-          const tags = mealTags(meal);
-          const mealText = `${meal.name} ${meal.description || ''}`.toLowerCase();
-          // Exclude meat, poultry, fish, seafood
-          const hasMeat = mealText.includes('chicken') || mealText.includes('beef') || mealText.includes('pork') || 
-                         mealText.includes('turkey') || mealText.includes('fish') || mealText.includes('salmon') ||
-                         mealText.includes('tuna') || mealText.includes('shrimp') || mealText.includes('seafood');
-          return tags.includes('vegetarian') || (!hasMeat && (tags.includes('vegan') || tags.includes('plant-based')));
-        });
-      } else if (dietType === 'keto' || dietType === 'ketogenic') {
-        filtered = filtered.filter(meal => {
-          // Keto: low carb (typically <20g net carbs)
-          return meal.carbs < 25; // Approximate threshold
-        });
-      } else if (dietType === 'low_carb' || dietType === 'low carb' || dietType === 'low-carb') {
-        filtered = filtered.filter(meal => {
-          // Low carb: prioritize lower carb options
-          return meal.carbs < 50; // Approximate threshold
-        });
-      }
-    }
-    
-    // Filter by dietary_options (hard constraints for allergens)
-    if (profile.dietary_options && profile.dietary_options.length > 0) {
-      const normalizedOptions = profile.dietary_options.map(opt => opt.toLowerCase().replace(/[-\s]+/g, '_'));
-      const mealTags = (meal: Meal) => (meal.dietary_tags || []).map(tag => tag.toLowerCase().replace(/[-\s]+/g, '_'));
-      
-      // Hard constraints: exclude items with allergens
-      if (normalizedOptions.includes('gluten_free')) {
-        filtered = filtered.filter(meal => {
-          const tags = mealTags(meal);
-          return tags.includes('gluten_free') || tags.includes('gluten-free');
-        });
-      }
-      
-      if (normalizedOptions.includes('dairy_free')) {
-        filtered = filtered.filter(meal => {
-          const tags = mealTags(meal);
-          return tags.includes('dairy_free') || tags.includes('dairy-free');
-        });
-      }
-      
-      // Note: For other allergens (nut, soy, egg, shellfish), we'd need allergen data in the meal object
-      // For now, we rely on dietary_tags matching
-    }
-    
-    // If no meals match after filtering, return original list (let AI reasoning handle it)
-    return filtered.length > 0 ? filtered : meals;
+    // All diet filtering removed - return meals unchanged
+    return meals;
   };
 
   // Get user location (if available)
@@ -434,11 +428,31 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     }
   }, []);
 
-  const searchMeals = async (query: string, distance?: number, append = false): Promise<Meal[]> => {
+  const searchMeals = async (
+    query: string, 
+    distance?: number, 
+    append = false,
+    constraints: any = undefined, // Legacy parameter (deprecated)
+    searchKey?: string, // Optional searchKey for pagination (undefined for new searches)
+    filters?: {
+      calories?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
+      protein?: { enabled: boolean; min: number };
+      carbs?: { enabled: boolean; min: number };
+      fats?: { enabled: boolean; min: number };
+    },
+    macroFilters?: {
+      proteinMin?: number;
+      carbsMin?: number;
+      fatsMin?: number;
+      caloriesMax?: number;
+      caloriesMin?: number;
+    },
+    calorieMode?: "UNDER" | "OVER"
+  ): Promise<Meal[] | { meals: Meal[]; searchKey?: string; hasMore?: boolean }> => {
     try {
       // Log search parameters for debugging (dev only)
       if (process.env.NODE_ENV === 'development') {
-        console.log(`🔍 Search: query="${query}", radius=${distance} miles, hasLocation=${!!userLocation}`);
+        console.log(`🔍 Search: query="${query}", radius=${distance} miles, hasLocation=${!!userLocation}`, constraints);
       }
 
       const res = await fetch('/api/search', {
@@ -447,6 +461,14 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         body: JSON.stringify({ 
           query, 
           radius_miles: distance,
+          // NEW: Structured filters payload (preferred format)
+          filters: filters,
+          // Legacy: Structured macroFilters payload (for backward compatibility)
+          macroFilters: macroFilters || undefined,
+          calorieMode: calorieMode || undefined,
+          isHomepage: true, // Flag for homepage-specific logic
+          // Only include searchKey for pagination (not for new searches)
+          ...(searchKey ? { searchKey, isPagination: true } : {}),
           // Use new format: user_location_lat and user_location_lng
           ...(userLocation ? {
             user_location_lat: userLocation.latitude,
@@ -457,14 +479,18 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       
       const data = await res.json();
       
-      // Normalize API response to always be an array
+      // Normalize API response - return full response object if available
       let normalizedResults: any[] = [];
+      let responseSearchKey: string | undefined;
+      let hasMore: boolean = false;
       
       if (Array.isArray(data)) {
         normalizedResults = data;
       } else if (data && typeof data === 'object' && Array.isArray(data.meals)) {
         // New format: { meals, hasMore, nextOffset, searchKey }
         normalizedResults = data.meals;
+        responseSearchKey = data.searchKey;
+        hasMore = data.hasMore || false;
       } else if (data && typeof data === 'object' && Array.isArray(data.results)) {
         // Legacy format support
         normalizedResults = data.results;
@@ -480,6 +506,16 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         return true;
       });
       
+      // Return full response object if searchKey is present (for pagination)
+      if (responseSearchKey || hasMore) {
+        return {
+          meals: fullMeals,
+          searchKey: responseSearchKey,
+          hasMore,
+        };
+      }
+      
+      // Return array for backward compatibility
       return fullMeals;
     } catch (error) {
       console.error('Search failed:', error);
@@ -488,67 +524,130 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   };
 
   const handleFindMeals = async () => {
+    // Check if user can use the feature (gate check BEFORE searching)
+    const canUse = await canUseFeature('search');
+    if (!canUse) {
+      // Limit reached - redirect to chat to show gate message
+      router.push('/chat');
+      return;
+    }
+    
     updateActivity(); // Update activity on button click
     setIsLoadingMeals(true);
     setHasSearched(true);
     
-    // Build query based on all macro values with directions, cuisine, and profile settings
-    const buildMacroPart = (type: MacroType, value: number, direction: Direction) => {
-      const config = MACRO_CONFIG[type];
-      const unit = config.unit || "";
-      const directionText = direction === "above" ? "at least" : "at most";
-      return `${directionText} ${value}${unit} ${config.label.toLowerCase()}`;
-    };
-
-    const macroParts = [
-      buildMacroPart("calories", macroValues.calories, macroDirections.calories),
-      buildMacroPart("protein", macroValues.protein, macroDirections.protein),
-      buildMacroPart("carbs", macroValues.carbs, macroDirections.carbs),
-      buildMacroPart("fats", macroValues.fats, macroDirections.fats),
-    ].join(" ");
+    // Clear pagination state when filters change (new search, not pagination)
+    // This ensures old searchKey doesn't persist with new constraints
+    setLastSearchParams(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('seekeatz_last_search_params');
+    }
     
+    // Build minimal query (no macro text - backend uses structured constraints)
     const cuisinePart = selectedCuisine 
       ? ` ${CUISINES.find(c => c.id === selectedCuisine)?.label.toLowerCase()}` 
       : "";
+    const query = `find meals${cuisinePart}`.trim();
     
-    // Add diet type to query if set
-    const dietPart = userProfile.diet_type && userProfile.diet_type.toLowerCase() !== 'regular'
-      ? ` ${userProfile.diet_type.toLowerCase()}`
-      : "";
+    // NEW SEMANTICS (locked in):
+    // - Protein, Carbs, Fats are MINIMUMS (>=) - no direction toggle
+    // - Calories is user-selectable: UNDER (<=) or OVER (>=) based on calorieMode
+    const calorieMode = macroDirections.calories === "below" ? "UNDER" : "OVER";
     
-    // Add dietary options to query (high protein, etc.)
-    const dietaryPart = userProfile.dietary_options && userProfile.dietary_options.length > 0
-      ? userProfile.dietary_options
-          .filter(opt => {
-            const normalized = opt.toLowerCase().replace(/[-\s]+/g, '_');
-            return normalized === 'high_protein' || normalized === 'high-protein';
-          })
-          .map(opt => opt.toLowerCase())
-          .join(' ')
-      : "";
+    // Build structured filters payload with enabled flags
+    const filters: {
+      calories?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
+      protein?: { enabled: boolean; min: number };
+      carbs?: { enabled: boolean; min: number };
+      fats?: { enabled: boolean; min: number };
+    } = {};
     
-    const query = `${macroParts}${cuisinePart}${dietPart}${dietaryPart ? ' ' + dietaryPart : ''}`.trim();
+    // Calories filter
+    if (macroEnabled.calories) {
+      filters.calories = {
+        enabled: true,
+        mode: calorieMode === "UNDER" ? "BELOW" : "ABOVE",
+        value: macroValues.calories,
+      };
+    }
     
-    const meals = await searchMeals(query, activeDistance);
+    // Protein, Carbs, Fats are always MINIMUMS (>=) when enabled
+    if (macroEnabled.protein) {
+      filters.protein = {
+        enabled: true,
+        min: macroValues.protein,
+      };
+    }
+    if (macroEnabled.carbs) {
+      filters.carbs = {
+        enabled: true,
+        min: macroValues.carbs,
+      };
+    }
+    if (macroEnabled.fats) {
+      filters.fats = {
+        enabled: true,
+        min: macroValues.fats,
+      };
+    }
     
-    // Filter meals by selected cuisine if one is selected
+    // Build legacy macroFilters payload for backward compatibility
+    const macroFilters: {
+      proteinMin?: number;
+      carbsMin?: number;
+      fatsMin?: number;
+      caloriesMax?: number; // For UNDER mode
+      caloriesMin?: number; // For OVER mode
+    } = {};
+    
+    if (filters.protein?.enabled) {
+      macroFilters.proteinMin = filters.protein.min;
+    }
+    if (filters.carbs?.enabled) {
+      macroFilters.carbsMin = filters.carbs.min;
+    }
+    if (filters.fats?.enabled) {
+      macroFilters.fatsMin = filters.fats.min;
+    }
+    
+    // Calories: UNDER mode = max, OVER mode = min
+    if (filters.calories?.enabled) {
+      if (calorieMode === "UNDER") {
+        macroFilters.caloriesMax = filters.calories.value;
+      } else {
+        macroFilters.caloriesMin = filters.calories.value;
+      }
+    }
+    
+    // Clear existing meals before new search (prevents stale results)
+    setRecommendedMeals([]);
+    
+    // Increment usage for guest users (before making the API call)
+    await incrementUsage('search');
+    
+    const mealsResult = await searchMeals(query, activeDistance, false, undefined, undefined, filters, macroFilters, calorieMode); // No searchKey for new search
+    const meals = Array.isArray(mealsResult) ? mealsResult : mealsResult.meals || [];
+    const searchKey = Array.isArray(mealsResult) ? undefined : mealsResult.searchKey;
+    
+    // Filter meals by selected cuisine if one is selected (client-side fallback)
     let filteredMeals = selectedCuisine 
       ? meals.filter(meal => mealMatchesCuisine(meal, selectedCuisine))
       : meals;
     
-    // Apply profile-based filtering
+    // Diet filtering removed - filterMealsByProfile now returns meals unchanged
     filteredMeals = filterMealsByProfile(filteredMeals, userProfile);
     
     // Take first 3 meals
     const newMeals = filteredMeals.slice(0, 3);
     setRecommendedMeals(newMeals);
     
-    // Save search parameters and results
+    // Save search parameters and results (including searchKey for pagination)
     const searchParams = {
       macroValues: { ...macroValues },
       macroDirections: { ...macroDirections },
       selectedCuisine,
       distance: activeDistance,
+      searchKey, // Store for pagination
     };
     setLastSearchParams(searchParams);
     
@@ -571,58 +670,104 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     updateActivity(); // Update activity on button click
     setIsLoadingMeals(true);
     
-    // Build query based on all macro values with directions, cuisine, and profile settings
-    const buildMacroPart = (type: MacroType, value: number, direction: Direction) => {
-      const config = MACRO_CONFIG[type];
-      const unit = config.unit || "";
-      const directionText = direction === "above" ? "at least" : "at most";
-      return `${directionText} ${value}${unit} ${config.label.toLowerCase()}`;
-    };
-
-    const macroParts = [
-      buildMacroPart("calories", macroValues.calories, macroDirections.calories),
-      buildMacroPart("protein", macroValues.protein, macroDirections.protein),
-      buildMacroPart("carbs", macroValues.carbs, macroDirections.carbs),
-      buildMacroPart("fats", macroValues.fats, macroDirections.fats),
-    ].join(" ");
-    
+    // Build minimal query (no macro text - backend uses structured constraints)
     const cuisinePart = selectedCuisine 
       ? ` ${CUISINES.find(c => c.id === selectedCuisine)?.label.toLowerCase()}` 
       : "";
+    const query = `find meals${cuisinePart}`.trim();
     
-    // Add diet type to query if set
-    const dietPart = userProfile.diet_type && userProfile.diet_type.toLowerCase() !== 'regular'
-      ? ` ${userProfile.diet_type.toLowerCase()}`
-      : "";
+    // NEW SEMANTICS (locked in):
+    // - Protein, Carbs, Fats are MINIMUMS (>=) - no direction toggle
+    // - Calories is user-selectable: UNDER (<=) or OVER (>=) based on calorieMode
+    const calorieMode = macroDirections.calories === "below" ? "UNDER" : "OVER";
     
-    // Add dietary options to query (high protein, etc.)
-    const dietaryPart = userProfile.dietary_options && userProfile.dietary_options.length > 0
-      ? userProfile.dietary_options
-          .filter(opt => {
-            const normalized = opt.toLowerCase().replace(/[-\s]+/g, '_');
-            return normalized === 'high_protein' || normalized === 'high-protein';
-          })
-          .map(opt => opt.toLowerCase())
-          .join(' ')
-      : "";
+    // Build structured filters payload with enabled flags (reuse from lastSearchParams if available)
+    const filters: {
+      calories?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
+      protein?: { enabled: boolean; min: number };
+      carbs?: { enabled: boolean; min: number };
+      fats?: { enabled: boolean; min: number };
+    } = {};
     
-    const query = `${macroParts}${cuisinePart}${dietPart}${dietaryPart ? ' ' + dietaryPart : ''}`.trim();
+    // Calories filter
+    if (macroEnabled.calories) {
+      filters.calories = {
+        enabled: true,
+        mode: calorieMode === "UNDER" ? "BELOW" : "ABOVE",
+        value: macroValues.calories,
+      };
+    }
     
-    const meals = await searchMeals(query, activeDistance);
+    // Protein, Carbs, Fats are always MINIMUMS (>=) when enabled
+    if (macroEnabled.protein) {
+      filters.protein = {
+        enabled: true,
+        min: macroValues.protein,
+      };
+    }
+    if (macroEnabled.carbs) {
+      filters.carbs = {
+        enabled: true,
+        min: macroValues.carbs,
+      };
+    }
+    if (macroEnabled.fats) {
+      filters.fats = {
+        enabled: true,
+        min: macroValues.fats,
+      };
+    }
     
-    // Filter meals by selected cuisine if one is selected
-    let filteredMeals = selectedCuisine 
-      ? meals.filter(meal => mealMatchesCuisine(meal, selectedCuisine))
+    // Build legacy macroFilters payload for backward compatibility
+    const macroFilters: {
+      proteinMin?: number;
+      carbsMin?: number;
+      fatsMin?: number;
+      caloriesMax?: number; // For UNDER mode
+      caloriesMin?: number; // For OVER mode
+    } = {};
+    
+    if (filters.protein?.enabled) {
+      macroFilters.proteinMin = filters.protein.min;
+    }
+    if (filters.carbs?.enabled) {
+      macroFilters.carbsMin = filters.carbs.min;
+    }
+    if (filters.fats?.enabled) {
+      macroFilters.fatsMin = filters.fats.min;
+    }
+    
+    // Calories: UNDER mode = max, OVER mode = min
+    if (filters.calories?.enabled) {
+      if (calorieMode === "UNDER") {
+        macroFilters.caloriesMax = filters.calories.value;
+      } else {
+        macroFilters.caloriesMin = filters.calories.value;
+      }
+    }
+    
+    const mealsResult = await searchMeals(query, activeDistance, false, undefined, lastSearchParams?.searchKey, filters, macroFilters, calorieMode);
+    const meals: Meal[] = Array.isArray(mealsResult) ? mealsResult : (mealsResult.meals || []);
+    const responseSearchKey = Array.isArray(mealsResult) ? undefined : mealsResult.searchKey;
+    
+    // Update lastSearchParams with new searchKey if received
+    if (responseSearchKey && lastSearchParams) {
+      setLastSearchParams({ ...lastSearchParams, searchKey: responseSearchKey });
+    }
+    
+    // Filter meals by selected cuisine if one is selected (client-side fallback)
+    let filteredMeals: Meal[] = selectedCuisine 
+      ? meals.filter((meal: Meal) => mealMatchesCuisine(meal, selectedCuisine))
       : meals;
     
-    // Apply profile-based filtering
+    // Diet filtering removed - filterMealsByProfile now returns meals unchanged
     filteredMeals = filterMealsByProfile(filteredMeals, userProfile);
     
     // Get existing meal IDs to avoid duplicates
     const existingIds = new Set(recommendedMeals.map(m => m.id));
     
     // Filter out duplicates - fetch up to 15 results to have better chance of getting 3 unique ones
-    const uniqueMeals = filteredMeals.filter(m => !existingIds.has(m.id));
+    const uniqueMeals = filteredMeals.filter((m: Meal) => !existingIds.has(m.id));
     
     // Shuffle and take 3 new meals for variety
     const shuffled = [...uniqueMeals].sort(() => Math.random() - 0.5);
@@ -770,38 +915,26 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         <div className="flex justify-center overflow-x-auto no-scrollbar pb-1">
           <div className="flex gap-2 sm:gap-3">
             {CUISINES.map((cuisine) => {
-              const isActive = cuisine.id === selectedCuisine;
               return (
                 <button
                   key={cuisine.id}
                   onClick={() => {
-                    // Toggle: if already selected, deselect; otherwise select
-                    const newCuisine = isActive ? null : cuisine.id;
-                    setSelectedCuisine(newCuisine);
-                    // Persist immediately
-                    if (typeof window !== 'undefined') {
-                      localStorage.setItem('seekeatz_selected_cuisine', JSON.stringify(newCuisine));
-                    }
+                    // Show "Coming soon" - cuisine selection is disabled
+                    // No action taken, but button remains clickable
                   }}
-                  className={`flex flex-col items-center flex-shrink-0 transition-transform ${
-                    isActive ? "scale-105" : "scale-100"
-                  }`}
+                  className="flex flex-col items-center flex-shrink-0 transition-opacity opacity-50 cursor-pointer hover:opacity-60"
+                  title="Coming soon"
                 >
                   <div
-                    className={`h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center border border-border shadow-sm transition-all overflow-hidden ${
-                      isActive
-                        ? "bg-primary/10 shadow-[0_0_12px_rgba(72,149,239,0.6)] ring-2 ring-[#4DDDF9]/50"
-                        : "bg-muted/50"
-                    }`}
+                    className="h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center border border-border/50 shadow-sm transition-all overflow-hidden bg-muted/30 grayscale"
                   >
-                    <span className="text-xl sm:text-2xl leading-none">{cuisine.icon}</span>
+                    <span className="text-xl sm:text-2xl leading-none opacity-70">{cuisine.icon}</span>
                   </div>
-                  <span
-                    className={`mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] tracking-wide ${
-                      isActive ? "text-foreground" : "text-muted-foreground"
-                    }`}
-                  >
+                  <span className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] tracking-wide text-muted-foreground/60">
                     {cuisine.label}
+                  </span>
+                  <span className="mt-0.5 text-[9px] sm:text-[10px] text-muted-foreground/50">
+                    Coming soon
                   </span>
                 </button>
               );
@@ -820,12 +953,14 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         />
 
         {/* Macro tabs */}
-        <div className="mt-6 sm:mt-8 flex gap-4 sm:gap-5 flex-wrap justify-center">
+        <div className="mt-6 sm:mt-8 flex gap-2 sm:gap-5 flex-nowrap justify-center">
           {(["calories", "protein", "carbs", "fats"] as MacroType[]).map(
             (type) => {
               const isActive = macro === type;
               const isPopoverOpen = openPopover === type;
-              const currentDirection = macroDirections[type];
+              const isEnabled = macroEnabled[type];
+              const isCalories = type === "calories";
+              const currentDirection = isCalories ? macroDirections.calories : undefined;
               
               return (
                 <Popover
@@ -842,18 +977,23 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
                   <PopoverTrigger asChild>
                     <button
                       onClick={() => handleMacroChange(type)}
-                      className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-medium transition-all relative ${
+                      className={`px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-base font-medium transition-all relative flex-shrink-0 ${
                         isActive
                           ? "bg-gradient-to-r from-[#3A8BFF] to-[#4DDDF9] text-white shadow-lg shadow-[#3A8BFF]/40"
+                          : !isEnabled
+                          ? "bg-muted/50 text-muted-foreground border border-border/50 opacity-60"
                           : "bg-muted text-foreground border border-border hover:bg-muted/80"
                       }`}
                     >
                       {MACRO_CONFIG[type].label}
-                      {currentDirection === "above" && (
-                        <span className="ml-1 text-xs opacity-75">↑</span>
+                      {isCalories && currentDirection === "above" && (
+                        <span className="ml-0.5 sm:ml-1 text-xs opacity-75">↑</span>
                       )}
-                      {currentDirection === "below" && (
-                        <span className="ml-1 text-xs opacity-75">↓</span>
+                      {isCalories && currentDirection === "below" && (
+                        <span className="ml-0.5 sm:ml-1 text-xs opacity-75">↓</span>
+                      )}
+                      {!isEnabled && (
+                        <span className="ml-0.5 sm:ml-1 text-xs opacity-75">✕</span>
                       )}
                     </button>
                   </PopoverTrigger>
@@ -864,26 +1004,53 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
                     sideOffset={8}
                   >
                     <div className="flex flex-col gap-1">
-                      <button
-                        onClick={() => handleDirectionChange(type, "above")}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                          currentDirection === "above"
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted hover:bg-muted/80 text-foreground"
-                        }`}
-                      >
-                        Above (≥)
-                      </button>
-                      <button
-                        onClick={() => handleDirectionChange(type, "below")}
-                        className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                          currentDirection === "below"
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted hover:bg-muted/80 text-foreground"
-                        }`}
-                      >
-                        Below (≤)
-                      </button>
+                      {isCalories ? (
+                        // Calories: show direction toggle (ABOVE/BELOW)
+                        <>
+                          <button
+                            onClick={() => handleDirectionChange("above")}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                              currentDirection === "above"
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-muted hover:bg-muted/80 text-foreground"
+                            }`}
+                          >
+                            Above (≥)
+                          </button>
+                          <button
+                            onClick={() => handleDirectionChange("below")}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                              currentDirection === "below"
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-muted hover:bg-muted/80 text-foreground"
+                            }`}
+                          >
+                            Below (≤)
+                          </button>
+                          <button
+                            onClick={() => handleToggleExclude(type)}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                              !isEnabled
+                                ? "bg-destructive text-destructive-foreground"
+                                : "bg-muted hover:bg-muted/80 text-foreground"
+                            }`}
+                          >
+                            {isEnabled ? "Exclude" : "Include"}
+                          </button>
+                        </>
+                      ) : (
+                        // Protein/Carbs/Fats: show exclude toggle only (always minimums)
+                        <button
+                          onClick={() => handleToggleExclude(type)}
+                          className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                            !isEnabled
+                              ? "bg-destructive text-destructive-foreground"
+                              : "bg-muted hover:bg-muted/80 text-foreground"
+                          }`}
+                        >
+                          {isEnabled ? "Exclude" : "Include"}
+                        </button>
+                      )}
                     </div>
                   </PopoverContent>
                 </Popover>
@@ -942,6 +1109,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
                     <MealCard
                       meal={meal}
                       isFavorite={favoriteMeals.includes(meal.id)}
+                      userProfile={userProfile}
+                      loggedMeals={loggedMeals}
                       onClick={() => {
                         // Save scroll position and meal ID before navigating to meal detail
                         if (containerRef.current && typeof window !== 'undefined') {

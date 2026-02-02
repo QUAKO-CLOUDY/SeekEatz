@@ -1,0 +1,281 @@
+{
+    "restaurant_name": "Pei Wei Asian Kitchen",
+    "items": [
+      {
+        "name": "Orange Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 720,
+          "protein": 36,
+          "carbs": 81,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Mongolian Steak",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 710,
+          "protein": 42,
+          "carbs": 45,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Firecracker Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1090,
+          "protein": 46,
+          "carbs": 96,
+          "fat": 60
+        }
+      },
+      {
+        "name": "Honey-Seared Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 800,
+          "protein": 37,
+          "carbs": 80,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Kung Pao Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 840,
+          "protein": 42,
+          "carbs": 69,
+          "fat": 43
+        }
+      },
+      {
+        "name": "Spicy General Tso's Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1150,
+          "protein": 47,
+          "carbs": 101,
+          "fat": 60
+        }
+      },
+      {
+        "name": "Thai Coconut Curry Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 770,
+          "protein": 40,
+          "carbs": 45,
+          "fat": 48
+        }
+      },
+      {
+        "name": "Sesame Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1230,
+          "protein": 48,
+          "carbs": 119,
+          "fat": 65
+        }
+      },
+      {
+        "name": "Spicy Korean BBQ Steak",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 742,
+          "protein": 42,
+          "carbs": 38,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Beef & Broccoli",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 730,
+          "protein": 44,
+          "carbs": 50,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Kung Pao Shrimp",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 780,
+          "protein": 27,
+          "carbs": 80,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Teriyaki Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1180,
+          "protein": 43,
+          "carbs": 176,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Grilled Bourbon Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 810,
+          "protein": 50,
+          "carbs": 90,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Mongolian Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 610,
+          "protein": 36,
+          "carbs": 43,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Pei Wei Original Shrimp",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 720,
+          "protein": 21,
+          "carbs": 89,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Chicken & Broccoli",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 630,
+          "protein": 38,
+          "carbs": 47,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Teriyaki Crispy Tofu",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 570,
+          "protein": 6,
+          "carbs": 95,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Chicken Pad Thai",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1360,
+          "protein": 55,
+          "carbs": 168,
+          "fat": 43
+        }
+      },
+      {
+        "name": "Chicken Fried Rice",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1150,
+          "protein": 52,
+          "carbs": 157,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Chicken Lo Mein",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1040,
+          "protein": 51,
+          "carbs": 128,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Dan Dan Chicken Noodles",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1070,
+          "protein": 47,
+          "carbs": 126,
+          "fat": 40
+        }
+      },
+      {
+        "name": "Asian Chopped Chicken Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 400,
+          "protein": 32,
+          "carbs": 34,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Signature Chicken Lettuce Wraps",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 850,
+          "protein": 34,
+          "carbs": 75,
+          "fat": 47
+        }
+      }
+    ]
+  }

@@ -1,0 +1,214 @@
+{
+    "restaurant_name": "Zaxby's",
+    "items": [
+      
+      
+      
+      {
+        "name": "Asian Zensation Zalad",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 640,
+          "protein": 35,
+          "carbs": 62,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Blue Zalad",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 680,
+          "protein": 39,
+          "carbs": 43,
+          "fat": 39
+        }
+      },
+      
+      {
+        "name": "Chicken Finger Plate",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1110,
+          "protein": 45,
+          "carbs": 98,
+          "fat": 60
+        }
+      },
+      {
+        "name": "Big Zax Snak Meal",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 890,
+          "protein": 36,
+          "carbs": 80,
+          "fat": 48
+        }
+      },
+      
+      {
+        "name": "Boneless Wings Meal 5 ",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1040,
+          "protein": 34,
+          "carbs": 92,
+          "fat": 60
+        }
+      },
+      {
+        "name": "Traditional Wings Meal 5 ",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1030,
+          "protein": 51,
+          "carbs": 70,
+          "fat": 61
+        }
+      },
+      
+      {
+        "name": "Kickin Chicken Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 690,
+          "protein": 34,
+          "carbs": 51,
+          "fat": 39
+        }
+      },
+      
+      
+      
+      {
+        "name": "Catering Grilled Chicken Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 560,
+          "protein": 38,
+          "carbs": 36,
+          "fat": 29
+        }
+      },
+      
+      
+      {
+        "name": " Nibblerz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 960,
+          "protein": 38,
+          "carbs": 76,
+          "fat": 56
+        }
+      },
+      {
+        "name": "Chicken Bacon Ranch Loaded Fries",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1270,
+          "protein": 61,
+          "carbs": 88,
+          "fat": 78
+        }
+      },
+      {
+        "name": "Chicken Fingerz with Zax Sauce",
+        "category": "Protein",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 320,
+          "protein": 19,
+          "carbs": 11,
+          "fat": 23
+        }
+      },
+  
+      {
+        "name": "Ranch Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 190,
+          "protein":150,
+          "carbs": 2,
+          "fat":16
+        }
+      },
+      
+      {
+        "name": "Zax Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 150,
+          "protein": 0,
+          "carbs": 4,
+          "fat":15
+        }
+      },
+      {
+        "name": "Spicy Zax Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 170,
+          "protein": 1,
+          "carbs": 5,
+          "fat": 16
+        }
+      },
+  
+      {
+        "name": "Chicken Fingerz Zax Packz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 320,
+          "protein": 19,
+          "carbs":11,
+          "fat": 23
+        }
+      },
+    
+     
+      {
+        "name": "Zaxby's Signature Sandwichh",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 820,
+          "protein":31,
+          "carbs":52,
+          "fat": 53
+        }
+  
+      }
+    ]
+  }

@@ -1,0 +1,214 @@
+{
+    "restaurant_name": "QDOBA Mexican Eats",
+    "items": [
+      {
+        "name": "Chicken Queso Bowl",
+        "category": "Bowls",
+        "price_estimate": 12.45,
+        "macros": {
+          "calories": 780,
+          "protein": 43,
+          "carbs": 75,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Chicken Queso Burrito",
+        "category": "Bowls",
+        "price_estimate": 12.45,
+        "macros": {
+          "calories": 1080,
+          "protein": 51,
+          "carbs": 127,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Double Protein Bowl - Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 610,
+          "protein": 44,
+          "carbs": 48,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Quesabirria Burrito",
+        "category": "Burritos",
+        "price_estimate": 15.35,
+        "macros": {
+          "calories": 1080,
+          "protein": 51,
+          "carbs": 127,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Street Style Chicken Tacos",
+        "category": "Tacos",
+        "price_estimate": 12.45,
+        "macros": {
+          "calories": 520,
+          "protein": 26,
+          "carbs": 52,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Chorizo",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 16,
+          "carbs": 6,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Grilled Adobo Chicken",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 16,
+          "carbs": 2,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Grilled Steak",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 230,
+          "protein": 19,
+          "carbs": 4,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Ground Beef",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 17,
+          "carbs": 4,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Plant-Based Impossible",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 180,
+          "protein": 13,
+          "carbs": 9,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Chile Corn Salsa",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 2,
+          "carbs": 10,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Habanero Salsa",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 1,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Picante Ranch Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 40,
+          "protein": 0,
+          "carbs": 10,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Pico de Gallo",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Queso Diablo",
+        "category": "Chips, Dips & Sides",
+        "price_estimate": 2.50,
+        "macros": {
+          "calories": 90,
+          "protein": 3,
+          "carbs": 3,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Salsa Roja",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 1,
+          "carbs": 4,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Salsa Verde",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sour Cream",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 1,
+          "carbs": 3,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Three Cheese Queso",
+        "category": "Chips, Dips & Sides",
+        "price_estimate": 2.50,
+        "macros": {
+          "calories": 190,
+          "protein": 6,
+          "carbs": 6,
+          "fat": 15
+        }
+      }
+    ]
+  }

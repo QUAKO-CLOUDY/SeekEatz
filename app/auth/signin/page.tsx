@@ -7,6 +7,8 @@ import { createClient } from "@/utils/supabase/client";
 import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
+import { clearGuestSessionFull } from "@/lib/guest-session";
+import { claimAnonymousData } from "@/lib/claim-anon-data";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -71,7 +73,12 @@ export default function SignInPage() {
         
         // Clear session-based UI state on login
         if (typeof window !== 'undefined') {
-          localStorage.removeItem('seekeatz_chat_messages');
+          try {
+            // Chat is now stored in sessionStorage
+            
+          } catch (e) {
+            console.error('Failed to clear chat sessionStorage on login:', e);
+          }
           localStorage.removeItem('seekeatz_recommended_meals');
           localStorage.removeItem('seekeatz_has_searched');
           localStorage.removeItem('seekeatz_last_search_params');
@@ -113,42 +120,85 @@ export default function SignInPage() {
           console.warn("Could not fetch existing profile:", error);
         }
         
-        // Update profile in database
+        // Claim anonymous data (saved_meals, daily_logs, user_favorites)
         try {
+          await claimAnonymousData();
+        } catch (claimError) {
+          console.error('Error claiming anonymous data:', claimError);
+          // Don't block signin flow if claim fails
+        }
+
+        // Clear guest session data since user now has an account
+        if (typeof window !== 'undefined') {
+          try {
+            clearGuestSessionFull(); // Clear all guest session data including trial count
+          } catch (e) {
+            console.warn('Failed to clear guest session data:', e);
+          }
+        }
+
+        // Update profile in database - ensure profile row exists with all required fields
+        try {
+          const profileData: any = {
+            id: userId,
+            email: data.user.email, // Include email field
+            last_login: new Date(now).toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+
+          // Set has_completed_onboarding if user has completed onboarding
+          if (profile || hasCompletedOnboarding) {
+            profileData.has_completed_onboarding = true;
+          }
+
+          // Include profile data if available
+          if (profile) {
+            profileData.user_profile = profile;
+            // Also map individual fields if needed
+            if (profile.goal) profileData.goal = profile.goal;
+            if (profile.diet_type) profileData.diet_type = profile.diet_type;
+            if (profile.dietary_options) profileData.dietary_options = profile.dietary_options;
+            if (profile.target_calories) profileData.calorie_goal = profile.target_calories;
+            if (profile.target_protein_g) profileData.protein_goal = profile.target_protein_g;
+            if (profile.target_carbs_g) profileData.carb_limit = profile.target_carbs_g;
+            if (profile.target_fats_g) profileData.fat_limit = profile.target_fats_g;
+            if (profile.preferredMealTypes) profileData.preferred_meal_types = profile.preferredMealTypes;
+            if (profile.search_distance_miles) profileData.search_distance_miles = profile.search_distance_miles;
+          }
+
           await supabase
             .from("profiles")
-            .upsert({
-              id: userId,
-              last_login: new Date(now).toISOString(),
-              has_completed_onboarding: profile ? true : (hasCompletedOnboarding ? true : undefined),
-              user_profile: profile || undefined,
-              updated_at: new Date().toISOString(),
-            }, {
+            .upsert(profileData, {
               onConflict: "id",
             });
         } catch (error) {
-          console.warn("Could not update profile:", error);
+          console.error("Could not update profile:", error);
+          // Don't block navigation even if profile update fails
         }
 
         // Update localStorage
-        localStorage.setItem(`macroMatch_lastLogin_${userId}`, now.toString());
-        localStorage.setItem("macroMatch_lastLogin", now.toString());
+        localStorage.setItem(`seekEatz_lastLogin_${userId}`, now.toString());
+        localStorage.setItem("seekEatz_lastLogin", now.toString());
         
         // Set onboarding flags if user has completed onboarding
         if (profile || hasCompletedOnboarding) {
-          localStorage.setItem(`macroMatch_hasCompletedOnboarding_${userId}`, "true");
+          localStorage.setItem(`seekEatz_hasCompletedOnboarding_${userId}`, "true");
           localStorage.setItem("hasCompletedOnboarding", "true");
+          localStorage.setItem("onboarded", "true");
           if (profile) {
             localStorage.setItem("userProfile", JSON.stringify(profile));
           }
-          localStorage.removeItem("macroMatch_onboardingQuestionsComplete");
+          localStorage.removeItem("seekEatz_onboardingQuestionsComplete");
         }
         
         // Clear any saved last screen so user always goes to chat first after sign-in
         localStorage.removeItem("seekeatz_current_screen");
         localStorage.removeItem("seekeatz_nav_history");
         
-        // Navigate to chat - the auth state change listener in MainApp will handle the rest
+        // Refresh router to ensure session is updated in all components
+        router.refresh();
+        
+        // Navigate to chat - the auth state change listener will unlock the chat immediately
         router.push("/chat");
       }
     } catch (err) {
@@ -158,47 +208,47 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0F19] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
-          <p className="text-gray-400">Sign in to continue to SeekEatz</p>
+          <h1 className="text-3xl font-bold text-black mb-2">Welcome Back</h1>
+          <p className="text-black">Sign in to continue to SeekEatz</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <Label className="text-gray-300 mb-2 block">Email</Label>
+            <Label className="text-black mb-2 block">Email</Label>
             <div className="relative">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-500" />
               <Input
                 type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-14 pl-12 rounded-2xl bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-cyan-500 focus:ring-cyan-500/20"
+                className="h-14 pl-12 rounded-2xl bg-gray-50 border-gray-300 text-black placeholder:text-gray-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                 autoComplete="email"
               />
             </div>
           </div>
 
           <div>
-            <Label className="text-gray-300 mb-2 block">Password</Label>
+            <Label className="text-black mb-2 block">Password</Label>
             <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cyan-500" />
               <Input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="h-14 pl-12 pr-12 rounded-2xl bg-gray-900/50 border-gray-700 text-white placeholder:text-gray-500 focus:border-cyan-500 focus:ring-cyan-500/20"
+                className="h-14 pl-12 pr-12 rounded-2xl bg-gray-50 border-gray-300 text-black placeholder:text-gray-400 focus:border-cyan-500 focus:ring-cyan-500/20"
                 autoComplete="current-password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-cyan-500 hover:text-cyan-600 transition-colors"
               >
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -220,11 +270,11 @@ export default function SignInPage() {
           </Button>
         </form>
 
-        <p className="text-gray-500 text-sm text-center mt-6">
+        <p className="text-black text-sm text-center mt-6">
           Don't have an account?{" "}
           <button
             onClick={() => router.push("/auth/signup")}
-            className="text-cyan-400 hover:text-cyan-300 font-medium"
+            className="text-cyan-600 hover:text-cyan-700 font-medium"
           >
             Sign up
           </button>

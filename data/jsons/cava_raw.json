@@ -1,0 +1,368 @@
+{
+    "restaurant_name": "CAVA",
+    "items": [
+      {
+        "name": "Spicy Lamb + Avocado",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 800,
+          "protein": 43,
+          "carbs": 49,
+          "fat": 52
+        }
+      },
+      {
+        "name": "Steak + Harissa",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 620,
+          "protein": 36,
+          "carbs": 39,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Harissa Avocado",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 830,
+          "protein": 41,
+          "carbs": 62,
+          "fat": 49
+        }
+      },
+      {
+        "name": "Chicken + Rice",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 700,
+          "protein": 40,
+          "carbs": 44,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Greek Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 580,
+          "protein": 37,
+          "carbs": 19,
+          "fat": 40
+        }
+      },
+      {
+        "name": "Garlicky Chicken Shawarma",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 600,
+          "protein": 27,
+          "carbs": 50,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Falafel Crunch",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 860,
+          "protein": 24,
+          "carbs": 88,
+          "fat": 56
+        }
+      },
+      {
+        "name": "Spicy Chicken + Avocado",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 980,
+          "protein": 50,
+          "carbs": 85,
+          "fat": 51
+        }
+      },
+      {
+        "name": "Steak + Feta",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 820,
+          "protein": 44,
+          "carbs": 68,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Chicken Shawarma",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 640,
+          "protein": 33,
+          "carbs": 70,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Greek Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 870,
+          "protein": 48,
+          "carbs": 69,
+          "fat": 45
+        }
+      },
+      {
+        "name": "Braised Lamb",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 24,
+          "carbs": 2,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Grilled Chicken",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 28,
+          "carbs": 3,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Falafel",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 350,
+          "protein": 6,
+          "carbs": 24,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Grilled Steak",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 23,
+          "carbs": 1,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Harissa Honey Chicken",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 260,
+          "protein": 26,
+          "carbs": 7,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Roasted Vegetables",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 3,
+          "carbs": 14,
+          "fat": 4.5
+        }
+      },
+      {
+        "name": "Spicy Lamb Meatballs",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 24,
+          "carbs": 3,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Chicken Shawarma",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 16,
+          "carbs": 1,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Tzatziki",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 2,
+          "carbs": 1,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Hummus",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 2,
+          "carbs": 4,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Roasted Eggplant",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Crazy Feta",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 4,
+          "carbs": 1,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Harissa",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 1,
+          "carbs": 5,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Red Pepper Hummus",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 40,
+          "protein": 2,
+          "carbs": 5,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Balsamic Date Vinaigrette",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 60,
+          "protein": 0,
+          "carbs": 7,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Yogurt Dill",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 2,
+          "carbs": 1,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Lemon-Herb Tahini",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 2,
+          "carbs": 4,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Tahini Caesar",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 90,
+          "protein": 2,
+          "carbs": 3,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Greek Vinaigrette",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Skhug",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Hot Harissa Vinaigrette",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Garlic Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 180,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 20
+        }
+      }
+    ]
+  }

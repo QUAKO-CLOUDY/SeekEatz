@@ -41,18 +41,14 @@ export function SimplifiedOnboarding({ onComplete }: Props) {
       target_protein_g: 150,
       target_carbs_g: 200,
       target_fats_g: 65,
-      preferredMealTypes: [],
-      eatingStyles: [],
-      dietaryPreferences: [],
-      activityLevel: 'moderately-active',
-      trainingStyle: 'hybrid'
+      preferredMealTypes: []
     };
 
     // Save onboarding completion to localStorage
     const now = Date.now();
     localStorage.setItem("userProfile", JSON.stringify(profile));
     localStorage.setItem("hasCompletedOnboarding", "true");
-    localStorage.setItem("macroMatch_lastLogin", now.toString());
+    localStorage.setItem("seekEatz_lastLogin", now.toString());
 
     // Call the onComplete callback
     onComplete(profile);

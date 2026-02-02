@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { Navigation, type Screen } from './Navigation';
 import { HomeScreen } from './HomeScreen';
 import { LogScreen } from './LogScreen';
 import { Favorites } from './Favorites';
 import { Settings } from './Settings';
-import { AIChat } from './AIChat';
+import AIChat from './AIChat';
 import { MealDetail } from './MealDetail';
 import { SearchScreen } from './SearchScreen';
 import { OnboardingFlow } from './OnboardingFlow';
@@ -16,6 +16,7 @@ import { AuthScreen } from './AuthScreen';
 import type { UserProfile, Meal } from '../types';
 import type { LoggedMeal } from './LogScreen';
 import { useSessionActivity } from '../hooks/useSessionActivity';
+import { useNutrition } from '../contexts/NutritionContext'; // Import to sync loggedMeals with context
 
 type View = 'main' | 'meal-detail';
 
@@ -30,7 +31,26 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   
   // Router and Supabase client
   const router = useRouter();
-  const supabase = createClient();
+  const pathname = usePathname();
+  
+  // Client ready check (stable boolean) - must be defined before isChatRoute
+  const isClient = typeof window !== 'undefined';
+  
+  // Create stable Supabase client reference (not recreated every render)
+  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
+  if (!supabaseRef.current) {
+    supabaseRef.current = createClient();
+  }
+  const supabase = supabaseRef.current;
+  
+  // Check if we're on the /chat route (robust pathname check)
+  // Normalize pathname: remove trailing slashes and query strings for comparison
+  // Handle /chat, /chat/, /chat?foo=bar, etc.
+  // Only compute on client-side to avoid hydration mismatches
+  const normalizedPathname = isClient && pathname 
+    ? pathname.replace(/\/$/, '').split('?')[0] 
+    : '';
+  const isChatRoute = normalizedPathname === '/chat' || initialScreen === 'chat';
   
   // Hydration fix: Track if component is mounted on client
   const [isMounted, setIsMounted] = useState(false);
@@ -59,7 +79,15 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     target_protein_g: 150,
     target_carbs_g: 200,
     target_fats_g: 70,
+    search_distance_miles: 10,
   });
+
+  // Track current user ID
+  const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
+  
+  // Get updateLoggedMeals from NutritionContext to sync state
+  // NutritionProvider is now at root layout level, so this should always work
+  const { updateLoggedMeals } = useNutrition();
 
   // Session timeout handler - redirects to login on timeout
   const handleSessionTimeout = () => {
@@ -85,8 +113,16 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       if (savedHistory) {
         const parsed = JSON.parse(savedHistory);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setNavHistory(parsed);
-          setCurrentScreen(parsed[parsed.length - 1] as Screen);
+          // Validate and filter to only include valid Screen values
+          const validScreens: Screen[] = ['home', 'log', 'chat', 'favorites', 'settings', 'search'];
+          const filteredHistory = parsed.filter((screen): screen is Screen => 
+            typeof screen === 'string' && validScreens.includes(screen as Screen)
+          ) as Screen[];
+          
+          if (filteredHistory.length > 0) {
+            setNavHistory(filteredHistory);
+            setCurrentScreen(filteredHistory[filteredHistory.length - 1]);
+          }
         }
       } else {
         // Fallback to saved screen if no history
@@ -137,6 +173,44 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     } catch (e) {
       console.error('Failed to parse userProfile:', e);
     }
+
+    // Load logged meals and reset today's meals if it's a new day
+    try {
+      const saved = localStorage.getItem('seekeatz_logged_meals');
+      const todayStr = new Date().toISOString().split('T')[0];
+      const lastResetDate = localStorage.getItem('seekeatz_last_reset_date');
+      
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          // If it's a new day, filter out all meals from today's date (reset today's log)
+          // Keep all historical meals (dates before today)
+          if (lastResetDate && lastResetDate !== todayStr) {
+            // It's a new day - remove all meals from today's date to reset today's log
+            // Keep all meals from dates before today (historical data)
+            const filteredMeals = parsed.filter((log: LoggedMeal) => {
+              // Keep meals from dates before today (historical)
+              return log.date < todayStr;
+            });
+            setLoggedMeals(filteredMeals);
+            // Update last reset date to today
+            localStorage.setItem('seekeatz_last_reset_date', todayStr);
+          } else {
+            // Same day or first time - keep all meals including today's
+            setLoggedMeals(parsed);
+            // Set last reset date if not set
+            if (!lastResetDate) {
+              localStorage.setItem('seekeatz_last_reset_date', todayStr);
+            }
+          }
+        }
+      } else {
+        // No saved meals - set last reset date to today
+        localStorage.setItem('seekeatz_last_reset_date', todayStr);
+      }
+    } catch (e) {
+      console.error('Failed to parse loggedMeals:', e);
+    }
   }, [isMounted]);
 
   // Initialize app state: Check localStorage for 'onboarded' and Supabase session
@@ -147,28 +221,43 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       // Check localStorage for onboarding completion
       const isOnboarded = typeof window !== 'undefined' 
         ? localStorage.getItem('onboarded') === 'true' ||
-          localStorage.getItem('hasCompletedOnboarding') === 'true' ||
-          localStorage.getItem('macroMatch_completedOnboarding') === 'true'
+          localStorage.getItem('hasCompletedOnboarding') === 'true'
         : false;
 
       // Check Supabase session - retry if not found initially (session might still be propagating)
+      // Treat AuthSessionMissingError as "no user" (signed-out preview mode)
       let user = null;
       let retries = 0;
       while (retries < 3 && !user) {
-        const { data: { user: fetchedUser }, error } = await supabase.auth.getUser();
-        if (fetchedUser && !error) {
-          user = fetchedUser;
-          break;
-        }
-        // Wait a bit before retrying (only if we didn't get a user)
-        if (!fetchedUser && retries < 2) {
-          await new Promise(resolve => setTimeout(resolve, 200));
+        try {
+          const { data: { user: fetchedUser }, error } = await supabase.auth.getUser();
+          if (fetchedUser && !error) {
+            user = fetchedUser;
+            break;
+          }
+          // If error is AuthSessionMissingError, treat as no user (expected for signed-out users)
+          if (error && (error.message?.includes('Auth session missing') || error.name === 'AuthSessionMissingError')) {
+            // This is expected for signed-out users - break and continue with user = null
+            break;
+          }
+          // Wait a bit before retrying (only if we didn't get a user and it's not a session missing error)
+          if (!fetchedUser && retries < 2) {
+            await new Promise(resolve => setTimeout(resolve, 200));
+          }
+        } catch (error: any) {
+          // AuthSessionMissingError is expected when signed out - treat as no user
+          if (error?.message?.includes('Auth session missing') || error?.name === 'AuthSessionMissingError') {
+            // This is expected for signed-out users - break and continue with user = null
+            break;
+          }
+          console.warn("Unexpected auth error in MainApp:", error);
         }
         retries++;
       }
       
       // If we have a user but no onboarding flag, check the database
       if (user && !isOnboarded) {
+        setCurrentUserId(user.id); // Track current user ID
         try {
           const { data: profileData } = await supabase
             .from("profiles")
@@ -179,7 +268,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           if (profileData?.has_completed_onboarding) {
             // Set localStorage flags
             if (typeof window !== 'undefined') {
-              localStorage.setItem(`macroMatch_hasCompletedOnboarding_${user.id}`, "true");
+              localStorage.setItem(`seekEatz_hasCompletedOnboarding_${user.id}`, "true");
               localStorage.setItem("hasCompletedOnboarding", "true");
             }
             // User is onboarded - show app
@@ -189,6 +278,13 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         } catch (error) {
           console.warn("Could not check onboarding status:", error);
         }
+      }
+      
+      // Track user ID if user exists
+      if (user) {
+        setCurrentUserId(user.id);
+      } else {
+        setCurrentUserId(undefined);
       }
 
       // Only set state if we haven't already been set by auth state change listener
@@ -203,8 +299,62 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           // Not onboarded - show onboarding
           return 'onboarding';
         } else if (!user) {
-          // Onboarded but not authenticated - show auth
-          return 'auth';
+          // Onboarded but not authenticated
+          // If we're on the /chat route, allow preview access (don't show auth screen)
+          // The AIChat component will handle the free chat limit and redirect to /auth/signin if needed
+          if (isChatRoute) {
+            // Allow chat preview - show app UI, AIChat will handle limit logic
+            return 'app';
+          }
+          
+          // If onboarding was just completed (recent localStorage flag), give session time to propagate
+          // Check if onboardingCompleted flag was set very recently (within last 5 seconds)
+          const onboardingTimestamp = typeof window !== 'undefined' 
+            ? localStorage.getItem('onboardingCompletedTimestamp')
+            : null;
+          
+          if (onboardingTimestamp) {
+            const timestamp = parseInt(onboardingTimestamp, 10);
+            const timeSinceOnboarding = Date.now() - timestamp;
+            // If onboarding was completed less than 5 seconds ago, wait a bit more for session
+            if (timeSinceOnboarding < 5000) {
+              // Wait a bit and retry getting user
+              setTimeout(async () => {
+                try {
+                  const { data: { user: retryUser }, error: retryError } = await supabase.auth.getUser();
+                  if (retryUser) {
+                    setAppState('app');
+                  } else {
+                    // If error is AuthSessionMissingError, treat as no user (expected for signed-out)
+                    // Only show auth screen if NOT on chat route
+                    if (!isChatRoute && retryError && !retryError.message?.includes('Auth session missing')) {
+                      setAppState('auth');
+                    } else {
+                      // On chat route or session missing (signed-out preview) - show app
+                      setAppState('app');
+                    }
+                  }
+                } catch (error: any) {
+                  // AuthSessionMissingError is expected when signed out - show app for preview
+                  if (error?.message?.includes('Auth session missing') || error?.name === 'AuthSessionMissingError') {
+                    setAppState('app');
+                  } else {
+                    // Other errors - only show auth if NOT on chat route
+                    if (!isChatRoute) {
+                      setAppState('auth');
+                    } else {
+                      setAppState('app');
+                    }
+                  }
+                }
+              }, 1000);
+              // Return current state while waiting
+              return currentState || 'app';
+            }
+          }
+          // Onboarded but not authenticated - show auth (unless on chat route)
+          // On chat route, allow preview access
+          return isChatRoute ? 'app' : 'auth';
         } else {
           // Onboarded and authenticated - show app
           return 'app';
@@ -213,10 +363,12 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     };
 
     initializeApp();
-  }, [supabase, isMounted]);
+  }, [supabase, isMounted, isChatRoute]);
 
   // Set up auth state change listener - this is the primary way we react to sign-in
   useEffect(() => {
+    if (!isClient) return;
+    
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -225,13 +377,13 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       if (event === 'SIGNED_IN' && session?.user) {
         // User logged in - check onboarding status and switch to app view
         const userId = session.user.id;
+        setCurrentUserId(userId); // Track current user ID
         
         // Check if user has completed onboarding
         const isOnboarded = typeof window !== 'undefined' 
           ? localStorage.getItem('onboarded') === 'true' ||
             localStorage.getItem('hasCompletedOnboarding') === 'true' ||
-            localStorage.getItem('macroMatch_completedOnboarding') === 'true' ||
-            localStorage.getItem(`macroMatch_hasCompletedOnboarding_${userId}`) === 'true'
+            localStorage.getItem(`seekEatz_hasCompletedOnboarding_${userId}`) === 'true'
           : false;
         
         // If not onboarded in localStorage, check database
@@ -246,7 +398,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
             if (profileData?.has_completed_onboarding) {
               // Set localStorage flags
               if (typeof window !== 'undefined') {
-                localStorage.setItem(`macroMatch_hasCompletedOnboarding_${userId}`, "true");
+                localStorage.setItem(`seekEatz_hasCompletedOnboarding_${userId}`, "true");
                 localStorage.setItem("hasCompletedOnboarding", "true");
               }
               // User is onboarded - show app immediately
@@ -268,16 +420,23 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         // User is onboarded - switch to app view immediately
         setAppState('app');
       } else if (event === 'SIGNED_OUT') {
-        // User logged out - switch to auth view
-        setAppState('auth');
+        // User logged out
+        setCurrentUserId(undefined); // Clear user ID
+        // If on chat route, ALWAYS allow preview access (don't show auth screen)
+        // The AIChat component will handle the free chat limit and redirect to /auth/signin if needed
+        if (isChatRoute) {
+          setAppState('app');
+        } else {
+          // Not on chat route - show auth screen
+          setAppState('auth');
+        }
       } else if (event === 'TOKEN_REFRESHED' && session?.user) {
         // Session refreshed - make sure we're showing app if user is authenticated
         const userId = session.user.id;
         const isOnboarded = typeof window !== 'undefined' 
           ? localStorage.getItem('onboarded') === 'true' ||
             localStorage.getItem('hasCompletedOnboarding') === 'true' ||
-            localStorage.getItem('macroMatch_completedOnboarding') === 'true' ||
-            localStorage.getItem(`macroMatch_hasCompletedOnboarding_${userId}`) === 'true'
+            localStorage.getItem(`seekEatz_hasCompletedOnboarding_${userId}`) === 'true'
           : false;
         
         if (isOnboarded) {
@@ -289,7 +448,15 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, [supabase, isClient, isChatRoute]);
+
+  // Safety guard: If on chat route, never allow appState to be 'auth'
+  useEffect(() => {
+    if (isChatRoute && appState === 'auth') {
+      // Force app state for chat preview access
+      setAppState('app');
+    }
+  }, [isChatRoute, appState]);
 
   useEffect(() => {
     console.log('MainApp mounted, current screen:', currentScreen);
@@ -305,7 +472,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       } else if (currentScreen === 'search') {
         // Navigate to home and update history
         setNavHistory((prev) => {
-          const newHistory = [...prev, 'home'];
+          const newHistory: Screen[] = [...prev, 'home'];
           const limited = newHistory.slice(-10);
           if (typeof window !== 'undefined') {
             localStorage.setItem('seekeatz_nav_history', JSON.stringify(limited));
@@ -350,6 +517,18 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       console.error('Failed to save userProfile:', e);
     }
   }, [userProfile, isMounted]);
+
+  // Save logged meals to localStorage and sync with NutritionContext when they change (only after mounted)
+  useEffect(() => {
+    if (!isMounted) return;
+    try {
+      localStorage.setItem('seekeatz_logged_meals', JSON.stringify(loggedMeals));
+      // Sync with NutritionContext
+      updateLoggedMeals(loggedMeals);
+    } catch (e) {
+      console.error('Failed to save loggedMeals:', e);
+    }
+  }, [loggedMeals, isMounted, updateLoggedMeals]);
 
   // ========== ALL HOOKS END HERE - NOW HANDLERS AND CONDITIONAL RENDERS ==========
 
@@ -398,8 +577,16 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     );
   }
 
-  // Show auth screen
+  // Show auth screen (but NEVER on /chat route - always show app for preview)
   if (appState === 'auth') {
+    // If we're on the /chat route, force app state to allow preview access
+    // This should never happen due to logic above, but add safety check
+    if (isChatRoute) {
+      // Force app state for chat preview
+      setAppState('app');
+      // Return null briefly while state updates, then will render app
+      return null;
+    }
     return <AuthScreen onSuccess={handleAuthSuccess} />;
   }
 
@@ -498,11 +685,26 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
   const handleLogMeal = (meal: Meal) => {
     updateActivity(); // Update activity on meal logging
+    
+    // Debug log
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todayMeals = loggedMeals.filter(log => log.date === todayStr);
+    const todaysConsumed = todayMeals.reduce((sum, log) => sum + log.meal.calories, 0);
+    const targetCalories = userProfile?.target_calories || 0;
+    const remainingIfEatMeal = targetCalories - (todaysConsumed + meal.calories);
+    
+    console.log('[MainApp] Logging meal:', {
+      targetCalories,
+      todaysConsumedCalories: todaysConsumed,
+      mealCalories: meal.calories,
+      remainingIfEatMeal,
+    });
+    
     const loggedMeal: LoggedMeal = {
       id: `log-${Date.now()}-${Math.random()}`,
       meal,
       timestamp: new Date().toISOString(),
-      date: new Date().toISOString().split('T')[0],
+      date: todayStr,
     };
     setLoggedMeals((prev) => [...prev, loggedMeal]);
     setCurrentView('main');
@@ -527,7 +729,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           isFavorite={favoriteMeals.includes(selectedMeal.id)}
           onToggleFavorite={() => handleToggleFavorite(selectedMeal.id, selectedMeal)}
           onBack={handleBack}
-          onLogMeal={() => handleLogMeal(selectedMeal)}
+          onLogMeal={handleLogMeal}
         />
       </div>
     );
@@ -548,61 +750,75 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // Main app with navigation
   console.log('MainApp rendering, screen:', currentScreen, 'view:', currentView);
   
+  // NutritionProvider is now at root layout level, so we don't need to wrap here
+  // However, we can still pass props to update it if needed via context methods
   return (
     <div className="flex flex-col h-screen bg-background overflow-hidden">
-      <div className={`flex-1 ${currentScreen === 'home' ? 'overflow-y-auto' : 'overflow-hidden'}`}>
-        {currentScreen === 'home' && (
-          <HomeScreen
-            userProfile={userProfile}
-            onMealSelect={handleMealSelect}
-            favoriteMeals={favoriteMeals}
-            onSearch={() => handleNavigate('search')}
-            onNavigateToChat={(message) => {
-              if (message && typeof window !== 'undefined') {
-                localStorage.setItem('seekeatz_pending_chat_message', message);
-              }
-              handleNavigate('chat');
-            }}
-            onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
-          />
-        )}
-        {currentScreen === 'log' && (
-          <LogScreen
-            userProfile={userProfile}
-            loggedMeals={loggedMeals}
-            onRemoveMeal={handleRemoveMeal}
-          />
-        )}
-        {currentScreen === 'chat' && (
-          <AIChat
-            userProfile={userProfile}
-            onMealSelect={handleMealSelect}
-            favoriteMeals={favoriteMeals}
-            onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
-          />
-        )}
-        {currentScreen === 'favorites' && (
-          <Favorites
-            favoriteMeals={favoriteMeals}
-            favoriteMealsData={favoriteMealsData}
-            loggedMeals={loggedMeals}
-            onMealSelect={handleMealSelect}
-            onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
-          />
-        )}
-        {currentScreen === 'settings' && (
-          <Settings
-            userProfile={userProfile}
-            onUpdateProfile={handleUpdateProfile}
-          />
-        )}
+        <div className="flex-1 relative h-full overflow-hidden">
+          {currentScreen === 'home' && (
+            <HomeScreen
+              userProfile={userProfile}
+              onMealSelect={handleMealSelect}
+              favoriteMeals={favoriteMeals}
+              loggedMeals={loggedMeals}
+              onSearch={() => handleNavigate('search')}
+              onNavigateToChat={(message) => {
+                if (message && typeof window !== 'undefined') {
+                  localStorage.setItem('seekeatz_pending_chat_message', message);
+                }
+                handleNavigate('chat');
+              }}
+              onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
+            />
+          )}
+          {currentView === 'meal-detail' && selectedMeal && (
+            <MealDetail
+              meal={selectedMeal}
+              isFavorite={favoriteMeals.includes(selectedMeal.id)}
+              onToggleFavorite={() => handleToggleFavorite(selectedMeal.id, selectedMeal)}
+              onBack={() => setCurrentView('main')}
+              onLogMeal={handleLogMeal}
+            />
+          )}
+          {currentScreen === 'log' && (
+            <LogScreen
+              userProfile={userProfile}
+              loggedMeals={loggedMeals}
+              onRemoveMeal={handleRemoveMeal}
+            />
+          )}
+          {currentScreen === 'chat' && (
+            <AIChat
+              userId={currentUserId}
+              userProfile={userProfile}
+              onMealSelect={handleMealSelect}
+              favoriteMeals={favoriteMeals}
+              onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
+              onSignInRequest={() => router.push('/auth/signin')}
+            />
+          )}
+          {currentScreen === 'favorites' && (
+            <Favorites
+              favoriteMeals={favoriteMeals}
+              favoriteMealsData={favoriteMealsData}
+              loggedMeals={loggedMeals}
+              onMealSelect={handleMealSelect}
+              onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
+            />
+          )}
+          {currentScreen === 'settings' && (
+            <Settings
+              userProfile={userProfile}
+              onUpdateProfile={handleUpdateProfile}
+            />
+          )}
+        </div>
+        
+        <Navigation
+          currentScreen={currentScreen}
+          onNavigate={handleNavigate}
+        />
       </div>
-      
-      <Navigation
-        currentScreen={currentScreen}
-        onNavigate={handleNavigate}
-      />
-    </div>
   );
 }
 

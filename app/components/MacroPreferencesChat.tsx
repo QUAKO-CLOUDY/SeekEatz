@@ -5,15 +5,7 @@ import { Send, Sparkles, ArrowRight, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
-
-// --- Types ---
-export type UserProfile = {
-  full_name?: string;
-  target_calories: number;
-  target_protein_g: number;
-  target_carbs_g: number;
-  target_fats_g: number;
-};
+import type { UserProfile } from '../types';
 
 type Props = {
   userProfile?: UserProfile; // Made optional for easier testing
@@ -87,13 +79,18 @@ export function MacroPreferencesChat({
         response = `Mediterranean cuisine is amazing for balanced nutrition! Lots of lean proteins, healthy fats, and fresh veggies. I'll prioritize Mediterranean restaurants and meals. Any foods you especially love?`;
         suggestions = ['Grilled proteins', 'Seafood', 'Vegetarian'];
       } else {
-        response = `Great! I'll keep that in mind when showing you meals. To make sure I find the perfect options, do you have any dietary restrictions or foods you absolutely love?`;
-        suggestions = ['No restrictions', 'Gluten-free', 'Dairy-free'];
+        response = `Great! I'll keep that in mind when showing you meals. To make sure I find the perfect options, do you have any dietary preferences or foods you absolutely love?`;
+        suggestions = ['No restrictions', 'High protein', 'Low carb'];
       }
     } 
     // Second level responses
     else if (conversationDepth === 1) {
-      response = `Perfect! I have everything I need to find you the best meals. I'll filter restaurants and grocery options based on your preferences and make sure they align with your ${userProfile.goal.replace('-', ' ')} goals.`;
+      if (userProfile.goal) {
+        const goalText = userProfile.goal.replace('-', ' ');
+        response = `Perfect! I have everything I need to find you the best meals. I'll filter restaurants and grocery options based on your preferences and make sure they align with your ${goalText} goals.`;
+      } else {
+        response = `Perfect! I have everything I need to find you the best meals. I'll filter restaurants and grocery options based on your preferences and make sure they align with your nutrition goals.`;
+      }
     } 
     // Catch-all for additional messages
     else {

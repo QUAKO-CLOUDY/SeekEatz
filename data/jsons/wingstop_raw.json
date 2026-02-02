@@ -1,0 +1,278 @@
+{
+    "restaurant_name": "Wingstop",
+    "items": [
+      {
+        "name": "Atomic Classic Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 45, "protein": 6, "carbs": 0, "fat": 2.5 }
+      },
+      {
+        "name": "Cajun Classic Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 45, "protein": 6, "carbs": 0, "fat": 2.5 }
+      },
+      {
+        "name": "Garlic Parmesan Classic Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 90, "protein": 8, "carbs": 0, "fat": 6 }
+      },
+      {
+        "name": "Hawaiian Classic Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 50, "protein": 6, "carbs": 2, "fat": 2.5 }
+      },
+      {
+        "name": "Hickory Smoked BBQ Classic Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 50, "protein": 6, "carbs": 2, "fat": 2.5 }
+      },
+      {
+        "name": "Lemon Pepper Classic Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 70, "protein": 6, "carbs": 0, "fat": 5 }
+      },
+      {
+        "name": "Louisiana Rub Classic Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 60, "protein": 6, "carbs": 0, "fat": 3.5 }
+      },
+      {
+        "name": "Mango Habanero Classic Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 50, "protein": 6, "carbs": 2, "fat": 2.5 }
+      },
+      {
+        "name": "Mild Classic Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 60, "protein": 6, "carbs": 0, "fat": 4 }
+      },
+      {
+        "name": "Original Hot Classic Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 45, "protein": 6, "carbs": 0, "fat": 2.5 }
+      },
+      {
+        "name": "Plain Classic Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 45, "protein": 6, "carbs": 0, "fat": 2 }
+      },
+      {
+        "name": "Spicy Korean Q Classic Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 50, "protein": 6, "carbs": 2, "fat": 2.5 }
+      },
+      {
+        "name": "Atomic Boneless Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 60, "protein": 3, "carbs": 5, "fat": 3 }
+      },
+      {
+        "name": "Cajun Boneless Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 60, "protein": 3, "carbs": 5, "fat": 3 }
+      },
+      {
+        "name": "Garlic Parmesan Boneless Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 100, "protein": 5, "carbs": 5, "fat": 7 }
+      },
+      {
+        "name": "Hawaiian Boneless Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 60, "protein": 3, "carbs": 6, "fat": 3 }
+      },
+      {
+        "name": "Hickory Smoked BBQ Boneless Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 60, "protein": 3, "carbs": 6, "fat": 3 }
+      },
+      {
+        "name": "Lemon Pepper Boneless Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 80, "protein": 3, "carbs": 5, "fat": 5 }
+      },
+      {
+        "name": "Louisiana Rub Boneless Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 70, "protein": 3, "carbs": 5, "fat": 4 }
+      },
+      {
+        "name": "Mango Habanero Boneless Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 60, "protein": 3, "carbs": 7, "fat": 3 }
+      },
+      {
+        "name": "Mild Boneless Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 70, "protein": 3, "carbs": 5, "fat": 4.5 }
+      },
+      {
+        "name": "Original Hot Boneless Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 60, "protein": 3, "carbs": 5, "fat": 3 }
+      },
+      {
+        "name": "Plain Boneless Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 60, "protein": 3, "carbs": 4, "fat": 2.5 }
+      },
+      {
+        "name": "Spicy Korean Q Boneless Wing (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 60, "protein": 3, "carbs": 7, "fat": 3 }
+      },
+      {
+        "name": "Atomic Tender (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 110, "protein": 7, "carbs": 9, "fat": 6 }
+      },
+      {
+        "name": "Cajun Tender (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 110, "protein": 7, "carbs": 9, "fat": 6 }
+      },
+      {
+        "name": "Garlic Parmesan Tender (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 190, "protein": 11, "carbs": 9, "fat": 13 }
+      },
+      {
+        "name": "Hawaiian Tender (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 120, "protein": 7, "carbs": 11, "fat": 5 }
+      },
+      {
+        "name": "Hickory Smoked BBQ Tender (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 120, "protein": 7, "carbs": 11, "fat": 6 }
+      },
+      {
+        "name": "Lemon Pepper Tender (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 150, "protein": 7, "carbs": 9, "fat": 10 }
+      },
+      {
+        "name": "Louisiana Rub Tender (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 130, "protein": 7, "carbs": 8, "fat": 8 }
+      },
+      {
+        "name": "Mango Habanero Tender (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 120, "protein": 7, "carbs": 11, "fat": 6 }
+      },
+      {
+        "name": "Mild Tender (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 140, "protein": 7, "carbs": 8, "fat": 9 }
+      },
+      {
+        "name": "Original Hot Tender (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 110, "protein": 7, "carbs": 8, "fat": 6 }
+      },
+      {
+        "name": "Plain Tender (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 110, "protein": 7, "carbs": 8, "fat": 5 }
+      },
+      {
+        "name": "Spicy Korean Q Tender (1 pc)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": { "calories": 120, "protein": 7, "carbs": 12, "fat": 6 }
+      },
+      {
+        "name": "Ranch Dip",
+        "category": "Dips & Flavors",
+        "price_estimate": 1.79,
+        "image_url": null,
+        "macros": { "calories": 300, "protein": 2, "carbs": 7, "fat": 30 }
+      },
+      {
+        "name": "Blue Cheese Dip",
+        "category": "Dips & Flavors",
+        "price_estimate": 1.79,
+        "image_url": null,
+        "macros": { "calories": 320, "protein": 4, "carbs": 4, "fat": 33 }
+      },
+      {
+        "name": "Cheddar Cheese Sauce",
+        "category": "SaDips & Flavorsuce",
+        "price_estimate": 1.79,
+        "image_url": null,
+        "macros": { "calories": 90, "protein": 3, "carbs": 8, "fat": 6 }
+      }
+    ]
+  }

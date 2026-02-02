@@ -1,0 +1,1493 @@
+{
+    "restaurant_name": "Playa Bowls",
+    "items": [
+      {
+        "name": "Playa Acai Base",
+        "category": "Base",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 250,
+          "protein": 3,
+          "carbs": 39,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Playa Mango Base",
+        "category": "Base",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 310,
+          "protein": 0,
+          "carbs": 78,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Playa Pitaya Base",
+        "category": "Base",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 330,
+          "protein": 0,
+          "carbs": 80,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Playa Coconut Base",
+        "category": "Base",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 270,
+          "protein": 3,
+          "carbs": 33,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Green Base",
+        "category": "Base",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 190,
+          "protein": 4,
+          "carbs": 42,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Banana Base",
+        "category": "Base",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 250,
+          "protein": 3,
+          "carbs": 62,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Oatmeal Base",
+        "category": "Base",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 220,
+          "protein": 7,
+          "carbs": 39,
+          "fat": 3.5
+        }
+      },
+      {
+        "name": "1/2 Banana",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 45,
+          "protein": 1,
+          "carbs": 11,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Banana",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 90,
+          "protein": 1,
+          "carbs": 23,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Blueberry",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 30,
+          "protein": 0,
+          "carbs": 8,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Kiwi",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 25,
+          "protein": 0,
+          "carbs": 6,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Mango",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 35,
+          "protein": 0,
+          "carbs": 8,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Pineapple",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 30,
+          "protein": 0,
+          "carbs": 8,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Strawberry",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 20,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Almonds",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 70,
+          "protein": 2,
+          "carbs": 2,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Bee Pollen",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 10,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Blueberry Flax Granola",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 220,
+          "protein": 4,
+          "carbs": 37,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Brown Sugar",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 110,
+          "protein": 0,
+          "carbs": 28,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Cacao Nibs",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 35,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Chia Seeds",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 15,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Cinnamon",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Coconut Flakes",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 45,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 4.5
+        }
+      },
+      {
+        "name": "Figs",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 35,
+          "protein": 0,
+          "carbs": 9,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Gluten Free/Vegan Granola",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 260,
+          "protein": 6,
+          "carbs": 40,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Goji Berries",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 40,
+          "protein": 1,
+          "carbs": 9,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Hemp Seeds",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 35,
+          "protein": 2,
+          "carbs": 0,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Maple Syrup",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 20,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Walnuts",
+        "category": "Topping",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 70,
+          "protein": 2,
+          "carbs": 2,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Agave",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Almond Butter",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 190,
+          "protein": 2,
+          "carbs": 6,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Honey",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 4,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Nutella",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 150,
+          "protein": 2,
+          "carbs": 17,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Peanut Butter",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 170,
+          "protein": 7,
+          "carbs": 6,
+          "fat": 14
+        }
+      },
+      {
+        "name": "White Chocolate",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 20,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Muscle Milk Chocolate",
+        "category": "Protein",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 60,
+          "protein": 6,
+          "carbs": 4,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Muscle Milk Vanilla",
+        "category": "Protein",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 60,
+          "protein": 6,
+          "carbs": 4,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Plant Fusion Chocolate",
+        "category": "Protein",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 60,
+          "protein": 10,
+          "carbs": 0,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Plant Fusion Vanilla",
+        "category": "Protein",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 60,
+          "protein": 10,
+          "carbs": 0,
+          "fat": 2
+        }
+      },
+      {
+        "name": "North Pole Acai Bowl",
+        "category": "Special Bowls",
+        "price_estimate": 18.20,
+        "image_url": null,
+        "macros": {
+          "calories": 780,
+          "protein": 10,
+          "carbs": 121,
+          "fat": 24
+        }
+      },
+      {
+        "name": "8th Ave",
+        "category": "Acai Bowls",
+        "price_estimate": 14.95,
+        "image_url": null,
+        "macros": {
+          "calories": 570,
+          "protein": 8,
+          "carbs": 102,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Pura Vida",
+        "category": "Acai Bowls",
+        "price_estimate": 16.25,
+        "image_url": null,
+        "macros": {
+          "calories": 540,
+          "protein": 8,
+          "carbs": 92,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Tropical",
+        "category": "Acai Bowls",
+        "price_estimate": 16.25,
+        "image_url": null,
+        "macros": {
+          "calories": 610,
+          "protein": 8,
+          "carbs": 101,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Nutella Bowl",
+        "category": "Acai Bowls",
+        "price_estimate": 17.55,
+        "image_url": null,
+        "macros": {
+          "calories": 730,
+          "protein": 10,
+          "carbs": 111,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Power Bowl",
+        "category": "Acai Bowls",
+        "price_estimate": 18.20,
+        "image_url": null,
+        "macros": {
+          "calories": 790,
+          "protein": 21,
+          "carbs": 108,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Mucho Mango Bowl",
+        "category": "Mango Bowls",
+        "price_estimate": 16.90,
+        "image_url": null,
+        "macros": {
+          "calories": 680,
+          "protein": 2,
+          "carbs": 142,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Mango Berry Bowl",
+        "category": "Mango Bowls",
+        "price_estimate": 16.90,
+        "image_url": null,
+        "macros": {
+          "calories": 550,
+          "protein": 5,
+          "carbs": 132,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Goldie Mango Bowl",
+        "category": "Mango Bowls",
+        "price_estimate": 16.90,
+        "image_url": null,
+        "macros": {
+          "calories": 760,
+          "protein": 7,
+          "carbs": 150,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Mango Power Bowl",
+        "category": "Mango Bowls",
+        "price_estimate": 18.20,
+        "image_url": null,
+        "macros": {
+          "calories": 870,
+          "protein": 19,
+          "carbs": 152,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Pink Flamingo",
+        "category": "Pitaya Bowls",
+        "price_estimate": 14.30,
+        "image_url": null,
+        "macros": {
+          "calories": 660,
+          "protein": 5,
+          "carbs": 143,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Dragonberry",
+        "category": "Pitaya Bowls",
+        "price_estimate": 16.90,
+        "image_url": null,
+        "macros": {
+          "calories": 620,
+          "protein": 5,
+          "carbs": 134,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Electric Mermaid",
+        "category": "Pitaya Bowls",
+        "price_estimate": 18.20,
+        "image_url": null,
+        "macros": {
+          "calories": 700,
+          "protein": 6,
+          "carbs": 145,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Goji Bowl",
+        "category": "Pitaya Bowls",
+        "price_estimate": 16.90,
+        "image_url": null,
+        "macros": {
+          "calories": 730,
+          "protein": 6,
+          "carbs": 151,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Nutaya",
+        "category": "Pitaya Bowls",
+        "price_estimate": 18.20,
+        "image_url": null,
+        "macros": {
+          "calories": 870,
+          "protein": 8,
+          "carbs": 157,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Pink Power",
+        "category": "Pitaya Bowls",
+        "price_estimate": 18.20,
+        "image_url": null,
+        "macros": {
+          "calories": 740,
+          "protein": 12,
+          "carbs": 151,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Coconut Power",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 800,
+          "protein": 16,
+          "carbs": 104,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Coco Craze",
+        "category": "Coconut Bowls",
+        "price_estimate": 18.20,
+        "image_url": null,
+        "macros": {
+          "calories": 670,
+          "protein": 8,
+          "carbs": 104,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Nutelloco",
+        "category": "Coconut Bowls",
+        "price_estimate": 16.90,
+        "image_url": null,
+        "macros": {
+          "calories": 800,
+          "protein": 11,
+          "carbs": 107,
+          "fat": 37
+        }
+      },
+      {
+        "name": "Coco Bowl",
+        "category": "Coconut Bowls",
+        "price_estimate": 15.60,
+        "image_url": null,
+        "macros": {
+          "calories": 600,
+          "protein": 8,
+          "carbs": 96,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Coco Berry",
+        "category": "Coconut Bowls",
+        "price_estimate": 16.90,
+        "image_url": null,
+        "macros": {
+          "calories": 570,
+          "protein": 8,
+          "carbs": 87,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Green Power Bowl",
+        "category": "Green Bowls",
+        "price_estimate": 18.20,
+        "image_url": null,
+        "macros": {
+          "calories": 750,
+          "protein": 13,
+          "carbs": 112,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Pacific",
+        "category": "Green Bowls",
+        "price_estimate": 16.90,
+        "image_url": null,
+        "macros": {
+          "calories": 560,
+          "protein": 11,
+          "carbs": 102,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Hemp",
+        "category": "Green Bowls",
+        "price_estimate": 15.60,
+        "image_url": null,
+        "macros": {
+          "calories": 540,
+          "protein": 11,
+          "carbs": 103,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Ocean Ave",
+        "category": "Green Bowls",
+        "price_estimate": 11.00,
+        "image_url": null,
+        "macros": {
+          "calories": 520,
+          "protein": 9,
+          "carbs": 105,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Lola",
+        "category": "Green Bowls",
+        "price_estimate": 15.60,
+        "image_url": null,
+        "macros": {
+          "calories": 540,
+          "protein": 9,
+          "carbs": 101,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Costa",
+        "category": "Banana Bowls",
+        "price_estimate": 18.20,
+        "image_url": null,
+        "macros": {
+          "calories": 780,
+          "protein": 17,
+          "carbs": 143,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Nica",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 820,
+          "protein": 18,
+          "carbs": 125,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Tide",
+        "category": "Banana Bowls",
+        "price_estimate": 15.60,
+        "image_url": null,
+        "macros": {
+          "calories": 630,
+          "protein": 10,
+          "carbs": 135,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Olas",
+        "category": "Banana Bowls",
+        "price_estimate": 16.90,
+        "image_url": null,
+        "macros": {
+          "calories": 790,
+          "protein": 11,
+          "carbs": 128,
+          "fat": 30
+        }
+      },
+      {
+        "name": "#1 Nutella Bowl",
+        "category": "Acai Bowls",
+        "price_estimate": 17.55,
+        "image_url": null,
+        "macros": {
+          "calories": 480,
+          "protein": 11,
+          "carbs": 75,
+          "fat": 17
+        }
+      },
+      {
+        "name": "#2 Blueberry, Strawberry & Almonds",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 320,
+          "protein": 10,
+          "carbs": 54,
+          "fat": 8
+        }
+      },
+      {
+        "name": "#3 Power Bowl",
+        "category": "Acai Bowls",
+        "price_estimate": 18.20,
+        "image_url": null,
+        "macros": {
+          "calories": 540,
+          "protein": 22,
+          "carbs": 71,
+          "fat": 21
+        }
+      },
+      {
+        "name": "#4 Maple & Brown Sugar",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 350,
+          "protein": 7,
+          "carbs": 72,
+          "fat": 3.5
+        }
+      },
+      {
+        "name": "#5 Banana, Cinnamon, Figs & Walnuts",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 380,
+          "protein": 10,
+          "carbs": 62,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Coconut New Orleans Smoothie 16oz",
+        "category": "Coffees",
+        "price_estimate": 10.39,
+        "image_url": null,
+        "macros": {
+          "calories": 350,
+          "protein": 4,
+          "carbs": 58,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Coconut New Orleans Smoothie 20oz",
+        "category": "Coffees",
+        "price_estimate": 11.69,
+        "image_url": null,
+        "macros": {
+          "calories": 430,
+          "protein": 6,
+          "carbs": 68,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Dolce Latte Smoothie 16oz",
+        "category": "Coffees",
+        "price_estimate": 10.39,
+        "image_url": null,
+        "macros": {
+          "calories": 370,
+          "protein": 12,
+          "carbs": 60,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Dolce Latte Smoothie 20z",
+        "category": "Coffees",
+        "price_estimate": 11.69,
+        "image_url": null,
+        "macros": {
+          "calories": 460,
+          "protein": 13,
+          "carbs": 82,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Pink Pitaya 16 Oz",
+        "category": "Smoothies",
+        "price_estimate": 10.39,
+        "image_url": null,
+        "macros": {
+          "calories": 380,
+          "protein": 2,
+          "carbs": 83,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Pink Pitaya 20 Oz",
+        "category": "Smoothies",
+        "price_estimate": 11.69,
+        "image_url": null,
+        "macros": {
+          "calories": 440,
+          "protein": 3,
+          "carbs": 97,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Strawberry Banana 16 Oz",
+        "category": "Smoothies",
+        "price_estimate": 10.39,
+        "image_url": null,
+        "macros": {
+          "calories": 240,
+          "protein": 3,
+          "carbs": 50,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Strawberry Banana 20 Oz",
+        "category": "Smoothies",
+        "price_estimate": 11.69,
+        "image_url": null,
+        "macros": {
+          "calories": 300,
+          "protein": 4,
+          "carbs": 64,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Matcha 16 Oz",
+        "category": "Smoothies",
+        "price_estimate": 10.39,
+        "image_url": null,
+        "macros": {
+          "calories": 300,
+          "protein": 6,
+          "carbs": 60,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Matcha 20 Oz",
+        "category": "Smoothies",
+        "price_estimate": 11.69,
+        "image_url": null,
+        "macros": {
+          "calories": 380,
+          "protein": 7,
+          "carbs": 78,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Orange Power 16 Oz",
+        "category": "Smoothies",
+        "price_estimate": 10.39,
+        "image_url": null,
+        "macros": {
+          "calories": 310,
+          "protein": 10,
+          "carbs": 54,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Orange Power 20 Oz",
+        "category": "Smoothies",
+        "price_estimate": 11.69,
+        "image_url": null,
+        "macros": {
+          "calories": 330,
+          "protein": 10,
+          "carbs": 58,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Green Smoothie 16 Oz",
+        "category": "Smoothies",
+        "price_estimate": 9.74,
+        "image_url": null,
+        "macros": {
+          "calories": 280,
+          "protein": 7,
+          "carbs": 54,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Green Smoothie 20 Oz",
+        "category": "Smoothies",
+        "price_estimate": 11.69,
+        "image_url": null,
+        "macros": {
+          "calories": 360,
+          "protein": 8,
+          "carbs": 73,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Kowabunga 16 Oz",
+        "category": "Smoothies",
+        "price_estimate": 10.39,
+        "image_url": null,
+        "macros": {
+          "calories": 230,
+          "protein": 3,
+          "carbs": 47,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Kowabunga 20 Oz",
+        "category": "Smoothies",
+        "price_estimate": 11.69,
+        "image_url": null,
+        "macros": {
+          "calories": 310,
+          "protein": 4,
+          "carbs": 67,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Dang 16 Oz",
+        "category": "Smoothies",
+        "price_estimate": 10.39,
+        "image_url": null,
+        "macros": {
+          "calories": 450,
+          "protein": 11,
+          "carbs": 68,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Dang 20 Oz",
+        "category": "Smoothies",
+        "price_estimate": 11.69,
+        "image_url": null,
+        "macros": {
+          "calories": 520,
+          "protein": 12,
+          "carbs": 85,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Dolce 16 Oz",
+        "category": "Smoothies",
+        "price_estimate": 10.39,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 17,
+          "carbs": 71,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Dolce 20 Oz",
+        "category": "Smoothies",
+        "price_estimate": 11.69,
+        "image_url": null,
+        "macros": {
+          "calories": 620,
+          "protein": 19,
+          "carbs": 98,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Aloha 16 Oz",
+        "category": "Smoothies",
+        "price_estimate": 10.39,
+        "image_url": null,
+        "macros": {
+          "calories": 260,
+          "protein": 3,
+          "carbs": 52,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Aloha 20 Oz",
+        "category": "Smoothies",
+        "price_estimate": 11.69,
+        "image_url": null,
+        "macros": {
+          "calories": 350,
+          "protein": 4,
+          "carbs": 75,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Booster 16 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 550,
+          "protein": 17,
+          "carbs": 63,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Booster 20 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 650,
+          "protein": 18,
+          "carbs": 76,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Acai Energy 16 Oz",
+        "category": "Smoothies",
+        "price_estimate": 10.39,
+        "image_url": null,
+        "macros": {
+          "calories": 280,
+          "protein": 3,
+          "carbs": 48,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Acai Energy 20 Oz",
+        "category": "Smoothies",
+        "price_estimate": 11.69,
+        "image_url": null,
+        "macros": {
+          "calories": 390,
+          "protein": 5,
+          "carbs": 70,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Mermaid Fuel 12 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 150,
+          "protein": 2,
+          "carbs": 38,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Mermaid Fuel 16 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 190,
+          "protein": 2,
+          "carbs": 47,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Mermaid Fuel 20 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 210,
+          "protein": 2,
+          "carbs": 51,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Green Room 12 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 100,
+          "protein": 2,
+          "carbs": 21,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Green Room 16 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 150,
+          "protein": 3,
+          "carbs": 33,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Green Room 20 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 170,
+          "protein": 3,
+          "carbs": 39,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Ground Swell 12 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 150,
+          "protein": 2,
+          "carbs": 36,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Ground Swell 16 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 180,
+          "protein": 2,
+          "carbs": 43,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Ground Swell 20 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 200,
+          "protein": 2,
+          "carbs": 49,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Ding Repair 12 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 110,
+          "protein": 3,
+          "carbs": 27,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Ding Repair 16 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 150,
+          "protein": 3,
+          "carbs": 35,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Ding Repair 20 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 160,
+          "protein": 3,
+          "carbs": 37,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Endless Summer 12 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 170,
+          "protein": 4,
+          "carbs": 39,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Endless Summer 16 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 190,
+          "protein": 4,
+          "carbs": 46,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Endless Summer 20 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 240,
+          "protein": 6,
+          "carbs": 56,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Beach Break 12 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 140,
+          "protein": 2,
+          "carbs": 34,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Beach Break 16 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 190,
+          "protein": 3,
+          "carbs": 46,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Beach Break 20 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 220,
+          "protein": 4,
+          "carbs": 54,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Dawn Patrol 12 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 140,
+          "protein": 2,
+          "carbs": 34,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Dawn Patrol 16 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 210,
+          "protein": 3,
+          "carbs": 50,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Dawn Patrol 20 Oz",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 310,
+          "protein": 4,
+          "carbs": 74,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Booster Bowl",
+        "category": "Special Bowls",
+        "price_estimate": 16.90,
+        "image_url": null,
+        "macros": {
+          "calories": 840,
+          "protein": 22,
+          "carbs": 112,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Stupid Cupid Bowl",
+        "category": "Special Bowls",
+        "price_estimate": 16.90,
+        "image_url": null,
+        "macros": {
+          "calories": 680,
+          "protein": 10,
+          "carbs": 109,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Acai Energy",
+        "category": "Entree",
+        "price_estimate": 10.39,
+        "image_url": null,
+        "macros": {
+          "calories": 420,
+          "protein": 3,
+          "carbs": 50,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Avocolada",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 600,
+          "protein": 5,
+          "carbs": 57,
+          "fat": 126
+        }
+      }
+    ]
+  }

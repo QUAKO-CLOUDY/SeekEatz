@@ -1,0 +1,170 @@
+{
+    "restaurant_name": "Steak 'n Shake",
+    "items": [
+      {
+        "name": "The Original Double 'N Cheese",
+        "category": "Specialties",
+        "price_estimate": 7.99,
+        "macros": {
+          "calories": 460,
+          "protein": 23,
+          "carbs": 33,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Single Steakburger without Cheese",
+        "category": "Specialties",
+        "price_estimate": 6.69,
+        "macros": {
+          "calories": 320,
+          "protein": 15,
+          "carbs": 32,
+          "fat": 130
+        }
+      },
+      {
+        "name": "Single Steakburger with Cheese",
+        "category": "Specialties",
+        "price_estimate": 6.69,
+        "macros": {
+          "calories": 390,
+          "protein": 19,
+          "carbs": 32,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Bacon 'n Cheese Double Steakburger",
+        "category": "Specialties",
+        "price_estimate": 10.49,
+        "macros": {
+          "calories": 600,
+          "protein": 34,
+          "carbs": 29,
+          "fat": 38
+        }
+      },
+      {
+        "name": "7 X 7",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1660,
+          "protein": 95,
+          "carbs": 29,
+          "fat": 128
+        }
+      },
+      {
+        "name": "Bacon 'n Cheese Single Steakburger",
+        "category": "Specialties",
+        "price_estimate": 7.69,
+        "macros": {
+          "calories": 460,
+          "protein": 25,
+          "carbs": 29,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Triple Steakburger",
+        "category": "Specialties",
+        "price_estimate": 10.99,
+        "macros": {
+          "calories": 750,
+          "protein": 40,
+          "carbs": 32,
+          "fat": 50
+        }
+      },
+      {
+        "name": "Garlic Double Steakburger",
+        "category": "Specialties",
+        "price_estimate": 8.99,
+        "macros": {
+          "calories": 730,
+          "protein": 28,
+          "carbs": 33,
+          "fat": 50
+        }
+      },
+      {
+        "name": "Western BBQ 'n Bacon Steakburger",
+        "category": "Specialties",
+        "price_estimate": 10.99,
+        "macros": {
+          "calories": 790,
+          "protein": 35,
+          "carbs": 54,
+          "fat": 43
+        }
+      },
+      {
+        "name": "Butter Single Steakburger",
+        "category": "Specialties",
+        "price_estimate": 7.19,
+        "macros": {
+          "calories": 870,
+          "protein": 28,
+          "carbs": 34,
+          "fat": 65
+        }
+      },
+      {
+        "name": "Steak Frank",
+        "category": "Specialties",
+        "price_estimate": 6.99,
+        "macros": {
+          "calories": 540,
+          "protein": 13,
+          "carbs": 40,
+          "fat": 36
+        }
+      },
+      {
+        "name": "3 PC Chicken Fingers",
+        "category": "Specialties",
+        "price_estimate": 9.09,
+        "macros": {
+          "calories": 330,
+          "protein": 21,
+          "carbs": 22,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Grilled Cheese",
+        "category": "Specialties",
+        "price_estimate": 5.49,
+        "macros": {
+          "calories": 590,
+          "protein": 24,
+          "carbs": 41,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Chili Mac",
+        "category": "Chili & Sides",
+        "price_estimate": 7.29,
+        "macros": {
+          "calories": 1200,
+          "protein": 46,
+          "carbs": 112,
+          "fat": 61
+        }
+      },
+      {
+        "name": "Chili Cup Deluxe",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 500,
+          "protein": 29,
+          "carbs": 36,
+          "fat": 28
+        }
+      }
+    ]
+  }

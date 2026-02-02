@@ -39,7 +39,7 @@ export async function hasCompletedOnboarding(userId?: string): Promise<boolean> 
   
   if (!user) {
     // Check localStorage for anonymous onboarding completion
-    const localStorageFlag = localStorage.getItem("macroMatch_hasCompletedOnboarding");
+    const localStorageFlag = localStorage.getItem("seekEatz_hasCompletedOnboarding");
     return localStorageFlag === "true";
   }
 
@@ -61,7 +61,7 @@ export async function hasCompletedOnboarding(userId?: string): Promise<boolean> 
   }
 
   // Fallback to localStorage
-  const localStorageFlag = localStorage.getItem(`macroMatch_hasCompletedOnboarding_${userIdToCheck}`);
+  const localStorageFlag = localStorage.getItem(`seekEatz_hasCompletedOnboarding_${userIdToCheck}`);
   return localStorageFlag === "true";
 }
 
@@ -76,12 +76,12 @@ export async function getLastLogin(userId?: string): Promise<number | null> {
   const userIdToCheck = userId || user?.id;
 
   if (userIdToCheck) {
-    const lastLogin = localStorage.getItem(`macroMatch_lastLogin_${userIdToCheck}`);
+    const lastLogin = localStorage.getItem(`seekEatz_lastLogin_${userIdToCheck}`);
     return lastLogin ? parseInt(lastLogin, 10) : null;
   }
 
   // Check anonymous lastLogin
-  const anonymousLastLogin = localStorage.getItem("macroMatch_lastLogin");
+  const anonymousLastLogin = localStorage.getItem("seekEatz_lastLogin");
   return anonymousLastLogin ? parseInt(anonymousLastLogin, 10) : null;
 }
 
@@ -108,7 +108,7 @@ export async function updateLastLogin(userId?: string): Promise<void> {
   const userIdToCheck = userId || user?.id;
 
   if (userIdToCheck) {
-    localStorage.setItem(`macroMatch_lastLogin_${userIdToCheck}`, now.toString());
+    localStorage.setItem(`seekEatz_lastLogin_${userIdToCheck}`, now.toString());
     
     // Also try to update Supabase profiles table
     try {
@@ -126,7 +126,7 @@ export async function updateLastLogin(userId?: string): Promise<void> {
     }
   } else {
     // Anonymous user
-    localStorage.setItem("macroMatch_lastLogin", now.toString());
+    localStorage.setItem("seekEatz_lastLogin", now.toString());
   }
 }
 
@@ -156,13 +156,13 @@ export async function setOnboardingComplete(userId: string, profile?: any): Prom
 
   // Always set localStorage as fallback
   if (typeof window !== "undefined") {
-    localStorage.setItem(`macroMatch_hasCompletedOnboarding_${userId}`, "true");
-    localStorage.setItem(`macroMatch_lastLogin_${userId}`, now.toString());
+    localStorage.setItem(`seekEatz_hasCompletedOnboarding_${userId}`, "true");
+    localStorage.setItem(`seekEatz_lastLogin_${userId}`, now.toString());
     if (profile) {
       localStorage.setItem("userProfile", JSON.stringify(profile));
     }
     localStorage.setItem("hasCompletedOnboarding", "true");
-    localStorage.setItem("macroMatch_lastLogin", now.toString());
+    localStorage.setItem("seekEatz_lastLogin", now.toString());
   }
 }
 

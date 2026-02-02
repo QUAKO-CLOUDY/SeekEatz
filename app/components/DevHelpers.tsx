@@ -13,7 +13,6 @@ export function DevHelpers() {
       (window as any).resetOnboarding = () => {
         localStorage.removeItem("onboardingCompleted");
         localStorage.removeItem("hasCompletedOnboarding");
-        localStorage.removeItem("macroMatch_completedOnboarding");
         
         // Remove user-specific flags
         const keys = Object.keys(localStorage);

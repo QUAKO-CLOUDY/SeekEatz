@@ -1,0 +1,329 @@
+{
+    "restaurant_name": "Five Guys",
+    "items": [
+        {
+            "name": "Bacon (2 pieces) (Supplier S)",
+            "category": "Protein",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 70,
+                "protein": 5,
+                "carbs": 0,
+                "fat": 6
+            }
+        },
+        {
+            "name": "Bacon (2 pieces) (Supplier D)",
+            "category": "Protein",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 73,
+                "protein": 6,
+                "carbs": 0,
+                "fat": 5
+            }
+        },
+        {
+            "name": "Hamburger",
+            "category": "Burgers",
+            "price_estimate": 13.07,
+        "image_url": null,
+            "macros": {
+                "calories": 302,
+                "protein": 16,
+                "carbs": 0,
+                "fat": 17
+            }
+        },
+        {
+            "name": "Hot Dog (Supplier H)",
+            "category": "Dogs",
+            "price_estimate": 8.87,
+        "image_url": null,
+            "macros": {
+                "calories": 280,
+                "protein": 11,
+                "carbs": 1,
+                "fat": 26
+            }
+        },
+        {
+            "name": "Hot Dog (Supplier K)",
+            "category": "Protein",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 260,
+                "protein": 11,
+                "carbs": 460,
+                "fat": 24
+            }
+        },
+        {
+            "name": "Bun",
+            "category": "Base",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 240,
+                "protein": 7,
+                "carbs": 39,
+                "fat": 9
+            }
+        },
+        {
+            "name": "Eggs (2)",
+            "category": "Protein",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 143,
+                "protein": 13,
+                "carbs": 1,
+                "fat": 10
+            }
+        },
+        {
+            "name": "A.1. Sauce",
+            "category": "Sauce",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 15,
+                "protein": 0,
+                "carbs": 3,
+                "fat": 0
+            }
+        },
+        {
+            "name": "BBQ Sauce",
+            "category": "Sauce",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 49,
+                "protein": 0.5,
+                "carbs": 15,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Cheese (1 slice) (Supplier K)",
+            "category": "Topping",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 70,
+                "protein": 4,
+                "carbs": 0.5,
+                "fat": 6
+            }
+        },
+        {
+            "name": "Cheese (1 slice) (Supplier S)",
+            "category": "Topping",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 70,
+                "protein": 3,
+                "carbs": 1,
+                "fat": 6
+            }
+        },
+        {
+            "name": "Green Peppers",
+            "category": "Topping",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 3,
+                "protein": 0,
+                "carbs": 1,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Grilled Mushrooms",
+            "category": "Topping",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 6,
+                "protein": 0,
+                "carbs": 1,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Hot Sauce",
+            "category": "Sauce",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 0,
+                "protein": 0,
+                "carbs": 0,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Jalapeño Peppers",
+            "category": "Topping",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 3,
+                "protein": 0,
+                "carbs": 0.5,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Ketchup",
+            "category": "Sauce",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 30,
+                "protein": 0,
+                "carbs": 5,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Lettuce",
+            "category": "Topping",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 3,
+                "protein": 0,
+                "carbs": 1,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Mayonnaise (Supplier K)",
+            "category": "Sauce",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 111,
+                "protein": 0,
+                "carbs": 0,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Mayonnaise (Supplier S)",
+            "category": "Sauce",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 103,
+                "protein": 0,
+                "carbs": 0,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Mustard",
+            "category": "Sauce",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 0,
+                "protein": 0,
+                "carbs": 0,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Onions / Grilled Onions",
+            "category": "Topping",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 11,
+                "protein": 0,
+                "carbs": 2,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Pickles (Supplier M)",
+            "category": "Topping",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 0,
+                "protein": 0,
+                "carbs": 0,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Pickles (Supplier B)",
+            "category": "Topping",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 0,
+                "protein": 0,
+                "carbs": 0,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Relish",
+            "category": "Sauce",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 16,
+                "protein": 0,
+                "carbs": 4,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Tomatoes",
+            "category": "Topping",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 8,
+                "protein": 0.5,
+                "carbs": 2,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Fry Sauce PC",
+            "category": "Sauce",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 100,
+                "protein": 0,
+                "carbs": 5,
+                "fat": 9
+            }
+        },
+        {
+            "name": "Malt Vinegar (1tbs)",
+            "category": "Sauce",
+            "price_estimate": null,
+        "image_url": null,
+            "macros": {
+                "calories": 0,
+                "protein": 0,
+                "carbs": 0,
+                "fat": 0
+            }
+        }
+    ]
+}

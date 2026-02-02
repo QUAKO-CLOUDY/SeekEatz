@@ -1,0 +1,444 @@
+{
+    "restaurant_name": "Sweetgreen",
+    "items": [
+      {
+        "name": "BBQ Chicken Salad",
+        "category": "Salads",
+        "price_estimate": 16.25,
+        "macros": {
+          "calories": 480,
+          "protein": 27,
+          "carbs": 31,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Buffalo Chicken",
+        "category": "Salads",
+        "price_estimate": 16.50,
+        "macros": {
+          "calories": 500,
+          "protein": 36,
+          "carbs": 30,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Garden Cobb",
+        "category": "Salads",
+        "price_estimate": 15.95,
+        "macros": {
+          "calories": 675,
+          "protein": 22,
+          "carbs": 37,
+          "fat": 48
+        }
+      },
+      {
+        "name": "Guacamole Greens",
+        "category": "Salads",
+        "price_estimate": 16.25,
+        "macros": {
+          "calories": 515,
+          "protein": 27,
+          "carbs": 27,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Hummus Crunch",
+        "category": "Salads",
+        "price_estimate": 15.95,
+        "macros": {
+          "calories": 380,
+          "protein": 13,
+          "carbs": 38,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Kale Caesar",
+        "category": "Salads",
+        "price_estimate": 15.25,
+        "macros": {
+          "calories": 405,
+          "protein": 35,
+          "carbs": 13,
+          "fat": 24
+        }
+      },
+      
+      {
+        "name": "Super Green Goddess",
+        "category": "Salads",
+        "price_estimate": 13.25,
+        "macros": {
+          "calories": 415,
+          "protein": 11,
+          "carbs": 37,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Chicken Avocado Ranch",
+        "category": "Bowls",
+        "price_estimate": 16.25,
+        "macros": {
+          "calories": 695,
+          "protein": 29,
+          "carbs": 58,
+          "fat": 39
+        }
+      },
+      
+      {
+        "name": "Chicken Pesto Parm",
+        "category": "Bowls",
+        "price_estimate": 15.95,
+        "macros": {
+          "calories": 495,
+          "protein": 36,
+          "carbs": 41,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Crispy Rice Bowl",
+        "category": "Bowls",
+        "price_estimate": 16.25,
+        "macros": {
+          "calories": 600,
+          "protein": 31,
+          "carbs": 61,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Elote Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 515,
+          "protein": 17,
+          "carbs": 48,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Fish Taco",
+        "category": "Bowls",
+        "price_estimate": 17.95,
+        "macros": {
+          "calories": 805,
+          "protein": 35,
+          "carbs": 58,
+          "fat": 48
+        }
+      },
+      {
+        "name": "Fish Taco (Steelhead)",
+        "category": "Bowls",
+        "price_estimate": 17.95,
+        "macros": {
+          "calories": 715,
+          "protein": 354,
+          "carbs": 54,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Harvest Bowl",
+        "category": "Bowls",
+        "price_estimate": 15.50,
+        "macros": {
+          "calories": 685,
+          "protein": 37,
+          "carbs": 62,
+          "fat": 32
+        }
+      },
+      
+      {
+        "name": "Shroomami",
+        "category": "Bowls",
+        "price_estimate": 14.75,
+        "macros": {
+          "calories": 600,
+          "protein": 21,
+          "carbs": 49,
+          "fat": 35
+        }
+      },
+      
+      {
+        "name": "Hot Honey Chicken",
+        "category": "Protein Plates",
+        "price_estimate": 17.50,
+        "macros": {
+          "calories": 855,
+          "protein": 49,
+          "carbs": 73,
+          "fat": 39
+        }
+      },
+      {
+        "name": "Miso Glazed Salmon",
+        "category": "Protein Plates",
+        "price_estimate": 18.75,
+        "macros": {
+          "calories": 860,
+          "protein": 33,
+          "carbs": 88,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Miso Glazed Steelhead",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 770,
+          "protein": 33,
+          "carbs": 84,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Blackened Chicken",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 21,
+          "carbs": 1,
+          "fat": 6
+        }
+      },
+      
+      {
+        "name": "Miso Glazed Salmon (Protein)",
+        "category": "Protein Plates",
+        "price_estimate": 18.75,
+        "macros": {
+          "calories": 860,
+          "protein": 33,
+          "carbs": 88,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Miso Glazed Steelhead (Protein)",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 770,
+          "protein": 33,
+          "carbs": 84,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Roasted Chicken",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 21,
+          "carbs": 1,
+          "fat": 2
+        }
+      },
+      
+      {
+        "name": "Roasted Tofu",
+        "category": "Protein",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 7,
+          "carbs": 2,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Warm Portobello Mix",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 5,
+          "carbs": 6,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Warm Roasted Sweet Potatoes",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 85,
+          "protein": 2,
+          "carbs": 15,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Balsamic Vinaigrette",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 0,
+          "carbs": 6,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Balsamic Vinegar",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      
+      {
+        "name": "Crushed Red Pepper",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Extra Virgin Olive Oil",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Green Goddess Ranch",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 145,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Honey BBQ Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 40,
+          "protein": 0,
+          "carbs": 4,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Hot Honey Mustard Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 0,
+          "carbs": 7,
+          "fat": 10
+        }
+      },
+      
+      {
+        "name": "Lemon Squeeze",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Lime Cilantro Jalapeno Vinaigrette",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 108,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Lime Squeeze",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Miso Sesame Ginger",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 1,
+          "carbs": 0,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Pesto Vinaigrette",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 85,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 9
+        }
+      },
+      
+      {
+        "name": "Sweetgreen Hot Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 1,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Umami Seasoning",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      }
+      
+    ]
+  } 

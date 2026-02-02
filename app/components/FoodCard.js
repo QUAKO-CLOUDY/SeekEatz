@@ -22,6 +22,16 @@ export default function FoodCard({ item, restaurantName }) {
           width={48}
           height={48}
           className="w-12 h-12 object-contain"
+          onError={(e) => {
+            // Fallback to default.png if logo fails to load
+            if (logoPath !== '/logos/default.png') {
+              e.currentTarget.onerror = null; // Prevent infinite loop
+              e.currentTarget.src = '/logos/default.png';
+            } else {
+              // If default.png also fails, hide the image
+              e.currentTarget.style.display = 'none';
+            }
+          }}
         />
       </div>
 

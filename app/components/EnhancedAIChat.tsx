@@ -17,7 +17,7 @@ type Meal = {
   calories: number;
   protein: number;
   carbs: number;
-  fat: number;
+  fats: number; // Use "fats" (plural) to match Meal type
   restaurant?: string;
   image?: string;
   tags?: string[];
@@ -41,7 +41,7 @@ type Message = {
     calories: number;
     protein: number;
     carbs: number;
-    fat: number;
+    fats: number; // Use "fats" (plural) to match Meal type
   };
 };
 
@@ -58,7 +58,7 @@ const MOCK_MEALS: Meal[] = [
     calories: 550,
     protein: 45,
     carbs: 40,
-    fat: 15,
+    fats: 15, // Use "fats" (plural) to match Meal type
     restaurant: "Fresh & Co",
     price: 14.5,
   },
@@ -68,7 +68,7 @@ const MOCK_MEALS: Meal[] = [
     calories: 480,
     protein: 35,
     carbs: 12,
-    fat: 22,
+    fats: 22, // Use "fats" (plural) to match Meal type
     restaurant: "Green Leaf",
     price: 16.0,
   },
@@ -117,7 +117,7 @@ const isDark = resolvedTheme === "dark";
       calories: 550,
       protein: 45,
       carbs: 52,
-      fat: 18,
+      fats: 18, // Use "fats" (plural) to match Meal type
     };
 
     return {
@@ -275,7 +275,7 @@ const isDark = resolvedTheme === "dark";
                     </div>
                     <div className="text-center">
                       <div className="text-lg font-bold">
-                        {message.macroSuggestion.fat}g
+                        {message.macroSuggestion.fats}g
                       </div>
                       <div
                         className={`text-xs ${isDark ? "text-gray-400" : "text-gray-600"}`}

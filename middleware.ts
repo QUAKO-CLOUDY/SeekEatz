@@ -62,14 +62,35 @@ export async function middleware(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
+  const pathname = request.nextUrl.pathname
 
-  // 2. PROTECTED ROUTES: Only block these specific pages
-  // If they try to go to /dashboard or /profile without login, redirect them.
-  // BUT do not block the Home Page (/) or the API.
-  const protectedRoutes = ['/dashboard', '/profile', '/settings']
+  // 2. PUBLIC ROUTES: These should always be accessible, never redirect
+  // Exact matches
+  const publicExactPaths = ['/', '/get-started', '/onboarding', '/chat', '/waitlist']
+  // Prefix matches
+  const publicPrefixPaths = ['/waitlist/', '/api/']
   
-  if (protectedRoutes.some(route => request.nextUrl.pathname.startsWith(route)) && !user) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  const isPublicRoute = 
+    publicExactPaths.includes(pathname) ||
+    publicPrefixPaths.some(prefix => pathname.startsWith(prefix)) ||
+    pathname.startsWith('/auth/') // Auth pages are always public
+
+  // If it's a public route, allow access without auth check
+  if (isPublicRoute) {
+    // Optional: Redirect logged-in users away from auth pages (but allow them to access other public routes)
+    if (user && (pathname.startsWith('/auth/signin') || pathname.startsWith('/auth/signup'))) {
+      return NextResponse.redirect(new URL('/chat', request.url))
+    }
+    return response
+  }
+
+  // 3. PROTECTED ROUTES: Require login for private app routes
+  // If user tries to access these without login, redirect to sign-in
+  const protectedRoutes = ['/home', '/favorites', '/settings']
+  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
+  
+  if (isProtectedRoute && !user) {
+    return NextResponse.redirect(new URL('/auth/signin', request.url))
   }
 
   return response

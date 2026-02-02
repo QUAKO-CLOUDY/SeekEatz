@@ -28,17 +28,21 @@ function convertToMeal(item: any): Meal {
     item.image_url || item.image
   );
 
-  // Handle fats - check fats_g (database column) first, then other variations
-  const fats = item.fats_g ?? item.fat_g ?? item.fats ?? item.fat ?? 
-               (item.nutrition_info?.fats_g) ?? 
-               (item.nutrition_info?.fat_g) ?? 
+  // Handle fats - normalize fat/fats consistently
+  // Prefer fat (singular) from DB, fallback to fats (plural)
+  // Also check _g suffixed variants for compatibility
+  const fats = item.fat ?? item.fats ?? 
+               item.fat_g ?? item.fats_g ?? 
+               (item.nutrition_info?.fat) ?? 
                (item.nutrition_info?.fats) ?? 
-               (item.nutrition_info?.fat) ?? 0;
+               (item.nutrition_info?.fat_g) ?? 
+               (item.nutrition_info?.fats_g) ?? 0;
 
   return {
     id: item.id || `meal-${Date.now()}-${Math.random()}`,
     name: mealName,
     restaurant: restaurantName,
+    restaurant_name: restaurantName, // Add for logo logic consistency
     calories: item.calories || 0,
     protein: item.protein_g || 0,
     carbs: item.carbs_g || 0,
@@ -81,7 +85,11 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
       
       if (Array.isArray(data)) {
         normalizedResults = data;
+      } else if (data && typeof data === 'object' && Array.isArray(data.meals)) {
+        // New format: { meals, hasMore, nextOffset, searchKey }
+        normalizedResults = data.meals;
       } else if (data && typeof data === 'object' && Array.isArray(data.results)) {
+        // Legacy format support
         normalizedResults = data.results;
       }
       

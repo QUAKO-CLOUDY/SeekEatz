@@ -1,0 +1,137 @@
+{
+    "restaurant_name": "Raising Cane's",
+    "items": [
+      {
+        "name": "Chicken Finger",
+        "category": "Extras",
+        "price_estimate": 1.99,
+        "image_url": null,
+        "macros": {
+          "calories": 130,
+          "protein": 13,
+          "carbs": 5,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Sandwich",
+        "category": "Extras",
+        "price_estimate": 7.69,
+        "image_url": null,
+        "macros": {
+          "calories": 830,
+          "protein": 47,
+          "carbs": 69,
+          "fat": 41
+        }
+      },
+      {
+        "name": "The 3 Finger Combo",
+        "category": "Combos",
+        "price_estimate": 9.59,
+        "image_url": null,
+        "macros": {
+          "calories": 1050,
+          "protein": 48,
+          "carbs": 83,
+          "fat": 59
+        }
+      },
+      {
+        "name": "The Box Combo",
+        "category": "Combos",
+        "price_estimate": 11.49,
+        "image_url": null,
+        "macros": {
+          "calories": 1290,
+          "protein": 62,
+          "carbs": 98,
+          "fat": 72
+        }
+      },
+      {
+        "name": "The Caniac Combo",
+        "category": "Combos",
+        "price_estimate": 16.59,
+        "image_url": null,
+        "macros": {
+          "calories": 1840,
+          "protein": 90,
+          "carbs": 125,
+          "fat": 108
+        }
+      },
+      {
+        "name": "The Sandwich Combo",
+        "category": "Combos",
+        "price_estimate": 10.29,
+        "image_url": null,
+        "macros": {
+          "calories": 1140,
+          "protein": 51,
+          "carbs": 108,
+          "fat": 56
+        }
+      },
+      {
+        "name": "Cane's Sauce",
+        "category": "Extras",
+        "price_estimate": 0.39,
+        "image_url": null,
+        "macros": {
+          "calories": 190,
+          "protein": 0,
+          "carbs": 6,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Honey Mustard",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 140,
+          "protein": 0.5,
+          "carbs": 16,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Ketchup",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 35,
+          "protein": 0,
+          "carbs": 8,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Louisiana Hot Sauce Packet",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Kraft Mayonnaise Packet",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 90,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 10
+        }
+      }
+    ]
+  }

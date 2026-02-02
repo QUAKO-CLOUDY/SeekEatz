@@ -1,0 +1,605 @@
+{
+    "restaurant_name": "KFC",
+    "items": [
+      {
+        "name": "Apple Pie Poppers",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 80,
+          "protein": 1,
+          "carbs": 9,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Honey BBQ Hot & Spicy Wings (1)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 110,
+          "protein": 5,
+          "carbs": 9,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Hot & Spicy Wings (1)",
+        "category": "Fried Chicken",
+        "price_estimate": 28.79,
+        "image_url": null,
+        "macros": {
+          "calories": 90,
+          "protein": 5,
+          "carbs": 3,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Mac & Cheese Bowl",
+        "category": "Sides, Sweets, Sauces",
+        "price_estimate": 3.59,
+        "image_url": null,
+        "macros": {
+          "calories": 480,
+          "protein": 30,
+          "carbs": 42,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Mashed Potatoes With Gravy (Medium)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 180,
+          "protein": 4,
+          "carbs": 27,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Mike's Hot Honey Hot & Spicy Wings (1)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 110,
+          "protein": 5,
+          "carbs": 9,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Original Recipe Chicken Breast",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 390,
+          "protein": 39,
+          "carbs": 11,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Original Recipe Chicken Drumstick",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 130,
+          "protein": 12,
+          "carbs": 4,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Original Recipe Chicken Thigh",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 280,
+          "protein": 19,
+          "carbs": 8,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Original Recipe Chicken Whole Wing",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 130,
+          "protein": 10,
+          "carbs": 3,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Extra Crispy Chicken Breast",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 530,
+          "protein": 35,
+          "carbs": 18,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Extra Crispy Chicken Drumstick",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 170,
+          "protein": 10,
+          "carbs": 5,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Extra Crispy Chicken Thigh",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 330,
+          "protein": 22,
+          "carbs": 9,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Extra Crispy Chicken Whole Wing",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 170,
+          "protein": 10,
+          "carbs": 5,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Kentucky Grilled Chicken Breast",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 210,
+          "protein": 38,
+          "carbs": 0,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Kentucky Grilled Chicken Drumstick",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 80,
+          "protein": 11,
+          "carbs": 0,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Kentucky Grilled Chicken Thigh",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 150,
+          "protein": 17,
+          "carbs": 0,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Kentucky Grilled Chicken Whole Wing",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 70,
+          "protein": 9,
+          "carbs": 0,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Spicy Crispy Chicken Breast",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 350,
+          "protein": 30,
+          "carbs": 11,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Spicy Crispy Chicken Drumstick",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 130,
+          "protein": 9,
+          "carbs": 5,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Spicy Crispy Chicken Thigh",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 270,
+          "protein": 13,
+          "carbs": 10,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Spicy Crispy Chicken Whole Wing",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 120,
+          "protein": 7,
+          "carbs": 5,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Original Recipe Tender (each)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 170,
+          "protein": 11,
+          "carbs": 20,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Kentucky Fried Nuggets (1)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 35,
+          "protein": 3,
+          "carbs": 1,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Chicken Littles",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 350,
+          "protein": 15,
+          "carbs": 39,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Classic Chicken Sandwich",
+        "category": "Sandwiches",
+        "price_estimate": 5.99,
+        "image_url": null,
+        "macros": {
+          "calories": 650,
+          "protein": 34,
+          "carbs": 49,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Spicy Chicken Sandwich",
+        "category": "Sandwiches",
+        "price_estimate": 5.99,
+        "image_url": null,
+        "macros": {
+          "calories": 620,
+          "protein": 34,
+          "carbs": 49,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Twister",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 680,
+          "protein": 29,
+          "carbs": 74,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Chicken Pot Pie",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 720,
+          "protein": 26,
+          "carbs": 60,
+          "fat": 41
+        }
+      },
+      {
+        "name": "KFC Famous Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 590,
+          "protein": 31,
+          "carbs": 67,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Caesar Side Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 40,
+          "protein": 3,
+          "carbs": 2,
+          "fat": 2
+        }
+      },
+      {
+        "name": "House Side Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 15,
+          "protein": 1,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Heinz Buttermilk Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 160,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Hidden Valley The Original Ranch Fat Free Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 35,
+          "protein": 1,
+          "carbs": 8,
+          "fat": 0
+        }
+      },
+      {
+        "name": "KFC Creamy Parmesan Caesar Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 260,
+          "protein": 2,
+          "carbs": 4,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Marzetti Light Italian Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Parmesan Garlic Croutons",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 60,
+          "protein": 2,
+          "carbs": 8,
+          "fat": 3
+        }
+      },
+      {
+        "name": "BBQ - Dipping Sauce Cup",
+        "category": "Sauces",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 45,
+          "protein": 0,
+          "carbs": 11,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Buffalo Ranch - Dipping Sauce Cup",
+        "category": "Side Sweets, Sauces,s",
+        "price_estimate": 0.47,
+        "image_url": null,
+        "macros": {
+          "calories": 120,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Colonel's Buttery Spread",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 35,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Comeback Sauce - Dipping Sauce Cup",
+        "category": "Sides, Sweets, Sauces",
+        "price_estimate": 0.47,
+        "image_url": null,
+        "macros": {
+          "calories": 120,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Grape Jelly Packet",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 35,
+          "protein": 0,
+          "carbs": 9,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Honey Mustard - Dipping Sauce Cup",
+        "category": "Sides, Sweets, Sauces",
+        "price_estimate": 0.47,
+        "image_url": null,
+        "macros": {
+          "calories": 110,
+          "protein": 0,
+          "carbs": 6,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Honey Sauce Packet",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 30,
+          "protein": 0,
+          "carbs": 8,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Ketchup",
+        "category": "Sides, Sweets, Sauces",
+        "price_estimate":0.00,
+        "image_url": null,
+        "macros": {
+          "calories": 30,
+          "protein": 0,
+          "carbs": 8,
+          "fat": 0
+        }
+      },
+      {
+        "name": "KFC Sauce - Dipping Sauce Cup",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 90,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Lemon Juice Packet",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Ranch - Dipping Sauce Cup",
+        "category": "Sides, Sweets, Sauces",
+        "price_estimate": 0.47,
+        "image_url": null,
+        "macros": {
+          "calories": 130,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Sticky Chicky Sweet n' Sour Dipping Sauce Cup",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 45,
+          "protein": 0,
+          "carbs": 11,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Strawberry Jam Packet",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 35,
+          "protein": 0,
+          "carbs": 9,
+          "fat": 0
+        }
+      }
+    ]
+  }

@@ -4,7 +4,6 @@ import * as React from "react";
 import { Heart, Clock, Flame, Zap } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { MealCard } from "./MealCard"; 
-import { mockMeals } from "../data/mockData";
 import type { Meal } from "../types"; // <--- IMPORT SHARED TYPES
 import type { LoggedMeal } from "./LogScreen";
 
@@ -23,10 +22,11 @@ export function Favorites({
   onMealSelect, 
   onToggleFavorite 
 }: Props) {
-  // Get favorite meals - first from stored data (API meals), then from mockMeals
-  const favoriteMealsList = favoriteMeals
-    .map(id => favoriteMealsData[id] || mockMeals.find(meal => meal.id === id))
-    .filter((meal): meal is Meal => meal !== undefined);
+  // Get favorite meals - only from stored API meals
+const favoriteMealsList: Meal[] = favoriteMeals
+.map(id => favoriteMealsData[id])
+.filter((meal): meal is Meal => meal !== undefined);
+
   
   // Get recent meals from logged meals (last 10, most recent first)
   const recentMeals = loggedMeals

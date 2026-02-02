@@ -1,0 +1,423 @@
+{
+    "restaurant_name": "El Pollo Loco",
+    "items": [
+      {
+        "name": "Queso Crunch Double Chicken Burrito Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1080,
+          "protein": 78,
+          "carbs": 96,
+          "fat": 43
+        }
+      },
+      {
+        "name": "Street Corn Double Chicken Burrito Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1080,
+          "protein": 75,
+          "carbs": 95,
+          "fat": 46
+        }
+      },
+      {
+        "name": "Chicken Leg",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 11,
+          "carbs": 0,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Chicken Thigh",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 200,
+          "protein": 21,
+          "carbs": 2,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Chicken Breast",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 200,
+          "protein": 34,
+          "carbs": 0,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Chicken Wing",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 10,
+          "carbs": 0,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Creamy Cilantro Dressing",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 310,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Ranch Dressing (packet)",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Citrus Vinaigrette",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 1,
+          "carbs": 18,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Creamy Chipotle Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Sour Cream",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Guacamole (Small)",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 2,
+          "carbs": 7,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Guacamole (Regular)",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 220,
+          "protein": 3,
+          "carbs": 15,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Queso Blanco (Small)",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 7,
+          "carbs": 3,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Queso Blanco (Regular)",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 320,
+          "protein": 14,
+          "carbs": 7,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Classic Chicken Tostada",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 830,
+          "protein": 41,
+          "carbs": 80,
+          "fat": 39
+        }
+      },
+      {
+        "name": "Double Chicken Tostada",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1000,
+          "protein": 65,
+          "carbs": 82,
+          "fat": 46
+        }
+      },
+      {
+        "name": "Double Chicken Avocado Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 350,
+          "protein": 50,
+          "carbs": 13,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Citrus Avocado Fresca Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 52,
+          "carbs": 12,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Original Pollo Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 580,
+          "protein": 41,
+          "carbs": 83,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Double Chicken Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 930,
+          "protein": 74,
+          "carbs": 87,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Grande Avocado Chicken Bowl",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 790,
+          "protein": 49,
+          "carbs": 90,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Chicken Avocado Taco",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 330,
+          "protein": 24,
+          "carbs": 17,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Taco al Carbón",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 15,
+          "carbs": 17,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Shredded Chicken Crunchy Taco",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 14,
+          "carbs": 22,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Chipotle Chicken Avocado Burrito",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 920,
+          "protein": 59,
+          "carbs": 67,
+          "fat": 47
+        }
+      },
+      {
+        "name": "Chipotle Guacamole Chicken Burrito",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1020,
+          "protein": 61,
+          "carbs": 83,
+          "fat": 51
+        }
+      },
+      {
+        "name": "Queso Guacamole Chicken Burrito",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 790,
+          "protein": 40,
+          "carbs": 90,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Chipotle Chicken Quesadilla",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 930,
+          "protein": 51,
+          "carbs": 54,
+          "fat": 57
+        }
+      },
+      {
+        "name": "Salsa Verde Chicken Quesadilla",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 820,
+          "protein": 51,
+          "carbs": 54,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Shredded Chicken Nachos",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1090,
+          "protein": 34,
+          "carbs": 94,
+          "fat": 65
+        }
+      },
+      {
+        "name": "Chicken Tortilla Soup",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 23,
+          "carbs": 19,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Original BRC Burrito",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 410,
+          "protein": 13,
+          "carbs": 63,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Chicken Legs (2)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 220,
+          "protein": 22,
+          "carbs": 0,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Salsa Fresca",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Avocado Salsa",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Salsa Roja",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Jalapeno Hot Sauce (packet)",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      }
+    ]
+  }

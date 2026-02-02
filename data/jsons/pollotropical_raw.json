@@ -1,0 +1,709 @@
+{
+    "restaurant_name": "Pollo Tropical",
+    "items": [
+      {
+        "name": "Chicken (¼ White)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 43,
+          "carbs": 0,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Chicken (¼ Dark)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 290,
+          "protein": 24,
+          "carbs": 0,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Chicken (¼ White) Without Skin",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 220,
+          "protein": 37,
+          "carbs": 0,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Chicken (¼ Dark) Without Skin",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 21,
+          "carbs": 0,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Chicken (½ )",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 650,
+          "protein": 67,
+          "carbs": 0,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Grilled Chicken Breast (2)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 59,
+          "carbs": 10,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Crispy Chicken Breast",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 31,
+          "carbs": 11,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Mojo Roast Pork With Sauteed Onions",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 370,
+          "protein": 39,
+          "carbs": 2,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Churrasco Steak With Chimichurri",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 270,
+          "protein": 25,
+          "carbs": 3,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Chicken (1/4 White) And Mojo Roast Pork With Sauteed Onions",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 730,
+          "protein": 82,
+          "carbs": 2,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Chicken (1/4 Dark) And Mojo Roast Pork With Sauteed Onions",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 660,
+          "protein": 63,
+          "carbs": 2,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Tropical Trio",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1530,
+          "protein": 98,
+          "carbs": 137,
+          "fat": 67
+        }
+      },
+      {
+        "name": "Caesar Salad - Add Protein Choice",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 380,
+          "protein": 7,
+          "carbs": 12,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Caesar Salad W/O Dressing - Add Protein Choice",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 90,
+          "protein": 4,
+          "carbs": 11,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Grilled Chicken For Ceasar Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 29,
+          "carbs": 5,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Avocado Crispy Chicken Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1080,
+          "protein": 45,
+          "carbs": 40,
+          "fat": 78
+        }
+      },
+      {
+        "name": "Avocado Grilled Chicken Salad",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 960,
+          "protein": 56,
+          "carbs": 36,
+          "fat": 73
+        }
+      },
+      {
+        "name": "Caribbean Chicken Soup (Cup)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 18,
+          "carbs": 33,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Caribbean Chicken Soup (Bowl)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 22,
+          "carbs": 41,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Grilled Chicken Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 470,
+          "protein": 41,
+          "carbs": 36,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Cuban Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1050,
+          "protein": 61,
+          "carbs": 67,
+          "fat": 59
+        }
+      },
+      {
+        "name": "Grilled Chicken Caesar Wrap",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 680,
+          "protein": 39,
+          "carbs": 42,
+          "fat": 45
+        }
+      },
+      {
+        "name": "Grilled Chicken Quesadilla Wrap",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 660,
+          "protein": 48,
+          "carbs": 41,
+          "fat": 39
+        }
+      },
+      {
+        "name": "Tropichop Rice And Veggies (Regular)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 350,
+          "protein": 7,
+          "carbs": 71,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Tropichop Rice And Veggies (Large)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 530,
+          "protein": 10,
+          "carbs": 106,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Boneless Chicken Breast (Regular)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 29,
+          "carbs": 5,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Boneless Chicken Breast (Large)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 60,
+          "carbs": 10,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Mojo Roast Pork (Regular)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 19,
+          "carbs": 0,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Mojo Roast Pork (Large)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 330,
+          "protein": 39,
+          "carbs": 0,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Boneless Chicken Breast And Mojo Roast Pork (Regular)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 290,
+          "protein": 49,
+          "carbs": 5,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Boneless Chicken Breast And Mojo Roast Pork (Large)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 580,
+          "protein": 97,
+          "carbs": 10,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Churrasco Steak (Regular)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 200,
+          "protein": 13,
+          "carbs": 2,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Churrasco Steak (Large)",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 270,
+          "protein": 25,
+          "carbs": 3,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Chicken And Rolls",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1570,
+          "protein": 142,
+          "carbs": 56,
+          "fat": 88
+        }
+      },
+      {
+        "name": "Family Duo Whole Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "macros": {
+          "calories": 3360,
+          "protein": 246,
+          "carbs": 223,
+          "fat": 166
+        }
+      },
+      {
+        "name": "White Rice",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 4,
+          "carbs": 47,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Yellow Rice With Vegetables",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 4,
+          "carbs": 34,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Brown Rice",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 200,
+          "protein": 4,
+          "carbs": 34,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Black Beans",
+        "category": "Base",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 12,
+          "carbs": 36,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Kernel Corn",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 5,
+          "carbs": 26,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Caesar Salad",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 340,
+          "protein": 5,
+          "carbs": 8,
+          "fat": 32
+        }
+      },
+      {
+        "name": "French Fries",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 340,
+          "protein": 4,
+          "carbs": 40,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Mac & Cheese",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 290,
+          "protein": 11,
+          "carbs": 21,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Mashed Potatoes",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 4,
+          "carbs": 28,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Chicken Gravy",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Mashed Potatoes And Gravy",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 4,
+          "carbs": 29,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Sweet Plantains",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 450,
+          "protein": 3,
+          "carbs": 85,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Fried Yuca",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 320,
+          "protein": 1,
+          "carbs": 46,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Cheesy Yuca Bites",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 370,
+          "protein": 3,
+          "carbs": 41,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Avocado",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 1,
+          "carbs": 4,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Diced Tomatoes",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sauteed Onions",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Sauteed Pepper Topping",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Salsa (1 Oz)",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "BBQ Sauce (1 Oz)",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 0,
+          "carbs": 12,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Guava BBQ Sauce (1 Oz)",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 60,
+          "protein": 0,
+          "carbs": 15,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Chipotle Mayo (1 Oz)",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Curry Mustard (1 Oz)",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Caesar Dressing (3 Foz/Salad)",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 500,
+          "protein": 5,
+          "carbs": 2,
+          "fat": 54
+        }
+      },
+      {
+        "name": "Cilantro Garlic Sauce (1 Oz)",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Spicy Poyo-Poyo (1 Oz)",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Ketchup (1 Oz)",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 0,
+          "carbs": 8,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Pineapple Rum Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "macros": {
+          "calories": 60,
+          "protein": 0,
+          "carbs": 14,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Jalapeno Slices (1 Oz)",
+        "category": "Topping",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      }
+    ]
+  }

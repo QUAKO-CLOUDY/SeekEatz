@@ -1,0 +1,437 @@
+{
+    "restaurant_name": "Burger King",
+    "items": [
+      {
+        "name": "3 Piece French Toast Sticks",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 230,
+          "protein": 3,
+          "carbs": 29,
+          "fat": 11
+        }
+      },
+      {
+        "name": "5 Piece French Toast Sticks",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 380,
+          "protein": 5,
+          "carbs": 49,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Bacon, Egg, & Cheese Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 400,
+          "protein": 13,
+          "carbs": 29,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Bacon, Egg, & Cheese Croissan'wich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 370,
+          "protein": 14,
+          "carbs": 30,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Bacon, Sausage, Egg, & Cheese Croissan'wich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 500,
+          "protein": 19,
+          "carbs": 29,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Breakfast Burrito Jr.",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 370,
+          "protein": 15,
+          "carbs": 27,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Egg & Cheese Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 400,
+          "protein": 13,
+          "carbs": 29,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Egg & Cheese Croissan'wich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 340,
+          "protein": 12,
+          "carbs": 29,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Egg-Normous Burrito",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 780,
+          "protein": 32,
+          "carbs": 68,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Fully Loaded Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 640,
+          "protein": 28,
+          "carbs": 31,
+          "fat": 45
+        }
+      },
+      {
+        "name": "Fully Loaded Croissan'wich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 610,
+          "protein": 28,
+          "carbs": 31,
+          "fat": 40
+        }
+      },
+      {
+        "name": "Ham, Egg, & Cheese Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 400,
+          "protein": 17,
+          "carbs": 29,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Ham, Egg, & Cheese Croissan'wich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 370,
+          "protein": 17,
+          "carbs": 30,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Pancake & Sausage Platter",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 610,
+          "protein": 12,
+          "carbs": 72,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Pancake Platter",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 400,
+          "protein": 5,
+          "carbs": 74,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Sausage, Egg, & Cheese Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 560,
+          "protein": 20,
+          "carbs": 32,
+          "fat": 39
+        }
+      },
+      {
+        "name": "Sausage, Egg, & Cheese Croissan'wich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 500,
+          "protein": 19,
+          "carbs": 28,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Sausage Biscuit",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 440,
+          "protein": 12,
+          "carbs": 30,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Bacon Cheeseburger",
+        "category": "Flame Grilled Burgers",
+        "price_estimate": 4.69,
+        "image_url": null,
+        "macros": {
+          "calories": 340,
+          "protein": 18,
+          "carbs": 30,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Bacon Double Cheeseburger",
+        "category": "Flame Grilled Burgers",
+        "price_estimate": 5.89,
+        "image_url": null,
+        "macros": {
+          "calories": 440,
+          "protein": 27,
+          "carbs": 30,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Bacon King",
+        "category": "Flame Grilled Burgers",
+        "price_estimate": 11.59,
+        "image_url": null,
+        "macros": {
+          "calories": 1200,
+          "protein": 66,
+          "carbs": 55,
+          "fat": 81
+        }
+      },
+      {
+        "name": "BBQ Bacon Whopper Jr.",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 390,
+          "protein": 18,
+          "carbs": 32,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Cheeseburger",
+        "category": "Flame Grilled Burgers",
+        "price_estimate": 3.49,
+        "image_url": null,
+        "macros": {
+          "calories": 290,
+          "protein": 15,
+          "carbs": 30,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Crispy Onion Whopper",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1150,
+          "protein": 47,
+          "carbs": 88,
+          "fat": 72
+        }
+      },
+      {
+        "name": "Crispy Onion Whopper Jr.",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 570,
+          "protein": 22,
+          "carbs": 47,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Double Cheeseburger",
+        "category": "Flame Grilled Burgers",
+        "price_estimate": 4.69,
+        "image_url": null,
+        "macros": {
+          "calories": 400,
+          "protein": 24,
+          "carbs": 30,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Double Whopper",
+        "category": "EntrFlame Grilled Burgersee",
+        "price_estimate": 10.19,
+        "image_url": null,
+        "macros": {
+          "calories": 900,
+          "protein": 48,
+          "carbs": 49,
+          "fat": 58
+        }
+      },
+      {
+        "name": "Hamburger",
+        "category": "Flame Grilled Burgers",
+        "price_estimate": 3.19,
+        "image_url": null,
+        "macros": {
+          "calories": 240,
+          "protein": 13,
+          "carbs": 26,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Impossible Whopper",
+        "category": "Flame Grilled Burgers",
+        "price_estimate": 8.99,
+        "image_url": null,
+        "macros": {
+          "calories": 630,
+          "protein": 25,
+          "carbs": 58,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Triple Whopper",
+        "category": "Entree",
+        "price_estimate": 10.79,
+        "image_url": null,
+        "macros": {
+          "calories": 1130,
+          "protein": 67,
+          "carbs": 49,
+          "fat": 75
+        }
+      },
+      {
+        "name": "Triple Whopper with Cheese",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1220,
+          "protein": 71,
+          "carbs": 50,
+          "fat": 82
+        }
+      },
+      {
+        "name": "Whopper",
+        "category": "Entree",
+        "price_estimate": 7.69,
+        "image_url": null,
+        "macros": {
+          "calories": 660,
+          "protein": 28,
+          "carbs": 49,
+          "fat": 40
+        }
+      },
+      {
+        "name": "Whopper Jr.",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 310,
+          "protein": 13,
+          "carbs": 27,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Big Fish",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 16,
+          "carbs": 51,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Chicken Jr.",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 450,
+          "protein": 12,
+          "carbs": 34,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Original Chicken Sandwich",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 660,
+          "protein": 28,
+          "carbs": 48,
+          "fat": 40
+        }
+      }
+    ]
+  }

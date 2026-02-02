@@ -6,6 +6,9 @@ import { MealCard } from "./MealCard";
 import type { UserProfile, Meal } from "../types";
 import { getMealImageUrl } from "@/lib/image-utils";
 import { useSessionActivity } from "../hooks/useSessionActivity";
+import { normalizeMacros } from "@/lib/macro-utils";
+import { canUseFeature, incrementUsage } from "@/lib/usage-gate";
+import { useRouter } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -13,8 +16,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "./ui/popover";
 
 type MacroType = "calories" | "protein" | "carbs" | "fats";
+
+type Direction = "above" | "below";
 
 type MacroConfig = {
   label: string;
@@ -34,7 +44,8 @@ const MACRO_CONFIG: Record<MacroType, MacroConfig> = {
 const CUISINES = [
   { id: "mexican", label: "Mexican", icon: "🌮" },
   { id: "american", label: "American", icon: "🍔" },
-  { id: "sushi", label: "Sushi", icon: "🍣" },
+  { id: "japanese", label: "Japanese", icon: "🍣" },
+  { id: "thai", label: "Thai", icon: "🍜" },
   { id: "mediterranean", label: "Mediterranean", icon: "🥙" },
   { id: "greek", label: "Greek", icon: "🫒" },
   { id: "chinese", label: "Chinese", icon: "🥟" },
@@ -50,6 +61,8 @@ function getGreeting(): string {
   return "Good evening";
 }
 
+import type { LoggedMeal } from './LogScreen';
+
 type Props = {
   userProfile: UserProfile;
   onMealSelect: (meal: Meal) => void;
@@ -57,10 +70,12 @@ type Props = {
   onSearch?: () => void;
   onNavigateToChat?: (message?: string) => void;
   onToggleFavorite?: (mealId: string, meal?: Meal) => void;
+  loggedMeals?: LoggedMeal[];
 };
 
-export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite }: Props) {
+export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite, loggedMeals = [] }: Props) {
   const { updateActivity } = useSessionActivity();
+  const router = useRouter();
   
   // Extract first name from user profile
   const getUserFirstName = () => {
@@ -100,36 +115,128 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     };
   });
 
-  // Load persisted meals and search state
-  const [recommendedMeals, setRecommendedMeals] = useState<Meal[]>(() => {
+  // Initialize direction preferences (above/below for calories only)
+  // Protein, carbs, fats are always minimums (no direction toggle)
+  const [macroDirections, setMacroDirections] = useState<Record<"calories", Direction>>(() => {
     if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('seekeatz_recommended_meals');
+      const saved = localStorage.getItem('seekeatz_macro_directions');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          // Only keep calories direction
+          return { calories: parsed.calories || "below" };
+        } catch (e) {
+          console.error('Failed to parse saved macro directions:', e);
+        }
+      }
+    }
+    // Default to 'below' for calories
+    return {
+      calories: "below",
+    };
+  });
+
+  // Initialize enabled state for each macro filter (all enabled by default)
+  const [macroEnabled, setMacroEnabled] = useState<Record<MacroType, boolean>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('seekeatz_macro_enabled');
       if (saved) {
         try {
           return JSON.parse(saved);
         } catch (e) {
-          console.error('Failed to parse saved meals:', e);
+          console.error('Failed to parse saved macro enabled state:', e);
         }
       }
     }
-    return [];
+    // Default to all enabled
+    return {
+      calories: true,
+      protein: true,
+      carbs: true,
+      fats: true,
+    };
   });
+
+  // State for which popover is open
+  const [openPopover, setOpenPopover] = useState<MacroType | null>(null);
+
+  // Load persisted meals and search state
+  const [recommendedMeals, setRecommendedMeals] = useState<Meal[]>([]);
   
   const [isLoadingMeals, setIsLoadingMeals] = useState(false);
-  const [hasSearched, setHasSearched] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('seekeatz_has_searched');
-      return saved === 'true';
-    }
-    return false;
-  });
-  const mealsSectionRef = useRef<HTMLDivElement>(null);
+  const [hasSearched, setHasSearched] = useState(false);
   
-  // Track last search parameters to detect changes
+  // Ref to track the main container for scroll position
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mealsSectionRef = useRef<HTMLDivElement>(null);
+  const hasRestoredScrollRef = useRef(false);
+  
+  // Prevent browser scroll restoration
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+  
+  // Load meals from localStorage on mount and whenever component becomes visible
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedMeals = localStorage.getItem('seekeatz_recommended_meals');
+        if (savedMeals) {
+          const parsed = JSON.parse(savedMeals);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setRecommendedMeals(parsed);
+          }
+        }
+        
+        const savedHasSearched = localStorage.getItem('seekeatz_has_searched');
+        if (savedHasSearched === 'true') {
+          setHasSearched(true);
+        }
+      } catch (e) {
+        console.error('Failed to load saved meals:', e);
+      }
+    }
+  }, []); // Run on mount
+  
+  
+  // Save scroll position continuously and on unmount
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    
+    let scrollTimeout: NodeJS.Timeout;
+    const handleScroll = () => {
+      if (typeof window !== 'undefined') {
+        // Debounce scroll position saving
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          sessionStorage.setItem('seekeatz_home_scroll_position', container.scrollTop.toString());
+        }, 100);
+      }
+    };
+    
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      clearTimeout(scrollTimeout);
+      container.removeEventListener('scroll', handleScroll);
+      // Save final scroll position on unmount
+      if (typeof window !== 'undefined' && container) {
+        sessionStorage.setItem('seekeatz_home_scroll_position', container.scrollTop.toString());
+      }
+    };
+  }, []);
+  
+  // Track last search parameters (including searchKey for pagination)
   const [lastSearchParams, setLastSearchParams] = useState<{
     macroValues: Record<MacroType, number>;
+    macroDirections?: Record<"calories", Direction>;
+    macroEnabled?: Record<MacroType, boolean>;
     selectedCuisine: string | null;
     distance?: number;
+    searchKey?: string; // For pagination
   } | null>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('seekeatz_last_search_params');
@@ -166,7 +273,34 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   const currentValue = macroValues[macro];
 
   const handleMacroChange = (nextMacro: MacroType) => {
+    // Open popover for direction selection instead of changing macro
+    setOpenPopover(nextMacro);
+    // Also set macro for the slider display
     setMacro(nextMacro);
+  };
+
+  const handleDirectionChange = (direction: Direction) => {
+    // Only calories has direction (above/below)
+    setMacroDirections({ calories: direction });
+    // Persist to localStorage
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('seekeatz_macro_directions', JSON.stringify({ calories: direction }));
+    }
+    // Close popover after selection
+    setOpenPopover(null);
+  };
+
+  const handleToggleExclude = (metric: MacroType) => {
+    setMacroEnabled((prev) => {
+      const updated = { ...prev, [metric]: !prev[metric] };
+      // Persist to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('seekeatz_macro_enabled', JSON.stringify(updated));
+      }
+      return updated;
+    });
+    // Close popover after toggle
+    setOpenPopover(null);
   };
 
   const handleValueChange = (newValue: number) => {
@@ -187,35 +321,11 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     }
   }, [selectedCuisine]);
 
-  // Clear meals when macro values, cuisine, or distance change (but only if we have meals and params have changed)
-  useEffect(() => {
-    // Only run if we have both last search params and current meals
-    if (lastSearchParams && recommendedMeals.length > 0) {
-      const macroValuesChanged = 
-        lastSearchParams.macroValues.calories !== macroValues.calories ||
-        lastSearchParams.macroValues.protein !== macroValues.protein ||
-        lastSearchParams.macroValues.carbs !== macroValues.carbs ||
-        lastSearchParams.macroValues.fats !== macroValues.fats;
-      
-      const cuisineChanged = lastSearchParams.selectedCuisine !== selectedCuisine;
-      const distanceChanged = lastSearchParams.distance !== activeDistance;
-      
-      if (macroValuesChanged || cuisineChanged || distanceChanged) {
-        // Clear meals when macros, cuisine, or distance change
-        setRecommendedMeals([]);
-        setHasSearched(false);
-        setLastSearchParams(null);
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('seekeatz_recommended_meals');
-          localStorage.removeItem('seekeatz_has_searched');
-          localStorage.removeItem('seekeatz_last_search_params');
-        }
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [macroValues.calories, macroValues.protein, macroValues.carbs, macroValues.fats, selectedCuisine, activeDistance]);
+  // Note: We no longer auto-clear meals when preferences change.
+  // Meals are only updated when the user explicitly clicks "Find meals that match this".
 
   // Convert API result to Meal type
+  // API returns meals with normalized macros: calories, protein, carbs, fats
   const convertToMeal = (item: any): Meal => {
     const category = item.category === 'Grocery' || item.category === 'Hot Bar' 
       ? 'grocery' as const 
@@ -231,23 +341,36 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       item.image_url || item.image
     );
 
-    // Handle fats - check fats_g (database column) first, then other variations
-    const fats = item.fats_g ?? item.fat_g ?? item.fats ?? item.fat ?? 
-                 (item.nutrition_info?.fats_g) ?? 
-                 (item.nutrition_info?.fat_g) ?? 
-                 (item.nutrition_info?.fats) ?? 
-                 (item.nutrition_info?.fat) ?? 0;
+    // Normalize macros from API response
+    // API returns: { calories, protein, carbs, fats } (already normalized)
+    // Also support legacy formats for backward compatibility
+    const macrosData = item.macros || {
+      calories: item.calories,
+      protein: item.protein ?? item.protein_g,
+      carbs: item.carbs ?? item.carbs_g,
+      fats: item.fats ?? item.fat ?? item.fats_g ?? item.fat_g,
+    };
+    
+    const normalizedMacros = normalizeMacros(macrosData);
+    
+    // If normalization fails, use fallback values (shouldn't happen with proper API)
+    const calories = normalizedMacros?.calories ?? item.calories ?? 0;
+    const protein = normalizedMacros?.protein ?? item.protein ?? item.protein_g ?? 0;
+    const carbs = normalizedMacros?.carbs ?? item.carbs ?? item.carbs_g ?? 0;
+    const fats = normalizedMacros?.fats ?? item.fats ?? item.fat ?? item.fats_g ?? item.fat_g ?? 0;
 
     return {
       id: item.id || `meal-${Date.now()}-${Math.random()}`,
       name: mealName,
       restaurant: restaurantName,
-      calories: item.calories || 0,
-      protein: item.protein_g || 0,
-      carbs: item.carbs_g || 0,
-      fats: typeof fats === 'number' ? fats : 0,
+      restaurant_name: restaurantName, // Also set restaurant_name for logo logic
+      calories,
+      protein,
+      carbs,
+      fats,
+      macros: normalizedMacros || undefined, // Include normalized macros object if available
       image: imageUrl,
-      price: item.price || null,
+      price: item.price ?? item.price_estimate ?? null,
       description: item.description || '',
       category: category,
       dietary_tags: item.dietary_tags || item.tags || [],
@@ -267,74 +390,21 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     const mealText = `${meal.name} ${meal.restaurant} ${meal.description || ''} ${(meal.dietary_tags || []).join(' ')}`.toLowerCase();
     
     // Check if cuisine name appears in meal text
-    return mealText.includes(cuisineLabel.toLowerCase());
+    let matches = mealText.includes(cuisineLabel.toLowerCase());
+    
+    // Special case: Japanese cuisine should also match "sushi"
+    if (cuisineId === "japanese" && !matches) {
+      matches = mealText.includes("sushi");
+    }
+    
+    return matches;
   };
 
-  // Filter meals based on user profile (diet_type and dietary_options)
+  // Diet filtering removed - all diet logic disabled
+  // This function is kept for compatibility but returns meals unchanged
   const filterMealsByProfile = (meals: Meal[], profile: UserProfile): Meal[] => {
-    if (!meals || meals.length === 0) return meals;
-    
-    let filtered = [...meals];
-    
-    // Filter by diet_type
-    if (profile.diet_type) {
-      const dietType = profile.diet_type.toLowerCase();
-      const mealTags = (meal: Meal) => (meal.dietary_tags || []).map(tag => tag.toLowerCase());
-      
-      if (dietType === 'vegan') {
-        filtered = filtered.filter(meal => {
-          const tags = mealTags(meal);
-          return tags.includes('vegan') || tags.includes('plant-based');
-        });
-      } else if (dietType === 'vegetarian') {
-        filtered = filtered.filter(meal => {
-          const tags = mealTags(meal);
-          const mealText = `${meal.name} ${meal.description || ''}`.toLowerCase();
-          // Exclude meat, poultry, fish, seafood
-          const hasMeat = mealText.includes('chicken') || mealText.includes('beef') || mealText.includes('pork') || 
-                         mealText.includes('turkey') || mealText.includes('fish') || mealText.includes('salmon') ||
-                         mealText.includes('tuna') || mealText.includes('shrimp') || mealText.includes('seafood');
-          return tags.includes('vegetarian') || (!hasMeat && (tags.includes('vegan') || tags.includes('plant-based')));
-        });
-      } else if (dietType === 'keto' || dietType === 'ketogenic') {
-        filtered = filtered.filter(meal => {
-          // Keto: low carb (typically <20g net carbs)
-          return meal.carbs < 25; // Approximate threshold
-        });
-      } else if (dietType === 'low_carb' || dietType === 'low carb' || dietType === 'low-carb') {
-        filtered = filtered.filter(meal => {
-          // Low carb: prioritize lower carb options
-          return meal.carbs < 50; // Approximate threshold
-        });
-      }
-    }
-    
-    // Filter by dietary_options (hard constraints for allergens)
-    if (profile.dietary_options && profile.dietary_options.length > 0) {
-      const normalizedOptions = profile.dietary_options.map(opt => opt.toLowerCase().replace(/[-\s]+/g, '_'));
-      const mealTags = (meal: Meal) => (meal.dietary_tags || []).map(tag => tag.toLowerCase().replace(/[-\s]+/g, '_'));
-      
-      // Hard constraints: exclude items with allergens
-      if (normalizedOptions.includes('gluten_free')) {
-        filtered = filtered.filter(meal => {
-          const tags = mealTags(meal);
-          return tags.includes('gluten_free') || tags.includes('gluten-free');
-        });
-      }
-      
-      if (normalizedOptions.includes('dairy_free')) {
-        filtered = filtered.filter(meal => {
-          const tags = mealTags(meal);
-          return tags.includes('dairy_free') || tags.includes('dairy-free');
-        });
-      }
-      
-      // Note: For other allergens (nut, soy, egg, shellfish), we'd need allergen data in the meal object
-      // For now, we rely on dietary_tags matching
-    }
-    
-    // If no meals match after filtering, return original list (let AI reasoning handle it)
-    return filtered.length > 0 ? filtered : meals;
+    // All diet filtering removed - return meals unchanged
+    return meals;
   };
 
   // Get user location (if available)
@@ -358,11 +428,31 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     }
   }, []);
 
-  const searchMeals = async (query: string, distance?: number, append = false): Promise<Meal[]> => {
+  const searchMeals = async (
+    query: string, 
+    distance?: number, 
+    append = false,
+    constraints: any = undefined, // Legacy parameter (deprecated)
+    searchKey?: string, // Optional searchKey for pagination (undefined for new searches)
+    filters?: {
+      calories?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
+      protein?: { enabled: boolean; min: number };
+      carbs?: { enabled: boolean; min: number };
+      fats?: { enabled: boolean; min: number };
+    },
+    macroFilters?: {
+      proteinMin?: number;
+      carbsMin?: number;
+      fatsMin?: number;
+      caloriesMax?: number;
+      caloriesMin?: number;
+    },
+    calorieMode?: "UNDER" | "OVER"
+  ): Promise<Meal[] | { meals: Meal[]; searchKey?: string; hasMore?: boolean }> => {
     try {
       // Log search parameters for debugging (dev only)
       if (process.env.NODE_ENV === 'development') {
-        console.log(`🔍 Search: query="${query}", radius=${distance} miles, hasLocation=${!!userLocation}`);
+        console.log(`🔍 Search: query="${query}", radius=${distance} miles, hasLocation=${!!userLocation}`, constraints);
       }
 
       const res = await fetch('/api/search', {
@@ -371,18 +461,38 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         body: JSON.stringify({ 
           query, 
           radius_miles: distance,
-          user_location: userLocation
+          // NEW: Structured filters payload (preferred format)
+          filters: filters,
+          // Legacy: Structured macroFilters payload (for backward compatibility)
+          macroFilters: macroFilters || undefined,
+          calorieMode: calorieMode || undefined,
+          isHomepage: true, // Flag for homepage-specific logic
+          // Only include searchKey for pagination (not for new searches)
+          ...(searchKey ? { searchKey, isPagination: true } : {}),
+          // Use new format: user_location_lat and user_location_lng
+          ...(userLocation ? {
+            user_location_lat: userLocation.latitude,
+            user_location_lng: userLocation.longitude,
+          } : {}),
         }),
       });
       
       const data = await res.json();
       
-      // Normalize API response to always be an array
+      // Normalize API response - return full response object if available
       let normalizedResults: any[] = [];
+      let responseSearchKey: string | undefined;
+      let hasMore: boolean = false;
       
       if (Array.isArray(data)) {
         normalizedResults = data;
+      } else if (data && typeof data === 'object' && Array.isArray(data.meals)) {
+        // New format: { meals, hasMore, nextOffset, searchKey }
+        normalizedResults = data.meals;
+        responseSearchKey = data.searchKey;
+        hasMore = data.hasMore || false;
       } else if (data && typeof data === 'object' && Array.isArray(data.results)) {
+        // Legacy format support
         normalizedResults = data.results;
       }
       
@@ -396,6 +506,16 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         return true;
       });
       
+      // Return full response object if searchKey is present (for pagination)
+      if (responseSearchKey || hasMore) {
+        return {
+          meals: fullMeals,
+          searchKey: responseSearchKey,
+          hasMore,
+        };
+      }
+      
+      // Return array for backward compatibility
       return fullMeals;
     } catch (error) {
       console.error('Search failed:', error);
@@ -404,52 +524,130 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   };
 
   const handleFindMeals = async () => {
+    // Check if user can use the feature (gate check BEFORE searching)
+    const canUse = await canUseFeature('search');
+    if (!canUse) {
+      // Limit reached - redirect to chat to show gate message
+      router.push('/chat');
+      return;
+    }
+    
     updateActivity(); // Update activity on button click
     setIsLoadingMeals(true);
     setHasSearched(true);
     
-    // Build query based on all macro values, cuisine, and profile settings
+    // Clear pagination state when filters change (new search, not pagination)
+    // This ensures old searchKey doesn't persist with new constraints
+    setLastSearchParams(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('seekeatz_last_search_params');
+    }
+    
+    // Build minimal query (no macro text - backend uses structured constraints)
     const cuisinePart = selectedCuisine 
       ? ` ${CUISINES.find(c => c.id === selectedCuisine)?.label.toLowerCase()}` 
       : "";
+    const query = `find meals${cuisinePart}`.trim();
     
-    // Add diet type to query if set
-    const dietPart = userProfile.diet_type && userProfile.diet_type.toLowerCase() !== 'regular'
-      ? ` ${userProfile.diet_type.toLowerCase()}`
-      : "";
+    // NEW SEMANTICS (locked in):
+    // - Protein, Carbs, Fats are MINIMUMS (>=) - no direction toggle
+    // - Calories is user-selectable: UNDER (<=) or OVER (>=) based on calorieMode
+    const calorieMode = macroDirections.calories === "below" ? "UNDER" : "OVER";
     
-    // Add dietary options to query (high protein, etc.)
-    const dietaryPart = userProfile.dietary_options && userProfile.dietary_options.length > 0
-      ? userProfile.dietary_options
-          .filter(opt => {
-            const normalized = opt.toLowerCase().replace(/[-\s]+/g, '_');
-            return normalized === 'high_protein' || normalized === 'high-protein';
-          })
-          .map(opt => opt.toLowerCase())
-          .join(' ')
-      : "";
+    // Build structured filters payload with enabled flags
+    const filters: {
+      calories?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
+      protein?: { enabled: boolean; min: number };
+      carbs?: { enabled: boolean; min: number };
+      fats?: { enabled: boolean; min: number };
+    } = {};
     
-    const query = `${macroValues.calories} calories ${macroValues.protein}g protein ${macroValues.carbs}g carbs ${macroValues.fats}g fats${cuisinePart}${dietPart}${dietaryPart ? ' ' + dietaryPart : ''}`.trim();
+    // Calories filter
+    if (macroEnabled.calories) {
+      filters.calories = {
+        enabled: true,
+        mode: calorieMode === "UNDER" ? "BELOW" : "ABOVE",
+        value: macroValues.calories,
+      };
+    }
     
-    const meals = await searchMeals(query, activeDistance);
+    // Protein, Carbs, Fats are always MINIMUMS (>=) when enabled
+    if (macroEnabled.protein) {
+      filters.protein = {
+        enabled: true,
+        min: macroValues.protein,
+      };
+    }
+    if (macroEnabled.carbs) {
+      filters.carbs = {
+        enabled: true,
+        min: macroValues.carbs,
+      };
+    }
+    if (macroEnabled.fats) {
+      filters.fats = {
+        enabled: true,
+        min: macroValues.fats,
+      };
+    }
     
-    // Filter meals by selected cuisine if one is selected
+    // Build legacy macroFilters payload for backward compatibility
+    const macroFilters: {
+      proteinMin?: number;
+      carbsMin?: number;
+      fatsMin?: number;
+      caloriesMax?: number; // For UNDER mode
+      caloriesMin?: number; // For OVER mode
+    } = {};
+    
+    if (filters.protein?.enabled) {
+      macroFilters.proteinMin = filters.protein.min;
+    }
+    if (filters.carbs?.enabled) {
+      macroFilters.carbsMin = filters.carbs.min;
+    }
+    if (filters.fats?.enabled) {
+      macroFilters.fatsMin = filters.fats.min;
+    }
+    
+    // Calories: UNDER mode = max, OVER mode = min
+    if (filters.calories?.enabled) {
+      if (calorieMode === "UNDER") {
+        macroFilters.caloriesMax = filters.calories.value;
+      } else {
+        macroFilters.caloriesMin = filters.calories.value;
+      }
+    }
+    
+    // Clear existing meals before new search (prevents stale results)
+    setRecommendedMeals([]);
+    
+    // Increment usage for guest users (before making the API call)
+    await incrementUsage('search');
+    
+    const mealsResult = await searchMeals(query, activeDistance, false, undefined, undefined, filters, macroFilters, calorieMode); // No searchKey for new search
+    const meals = Array.isArray(mealsResult) ? mealsResult : mealsResult.meals || [];
+    const searchKey = Array.isArray(mealsResult) ? undefined : mealsResult.searchKey;
+    
+    // Filter meals by selected cuisine if one is selected (client-side fallback)
     let filteredMeals = selectedCuisine 
       ? meals.filter(meal => mealMatchesCuisine(meal, selectedCuisine))
       : meals;
     
-    // Apply profile-based filtering
+    // Diet filtering removed - filterMealsByProfile now returns meals unchanged
     filteredMeals = filterMealsByProfile(filteredMeals, userProfile);
     
     // Take first 3 meals
     const newMeals = filteredMeals.slice(0, 3);
     setRecommendedMeals(newMeals);
     
-    // Save search parameters and results
+    // Save search parameters and results (including searchKey for pagination)
     const searchParams = {
       macroValues: { ...macroValues },
+      macroDirections: { ...macroDirections },
       selectedCuisine,
       distance: activeDistance,
+      searchKey, // Store for pagination
     };
     setLastSearchParams(searchParams);
     
@@ -472,44 +670,104 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     updateActivity(); // Update activity on button click
     setIsLoadingMeals(true);
     
-    // Build query based on all macro values, cuisine, and profile settings
+    // Build minimal query (no macro text - backend uses structured constraints)
     const cuisinePart = selectedCuisine 
       ? ` ${CUISINES.find(c => c.id === selectedCuisine)?.label.toLowerCase()}` 
       : "";
+    const query = `find meals${cuisinePart}`.trim();
     
-    // Add diet type to query if set
-    const dietPart = userProfile.diet_type && userProfile.diet_type.toLowerCase() !== 'regular'
-      ? ` ${userProfile.diet_type.toLowerCase()}`
-      : "";
+    // NEW SEMANTICS (locked in):
+    // - Protein, Carbs, Fats are MINIMUMS (>=) - no direction toggle
+    // - Calories is user-selectable: UNDER (<=) or OVER (>=) based on calorieMode
+    const calorieMode = macroDirections.calories === "below" ? "UNDER" : "OVER";
     
-    // Add dietary options to query (high protein, etc.)
-    const dietaryPart = userProfile.dietary_options && userProfile.dietary_options.length > 0
-      ? userProfile.dietary_options
-          .filter(opt => {
-            const normalized = opt.toLowerCase().replace(/[-\s]+/g, '_');
-            return normalized === 'high_protein' || normalized === 'high-protein';
-          })
-          .map(opt => opt.toLowerCase())
-          .join(' ')
-      : "";
+    // Build structured filters payload with enabled flags (reuse from lastSearchParams if available)
+    const filters: {
+      calories?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
+      protein?: { enabled: boolean; min: number };
+      carbs?: { enabled: boolean; min: number };
+      fats?: { enabled: boolean; min: number };
+    } = {};
     
-    const query = `${macroValues.calories} calories ${macroValues.protein}g protein ${macroValues.carbs}g carbs ${macroValues.fats}g fats${cuisinePart}${dietPart}${dietaryPart ? ' ' + dietaryPart : ''}`.trim();
+    // Calories filter
+    if (macroEnabled.calories) {
+      filters.calories = {
+        enabled: true,
+        mode: calorieMode === "UNDER" ? "BELOW" : "ABOVE",
+        value: macroValues.calories,
+      };
+    }
     
-    const meals = await searchMeals(query, activeDistance);
+    // Protein, Carbs, Fats are always MINIMUMS (>=) when enabled
+    if (macroEnabled.protein) {
+      filters.protein = {
+        enabled: true,
+        min: macroValues.protein,
+      };
+    }
+    if (macroEnabled.carbs) {
+      filters.carbs = {
+        enabled: true,
+        min: macroValues.carbs,
+      };
+    }
+    if (macroEnabled.fats) {
+      filters.fats = {
+        enabled: true,
+        min: macroValues.fats,
+      };
+    }
     
-    // Filter meals by selected cuisine if one is selected
-    let filteredMeals = selectedCuisine 
-      ? meals.filter(meal => mealMatchesCuisine(meal, selectedCuisine))
+    // Build legacy macroFilters payload for backward compatibility
+    const macroFilters: {
+      proteinMin?: number;
+      carbsMin?: number;
+      fatsMin?: number;
+      caloriesMax?: number; // For UNDER mode
+      caloriesMin?: number; // For OVER mode
+    } = {};
+    
+    if (filters.protein?.enabled) {
+      macroFilters.proteinMin = filters.protein.min;
+    }
+    if (filters.carbs?.enabled) {
+      macroFilters.carbsMin = filters.carbs.min;
+    }
+    if (filters.fats?.enabled) {
+      macroFilters.fatsMin = filters.fats.min;
+    }
+    
+    // Calories: UNDER mode = max, OVER mode = min
+    if (filters.calories?.enabled) {
+      if (calorieMode === "UNDER") {
+        macroFilters.caloriesMax = filters.calories.value;
+      } else {
+        macroFilters.caloriesMin = filters.calories.value;
+      }
+    }
+    
+    const mealsResult = await searchMeals(query, activeDistance, false, undefined, lastSearchParams?.searchKey, filters, macroFilters, calorieMode);
+    const meals: Meal[] = Array.isArray(mealsResult) ? mealsResult : (mealsResult.meals || []);
+    const responseSearchKey = Array.isArray(mealsResult) ? undefined : mealsResult.searchKey;
+    
+    // Update lastSearchParams with new searchKey if received
+    if (responseSearchKey && lastSearchParams) {
+      setLastSearchParams({ ...lastSearchParams, searchKey: responseSearchKey });
+    }
+    
+    // Filter meals by selected cuisine if one is selected (client-side fallback)
+    let filteredMeals: Meal[] = selectedCuisine 
+      ? meals.filter((meal: Meal) => mealMatchesCuisine(meal, selectedCuisine))
       : meals;
     
-    // Apply profile-based filtering
+    // Diet filtering removed - filterMealsByProfile now returns meals unchanged
     filteredMeals = filterMealsByProfile(filteredMeals, userProfile);
     
     // Get existing meal IDs to avoid duplicates
     const existingIds = new Set(recommendedMeals.map(m => m.id));
     
     // Filter out duplicates - fetch up to 15 results to have better chance of getting 3 unique ones
-    const uniqueMeals = filteredMeals.filter(m => !existingIds.has(m.id));
+    const uniqueMeals = filteredMeals.filter((m: Meal) => !existingIds.has(m.id));
     
     // Shuffle and take 3 new meals for variety
     const shuffled = [...uniqueMeals].sort(() => Math.random() - 0.5);
@@ -523,23 +781,96 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     setIsLoadingMeals(false);
   };
 
+  // Restore scroll position to specific meal card or saved position
+  useEffect(() => {
+    if (!containerRef.current || hasRestoredScrollRef.current || recommendedMeals.length === 0) return;
+    
+    const restoreScroll = () => {
+      const container = containerRef.current;
+      if (!container || typeof window === 'undefined') return;
+      
+      const lastClickedMealId = sessionStorage.getItem('seekeatz_last_clicked_meal_id');
+      
+      if (lastClickedMealId) {
+        // Try to find and scroll to the specific meal card
+        const mealElement = container.querySelector(`[data-meal-id="${lastClickedMealId}"]`);
+        if (mealElement) {
+          const containerRect = container.getBoundingClientRect();
+          const mealRect = mealElement.getBoundingClientRect();
+          const scrollTop = container.scrollTop;
+          const targetScroll = scrollTop + mealRect.top - containerRect.top - 100; // 100px offset from top
+          
+          // Set scroll position immediately and multiple times to ensure it sticks on desktop
+          container.scrollTop = targetScroll;
+          requestAnimationFrame(() => {
+            if (container) container.scrollTop = targetScroll;
+            requestAnimationFrame(() => {
+              if (container) container.scrollTop = targetScroll;
+            });
+          });
+          
+          hasRestoredScrollRef.current = true;
+          sessionStorage.removeItem('seekeatz_last_clicked_meal_id');
+          return;
+        }
+      }
+      
+      // Fallback: restore saved scroll position
+      const savedScrollPosition = sessionStorage.getItem('seekeatz_home_scroll_position');
+      if (savedScrollPosition) {
+        const scrollY = parseFloat(savedScrollPosition);
+        container.scrollTop = scrollY;
+        // Set multiple times to ensure it sticks on desktop
+        requestAnimationFrame(() => {
+          if (container) container.scrollTop = scrollY;
+          requestAnimationFrame(() => {
+            if (container) container.scrollTop = scrollY;
+          });
+        });
+        hasRestoredScrollRef.current = true;
+      }
+    };
+    
+    // Try immediately, then retry after a short delay to ensure DOM is ready
+    restoreScroll();
+    const timeoutId = setTimeout(restoreScroll, 50);
+    
+    return () => clearTimeout(timeoutId);
+  }, [recommendedMeals.length]);
+
   return (
     <div 
-      className="w-full bg-background text-foreground px-4 pt-3 sm:pt-6 pb-safe flex flex-col"
-      style={{ paddingBottom: `calc(8rem + env(safe-area-inset-bottom, 0px))` }}
+      ref={(el) => {
+        containerRef.current = el;
+        // Set initial scroll position immediately if we have one (before meals load)
+        if (el && !hasRestoredScrollRef.current && typeof window !== 'undefined') {
+          const savedScrollPosition = sessionStorage.getItem('seekeatz_home_scroll_position');
+          if (savedScrollPosition && recommendedMeals.length === 0) {
+            const scrollY = parseFloat(savedScrollPosition);
+            el.scrollTop = scrollY;
+            // Set multiple times to ensure it sticks
+            requestAnimationFrame(() => {
+              if (el) el.scrollTop = scrollY;
+            });
+          }
+        }
+      }}
+      className="w-full h-full bg-background text-foreground px-4 pb-safe flex flex-col overflow-y-auto"
+      style={{ 
+        paddingTop: `calc(0.75rem + env(safe-area-inset-top, 0px))`,
+        paddingBottom: `calc(8rem + env(safe-area-inset-bottom, 0px))`,
+        // Prevent scroll restoration from browser
+        scrollBehavior: 'auto'
+      }}
     >
       {/* Top greeting & distance selector */}
       <header className="flex items-center justify-between mb-3 sm:mb-4">
-        <div className="flex flex-col">
-          <span className="text-[10px] sm:text-xs text-muted-foreground">{getGreeting()},</span>
-          <span className="text-lg sm:text-xl font-semibold">
-            <span
-              className="bg-gradient-to-r from-[#4DDDF9] to-[#3A8BFF] bg-clip-text text-transparent"
-              aria-label={userName}
-            >
-              {userName}
-            </span>
-          </span>
+        <div className="flex items-center">
+          <img 
+            src="/logos/seekeatz.png" 
+            alt="Seekeatz Logo"
+            className="h-12 sm:h-16 w-auto object-contain"
+          />
         </div>
         <Select
           value={activeDistance.toString()}
@@ -581,44 +912,34 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
 
       {/* Cuisine row */}
       <section className="mb-4 sm:mb-5">
-        <div className="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar pb-1">
-          {CUISINES.map((cuisine) => {
-            const isActive = cuisine.id === selectedCuisine;
-            return (
-              <button
-                key={cuisine.id}
-                onClick={() => {
-                  // Toggle: if already selected, deselect; otherwise select
-                  const newCuisine = isActive ? null : cuisine.id;
-                  setSelectedCuisine(newCuisine);
-                  // Persist immediately
-                  if (typeof window !== 'undefined') {
-                    localStorage.setItem('seekeatz_selected_cuisine', JSON.stringify(newCuisine));
-                  }
-                }}
-                className={`flex flex-col items-center flex-shrink-0 transition-transform ${
-                  isActive ? "scale-105" : "scale-100"
-                }`}
-              >
-                <div
-                  className={`h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center border border-border shadow-sm transition-all overflow-hidden ${
-                    isActive
-                      ? "bg-primary/10 shadow-[0_0_12px_rgba(72,149,239,0.6)] ring-2 ring-[#4DDDF9]/50"
-                      : "bg-muted/50"
-                  }`}
+        <div className="flex justify-center overflow-x-auto no-scrollbar pb-1">
+          <div className="flex gap-2 sm:gap-3">
+            {CUISINES.map((cuisine) => {
+              return (
+                <button
+                  key={cuisine.id}
+                  onClick={() => {
+                    // Show "Coming soon" - cuisine selection is disabled
+                    // No action taken, but button remains clickable
+                  }}
+                  className="flex flex-col items-center flex-shrink-0 transition-opacity opacity-50 cursor-pointer hover:opacity-60"
+                  title="Coming soon"
                 >
-                  <span className="text-xl sm:text-2xl leading-none">{cuisine.icon}</span>
-                </div>
-                <span
-                  className={`mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] tracking-wide ${
-                    isActive ? "text-foreground" : "text-muted-foreground"
-                  }`}
-                >
-                  {cuisine.label}
-                </span>
-              </button>
-            );
-          })}
+                  <div
+                    className="h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center border border-border/50 shadow-sm transition-all overflow-hidden bg-muted/30 grayscale"
+                  >
+                    <span className="text-xl sm:text-2xl leading-none opacity-70">{cuisine.icon}</span>
+                  </div>
+                  <span className="mt-1.5 sm:mt-2 text-[10px] sm:text-[11px] tracking-wide text-muted-foreground/60">
+                    {cuisine.label}
+                  </span>
+                  <span className="mt-0.5 text-[9px] sm:text-[10px] text-muted-foreground/50">
+                    Coming soon
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -632,22 +953,107 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         />
 
         {/* Macro tabs */}
-        <div className="mt-6 sm:mt-8 flex gap-4 sm:gap-5 flex-wrap justify-center">
+        <div className="mt-6 sm:mt-8 flex gap-2 sm:gap-5 flex-nowrap justify-center">
           {(["calories", "protein", "carbs", "fats"] as MacroType[]).map(
             (type) => {
               const isActive = macro === type;
+              const isPopoverOpen = openPopover === type;
+              const isEnabled = macroEnabled[type];
+              const isCalories = type === "calories";
+              const currentDirection = isCalories ? macroDirections.calories : undefined;
+              
               return (
-                <button
+                <Popover
                   key={type}
-                  onClick={() => handleMacroChange(type)}
-                  className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-sm sm:text-base font-medium transition-all ${
-                    isActive
-                      ? "bg-gradient-to-r from-[#3A8BFF] to-[#4DDDF9] text-white shadow-lg shadow-[#3A8BFF]/40"
-                      : "bg-muted text-foreground border border-border hover:bg-muted/80"
-                  }`}
+                  open={isPopoverOpen}
+                  onOpenChange={(open) => {
+                    if (!open) {
+                      setOpenPopover(null);
+                    } else {
+                      setOpenPopover(type);
+                    }
+                  }}
                 >
-                  {MACRO_CONFIG[type].label}
-                </button>
+                  <PopoverTrigger asChild>
+                    <button
+                      onClick={() => handleMacroChange(type)}
+                      className={`px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-base font-medium transition-all relative flex-shrink-0 ${
+                        isActive
+                          ? "bg-gradient-to-r from-[#3A8BFF] to-[#4DDDF9] text-white shadow-lg shadow-[#3A8BFF]/40"
+                          : !isEnabled
+                          ? "bg-muted/50 text-muted-foreground border border-border/50 opacity-60"
+                          : "bg-muted text-foreground border border-border hover:bg-muted/80"
+                      }`}
+                    >
+                      {MACRO_CONFIG[type].label}
+                      {isCalories && currentDirection === "above" && (
+                        <span className="ml-0.5 sm:ml-1 text-xs opacity-75">↑</span>
+                      )}
+                      {isCalories && currentDirection === "below" && (
+                        <span className="ml-0.5 sm:ml-1 text-xs opacity-75">↓</span>
+                      )}
+                      {!isEnabled && (
+                        <span className="ml-0.5 sm:ml-1 text-xs opacity-75">✕</span>
+                      )}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent 
+                    side="top" 
+                    align="center"
+                    className="w-auto p-2"
+                    sideOffset={8}
+                  >
+                    <div className="flex flex-col gap-1">
+                      {isCalories ? (
+                        // Calories: show direction toggle (ABOVE/BELOW)
+                        <>
+                          <button
+                            onClick={() => handleDirectionChange("above")}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                              currentDirection === "above"
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-muted hover:bg-muted/80 text-foreground"
+                            }`}
+                          >
+                            Above (≥)
+                          </button>
+                          <button
+                            onClick={() => handleDirectionChange("below")}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                              currentDirection === "below"
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-muted hover:bg-muted/80 text-foreground"
+                            }`}
+                          >
+                            Below (≤)
+                          </button>
+                          <button
+                            onClick={() => handleToggleExclude(type)}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                              !isEnabled
+                                ? "bg-destructive text-destructive-foreground"
+                                : "bg-muted hover:bg-muted/80 text-foreground"
+                            }`}
+                          >
+                            {isEnabled ? "Exclude" : "Include"}
+                          </button>
+                        </>
+                      ) : (
+                        // Protein/Carbs/Fats: show exclude toggle only (always minimums)
+                        <button
+                          onClick={() => handleToggleExclude(type)}
+                          className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                            !isEnabled
+                              ? "bg-destructive text-destructive-foreground"
+                              : "bg-muted hover:bg-muted/80 text-foreground"
+                          }`}
+                        >
+                          {isEnabled ? "Exclude" : "Include"}
+                        </button>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               );
             }
           )}
@@ -678,14 +1084,14 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           ) : (
             <>
               <Search className="w-4 h-4 sm:w-5 sm:h-5" />
-              Find Meals That Match This
+              Find Meals That Match
             </>
           )}
         </button>
       </main>
 
       {/* Recommended Meals Section */}
-      {hasSearched && (
+      {(hasSearched || recommendedMeals.length > 0) && (
         <section ref={mealsSectionRef} className="w-full mt-6 sm:mt-8 mb-24">
           <h2 className="text-lg sm:text-xl font-semibold mb-4 px-4 text-foreground">
             Recommended Meals
@@ -699,13 +1105,23 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
             <>
               <div className="space-y-3 sm:space-y-4 px-4">
                 {recommendedMeals.map((meal) => (
-                  <MealCard
-                    key={meal.id}
-                    meal={meal}
-                    isFavorite={favoriteMeals.includes(meal.id)}
-                    onClick={() => onMealSelect(meal)}
-                    onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(meal.id, meal) : undefined}
-                  />
+                  <div key={meal.id} data-meal-id={meal.id}>
+                    <MealCard
+                      meal={meal}
+                      isFavorite={favoriteMeals.includes(meal.id)}
+                      userProfile={userProfile}
+                      loggedMeals={loggedMeals}
+                      onClick={() => {
+                        // Save scroll position and meal ID before navigating to meal detail
+                        if (containerRef.current && typeof window !== 'undefined') {
+                          sessionStorage.setItem('seekeatz_home_scroll_position', containerRef.current.scrollTop.toString());
+                          sessionStorage.setItem('seekeatz_last_clicked_meal_id', meal.id);
+                        }
+                        onMealSelect(meal);
+                      }}
+                      onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(meal.id, meal) : undefined}
+                    />
+                  </div>
                 ))}
               </div>
               
@@ -803,6 +1219,8 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
   const isUserScrollingRef = useRef(false);
   const isProgrammaticScrollRef = useRef(false);
   const [isScrolling, setIsScrolling] = useState(false);
+  const isHoveredRef = useRef(false);
+  const lastScrollPositionRef = useRef<number>(0);
   
   const values = useMemo(() => {
     const arr: number[] = [];
@@ -868,14 +1286,29 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     const el = itemRefs.current[idx];
     if (!container || !el) return;
     
-    // Use requestAnimationFrame to ensure DOM is ready
+      // Use requestAnimationFrame to ensure DOM is ready
     requestAnimationFrame(() => {
       if (!container || !el) return;
       isProgrammaticScrollRef.current = true;
-      const containerCenter = container.clientWidth / 2;
-      const target = el.offsetLeft + el.offsetWidth / 2 - containerCenter;
-      // Use auto behavior for instant scroll, then let CSS snap handle it
-      container.scrollTo({ left: target, behavior: "auto" });
+      
+      // Use getBoundingClientRect for precise positioning (same as handleScrollEnd)
+      const containerRect = container.getBoundingClientRect();
+      const elRect = el.getBoundingClientRect();
+      
+      // Calculate the center of the visible scroll container (where the arrow is)
+      const containerCenterX = containerRect.left + containerRect.width / 2;
+      
+      // Calculate the element's center in screen coordinates
+      const elCenterX = elRect.left + elRect.width / 2;
+      
+      // Calculate the offset needed to align centers
+      const offsetX = elCenterX - containerCenterX;
+      
+      // Convert screen offset to scroll offset and apply
+      const targetScroll = container.scrollLeft + offsetX;
+      
+      // Use scrollLeft directly for instant positioning
+      container.scrollLeft = targetScroll;
       
       // Update transforms after scroll
       requestAnimationFrame(() => {
@@ -903,15 +1336,24 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
   const findClosestValue = () => {
     const container = containerRef.current;
     if (!container) return null;
-    const centerX = container.scrollLeft + container.clientWidth / 2;
+    
+    // Get the container's bounding rect to find the true visual center (where the arrow is)
+    const containerRect = container.getBoundingClientRect();
+    const containerCenter = containerRect.left + containerRect.width / 2;
 
     let closestIdx = 0;
     let closestDist = Infinity;
 
+    // Find the number closest to the arrow center
+    // This works even when stopped exactly between two numbers
     itemRefs.current.forEach((el, idx) => {
       if (!el) return;
-      const elCenter = el.offsetLeft + el.offsetWidth / 2;
-      const dist = Math.abs(elCenter - centerX);
+      // Get the element's absolute center position
+      const elRect = el.getBoundingClientRect();
+      const elCenter = elRect.left + elRect.width / 2;
+      // Calculate distance from arrow center to number center
+      const dist = Math.abs(elCenter - containerCenter);
+      // Always find the closest one (handles ties by keeping the first closest found)
       if (dist < closestDist) {
         closestDist = dist;
         closestIdx = idx;
@@ -925,34 +1367,55 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
   const handleScrollEnd = () => {
     if (isProgrammaticScrollRef.current) return;
     
-    // Update transforms one final time
-    updateTransforms();
+    const container = containerRef.current;
+    if (!container) return;
     
-    // Find closest value and snap instantly (no animation delay)
+    // Always find the closest number to the arrow center
+    // This handles cases where scroll stops exactly between two numbers
     const closest = findClosestValue();
     if (!closest) return;
     
-    const container = containerRef.current;
     const el = itemRefs.current[closest.idx];
-    if (!container || !el) return;
+    if (!el) return;
     
-    // Explicitly align the needle with the integer
-    const containerCenter = container.clientWidth / 2;
-    const target = el.offsetLeft + el.offsetWidth / 2 - containerCenter;
+    // Use getBoundingClientRect for precise positioning
+    // This accounts for all transforms, padding, and positioning
+    const containerRect = container.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
     
-    // Instantly snap to exact position (no smooth animation)
-    container.scrollTo({ left: target, behavior: 'auto' });
+    // Calculate the center of the visible scroll container (where the arrow is)
+    const containerCenterX = containerRect.left + containerRect.width / 2;
     
-    // Update value immediately
+    // Calculate the element's center in screen coordinates
+    const elCenterX = elRect.left + elRect.width / 2;
+    
+    // Calculate the offset needed to align centers
+    // This is the difference in screen coordinates
+    const offsetX = elCenterX - containerCenterX;
+    
+    // Convert screen offset to scroll offset and apply
+    // We need to scroll by the offset amount to align the centers
+    const targetScroll = container.scrollLeft + offsetX;
+    
+    // Snap instantly to exact position using scrollLeft for immediate positioning
+    // This always snaps to the closest number, even if stopped between two numbers
+    isProgrammaticScrollRef.current = true;
+    container.scrollLeft = targetScroll;
+    isProgrammaticScrollRef.current = false;
+    
+    // Update transforms immediately for visual feedback (synchronously, no RAF delay)
+    updateTransforms();
+    
+    // Always update value to match the closest number (even if already correct, ensures sync)
     if (closest.value !== value) {
       onChange(closest.value);
     }
-    
-    // Update transforms after instant snap
-    updateTransforms();
   };
 
   const handleScroll = () => {
+    const container = containerRef.current;
+    if (!container) return;
+    
     // Mark that user is actively scrolling
     if (!isUserScrollingRef.current) {
       isUserScrollingRef.current = true;
@@ -962,17 +1425,35 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     // Update transforms during scroll (throttled)
     scheduleTransformUpdate();
     
-    // Clear any pending scroll end handler
+    // Clear any pending scroll end handlers
     if (scrollEndTimeoutRef.current) {
       clearTimeout(scrollEndTimeoutRef.current);
+      scrollEndTimeoutRef.current = null;
     }
     
-    // Only update value when scroll ends (debounced) - NOT during scroll
+    // Update last scroll position
+    const currentPos = container.scrollLeft;
+    lastScrollPositionRef.current = currentPos;
+    
+    // Use a very short timeout for immediate snap detection
     scrollEndTimeoutRef.current = setTimeout(() => {
-      isUserScrollingRef.current = false;
-      setIsScrolling(false);
-      handleScrollEnd();
-    }, 15); // 15ms delay to detect scroll end, then instant snap
+      // Double-check that scroll position hasn't changed (handles momentum scrolling)
+      const newPos = container.scrollLeft;
+      if (Math.abs(newPos - lastScrollPositionRef.current) < 0.5) {
+        // Scroll has truly stopped - snap immediately
+        isUserScrollingRef.current = false;
+        setIsScrolling(false);
+        handleScrollEnd();
+      } else {
+        // Still scrolling, check again
+        lastScrollPositionRef.current = newPos;
+        scrollEndTimeoutRef.current = setTimeout(() => {
+          isUserScrollingRef.current = false;
+          setIsScrolling(false);
+          handleScrollEnd();
+        }, 5); // Very short second check
+      }
+    }, 10); // Very short initial delay (10ms)
   };
 
   const handleClick = (idx: number) => {
@@ -981,10 +1462,25 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     if (!container || !el) return;
     
     isProgrammaticScrollRef.current = true;
-    const containerCenter = container.clientWidth / 2;
-    const target = el.offsetLeft + el.offsetWidth / 2 - containerCenter;
-    // Use auto for instant scroll, CSS snap will handle positioning
-    container.scrollTo({ left: target, behavior: "auto" });
+    
+    // Use getBoundingClientRect for precise positioning (same as handleScrollEnd)
+    const containerRect = container.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+    
+    // Calculate the center of the visible scroll container (where the arrow is)
+    const containerCenterX = containerRect.left + containerRect.width / 2;
+    
+    // Calculate the element's center in screen coordinates
+    const elCenterX = elRect.left + elRect.width / 2;
+    
+    // Calculate the offset needed to align centers
+    const offsetX = elCenterX - containerCenterX;
+    
+    // Convert screen offset to scroll offset and apply
+    const targetScroll = container.scrollLeft + offsetX;
+    
+    // Use scrollLeft directly for instant positioning
+    container.scrollLeft = targetScroll;
     onChange(values[idx]);
     
     // Update transforms after scroll
@@ -996,6 +1492,57 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
       isProgrammaticScrollRef.current = false;
     }, 100);
   };
+
+  // Handle wheel events - only prevent default when hovering over the component
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleMouseEnter = () => {
+      isHoveredRef.current = true;
+    };
+
+    const handleMouseLeave = () => {
+      isHoveredRef.current = false;
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      // Only handle wheel events when hovering over the component
+      if (!isHoveredRef.current) {
+        return; // Let the event bubble for normal page scrolling - DO NOT prevent default
+      }
+
+      // Check if this is primarily a vertical scroll (deltaY > deltaX)
+      const isVerticalScroll = Math.abs(e.deltaY) > Math.abs(e.deltaX);
+      
+      if (isVerticalScroll) {
+        // Check if the container can actually scroll in the direction we want
+        const { scrollLeft, scrollWidth, clientWidth } = container;
+        const canScrollLeft = scrollLeft > 0;
+        const canScrollRight = scrollLeft < scrollWidth - clientWidth - 1;
+        
+        // Only prevent default if we can actually scroll the container
+        // If at bounds, let the event bubble for normal page scrolling
+        if ((e.deltaY < 0 && canScrollLeft) || (e.deltaY > 0 && canScrollRight)) {
+          e.preventDefault();
+          container.scrollLeft += e.deltaY;
+          handleScroll();
+        }
+        // If at bounds, don't prevent default - let page scroll normally
+      }
+      // For horizontal scroll, don't prevent default - allow native behavior
+    };
+
+    container.addEventListener('mouseenter', handleMouseEnter);
+    container.addEventListener('mouseleave', handleMouseLeave);
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener('mouseenter', handleMouseEnter);
+      container.removeEventListener('mouseleave', handleMouseLeave);
+      container.removeEventListener('wheel', handleWheel);
+    };
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -1052,10 +1599,10 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
         style={{ 
           perspective: '800px',
           transformStyle: 'preserve-3d',
-          scrollSnapType: 'x mandatory', // Enable CSS scroll snap
+          scrollSnapType: 'none', // Disable CSS scroll snap - we handle it in JS for immediate control
           scrollBehavior: 'auto', // Use auto for native momentum (smooth causes issues)
           WebkitOverflowScrolling: 'touch', // Momentum scrolling on iOS
-          overscrollBehavior: 'contain', // Prevent scroll chaining
+          overscrollBehavior: 'auto', // Allow scroll chaining when not at bounds
           // Prevent layout shifts
           contain: 'layout style paint',
         }}

@@ -20,8 +20,6 @@ const DIET_TYPES = [
   'Low-Carb',
   'High-Protein',
   'Mediterranean',
-  'Gluten-Free',
-  'Dairy-Free',
   'Pescatarian',
 ];
 
@@ -36,12 +34,12 @@ export default function AccountEditPage() {
   
   const [profile, setProfile] = useState<UserProfile>({
     goal: 'maintain',
-    dietaryType: 'None',
-    allergens: [],
-    calorieTarget: 2200,
-    proteinTarget: 150,
-    carbsTarget: 200,
-    fatsTarget: 70,
+    diet_type: 'None',
+    dietary_options: [],
+    target_calories: 2200,
+    target_protein_g: 150,
+    target_carbs_g: 200,
+    target_fats_g: 70,
   });
 
   // Load user profile from Supabase and localStorage
@@ -108,25 +106,30 @@ export default function AccountEditPage() {
       }
 
       // Validate inputs
-      if (profile.calorieTarget < 500 || profile.calorieTarget > 5000) {
+      const cals = profile.target_calories ?? 0;
+      const protein = profile.target_protein_g ?? 0;
+      const carbs = profile.target_carbs_g ?? 0;
+      const fats = profile.target_fats_g ?? 0;
+
+      if (cals < 500 || cals > 5000) {
         setError('Calorie target must be between 500 and 5000');
         setIsSaving(false);
         return;
       }
 
-      if (profile.proteinTarget < 0 || profile.proteinTarget > 500) {
+      if (protein < 0 || protein > 500) {
         setError('Protein target must be between 0 and 500g');
         setIsSaving(false);
         return;
       }
 
-      if (profile.carbsTarget < 0 || profile.carbsTarget > 600) {
+      if (carbs < 0 || carbs > 600) {
         setError('Carbs target must be between 0 and 600g');
         setIsSaving(false);
         return;
       }
 
-      if (profile.fatsTarget < 0 || profile.fatsTarget > 300) {
+      if (fats < 0 || fats > 300) {
         setError('Fats target must be between 0 and 300g');
         setIsSaving(false);
         return;
@@ -221,8 +224,8 @@ export default function AccountEditPage() {
             Diet Type
           </Label>
           <Select
-            value={profile.dietaryType}
-            onValueChange={(value) => setProfile(prev => ({ ...prev, dietaryType: value }))}
+            value={profile.diet_type ?? 'None'}
+            onValueChange={(value) => setProfile(prev => ({ ...prev, diet_type: value }))}
           >
             <SelectTrigger id="dietType" className="h-12">
               <SelectValue placeholder="Select diet type" />
@@ -248,10 +251,10 @@ export default function AccountEditPage() {
             min="500"
             max="5000"
             step="50"
-            value={profile.calorieTarget}
+            value={profile.target_calories ?? ''}
             onChange={(e) => setProfile(prev => ({ 
               ...prev, 
-              calorieTarget: parseInt(e.target.value) || 0 
+              target_calories: parseInt(e.target.value) || 0 
             }))}
             className="h-12 text-lg"
           />
@@ -276,10 +279,10 @@ export default function AccountEditPage() {
                 min="0"
                 max="500"
                 step="5"
-                value={profile.proteinTarget}
+                value={profile.target_protein_g ?? ''}
                 onChange={(e) => setProfile(prev => ({ 
                   ...prev, 
-                  proteinTarget: parseInt(e.target.value) || 0 
+                  target_protein_g: parseInt(e.target.value) || 0 
                 }))}
                 className="h-12"
               />
@@ -296,10 +299,10 @@ export default function AccountEditPage() {
                 min="0"
                 max="600"
                 step="10"
-                value={profile.carbsTarget}
+                value={profile.target_carbs_g ?? ''}
                 onChange={(e) => setProfile(prev => ({ 
                   ...prev, 
-                  carbsTarget: parseInt(e.target.value) || 0 
+                  target_carbs_g: parseInt(e.target.value) || 0 
                 }))}
                 className="h-12"
               />
@@ -316,10 +319,10 @@ export default function AccountEditPage() {
                 min="0"
                 max="300"
                 step="5"
-                value={profile.fatsTarget}
+                value={profile.target_fats_g ?? ''}
                 onChange={(e) => setProfile(prev => ({ 
                   ...prev, 
-                  fatsTarget: parseInt(e.target.value) || 0 
+                  target_fats_g: parseInt(e.target.value) || 0 
                 }))}
                 className="h-12"
               />

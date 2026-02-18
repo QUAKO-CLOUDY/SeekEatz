@@ -375,80 +375,45 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       console.log('Auth state changed:', event, session?.user?.id);
       
       if (event === 'SIGNED_IN' && session?.user) {
-        // User logged in - check onboarding status and switch to app view
-        const userId = session.user.id;
-        setCurrentUserId(userId); // Track current user ID
+        // User just signed in - reload profile
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
         
-        // Check if user has completed onboarding
-        const isOnboarded = typeof window !== 'undefined' 
-          ? localStorage.getItem('onboarded') === 'true' ||
-            localStorage.getItem('hasCompletedOnboarding') === 'true' ||
-            localStorage.getItem(`seekEatz_hasCompletedOnboarding_${userId}`) === 'true'
-          : false;
-        
-        // If not onboarded in localStorage, check database
-        if (!isOnboarded) {
-          try {
-            const { data: profileData } = await supabase
-              .from("profiles")
-              .select("has_completed_onboarding")
-              .eq("id", userId)
-              .single();
-            
-            if (profileData?.has_completed_onboarding) {
-              // Set localStorage flags
-              if (typeof window !== 'undefined') {
-                localStorage.setItem(`seekEatz_hasCompletedOnboarding_${userId}`, "true");
-                localStorage.setItem("hasCompletedOnboarding", "true");
-              }
-              // User is onboarded - show app immediately
-              setAppState('app');
-              return;
-            } else {
-              // User not onboarded - show onboarding
-              setAppState('onboarding');
-              return;
-            }
-          } catch (error) {
-            console.warn("Could not check onboarding status:", error);
-            // If we can't check, assume not onboarded
+        if (profileData) {
+          setUserProfile(profileData);
+          // Update app state based on onboarding status
+          if (profileData.has_completed_onboarding) {
+            setAppState('app');
+          } else {
             setAppState('onboarding');
-            return;
           }
         }
-        
-        // User is onboarded - switch to app view immediately
-        setAppState('app');
       } else if (event === 'SIGNED_OUT') {
-        // User logged out
-        setCurrentUserId(undefined); // Clear user ID
-        // If on chat route, ALWAYS allow preview access (don't show auth screen)
-        // The AIChat component will handle the free chat limit and redirect to /auth/signin if needed
-        if (isChatRoute) {
-          setAppState('app');
-        } else {
-          // Not on chat route - show auth screen
-          setAppState('auth');
-        }
-      } else if (event === 'TOKEN_REFRESHED' && session?.user) {
-        // Session refreshed - make sure we're showing app if user is authenticated
-        const userId = session.user.id;
+        // User signed out - reset to default profile
+        setCurrentUserId(undefined);
+        setUserProfile({
+          target_calories: 2000,
+          target_protein_g: 150,
+          target_carbs_g: 200,
+          target_fats_g: 70,
+          search_distance_miles: 10,
+        });
+        // Check if onboarded as guest
         const isOnboarded = typeof window !== 'undefined' 
           ? localStorage.getItem('onboarded') === 'true' ||
-            localStorage.getItem('hasCompletedOnboarding') === 'true' ||
-            localStorage.getItem(`seekEatz_hasCompletedOnboarding_${userId}`) === 'true'
+            localStorage.getItem('hasCompletedOnboarding') === 'true'
           : false;
-        
-        if (isOnboarded) {
-          setAppState('app');
-        }
+        setAppState(isOnboarded ? 'app' : 'auth');
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase, isClient, isChatRoute]);
+  }, [supabase, isClient]);
 
   // Safety guard: If on chat route, never allow appState to be 'auth'
   useEffect(() => {
@@ -754,71 +719,70 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // However, we can still pass props to update it if needed via context methods
   return (
     <div className="flex flex-col h-screen bg-background overflow-hidden">
-        <div className="flex-1 relative h-full overflow-hidden">
-          {currentScreen === 'home' && (
-            <HomeScreen
-              userProfile={userProfile}
-              onMealSelect={handleMealSelect}
-              favoriteMeals={favoriteMeals}
-              loggedMeals={loggedMeals}
-              onSearch={() => handleNavigate('search')}
-              onNavigateToChat={(message) => {
-                if (message && typeof window !== 'undefined') {
-                  localStorage.setItem('seekeatz_pending_chat_message', message);
-                }
-                handleNavigate('chat');
-              }}
-              onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
-            />
-          )}
-          {currentView === 'meal-detail' && selectedMeal && (
-            <MealDetail
-              meal={selectedMeal}
-              isFavorite={favoriteMeals.includes(selectedMeal.id)}
-              onToggleFavorite={() => handleToggleFavorite(selectedMeal.id, selectedMeal)}
-              onBack={() => setCurrentView('main')}
-              onLogMeal={handleLogMeal}
-            />
-          )}
-          {currentScreen === 'log' && (
-            <LogScreen
-              userProfile={userProfile}
-              loggedMeals={loggedMeals}
-              onRemoveMeal={handleRemoveMeal}
-            />
-          )}
-          {currentScreen === 'chat' && (
-            <AIChat
-              userId={currentUserId}
-              userProfile={userProfile}
-              onMealSelect={handleMealSelect}
-              favoriteMeals={favoriteMeals}
-              onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
-              onSignInRequest={() => router.push('/auth/signin')}
-            />
-          )}
-          {currentScreen === 'favorites' && (
-            <Favorites
-              favoriteMeals={favoriteMeals}
-              favoriteMealsData={favoriteMealsData}
-              loggedMeals={loggedMeals}
-              onMealSelect={handleMealSelect}
-              onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
-            />
-          )}
-          {currentScreen === 'settings' && (
-            <Settings
-              userProfile={userProfile}
-              onUpdateProfile={handleUpdateProfile}
-            />
-          )}
-        </div>
-        
-        <Navigation
-          currentScreen={currentScreen}
-          onNavigate={handleNavigate}
-        />
+      <div className="flex-1 relative h-full overflow-hidden">
+        {currentScreen === 'home' && (
+          <HomeScreen
+            userProfile={userProfile}
+            onMealSelect={handleMealSelect}
+            favoriteMeals={favoriteMeals}
+            loggedMeals={loggedMeals}
+            onSearch={() => handleNavigate('search')}
+            onNavigateToChat={(message) => {
+              if (message && typeof window !== 'undefined') {
+                localStorage.setItem('seekeatz_pending_chat_message', message);
+              }
+              handleNavigate('chat');
+            }}
+            onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
+          />
+        )}
+        {currentView === 'meal-detail' && selectedMeal && (
+          <MealDetail
+            meal={selectedMeal}
+            isFavorite={favoriteMeals.includes(selectedMeal.id)}
+            onToggleFavorite={() => handleToggleFavorite(selectedMeal.id, selectedMeal)}
+            onBack={() => setCurrentView('main')}
+            onLogMeal={handleLogMeal}
+          />
+        )}
+        {currentScreen === 'log' && (
+          <LogScreen
+            userProfile={userProfile}
+            loggedMeals={loggedMeals}
+            onRemoveMeal={handleRemoveMeal}
+          />
+        )}
+        {currentScreen === 'chat' && (
+          <AIChat
+            userId={currentUserId}
+            userProfile={userProfile}
+            onMealSelect={handleMealSelect}
+            favoriteMeals={favoriteMeals}
+            onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
+            onSignInRequest={() => router.push('/auth/signin')}
+          />
+        )}
+        {currentScreen === 'favorites' && (
+          <Favorites
+            favoriteMeals={favoriteMeals}
+            favoriteMealsData={favoriteMealsData}
+            loggedMeals={loggedMeals}
+            onMealSelect={handleMealSelect}
+            onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
+          />
+        )}
+        {currentScreen === 'settings' && (
+          <Settings
+            userProfile={userProfile}
+            onUpdateProfile={handleUpdateProfile}
+          />
+        )}
       </div>
+      
+      <Navigation
+        currentScreen={currentScreen}
+        onNavigate={handleNavigate}
+      />
+    </div>
   );
 }
-

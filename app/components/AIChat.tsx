@@ -47,18 +47,18 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   // Check if user is signed in (userId prop or check session)
   const [isSignedIn, setIsSignedIn] = useState(!!userId);
   const [isLimitReached, setIsLimitReached] = useState(false);
-  
+
   // Current session ID (stable per tab)
   const [currentSessionId, setCurrentSessionId] = useState<string>(() => {
     if (typeof window === 'undefined') return '';
     return getGuestSessionId();
   });
-  
+
   // Update isSignedIn when userId prop changes
   useEffect(() => {
     setIsSignedIn(!!userId);
   }, [userId]);
-  
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -66,7 +66,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         // Retry logic for auth check (helps with timing after signup)
         let retries = 0;
         let user = null;
-        
+
         while (retries < 5 && !user) {
           const { data: { user: fetchedUser }, error } = await supabase.auth.getUser();
           // AuthSessionMissingError is expected when signed out - treat as not signed in
@@ -82,14 +82,14 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             setMessages(prev => prev.filter(msg => !msg.isGateMessage));
             break;
           }
-          
+
           // If no user and not a session missing error, retry after a short delay
           if (!fetchedUser && retries < 4) {
             await new Promise(resolve => setTimeout(resolve, 300));
           }
           retries++;
         }
-        
+
         // If still no user after retries, set to false
         if (!user) {
           setIsSignedIn(false);
@@ -104,20 +104,20 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       }
     };
     checkAuth();
-    
+
     // Listen for auth changes
     const supabase = createClient();
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       const isAuthenticated = !!session?.user;
       setIsSignedIn(isAuthenticated);
-      
+
       if (event === 'SIGNED_IN' && session?.user) {
         // User signed in - immediately clear guest restrictions
         setIsLimitReached(false);
-        
+
         // Remove gate messages immediately
         setMessages(prev => prev.filter(msg => !msg.isGateMessage));
-        
+
         // Claim the current session (define inline to avoid dependency issues)
         const sessionId = currentSessionId;
         if (sessionId) {
@@ -136,7 +136,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           }
         }
       }
-      
+
       if (event === 'SIGNED_OUT') {
         // On sign out: clear chat and rotate session ID (but NOT trial count)
         clearChat();
@@ -144,7 +144,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         setCurrentSessionId(getGuestSessionId());
       }
     });
-    
+
     return () => {
       subscription.unsubscribe();
     };
@@ -159,10 +159,10 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const abortControllerRef = useRef<AbortController | null>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  
+
   // User location state (for nearby meal filtering)
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-  
+
   // Get user location on mount (if permission granted)
   useEffect(() => {
     if (typeof window !== 'undefined' && navigator.geolocation) {
@@ -197,10 +197,10 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   // Ensure chat session is owned by authenticated user
   const ensureChatSessionOwned = useCallback(async (userId: string, sessionId: string) => {
     if (!sessionId) return;
-    
+
     try {
       const supabase = createClient();
-      
+
       // Upsert chat_sessions to claim the session
       const { error: sessionError } = await supabase
         .from('chat_sessions')
@@ -210,12 +210,12 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         }, {
           onConflict: 'session_id',
         });
-      
+
       if (sessionError) {
         console.error('Failed to claim chat session:', sessionError);
         return;
       }
-      
+
       // Migrate guest messages from sessionStorage to Supabase
       const guestMessages = getGuestChatMessages();
       if (guestMessages.length > 0) {
@@ -228,12 +228,12 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             meal_data: msg.meals ? JSON.parse(JSON.stringify(msg.meals)) : null,
             meal_search_context: msg.mealSearchContext ? JSON.parse(JSON.stringify(msg.mealSearchContext)) : null,
           }));
-        
+
         if (messagesToInsert.length > 0) {
           const { error: messagesError } = await supabase
             .from('messages')
             .insert(messagesToInsert);
-          
+
           if (messagesError) {
             console.error('Failed to migrate guest messages:', messagesError);
           } else {
@@ -246,30 +246,30 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       console.error('Error claiming chat session:', error);
     }
   }, []);
-  
+
   // Load messages from Supabase for authenticated users
   useEffect(() => {
     const loadMessagesFromSupabase = async () => {
       if (!isSignedIn || !userId || !currentSessionId) return;
-      
+
       try {
         // First ensure the session is owned
         await ensureChatSessionOwned(userId, currentSessionId);
-        
+
         const supabase = createClient();
-        
+
         // Load messages from the session
         const { data: messagesData, error: messagesError } = await supabase
           .from('messages')
           .select('*')
           .eq('session_id', currentSessionId)
           .order('created_at', { ascending: true });
-        
+
         if (messagesError) {
           console.error('Failed to load messages from Supabase:', messagesError);
           return;
         }
-        
+
         if (messagesData && messagesData.length > 0) {
           // Convert Supabase messages to ChatMessage format
           const loadedMessages: ChatMessage[] = messagesData.map(msg => ({
@@ -280,19 +280,19 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             mealSearchContext: msg.meal_search_context || undefined,
             isGateMessage: false
           }));
-          
+
           setMessages(loadedMessages);
         }
       } catch (error) {
         console.error('Error loading messages from Supabase:', error);
       }
     };
-    
+
     if (isSignedIn && userId && currentSessionId) {
       loadMessagesFromSupabase();
     }
   }, [isSignedIn, userId, currentSessionId, ensureChatSessionOwned, setMessages]);
-  
+
   // Check trial limit on mount and when auth state changes
   useEffect(() => {
     const checkLimit = async () => {
@@ -303,11 +303,11 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         setMessages(prev => prev.filter(msg => !msg.isGateMessage));
         return;
       }
-      
+
       // User is not signed in - check trial limit
       const limitReached = await checkHasReachedLimit();
       setIsLimitReached(limitReached);
-      
+
       // Show gate message if limit reached and not already shown
       if (limitReached) {
         setMessages(prev => {
@@ -328,18 +328,18 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         setMessages(prev => prev.filter(msg => !msg.isGateMessage));
       }
     };
-    
+
     checkLimit();
   }, [isSignedIn, setMessages]);
 
   // Log to Supabase (only for authenticated users)
   const logChatMessage = useCallback(async (role: 'user' | 'assistant', content: string, meals?: any[], mealSearchContext?: any) => {
     if (!isSignedIn || !userId || !currentSessionId) return;
-    
+
     try {
       // Ensure session is owned
       await ensureChatSessionOwned(userId, currentSessionId);
-      
+
       const supabase = createClient();
       const { error } = await supabase
         .from('messages')
@@ -350,7 +350,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           meal_data: meals ? JSON.parse(JSON.stringify(meals)) : null,
           meal_search_context: mealSearchContext ? JSON.parse(JSON.stringify(mealSearchContext)) : null,
         });
-      
+
       if (error) {
         console.error('Failed to log chat message to Supabase:', error);
       } else {
@@ -367,7 +367,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
   const logUsageEvent = useCallback(async (eventType: 'chat_submit' | 'chat_response' | 'limit_hit', metadata?: any) => {
     if (!isSignedIn || !userId) return;
-    
+
     try {
       const supabase = createClient();
       const { error } = await supabase
@@ -377,7 +377,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           event_type: eventType,
           metadata: metadata || null,
         });
-      
+
       if (error) {
         console.error('Failed to log usage event to Supabase:', error);
       }
@@ -427,12 +427,12 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
   // Auto-scroll
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+
   // Helper function to scroll to bottom with smooth behavior (for new messages)
   const scrollToBottom = useCallback((instant: boolean = false) => {
     const container = messagesContainerRef.current;
     const endRef = messagesEndRef.current;
-    
+
     if (container) {
       if (instant) {
         // Instant scroll - directly set scrollTop for immediate positioning
@@ -453,11 +453,11 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       }
     }
   }, []);
-  
+
   // Track previous message count to detect new messages
   const previousMessageCountRef = useRef(0);
   const isInitialMountRef = useRef(true);
-  
+
   // Scroll to bottom when new messages are added (smooth scroll)
   // Only if user was already near the bottom, or if it's a brand new chat
   useEffect(() => {
@@ -467,10 +467,10 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       previousMessageCountRef.current = messages.length;
       return;
     }
-    
+
     const currentMessageCount = messages.length;
     const previousMessageCount = previousMessageCountRef.current;
-    
+
     // Only scroll if new messages were added
     if (currentMessageCount > previousMessageCount) {
       // Only auto-scroll if user was at bottom (they want to see new messages)
@@ -478,13 +478,13 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         scrollToBottom(false);
       }
     }
-    
+
     previousMessageCountRef.current = currentMessageCount;
   }, [messages.length, scrollToBottom, isAtBottom]);
-  
+
   // Track if we've restored scroll position to prevent restoring multiple times
   const hasRestoredScrollRef = useRef(false);
-  
+
   // Scroll to last user message, then smoothly scroll to bottom
   useEffect(() => {
     if (isMounted && messages.length > 0 && !hasRestoredScrollRef.current) {
@@ -492,7 +492,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       if (container) {
         // Find the last user message
         const lastUserMessage = [...messages].reverse().find(m => m.role === 'user');
-        
+
         if (lastUserMessage) {
           // Wait for DOM to be ready, then scroll to last user message
           requestAnimationFrame(() => {
@@ -500,25 +500,25 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               if (container) {
                 // Find the message element by data attribute
                 const messageElement = container.querySelector(`[data-message-id="${lastUserMessage.id}"]`) as HTMLElement;
-                
+
                 if (messageElement) {
                   // Calculate scroll position to show the message
                   // Get positions relative to the container
                   const containerScrollTop = container.scrollTop;
                   const containerRect = container.getBoundingClientRect();
                   const messageRect = messageElement.getBoundingClientRect();
-                  
+
                   // Calculate where the message currently is relative to container's viewport
                   const messageTopRelativeToContainer = messageRect.top - containerRect.top + containerScrollTop;
-                  
+
                   // Scroll to show the message (center it in viewport)
                   const containerHeight = container.clientHeight;
                   const messageHeight = messageRect.height;
                   const scrollToPosition = messageTopRelativeToContainer - (containerHeight / 2) + (messageHeight / 2);
-                  
+
                   // Scroll to the last user message (instant)
                   container.scrollTop = Math.max(0, scrollToPosition);
-                  
+
                   // Then smoothly scroll to bottom after a short delay
                   setTimeout(() => {
                     scrollToBottom(false); // Use smooth scroll
@@ -554,7 +554,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   // This will also add it after a chat reset when messages become empty
   useEffect(() => {
     if (!isMounted) return;
-    
+
     // Only add initial message if there are no messages
     // If messages were loaded from sessionStorage, they won't be empty
     if (messages.length === 0) {
@@ -604,7 +604,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     if (isSignedIn) {
       // User is authenticated - immediately clear all guest restrictions
       setIsLimitReached(false);
-      
+
       // Remove any gate messages (messages with isGateMessage: true)
       setMessages(prev => {
         const filtered = prev.filter(msg => !msg.isGateMessage);
@@ -617,7 +617,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const updateArrowVisibility = () => {
     const container = chipsContainerRef.current;
     if (!container) return;
-    
+
     const { scrollLeft, scrollWidth, clientWidth } = container;
     setShowLeftArrow(scrollLeft > 10);
     setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
@@ -629,7 +629,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     const timer = setTimeout(() => {
       updateArrowVisibility();
     }, 100);
-    
+
     // Also check on resize
     const handleResize = () => {
       setTimeout(() => updateArrowVisibility(), 50);
@@ -646,7 +646,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const checkIfAtBottom = () => {
     const container = messagesContainerRef.current;
     if (!container) return;
-    
+
     const { scrollTop, scrollHeight, clientHeight } = container;
     // Consider at bottom if within 50px of bottom
     const threshold = 50;
@@ -664,7 +664,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
     // Listen for scroll events
     container.addEventListener('scroll', checkIfAtBottom);
-    
+
     return () => {
       container.removeEventListener('scroll', checkIfAtBottom);
     };
@@ -674,12 +674,12 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const scrollChips = (direction: 'left' | 'right') => {
     const container = chipsContainerRef.current;
     if (!container) return;
-    
+
     const scrollAmount = 250;
-    const targetScroll = direction === 'left' 
+    const targetScroll = direction === 'left'
       ? container.scrollLeft - scrollAmount
       : container.scrollLeft + scrollAmount;
-    
+
     container.scrollTo({
       left: targetScroll,
       behavior: 'smooth'
@@ -692,14 +692,14 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   };
 
   // Parse <MEAL_CARDS> from content and extract meals + pagination info
-  const parseMealCards = (content: string): { 
-    cleanContent: string; 
-    meals: Meal[]; 
-    mealSearchContext?: { searchKey: string; nextOffset: number; hasMore: boolean } 
+  const parseMealCards = (content: string): {
+    cleanContent: string;
+    meals: Meal[];
+    mealSearchContext?: { searchKey: string; nextOffset: number; hasMore: boolean }
   } => {
     const mealCardsRegex = /<MEAL_CARDS>([\s\S]*?)<\/MEAL_CARDS>/;
     const match = content.match(mealCardsRegex);
-    
+
     if (!match) {
       return { cleanContent: content, meals: [] };
     }
@@ -712,18 +712,18 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       const hasMore = parsed.hasMore === true;
       const nextOffset = typeof parsed.nextOffset === 'number' ? parsed.nextOffset : 0;
       const searchKey = parsed.searchKey || '';
-      
+
       console.log('[AIChat Debug] Parsed meals count:', meals.length, 'hasMore:', hasMore);
-      
+
       // Remove the <MEAL_CARDS> block from content
       const cleanContent = content.replace(mealCardsRegex, '').trim();
-      
+
       const mealSearchContext = hasMore && searchKey ? {
         searchKey,
         nextOffset,
         hasMore
       } : undefined;
-      
+
       return { cleanContent, meals, mealSearchContext };
     } catch (err) {
       console.error('[AIChat Debug] Failed to parse MEAL_CARDS JSON:', err);
@@ -737,30 +737,30 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   // Generate a short summary line based on user query and found meals
   const generateSummaryLine = (userQuery: string, mealCount: number): string => {
     const lowerQuery = userQuery.toLowerCase();
-    
+
     // Extract restaurant name if mentioned
     const restaurantMatch = lowerQuery.match(/\b(chipotle|mcdonald|mcdonalds|subway|taco bell|pizza hut|domino|kfc|burger king|wendy|starbucks|dunkin|panera|olive garden|red lobster|outback|applebees|chilis|buffalo wild wings|panda express|papa johns|little caesars|jimmy johns|quiznos|arby|jack in the box|in-n-out|five guys|shake shack|whataburger|culvers|white castle|sonic|del taco|el pollo loco|qdoba|moe|baja fresh|rubio|baja|california pizza kitchen|cpk|p.f. chang|cheesecake factory|red robin|ihop|denny|waffle house|perkins|bob evans|cracker barrel|texas roadhouse|longhorn|outback|bonefish|flemings|ruth chris|mortons|capital grille|fogo de chao|brazilian steakhouse|benihana|hibachi|sushi|japanese|chinese|thai|vietnamese|indian|mexican|italian|greek|mediterranean|french|american|steakhouse|seafood|bbq|barbecue|grill|diner|cafe|restaurant)\b/i);
     const restaurantName = restaurantMatch ? restaurantMatch[1].charAt(0).toUpperCase() + restaurantMatch[1].slice(1) : null;
-    
+
     // Extract meal type
     const hasLunch = lowerQuery.includes('lunch');
     const hasDinner = lowerQuery.includes('dinner');
     const hasBreakfast = lowerQuery.includes('breakfast');
     const mealType = hasBreakfast ? 'breakfast' : hasLunch ? 'lunch' : hasDinner ? 'dinner' : null;
-    
+
     // Extract calorie constraint
     const calorieMatch = lowerQuery.match(/(?:under|below|less than|max|maximum|up to)\s*(\d+)\s*(?:calories?|cal)/i);
     const maxCalories = calorieMatch ? parseInt(calorieMatch[1]) : null;
-    
+
     // Extract macro constraints
     const hasHighProtein = lowerQuery.match(/\b(high[\s-]?protein|(\d+)\+?\s*g?\s*protein|(\d+)\+?\s*grams?\s*protein)/i);
     const hasLowCarb = lowerQuery.match(/\b(low[\s-]?carb|low[\s-]?carbs|under\s*(\d+)\s*g?\s*carb)/i);
     const hasLowFat = lowerQuery.match(/\b(low[\s-]?fat|under\s*(\d+)\s*g?\s*fat)/i);
     // Diet logic removed - vegetarian/vegan filtering disabled
-    
+
     // Build summary line
     let summary = '';
-    
+
     if (restaurantName) {
       summary = `Here are ${mealCount} ${mealType ? mealType + ' ' : ''}options from ${restaurantName}.`;
     } else if (mealType && maxCalories) {
@@ -780,7 +780,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     } else {
       summary = `Here are ${mealCount} options that match your request.`;
     }
-    
+
     return summary;
   };
 
@@ -851,10 +851,10 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
     // Add user message optimistically
     setMessages(prev => [...prev, userMessage]);
-    
+
     // Clear input
     setInputText('');
-    
+
     // Set loading
     setIsLoading(true);
 
@@ -913,17 +913,18 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         let rawResponseText = '';
         try {
           rawResponseText = await response.text();
-          // Log the raw response text immediately
-          console.error(`[AIChat] /api/chat failed with status ${response.status}:`, rawResponseText || '(empty response body)');
         } catch (readError) {
           console.error('[AIChat] Failed to read error response body:', readError);
           rawResponseText = '(failed to read response body)';
         }
-        
+
         // Default error message
         let errorMessage = `Error ${response.status}: ${response.statusText}`;
         let serverMessage = '';
-        
+
+        // Check for usage limit in error response
+        let isUsageLimitError = response.status === 403;
+
         // Try to parse JSON error only after logging raw text
         if (rawResponseText && rawResponseText !== '(failed to read response body)') {
           try {
@@ -931,26 +932,66 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             // Use server's message field if available, otherwise fall back to answer or other fields
             serverMessage = errorJson.message || errorJson.answer || errorJson.error || '';
             errorMessage = serverMessage || errorJson.details || errorMessage;
-            
+
+            // Check for explicit usage limit flag or message content
+            if (errorJson.usageLimit === true || (serverMessage && serverMessage.toLowerCase().includes('usage limit'))) {
+              isUsageLimitError = true;
+            }
+
             // Log parsed error JSON for debugging
-            console.error('[AIChat] Parsed error JSON:', errorJson);
+            if (!isUsageLimitError) {
+              console.error('[AIChat] Parsed error JSON:', errorJson);
+            }
           } catch (parseError) {
             // Not JSON, use raw text if available
             if (rawResponseText.trim()) {
               errorMessage = rawResponseText.substring(0, 200);
-              console.error('[AIChat] Error response is not JSON, using raw text:', rawResponseText.substring(0, 500));
+              if (!isUsageLimitError) {
+                console.error('[AIChat] Error response is not JSON, using raw text:', rawResponseText.substring(0, 500));
+              }
             } else {
-              console.error('[AIChat] Error response body is empty or unreadable');
+              if (!isUsageLimitError) {
+                console.error('[AIChat] Error response body is empty or unreadable');
+              }
             }
           }
         } else {
-          console.error('[AIChat] Error response body could not be read');
+          if (!isUsageLimitError) {
+            console.error('[AIChat] Error response body could not be read');
+          }
+        }
+
+        // Only log the initial error if it's NOT a usage limit error (403 or flagged)
+        if (!isUsageLimitError) {
+          console.error(`[AIChat] /api/chat failed with status ${response.status}:`, rawResponseText || '(empty response body)');
+        }
+
+        // Handle usage limit specifically
+        if (isUsageLimitError && !isSignedIn) {
+          setIsLimitReached(true);
+          setMessages(prev => {
+            const hasGateMessage = prev.some(msg => msg.isGateMessage);
+            if (!hasGateMessage) {
+              const gateMessage: ChatMessage = {
+                id: `assistant-gate-${Date.now()}`,
+                role: 'assistant',
+                content: "You have ran out of your 3 free trial uses, please create an account to continue using the app for free.",
+                isGateMessage: true
+              };
+              // Filter out the failed user message before adding gate message
+              const filtered = prev.filter(msg => msg.id !== userMessage.id);
+              return [...filtered, gateMessage];
+            }
+            return prev.filter(msg => msg.id !== userMessage.id);
+          });
+          setTimeout(() => scrollToBottom(), 100);
+          return;
         }
 
         // Use server's message field for UI if available, otherwise use fallback
         const uiErrorMessage = serverMessage || errorMessage || 'Chat request failed';
         setError(uiErrorMessage);
-        
+
         // Remove user message on error
         setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
         return;
@@ -959,7 +1000,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       // For successful responses, check content type first before consuming body
       const contentType = response.headers.get('content-type') || '';
       const isJson = contentType.includes('application/json');
-      
+
       if (isJson) {
         // JSON response (meal mode) - read as text then parse
         let rawResponseText = '';
@@ -977,10 +1018,10 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
           return;
         }
-        
+
         try {
           const jsonData = JSON.parse(rawResponseText);
-          
+
           // Check for error flag or error field in response
           if (jsonData.error === true || jsonData.error) {
             // Log the full error response
@@ -991,17 +1032,17 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
             return;
           }
-          
+
           // Add debug log: log received keys and meals length
           console.log('[AIChat] Received response keys:', Object.keys(jsonData));
           console.log('[AIChat] Received data.meals?.length:', jsonData.meals?.length);
-          
+
           // Handle meal response format: treat ANY response with meals array (even if empty) as meal results
           // Response shape: { mode?: "meals", meals, hasMore, nextOffset, searchKey, summary?, message? }
           // Empty meals array is still a meal response (may have a message explaining why)
           if (jsonData.meals !== undefined && Array.isArray(jsonData.meals)) {
             const { meals: mealItems = [], hasMore, nextOffset, searchKey: responseSearchKey, summary: serverSummary, message } = jsonData;
-            
+
             // Convert to Meal format (prefer flattened fields from backend)
             const parsedMeals: Meal[] = (mealItems || []).map((item: any) => ({
               id: item.id,
@@ -1017,11 +1058,11 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               dietary_tags: item.dietary_tags || [],
               price: item.price || null,
             }));
-            
+
             if (parsedMeals.length > 0) {
               console.log('[AIChat] First meal from /api/chat:', parsedMeals[0]);
             }
-            
+
             // Store original query and filters for pagination
             const mealSearchContext = hasMore && responseSearchKey ? {
               searchKey: responseSearchKey,
@@ -1030,7 +1071,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               originalQuery: trimmedText, // Store original query for pagination
               filters: undefined // Can be extended if filters are passed
             } : undefined;
-            
+
             // Generate summary: use server message if meals array is empty, otherwise use server summary or generate from actual meals.length
             // NEVER hardcode meal count - always use parsedMeals.length
             let summaryLine: string;
@@ -1041,7 +1082,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               // Use server summary if provided, otherwise generate from actual meals.length
               summaryLine = serverSummary || generateSummaryLine(trimmedText, parsedMeals.length);
             }
-            
+
             const assistantMessage: ChatMessage = {
               id: assistantMessageId,
               role: 'assistant',
@@ -1049,9 +1090,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               meals: parsedMeals,
               mealSearchContext
             };
-            
+
             setMessages(prev => [...prev, assistantMessage]);
-            
+
             // Increment usage for guest users (only on successful response)
             if (!isSignedIn) {
               const newCount = await incrementUsage('chat');
@@ -1076,19 +1117,19 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                 setTimeout(() => scrollToBottom(), 100);
               }
             }
-            
+
             // Log to Supabase (for authenticated users)
             if (isSignedIn) {
               await logChatMessage('assistant', summaryLine, parsedMeals, mealSearchContext);
-              await logUsageEvent('chat_response', { 
+              await logUsageEvent('chat_response', {
                 messageCount: parsedMeals.length,
-                hasMeals: true 
+                hasMeals: true
               });
             }
-            
+
             return; // Done with meal response
           }
-          
+
           // Handle text response format from nutrition intent: { mode: "text", answer: string }
           // Only treat as text if mode is "text" AND meals array is undefined/missing (empty array still counts as meal response)
           if ((jsonData.mode === 'text' || jsonData.type === 'text') && (jsonData.answer || jsonData.message) && jsonData.meals === undefined) {
@@ -1098,9 +1139,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               role: 'assistant',
               content: textContent
             };
-            
+
             setMessages(prev => [...prev, assistantMessage]);
-            
+
             // Increment usage for guest users (only on successful response)
             if (!isSignedIn) {
               const newCount = await incrementUsage('chat');
@@ -1125,16 +1166,16 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                 setTimeout(() => scrollToBottom(), 100);
               }
             }
-            
+
             // Log to Supabase (for authenticated users)
             if (isSignedIn) {
               await logChatMessage('assistant', textContent);
               await logUsageEvent('chat_response', { hasMeals: false });
             }
-            
+
             return;
           }
-          
+
           // Unknown JSON response format
           console.error('[AIChat] Unknown JSON response format:', jsonData);
           console.error('[AIChat] Raw response text was:', rawResponseText.substring(0, 500));
@@ -1155,7 +1196,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           return;
         }
       }
-      
+
       // Streaming responses are no longer used - nutrition questions return JSON
       // If we get here, it's an unexpected response format
       // Try to read the response body to see what we got
@@ -1177,17 +1218,17 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         console.log('Request was aborted');
         return;
       }
-      
+
       console.error('Error sending message:', err);
       console.error('Error details:', {
         name: err instanceof Error ? err.name : 'Unknown',
         message: err instanceof Error ? err.message : String(err),
         stack: err instanceof Error ? err.stack : undefined
       });
-      
+
       const errorMessage = err instanceof Error ? err.message : 'Failed to send message';
       setError(errorMessage || 'An unexpected error occurred');
-      
+
       // Remove user message on error
       setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
     } finally {
@@ -1199,7 +1240,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
   // Handle form submit
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+    e.preventDefault();
     sendMessage(inputText);
   };
 
@@ -1249,7 +1290,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
       // Treat response as: { meals, hasMore, nextOffset, searchKey }
       const searchData = await response.json();
-      
+
       if (!searchData.meals || !Array.isArray(searchData.meals)) {
         setError('Invalid response format from server');
         return;
@@ -1275,13 +1316,13 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       setMessages(prev => prev.map(msg => {
         if (msg.id === messageId && msg.meals) {
           const updatedMeals = [...msg.meals, ...newMeals];
-          
+
           // Update visible count to show all meals (including newly loaded ones)
           setVisibleMealsCount(prevCount => ({
             ...prevCount,
             [messageId]: updatedMeals.length
           }));
-          
+
           // Always persist the updated context (even if hasMore is false)
           return {
             ...msg,
@@ -1335,9 +1376,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>
           SeekEatz <span className={`text-xs px-2 py-1 rounded-full align-middle ${isDark ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-600'}`}>Beta</span>
         </h1>
-          </div>
+      </div>
 
-      <div 
+      <div
         ref={messagesContainerRef}
         className="flex-1 overflow-y-auto p-4 space-y-4 pb-[220px]"
       >
@@ -1346,16 +1387,15 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             <div key={m.id} className="mb-4" data-message-id={m.id}>
               {/* Message Bubble */}
               <div className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} mb-2`}>
-                <div className={`${m.role === 'user' ? 'max-w-[85%]' : 'max-w-[75%]'} rounded-2xl ${m.role === 'user' ? 'p-4' : 'p-3'} shadow-sm ${
-                    m.role === 'user' 
-                      ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-br-none' 
-                      : isDark
-                        ? 'bg-gray-800 text-gray-100 border border-gray-700 rounded-bl-none'
-                        : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none'
+                <div className={`${m.role === 'user' ? 'max-w-[85%]' : 'max-w-[75%]'} rounded-2xl ${m.role === 'user' ? 'p-4' : 'p-3'} shadow-sm ${m.role === 'user'
+                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-br-none'
+                  : isDark
+                    ? 'bg-gray-800 text-gray-100 border border-gray-700 rounded-bl-none'
+                    : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none'
                   }`}>
                   <div className={`prose prose-sm max-w-none ${m.role === 'user' ? 'text-white' : isDark ? 'text-gray-100' : 'text-gray-800'}`}>
                     <ReactMarkdown>{m.content}</ReactMarkdown>
-        </div>
+                  </div>
                 </div>
               </div>
 
@@ -1366,7 +1406,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                 const visibleCount = visibleMealsCount[m.id] ?? 5; // Default to 5, or use stored count
                 const mealsToShow = m.meals.slice(0, visibleCount);
                 const hasMoreMeals = m.meals.length > visibleCount;
-                
+
                 return (
                   <div className="flex justify-start mb-2">
                     <div className="flex flex-col gap-3 w-full max-w-[95%]">
@@ -1387,7 +1427,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                   </div>
                 );
               })()}
-              
+
               {/* Load More Meals Button */}
               {/* Show button if there are more meals to show (either in state or from API) */}
               {m.role === 'assistant' && m.meals && (() => {
@@ -1396,34 +1436,34 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                 const hasMoreFromAPI = m.mealSearchContext?.hasMore;
                 return hasMoreInState || hasMoreFromAPI;
               })() && (
-                <div className="flex justify-start mb-4">
-                  <button
-                    onClick={() => {
-                      if (!m.meals) return;
-                      
-                      const visibleCount = visibleMealsCount[m.id] ?? 5;
-                      
-                      // If we have more meals in state, show them all
-                      if (m.meals.length > visibleCount) {
-                        setVisibleMealsCount(prev => ({
-                          ...prev,
-                          [m.id]: m.meals!.length // Show all meals we have (non-null assertion safe after check)
-                        }));
-                      }
-                      
-                      // If mealSearchContext has more, load them from API
-                      if (m.mealSearchContext?.hasMore) {
-                        loadMoreMeals(m.id, m.mealSearchContext);
-                      }
-                    }}
-                    disabled={isLoading}
-                    className="px-3 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-lg text-xs font-medium transition-all disabled:cursor-not-allowed"
-                  >
-                    {isLoading ? 'Loading...' : 'Load more meals'}
-                  </button>
-                </div>
-              )}
-              
+                  <div className="flex justify-start mb-4">
+                    <button
+                      onClick={() => {
+                        if (!m.meals) return;
+
+                        const visibleCount = visibleMealsCount[m.id] ?? 5;
+
+                        // If we have more meals in state, show them all
+                        if (m.meals.length > visibleCount) {
+                          setVisibleMealsCount(prev => ({
+                            ...prev,
+                            [m.id]: m.meals!.length // Show all meals we have (non-null assertion safe after check)
+                          }));
+                        }
+
+                        // If mealSearchContext has more, load them from API
+                        if (m.mealSearchContext?.hasMore) {
+                          loadMoreMeals(m.id, m.mealSearchContext);
+                        }
+                      }}
+                      disabled={isLoading}
+                      className="px-3 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-lg text-xs font-medium transition-all disabled:cursor-not-allowed"
+                    >
+                      {isLoading ? 'Loading...' : 'Load more meals'}
+                    </button>
+                  </div>
+                )}
+
               {/* Gate Message Buttons (for free chat limit) - GUEST GATING BYPASS: Never show for authenticated users */}
               {m.role === 'assistant' && m.isGateMessage && !isSignedIn && (
                 <div className="flex flex-col gap-2 justify-start mb-4">
@@ -1459,32 +1499,32 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                   </button>
                 </div>
               )}
-              </div>
-              );
+            </div>
+          );
         })}
 
         {isLoading && (
           <div className="flex justify-start mb-4">
-             <div className={`border rounded-2xl p-4 shadow-sm text-sm flex items-center gap-2 ${isDark ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-white border-gray-200 text-gray-500'}`}>
-                <div className={`animate-spin h-4 w-4 border-2 border-t-transparent rounded-full ${isDark ? 'border-blue-400' : 'border-blue-600'}`}></div>
-                Thinking...
-             </div>
+            <div className={`border rounded-2xl p-4 shadow-sm text-sm flex items-center gap-2 ${isDark ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-white border-gray-200 text-gray-500'}`}>
+              <div className={`animate-spin h-4 w-4 border-2 border-t-transparent rounded-full ${isDark ? 'border-blue-400' : 'border-blue-600'}`}></div>
+              Thinking...
+            </div>
           </div>
         )}
-        
+
         {error && (
           <div className="flex justify-center text-red-500 text-sm mb-4">
-            <AlertCircle size={16} className="mr-2" /> 
+            <AlertCircle size={16} className="mr-2" />
             {error}
-            <button 
-              onClick={() => setError(null)} 
+            <button
+              onClick={() => setError(null)}
               className="underline ml-2"
             >
               Dismiss
             </button>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -1501,7 +1541,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               <ChevronLeft size={18} className={isDark ? 'text-gray-300' : 'text-gray-600'} />
             </button>
           )}
-          
+
           {/* Right Arrow */}
           {showRightArrow && (
             <button
@@ -1513,7 +1553,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             </button>
           )}
 
-          <div 
+          <div
             ref={chipsContainerRef}
             className="overflow-x-auto scrollbar-hide px-12 md:px-16 pt-2 md:pt-3"
             onScroll={updateArrowVisibility}
@@ -1547,9 +1587,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               disabled={isLoading || (isLimitReached && !isSignedIn)}
               autoComplete="off"
             />
-            <button 
-              type="submit" 
-              disabled={!inputText.trim() || isLoading || (isLimitReached && !isSignedIn)} 
+            <button
+              type="submit"
+              disabled={!inputText.trim() || isLoading || (isLimitReached && !isSignedIn)}
               className={`flex-shrink-0 p-1.5 md:p-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all ${isLimitReached && !isSignedIn ? 'cursor-not-allowed' : ''}`}
             >
               <Send size={16} className="md:w-[18px] md:h-[18px]" />

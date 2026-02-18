@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
-import { OnboardingFlow } from "../components/OnboardingFlow";
+import { OnboardingFlow } from "@/app/components/OnboardingFlow";
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -46,7 +46,7 @@ export default function OnboardingPage() {
         if (typeof window !== "undefined") {
           const localStorageFlag = localStorage.getItem(`seekEatz_hasCompletedOnboarding_${user.id}`);
           const onboardingCompleted = localStorage.getItem("onboardingCompleted") === "true";
-          
+
           if (!isDev && (localStorageFlag === "true" || onboardingCompleted)) {
             // Completed according to localStorage - redirect to AI chatbot
             router.replace("/chat");

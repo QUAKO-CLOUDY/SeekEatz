@@ -5,9 +5,10 @@ import { generateObject } from 'ai';
 import { z } from 'zod';
 import { ROUTER_SYSTEM_PROMPT } from '@/lib/chat-prompts';
 import { searchHandler } from '@/app/api/search/handler';
-import { buildSearchParams } from '@/app/api/search/build-params';
+import { buildSearchParams } from '@/lib/search-utils';
 import { resolveRestaurantFromText, extractRestaurantPhrase, resolveRestaurantUniversal } from '@/lib/restaurant-resolver';
 import { extractMacroConstraintsFromText, hasConstraints } from '@/lib/extractMacroConstraintsFromText';
+import { hasRemainingUsage, incrementUsageCount } from '@/lib/usage-cookie';
 
 export const maxDuration = 30;
 
@@ -15,8 +16,8 @@ export const maxDuration = 30;
  * Helper function to create response headers for tracking LLM router usage
  */
 function createResponseHeaders(
-  usedLLMRouter: boolean, 
-  routerMode: string, 
+  usedLLMRouter: boolean,
+  routerMode: string,
   heuristicMode: string
 ): Record<string, string> {
   return {
@@ -47,7 +48,7 @@ const routerSchema = z.object({
  */
 function isLocationOnly(message: string): boolean {
   const lowerMessage = message.toLowerCase().trim();
-  
+
   // Location-only patterns
   const locationOnlyPatterns = [
     /^near\s+me$/i,
@@ -57,7 +58,7 @@ function isLocationOnly(message: string): boolean {
     /^in\s+my\s+area$/i,
     /^within\s+\d+\s*(mile|miles|mi)$/i,
   ];
-  
+
   return locationOnlyPatterns.some(pattern => pattern.test(lowerMessage));
 }
 
@@ -68,20 +69,20 @@ function isLocationOnly(message: string): boolean {
  */
 function isGenericMealDiscovery(message: string): boolean {
   if (!message || typeof message !== 'string') return false;
-  
+
   const lowerMessage = message.toLowerCase().trim();
-  
+
   // Check for explicit restaurant markers first - if present, NOT generic
   const explicitRestaurantMarkers = [
     /\b(from|at|in)\s+[a-z0-9]/i,  // "from X", "at X", "in X"
     /\b[a-z0-9\s&'-]+\s+(menu|restaurant|order|near me)\b/i,  // "X menu", "X restaurant"
   ];
-  
+
   const hasExplicitMarker = explicitRestaurantMarkers.some(pattern => pattern.test(message));
   if (hasExplicitMarker) {
     return false; // Explicit restaurant marker means NOT generic
   }
-  
+
   // Generic meal discovery patterns (conservative matching)
   const genericPatterns = [
     /^\s*find\s+me\s+(lunch|dinner|breakfast)\b/i,  // "find me lunch", "find me dinner"
@@ -92,7 +93,7 @@ function isGenericMealDiscovery(message: string): boolean {
     /^\s*find\s+(me\s+)?(something|anything)\b/i,  // "find me something", "find anything"
     /^\s*(give\s+me\s+)?(options|option)\s*$/i,  // "options", "give me options"
   ];
-  
+
   return genericPatterns.some(pattern => pattern.test(message));
 }
 
@@ -102,36 +103,36 @@ function isGenericMealDiscovery(message: string): boolean {
  */
 function hasFoodIntent(message: string): boolean {
   const lowerMessage = message.toLowerCase();
-  
+
   // Food intent verbs
   const foodVerbs = [
-    'find me', 'find', 'show me', 'show', 'recommend', 'suggest', 
+    'find me', 'find', 'show me', 'show', 'recommend', 'suggest',
     'options', 'option', 'give me', 'get me', 'want', 'looking for',
     'search', 'searching', 'looking', 'need', 'what should i eat', 'food ideas'
   ];
-  
+
   // Meal time keywords
   const mealTimeKeywords = ['meal', 'meals', 'lunch', 'dinner', 'breakfast', 'snack', 'snacks', 'food'];
-  
+
   // Dish type keywords
   const dishKeywords = [
-    'burger', 'burgers', 'bowl', 'bowls', 'sandwich', 'sandwiches', 
+    'burger', 'burgers', 'bowl', 'bowls', 'sandwich', 'sandwiches',
     'burrito', 'burritos', 'taco', 'tacos', 'salad', 'salads',
     'wrap', 'wraps', 'pizza', 'pizzas', 'sushi', 'pasta', 'noodles'
   ];
-  
+
   // Macro keywords
   const macroKeywords = [
-    'calories', 'calorie', 'cal', 'protein', 'carbs', 'carb', 
+    'calories', 'calorie', 'cal', 'protein', 'carbs', 'carb',
     'carbohydrates', 'fat', 'fats', 'macros', 'macro'
   ];
-  
+
   // Check for any food intent indicators
   const hasFoodVerb = foodVerbs.some(verb => lowerMessage.includes(verb));
   const hasMealTime = mealTimeKeywords.some(keyword => lowerMessage.includes(keyword));
   const hasDishType = dishKeywords.some(keyword => lowerMessage.includes(keyword));
   const hasMacro = macroKeywords.some(keyword => lowerMessage.includes(keyword));
-  
+
   return hasFoodVerb || hasMealTime || hasDishType || hasMacro;
 }
 
@@ -141,20 +142,20 @@ function hasFoodIntent(message: string): boolean {
  */
 async function validateRestaurant(restaurantName: string | undefined): Promise<string | undefined> {
   if (!restaurantName) return undefined;
-  
+
   try {
     const supabase = await createClient();
-    
+
     // Try fuzzy matching using search_restaurants_trgm RPC (same as searchHandler)
     const { data: restMatches } = await supabase.rpc('search_restaurants_trgm', {
       query_text: restaurantName
     });
-    
+
     if (restMatches && restMatches.length > 0) {
       // Return the first match (best match)
       return restMatches[0].name;
     }
-    
+
     // If RPC fails or returns no results, restaurant is invalid
     return undefined;
   } catch (error) {
@@ -191,8 +192,8 @@ function normalizeConstraints(constraints: {
 
   // Normalize calorieCap
   if (constraints.calorieCap !== undefined && constraints.calorieCap !== null) {
-    const value = typeof constraints.calorieCap === 'string' 
-      ? parseFloat(constraints.calorieCap) 
+    const value = typeof constraints.calorieCap === 'string'
+      ? parseFloat(constraints.calorieCap)
       : constraints.calorieCap;
     if (!isNaN(value) && value > 0) {
       normalized.calorieCap = value;
@@ -201,8 +202,8 @@ function normalizeConstraints(constraints: {
 
   // Normalize minProtein
   if (constraints.minProtein !== undefined && constraints.minProtein !== null) {
-    const value = typeof constraints.minProtein === 'string' 
-      ? parseFloat(constraints.minProtein) 
+    const value = typeof constraints.minProtein === 'string'
+      ? parseFloat(constraints.minProtein)
       : constraints.minProtein;
     if (!isNaN(value) && value > 0) {
       normalized.minProtein = value;
@@ -211,8 +212,8 @@ function normalizeConstraints(constraints: {
 
   // Normalize maxCarbs
   if (constraints.maxCarbs !== undefined && constraints.maxCarbs !== null) {
-    const value = typeof constraints.maxCarbs === 'string' 
-      ? parseFloat(constraints.maxCarbs) 
+    const value = typeof constraints.maxCarbs === 'string'
+      ? parseFloat(constraints.maxCarbs)
       : constraints.maxCarbs;
     if (!isNaN(value) && value > 0) {
       normalized.maxCarbs = value;
@@ -221,8 +222,8 @@ function normalizeConstraints(constraints: {
 
   // Normalize maxFat
   if (constraints.maxFat !== undefined && constraints.maxFat !== null) {
-    const value = typeof constraints.maxFat === 'string' 
-      ? parseFloat(constraints.maxFat) 
+    const value = typeof constraints.maxFat === 'string'
+      ? parseFloat(constraints.maxFat)
       : constraints.maxFat;
     if (!isNaN(value) && value > 0) {
       normalized.maxFat = value;
@@ -265,7 +266,7 @@ function parseMealConstraintsFromText(message: string): {
     /\b(under|below|less\s+than|max|maximum|at\s+most)\s+(\d+)\s*(calories?|cal|kcal)\b/i,
     /\b(under|below|less\s+than|max|maximum|at\s+most)\s+(\d+)\b/i, // "under 700" (assume calories)
   ];
-  
+
   for (const pattern of caloriePatterns) {
     const match = message.match(pattern);
     if (match) {
@@ -283,7 +284,7 @@ function parseMealConstraintsFromText(message: string): {
     /\b(at\s+least|minimum|min)\s+(\d+)\s*(g|grams?|gram)\s+(of\s+)?protein\b/i, // match[2] is the number
     /\b(\d+)\s*(g|grams?|gram)\s+(of\s+)?protein\b/i, // match[1] is the number
   ];
-  
+
   for (const pattern of proteinPatterns) {
     const match = message.match(pattern);
     if (match) {
@@ -302,7 +303,7 @@ function parseMealConstraintsFromText(message: string): {
   const carbsPatterns = [
     /\b(under|below|less\s+than|max|maximum|at\s+most)\s+(\d+)\s*(g|grams?|gram)\s+(carbs?|carbohydrates?)\b/i,
   ];
-  
+
   for (const pattern of carbsPatterns) {
     const match = message.match(pattern);
     if (match) {
@@ -319,7 +320,7 @@ function parseMealConstraintsFromText(message: string): {
   const fatPatterns = [
     /\b(under|below|less\s+than|max|maximum|at\s+most)\s+(\d+)\s*(g|grams?|gram)\s+fat\b/i,
   ];
-  
+
   for (const pattern of fatPatterns) {
     const match = message.match(pattern);
     if (match) {
@@ -342,19 +343,19 @@ function parseMealConstraintsFromText(message: string): {
     'grams', 'gram', 'g', 'lunch', 'dinner', 'breakfast', 'snack', 'meal', 'meals',
     'food', 'find', 'show', 'get', 'want', 'looking', 'search', 'options'
   ];
-  
+
   const restaurantPatterns = [
     /\bfrom\s+([a-z0-9\s&'-]+?)(?:\s|$|,|\.|!|\?)/i, // "from McDonald's" or "from Chipotle"
     /\bat\s+([a-z0-9\s&'-]+?)(?:\s|$|,|\.|!|\?)/i,   // "at McDonald's" or "at Chipotle"
   ];
-  
+
   for (const pattern of restaurantPatterns) {
     const match = message.match(pattern);
     if (match && match[1]) {
       let restaurantName = match[1].trim();
       // Clean up common trailing words that aren't part of the restaurant name
       restaurantName = restaurantName.replace(/\s+(restaurant|place|location|near|here|there)$/i, '');
-      
+
       // Check if the extracted name contains forbidden tokens
       const lowerName = restaurantName.toLowerCase();
       const isForbidden = forbiddenRestaurantTokens.some(token => {
@@ -362,7 +363,7 @@ function parseMealConstraintsFromText(message: string): {
         const tokenRegex = new RegExp(`\\b${token}\\b`, 'i');
         return tokenRegex.test(lowerName);
       });
-      
+
       // Only set restaurant if it's not forbidden and meets length requirements
       if (!isForbidden && restaurantName.length > 0 && restaurantName.length < 50) {
         constraints.restaurant = restaurantName;
@@ -386,7 +387,7 @@ function parseMealConstraintsFromText(message: string): {
  */
 function isMetaQuestion(message: string): boolean {
   const lowerMessage = message.toLowerCase();
-  
+
   // Meta keywords
   const metaKeywords = [
     'how does this app work',
@@ -406,7 +407,7 @@ function isMetaQuestion(message: string): boolean {
     'tutorial',
     'guide'
   ];
-  
+
   return metaKeywords.some(keyword => lowerMessage.includes(keyword));
 }
 
@@ -427,7 +428,7 @@ function preRouterHeuristic(message: string): {
       answer: "SeekEatz helps you find meals that match your nutrition goals. You can search for meals by type (burgers, bowls, sandwiches), calories, protein, carbs, or restaurant. Just tell me what you're looking for! For pricing and account questions, please check the Settings page."
     };
   }
-  
+
   // Check if message is ONLY location phrases - treat as generic meal discovery
   if (isLocationOnly(message)) {
     return {
@@ -435,7 +436,7 @@ function preRouterHeuristic(message: string): {
       mode: 'MEAL_SEARCH'
     };
   }
-  
+
   // Check for food intent (includes generic meal discovery, dish types, macros)
   if (hasFoodIntent(message)) {
     return {
@@ -443,7 +444,7 @@ function preRouterHeuristic(message: string): {
       mode: 'MEAL_SEARCH'
     };
   }
-  
+
   // Ambiguous - need LLM routing
   return {
     skipLLM: false,
@@ -454,11 +455,11 @@ function preRouterHeuristic(message: string): {
 export async function POST(req: Request) {
   // Generate short requestId for correlation (first 8 chars of timestamp + random)
   const requestId = Date.now().toString(36).slice(-6) + Math.random().toString(36).slice(-2);
-  
+
   // Top-level request scope: track whether LLM router was used
   // Defaults to false, set to true ONLY immediately before generateObject() is called
   let usedLLMRouter = false;
-  
+
   try {
     // 1. Parse request body with error handling
     let body;
@@ -471,7 +472,7 @@ export async function POST(req: Request) {
         message: "Invalid request format. Please send a valid JSON body with a 'message' field.",
         mode: "text",
         answer: "Invalid request format. Please try again."
-      }, { 
+      }, {
         status: 400,
         headers: createResponseHeaders(false, 'ERROR', 'none')
       });
@@ -486,7 +487,7 @@ export async function POST(req: Request) {
         message: "Missing or invalid 'message' field in request body.",
         mode: "text",
         answer: "Please provide a message to continue."
-      }, { 
+      }, {
         status: 400,
         headers: createResponseHeaders(false, 'ERROR', 'none')
       });
@@ -503,25 +504,42 @@ export async function POST(req: Request) {
         message: "Failed to initialize database connection.",
         mode: "text",
         answer: "I'm having trouble connecting to the database. Please try again."
-      }, { 
+      }, {
         status: 500,
         headers: createResponseHeaders(false, 'ERROR', 'none')
       });
     }
 
-    // 3. Auth Check (non-blocking, just for logging)
+    // 3. Auth & Usage Check
+    let user = null;
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      // User check is optional, continue regardless
+      const { data } = await supabase.auth.getUser();
+      user = data.user;
     } catch (authError) {
-      // Non-blocking, continue processing
       console.warn('Auth check warning:', authError);
+    }
+
+    // If not authenticated, verify usage limit
+    if (!user) {
+      const allowed = await hasRemainingUsage();
+      if (!allowed) {
+        return NextResponse.json({
+          error: true,
+          message: "You have reached the free usage limit.",
+          mode: "text",
+          answer: "You have reached the free usage limit. Please sign up to continue using SeekEatz.",
+          usageLimit: true
+        }, {
+          status: 403,
+          headers: createResponseHeaders(false, 'ERROR', 'none')
+        });
+      }
     }
 
     // 4. PRE-ROUTER HEURISTIC (Skip LLM when possible)
     const heuristic = preRouterHeuristic(message);
     const heuristicMode = heuristic.mode || null;
-    
+
     console.log('[api/chat] Pre-router heuristic:', {
       heuristicMode: heuristicMode || 'AMBIGUOUS',
       usedLLMRouter,
@@ -529,7 +547,7 @@ export async function POST(req: Request) {
     });
 
     let routerResult;
-    
+
     if (heuristic.skipLLM) {
       // Use heuristic result directly, skip generateObject
       // usedLLMRouter remains false (heuristic-only path)
@@ -552,21 +570,21 @@ export async function POST(req: Request) {
         routerResult = null; // Will trigger generateObject below
       }
     }
-    
+
     // 5. ROUTER LOGIC (Structured Output) - Only if heuristic didn't skip
     if (!heuristic.skipLLM || !routerResult) {
       // Set usedLLMRouter = true ONLY immediately before generateObject() is called
       usedLLMRouter = true;
-      
+
       // Unmistakable log when OpenAI router is about to run
       console.log(`[LLM ROUTER CALL] generateObject invoked requestId=${requestId}`);
-      
+
       try {
         const result = await generateObject({
           model: openai('gpt-4o-mini'),
           system: ROUTER_SYSTEM_PROMPT,
           messages: [
-            ...(history || []), 
+            ...(history || []),
             { role: 'user', content: message }
           ],
           schema: routerSchema,
@@ -622,39 +640,39 @@ export async function POST(req: Request) {
     // 5. MANUAL BRANCHING
     if (routerResult.mode === 'MEAL_SEARCH') {
       // PATH A: MEAL SEARCH
-      
+
       // STEP 0: Deterministic intent detection (no LLM, regex only)
       const { detectExplicitRestaurantConstraint } = await import('@/lib/intent-detection');
-      
+
       // Detect explicit restaurant constraint
       const restaurantIntent = detectExplicitRestaurantConstraint(message);
       const explicitRestaurantDetected = restaurantIntent.hasRestaurant;
       const extractedRestaurantQuery = restaurantIntent.restaurantQuery;
-      
+
       // Extract macro constraints using authoritative extractor
       const extractedConstraints = extractMacroConstraintsFromText(message);
       const macroConstraintsDetected = hasConstraints(extractedConstraints);
-      
+
       // Log constraint extraction
       console.log('[chat] extractedConstraints', extractedConstraints, 'macroConstraintsDetected', macroConstraintsDetected);
-      
+
       // Log intent detection results
       console.log('[api/chat] Intent detection:', {
         explicitRestaurantDetected,
         extractedRestaurantQuery: extractedRestaurantQuery || undefined,
         macroConstraintsDetected,
       });
-      
+
       // HARD GUARDRAIL: Only resolve restaurant if explicit constraint exists
       // Do NOT call restaurant resolver for macro queries or generic discovery
       let restaurantMatch: { status: 'MATCH'; canonicalName: string; restaurantId?: string; variants: string[]; matchType: 'exact' | 'tokenSubset' | 'fuzzy' } | { status: 'NOT_FOUND'; missingRestaurantQuery?: string } | { status: 'AMBIGUOUS'; candidates: Array<{ name: string; score: number }> } | { status: 'NO_RESTAURANT' } | { status: 'NO_MEALS'; canonicalName: string } = { status: 'NO_RESTAURANT' };
-      
+
       // CRITICAL: Only use routerResult.constraints?.restaurant if explicitRestaurantDetected is true
       // Do NOT trust LLM router's restaurant constraint unless user explicitly requested it
-      let restaurantQuery = explicitRestaurantDetected 
+      let restaurantQuery = explicitRestaurantDetected
         ? (routerResult.constraints?.restaurant?.trim() || extractedRestaurantQuery)
         : extractedRestaurantQuery; // Only use extracted query, ignore routerResult
-      
+
       // STEP 1: Restaurant resolution (ONLY if explicit constraint detected)
       let resolvedCandidates: any[] = [];
       if (!explicitRestaurantDetected) {
@@ -667,15 +685,15 @@ export async function POST(req: Request) {
       } else {
         // Use universal resolver for explicit restaurant queries (queries restaurants table first)
         restaurantMatch = await resolveRestaurantUniversal(message);
-        
+
         // Log resolution result
         const isDev = process.env.NODE_ENV === 'development';
         if (isDev) {
           console.log('[api/chat] Restaurant resolution result (universal):', {
             message: message.substring(0, 100),
             status: restaurantMatch.status,
-            canonicalName: restaurantMatch.status === 'MATCH' ? restaurantMatch.canonicalName : 
-                          restaurantMatch.status === 'NO_MEALS' ? restaurantMatch.canonicalName : undefined,
+            canonicalName: restaurantMatch.status === 'MATCH' ? restaurantMatch.canonicalName :
+              restaurantMatch.status === 'NO_MEALS' ? restaurantMatch.canonicalName : undefined,
             restaurantId: restaurantMatch.status === 'MATCH' ? restaurantMatch.restaurantId : undefined,
             variants: restaurantMatch.status === 'MATCH' ? restaurantMatch.variants : undefined,
             variantsCount: restaurantMatch.status === 'MATCH' ? restaurantMatch.variants?.length : undefined,
@@ -683,24 +701,24 @@ export async function POST(req: Request) {
             candidates: restaurantMatch.status === 'AMBIGUOUS' ? restaurantMatch.candidates : undefined,
           });
         }
-        
+
         // Store candidates for logging (empty array for non-AMBIGUOUS status)
-        resolvedCandidates = restaurantMatch.status === 'AMBIGUOUS' 
+        resolvedCandidates = restaurantMatch.status === 'AMBIGUOUS'
           ? restaurantMatch.candidates.map(c => ({ name: c.name, score: c.score }))
           : [];
       }
-      
+
       // STEP 2.5: Determine if this is a restaurant-only query (should use generic search query)
       let restaurantOnly = false;
       if (explicitRestaurantDetected && restaurantMatch.status === 'MATCH') {
         const { isRestaurantOnlyQuery } = await import('@/lib/restaurant-resolver');
         restaurantOnly = isRestaurantOnlyQuery(message, true);
       }
-      
+
       // STEP 2.6: Explicit restaurant gate - only apply restaurant constraint if user explicitly requested it
       // explicitRestaurant is true if we have explicit constraint AND restaurantMatch is MATCH
       const explicitRestaurant = explicitRestaurantDetected && restaurantMatch.status === 'MATCH';
-      
+
       // Log restaurant resolution enforcement
       const isDev = process.env.NODE_ENV === 'development';
       if (isDev && explicitRestaurantDetected) {
@@ -709,16 +727,17 @@ export async function POST(req: Request) {
           canonicalRestaurant: restaurantMatch.status === 'MATCH' ? restaurantMatch.canonicalName : undefined,
         });
       }
-      
+
       // Handle NO_RESTAURANT: proceed with normal dish search (no restaurant constraint)
       if (restaurantMatch.status === 'NO_RESTAURANT') {
         // Proceed with normal dish search - no restaurant constraint
         // This happens when no explicit constraint exists (e.g., "burger", macro queries)
       }
-      
+
       // Handle NO_MEALS: Restaurant exists but no menu_items found
       if (restaurantMatch.status === 'NO_MEALS' && explicitRestaurantDetected) {
         const canonicalName = restaurantMatch.canonicalName;
+        if (!user) await incrementUsageCount();
         return NextResponse.json({
           error: false,
           message: `No meals available for ${canonicalName}`,
@@ -728,7 +747,7 @@ export async function POST(req: Request) {
           headers: createResponseHeaders(usedLLMRouter, 'MEAL_SEARCH', heuristicMode || 'none')
         });
       }
-      
+
       // Handle NOT_FOUND: ONLY if explicit constraint exists
       if (restaurantMatch.status === 'NOT_FOUND' && explicitRestaurantDetected) {
         // Extract the restaurant name for the apology message
@@ -736,7 +755,7 @@ export async function POST(req: Request) {
           /\b(from|at|in)\s+([a-z0-9\s&'-]+?)(?:\s|$|,|\.|!|\?)/i,
           /\b([a-z0-9\s&'-]+?)\s+(menu|meals?|restaurant|order|near me)\b/i,
         ];
-        
+
         let restaurantName = message.trim();
         for (const pattern of restaurantPatterns) {
           const match = message.match(pattern);
@@ -748,10 +767,10 @@ export async function POST(req: Request) {
             break;
           }
         }
-        
+
         // Clean up restaurant name
         restaurantName = restaurantName.replace(/\s+(restaurant|place|location|near|here|there|menu|meals?)$/i, '').trim();
-        
+
         // Dev assertion: NOT_FOUND should only happen when explicit constraint exists
         if (isDev && !explicitRestaurantDetected) {
           console.error('[api/chat] CRITICAL: NOT_FOUND returned but explicitRestaurantDetected is false!', {
@@ -759,7 +778,8 @@ export async function POST(req: Request) {
             explicitRestaurantDetected,
           });
         }
-        
+
+        if (!user) await incrementUsageCount();
         return NextResponse.json({
           error: false,
           message: `Restaurant not found: ${restaurantName}`,
@@ -769,10 +789,11 @@ export async function POST(req: Request) {
           headers: createResponseHeaders(usedLLMRouter, 'MEAL_SEARCH', heuristicMode || 'none')
         });
       }
-      
+
       // Handle AMBIGUOUS: Ask for disambiguation (only if explicit constraint exists)
       if (restaurantMatch.status === 'AMBIGUOUS' && explicitRestaurantDetected) {
         const candidatesList = restaurantMatch.candidates.slice(0, 5).map(c => c.name).join(', ');
+        if (!user) await incrementUsageCount();
         return NextResponse.json({
           error: false,
           message: "Ambiguous restaurant match",
@@ -782,18 +803,19 @@ export async function POST(req: Request) {
           headers: createResponseHeaders(usedLLMRouter, 'MEAL_SEARCH', heuristicMode || 'none')
         });
       }
-      
+
       // If NO_RESTAURANT or NOT_FOUND but no restaurant intent, proceed with normal dish search (don't show NOT_FOUND message)
       // NO_RESTAURANT means no restaurant intent was detected (e.g., "burger")
       // NOT_FOUND without restaurant intent should not happen, but handle gracefully
-      
+
       // Check for diet requests - return text-only response
       const lowerMessage = message.toLowerCase();
       const dietKeywords = ['vegan', 'vegetarian', 'pescatarian', 'keto', 'dairy-free', 'gluten-free', 'nut-free', 'shellfish-free', 'soy-free', 'egg-free'];
       const hasDietRequest = dietKeywords.some(keyword => lowerMessage.includes(keyword));
-      
+
       if (hasDietRequest) {
         // Return text-only response for diet requests
+        if (!user) await incrementUsageCount();
         return NextResponse.json({
           error: false,
           message: "Diet filter request detected.",
@@ -803,7 +825,7 @@ export async function POST(req: Request) {
           headers: createResponseHeaders(usedLLMRouter, 'MEAL_SEARCH', heuristicMode || 'none')
         });
       }
-      
+
       // Check for "near me" language - MVP v1: return friendly message but proceed with normal search
       const locationKeywords = [
         'near me', 'nearby', 'close to me', 'within',
@@ -816,17 +838,17 @@ export async function POST(req: Request) {
         }
         return lowerMessage.includes(keyword);
       });
-      
+
       // Friendly message for location requests (MVP v1)
-      const locationMessage = hasLocationRequest 
+      const locationMessage = hasLocationRequest
         ? "Location-based filtering is coming soon — here are some great options from restaurants we support."
         : undefined;
-      
+
       // MVP v1: Sanitize message by removing location phrases and meal-time words (except breakfast) before search
       // Keep original message for chat history/display, use sanitized for search
       function sanitizeMessageForSearch(originalMessage: string): string {
         let sanitized = originalMessage;
-        
+
         // Remove location phrases (case-insensitive, with word boundaries where appropriate)
         const locationPhrases = [
           /\bnear\s+me\b/gi,
@@ -840,46 +862,46 @@ export async function POST(req: Request) {
           /\bclosest\b/gi,
           /\blocal\b/gi,
         ];
-        
+
         for (const phrase of locationPhrases) {
           sanitized = sanitized.replace(phrase, '');
         }
-        
+
         // DO NOT strip meal-time words (lunch, dinner, breakfast) - keep them for search
         // This prevents "find me dinner" from becoming "find me" which triggers restaurant inference
-        
+
         // Clean up extra whitespace (multiple spaces, leading/trailing)
         sanitized = sanitized.replace(/\s+/g, ' ').trim();
-        
+
         // If sanitized is empty (e.g., "near me" only), use generic meal discovery query
         if (!sanitized || sanitized.length === 0) {
           sanitized = 'find meals';
         }
-        
+
         return sanitized;
       }
-      
+
       // For generic discovery queries, normalize to meal time if present, otherwise keep original
       function normalizeGenericQuery(originalMessage: string): string {
         const lowerMessage = originalMessage.toLowerCase().trim();
-        
+
         // Extract meal time if present
         if (/\blunch\b/i.test(lowerMessage)) return 'lunch';
         if (/\bdinner\b/i.test(lowerMessage)) return 'dinner';
         if (/\bbreakfast\b/i.test(lowerMessage)) return 'breakfast';
-        
+
         // Otherwise return original (or a generic fallback)
         return originalMessage.trim() || 'find meals';
       }
-      
+
       // Determine query for search
       // If explicit restaurant constraint exists and restaurant-only, use generic query
       // Otherwise, use sanitized message
       const sanitizedMessage = sanitizeMessageForSearch(message);
-      const queryForSearch = (explicitRestaurantDetected && restaurantOnly) 
+      const queryForSearch = (explicitRestaurantDetected && restaurantOnly)
         ? 'find meals'
         : sanitizedMessage;
-      
+
       // Log message sanitization and restaurant-only detection
       if (isDev) {
         console.log('[api/chat] Message sanitization:', {
@@ -889,15 +911,15 @@ export async function POST(req: Request) {
           queryForSearch,
         });
       }
-      
+
       // Enforce exact behavior: use sanitized message for search, fixed limit/offset, no searchKey
       // This ensures typed chat uses the same logic as quick-picks
       // MVP v1: Do NOT pass location or distance params to searchHandler
       // Note: routerResult.constraints?.nearMe is ignored - we detect location from message text only
-      
+
       // Parse constraints from message text (deterministic, regex-based, no LLM)
       const parsedConstraints = parseMealConstraintsFromText(message);
-      
+
       // Merge constraints: prioritize macro constraints from intent detection, then parsed constraints, then routerResult
       // STRICT: Only apply restaurant constraint if restaurantMatch is MATCH AND explicitRestaurant is true
       // CRITICAL: If macro constraints are detected, DO NOT apply restaurant constraint (search globally)
@@ -911,7 +933,7 @@ export async function POST(req: Request) {
       const restaurantVariants = (restaurantMatch.status === 'MATCH' && explicitRestaurant && !macroConstraintsDetected)
         ? restaurantMatch.variants
         : undefined;
-      
+
       // Merge macro constraints: extracted constraints (authoritative) > routerResult > parsed constraints
       const mergedConstraints = {
         ...routerResult.constraints,
@@ -931,31 +953,31 @@ export async function POST(req: Request) {
         // when status is NOT_FOUND, AMBIGUOUS, NO_RESTAURANT, or when macro constraints are detected
         restaurant: canonicalRestaurant,
       };
-      
+
       // Normalize all constraints to ensure numeric fields are numbers (not strings)
       // This ensures constraints are always in the correct format before passing to searchHandler
       const normalizedConstraints = normalizeConstraints(mergedConstraints);
-      
+
       // Restaurant is already set to canonicalRestaurant (only when status === 'MATCH' && explicitRestaurant)
       // No additional validation needed since canonicalRestaurant comes from database match
       const validatedConstraints = {
         ...normalizedConstraints,
         restaurant: normalizedConstraints.restaurant, // Already canonicalRestaurant or undefined
       };
-      
+
       // Log when restaurant param is omitted (NOT_FOUND, AMBIGUOUS, or NO_RESTAURANT)
       if (restaurantMatch.status !== 'MATCH' && isDev) {
         console.log('[api/chat] Restaurant param omitted:', {
           status: restaurantMatch.status,
           reason: restaurantMatch.status === 'NOT_FOUND' ? 'NOT_FOUND - no canonical restaurant' :
-                  restaurantMatch.status === 'AMBIGUOUS' ? 'AMBIGUOUS - multiple candidates' :
-                  restaurantMatch.status === 'NO_RESTAURANT' ? 'NO_RESTAURANT - no restaurant intent' :
-                  restaurantMatch.status === 'NO_MEALS' ? 'NO_MEALS - restaurant exists but no menu_items' :
+            restaurantMatch.status === 'AMBIGUOUS' ? 'AMBIGUOUS - multiple candidates' :
+              restaurantMatch.status === 'NO_RESTAURANT' ? 'NO_RESTAURANT - no restaurant intent' :
+                restaurantMatch.status === 'NO_MEALS' ? 'NO_MEALS - restaurant exists but no menu_items' :
                   'unknown',
           explicitRestaurant,
         });
       }
-      
+
       // Log constraint parsing, merging, and validation
       console.log('[api/chat] Constraint parsing:', {
         message: message,
@@ -967,7 +989,7 @@ export async function POST(req: Request) {
         explicitRestaurant,
         canonicalRestaurant: canonicalRestaurant || undefined,
       });
-      
+
       try {
         // Log state flags before building search params
         console.log('[api/chat] State flags before buildSearchParams:', {
@@ -979,7 +1001,7 @@ export async function POST(req: Request) {
           canonicalRestaurant: canonicalRestaurant || undefined,
           finalRestaurantConstraint: canonicalRestaurant || undefined,
         });
-        
+
         // Build normalized SearchParams using unified function
         // CRITICAL: Merge extracted constraints into search params BEFORE calling buildSearchParams
         // This ensures extracted constraints are always applied (authoritative)
@@ -1008,7 +1030,7 @@ export async function POST(req: Request) {
           // MVP v1: userContext explicitly not passed - contains location fields
           // userContext is undefined (not passed) - this ensures no location-based filtering
         });
-        
+
         // Debug log: Log final constraints being passed to searchHandler
         if (isDev) {
           console.log('[api/chat] Final constraints passed to searchHandler:', {
@@ -1022,11 +1044,11 @@ export async function POST(req: Request) {
             queryForSearch,
           });
         }
-        
+
         // Call searchHandler and return response directly with consistent shape:
         // { mode: "meals", meals, hasMore, nextOffset, searchKey, summary?, message? }
         const result = await searchHandler(searchParams);
-        
+
         // Add debug log: log keys of response object and restaurant-only info
         if (isDev) {
           console.log('[api/chat] Meal search response:', {
@@ -1037,8 +1059,8 @@ export async function POST(req: Request) {
             canonicalRestaurant: restaurantMatch.status === 'MATCH' ? restaurantMatch.canonicalName : undefined,
           });
         }
-        
-        
+
+
         // STRICT RESTAURANT ENFORCEMENT: Dev assertion
         // If restaurantMatch is MATCH, ensure ALL returned meals are from that restaurant
         if (process.env.NODE_ENV === 'development' && restaurantMatch.status === 'MATCH') {
@@ -1047,17 +1069,17 @@ export async function POST(req: Request) {
             const mealRestaurant = meal.restaurant_name || meal.restaurant;
             return mealRestaurant !== canonicalRestaurant;
           });
-          
+
           if (violations.length > 0) {
             const errorMsg = `[api/chat] CRITICAL: ${violations.length} meal(s) violate restaurant constraint! ` +
               `Expected: ${canonicalRestaurant}, but found: ${violations.slice(0, 3).map((v: any) => `${v.name} (${v.restaurant_name || v.restaurant})`).join(', ')}`;
             console.error(errorMsg);
             throw new Error(errorMsg);
           }
-          
+
           console.log('[api/chat] Restaurant constraint verified: all meals from', canonicalRestaurant);
         }
-        
+
         // Standardize response shape: add mode field for meal results
         // Include restaurant metadata if restaurantMatch is MATCH
         const responseData: any = {
@@ -1066,12 +1088,12 @@ export async function POST(req: Request) {
           // Prepend location message if present (MVP v1 behavior)
           ...(locationMessage && { message: locationMessage })
         };
-        
+
         // Add restaurant metadata for UI display
         if (restaurantMatch.status === 'MATCH') {
           responseData.restaurant = restaurantMatch.canonicalName;
         }
-        
+
         // Log final result summary
         console.log('[api/chat] Final result summary:', {
           message: message.substring(0, 100),
@@ -1085,7 +1107,8 @@ export async function POST(req: Request) {
           },
           restaurantMatchStatus: restaurantMatch.status
         });
-        
+
+        if (!user) await incrementUsageCount();
         return NextResponse.json(responseData, {
           headers: createResponseHeaders(usedLLMRouter, 'MEAL_SEARCH', heuristicMode || 'none')
         });
@@ -1096,7 +1119,7 @@ export async function POST(req: Request) {
           message: "Failed to search for meals.",
           mode: "text",
           answer: "I encountered an error while searching for meals. Please try again."
-        }, { 
+        }, {
           status: 500,
           headers: createResponseHeaders(usedLLMRouter, 'MEAL_SEARCH', heuristicMode || 'none')
         });
@@ -1109,12 +1132,13 @@ export async function POST(req: Request) {
         return NextResponse.json({
           error: false,
           message: "Missing nutrition answer from router.",
-          mode: "text", 
-          answer: "I couldn't generate a nutrition answer for that question." 
+          mode: "text",
+          answer: "I couldn't generate a nutrition answer for that question."
         }, {
           headers: createResponseHeaders(usedLLMRouter, 'NUTRITION_TEXT', heuristicMode || 'none')
         });
       }
+      if (!user) await incrementUsageCount();
       return NextResponse.json({
         error: false,
         message: "Nutrition text response.",
@@ -1131,12 +1155,13 @@ export async function POST(req: Request) {
         return NextResponse.json({
           error: false,
           message: "Missing clarification question from router.",
-          mode: "text", 
-          answer: "Could you please clarify your request?" 
+          mode: "text",
+          answer: "Could you please clarify your request?"
         }, {
           headers: createResponseHeaders(usedLLMRouter, 'CLARIFY', heuristicMode || 'none')
         });
       }
+      if (!user) await incrementUsageCount();
       return NextResponse.json({
         error: false,
         message: "Clarification requested.",
@@ -1151,8 +1176,8 @@ export async function POST(req: Request) {
     return NextResponse.json({
       error: false,
       message: "Unknown router mode fallback.",
-      mode: "text", 
-      answer: "I couldn't process that request. Please try rephrasing." 
+      mode: "text",
+      answer: "I couldn't process that request. Please try rephrasing."
     }, {
       headers: createResponseHeaders(usedLLMRouter, 'CLARIFY', heuristicMode || 'none')
     });
@@ -1166,13 +1191,13 @@ export async function POST(req: Request) {
       stack: error instanceof Error ? error.stack : undefined,
       error: error
     });
-    
+
     return NextResponse.json({
       error: true,
       message: error instanceof Error ? error.message : "An unexpected error occurred.",
-      mode: "text", 
-      answer: "I'm having trouble processing your request. Please try again." 
-    }, { 
+      mode: "text",
+      answer: "I'm having trouble processing your request. Please try again."
+    }, {
       status: 500,
       headers: createResponseHeaders(false, 'ERROR', 'none')
     });

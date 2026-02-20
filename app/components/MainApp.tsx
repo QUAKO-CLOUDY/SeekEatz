@@ -28,46 +28,46 @@ type MainAppProps = {
 
 export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // ========== ALL HOOKS MUST BE DECLARED FIRST ==========
-  
+
   // Router and Supabase client
   const router = useRouter();
   const pathname = usePathname();
-  
+
   // Client ready check (stable boolean) - must be defined before isChatRoute
   const isClient = typeof window !== 'undefined';
-  
+
   // Create stable Supabase client reference (not recreated every render)
   const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
   if (!supabaseRef.current) {
     supabaseRef.current = createClient();
   }
   const supabase = supabaseRef.current;
-  
+
   // Check if we're on the /chat route (robust pathname check)
   // Normalize pathname: remove trailing slashes and query strings for comparison
   // Handle /chat, /chat/, /chat?foo=bar, etc.
   // Only compute on client-side to avoid hydration mismatches
-  const normalizedPathname = isClient && pathname 
-    ? pathname.replace(/\/$/, '').split('?')[0] 
+  const normalizedPathname = isClient && pathname
+    ? pathname.replace(/\/$/, '').split('?')[0]
     : '';
   const isChatRoute = normalizedPathname === '/chat' || initialScreen === 'chat';
-  
+
   // Hydration fix: Track if component is mounted on client
   const [isMounted, setIsMounted] = useState(false);
-  
+
   // State machine for app flow
   const [appState, setAppState] = useState<AppState>('loading');
-  
+
   // Use default values in useState initializers (no localStorage reads)
   // Navigation history stack to track screen navigation
   const [navHistory, setNavHistory] = useState<Screen[]>([initialScreen || 'home']);
-  
+
   // Current screen - use default value from prop
   const [currentScreen, setCurrentScreen] = useState<Screen>(initialScreen);
-  
+
   const [currentView, setCurrentView] = useState<View>('main');
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
-  
+
   // Use default values (empty array/object) - will be populated from localStorage in useEffect
   const [favoriteMeals, setFavoriteMeals] = useState<string[]>([]);
   const [favoriteMealsData, setFavoriteMealsData] = useState<Record<string, Meal>>({});
@@ -84,7 +84,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
   // Track current user ID
   const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
-  
+
   // Get updateLoggedMeals from NutritionContext to sync state
   // NutritionProvider is now at root layout level, so this should always work
   const { updateLoggedMeals } = useNutrition();
@@ -115,10 +115,10 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         if (Array.isArray(parsed) && parsed.length > 0) {
           // Validate and filter to only include valid Screen values
           const validScreens: Screen[] = ['home', 'log', 'chat', 'favorites', 'settings', 'search'];
-          const filteredHistory = parsed.filter((screen): screen is Screen => 
+          const filteredHistory = parsed.filter((screen): screen is Screen =>
             typeof screen === 'string' && validScreens.includes(screen as Screen)
           ) as Screen[];
-          
+
           if (filteredHistory.length > 0) {
             setNavHistory(filteredHistory);
             setCurrentScreen(filteredHistory[filteredHistory.length - 1]);
@@ -179,7 +179,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       const saved = localStorage.getItem('seekeatz_logged_meals');
       const todayStr = new Date().toISOString().split('T')[0];
       const lastResetDate = localStorage.getItem('seekeatz_last_reset_date');
-      
+
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
@@ -216,12 +216,12 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // Initialize app state: Check localStorage for 'onboarded' and Supabase session
   useEffect(() => {
     if (!isMounted) return;
-    
+
     const initializeApp = async () => {
       // Check localStorage for onboarding completion
-      const isOnboarded = typeof window !== 'undefined' 
+      const isOnboarded = typeof window !== 'undefined'
         ? localStorage.getItem('onboarded') === 'true' ||
-          localStorage.getItem('hasCompletedOnboarding') === 'true'
+        localStorage.getItem('hasCompletedOnboarding') === 'true'
         : false;
 
       // Check Supabase session - retry if not found initially (session might still be propagating)
@@ -254,7 +254,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         }
         retries++;
       }
-      
+
       // If we have a user but no onboarding flag, check the database
       if (user && !isOnboarded) {
         setCurrentUserId(user.id); // Track current user ID
@@ -264,7 +264,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
             .select("has_completed_onboarding")
             .eq("id", user.id)
             .single();
-          
+
           if (profileData?.has_completed_onboarding) {
             // Set localStorage flags
             if (typeof window !== 'undefined') {
@@ -279,7 +279,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           console.warn("Could not check onboarding status:", error);
         }
       }
-      
+
       // Track user ID if user exists
       if (user) {
         setCurrentUserId(user.id);
@@ -294,7 +294,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         if (currentState === 'app') {
           return currentState;
         }
-        
+
         if (!isOnboarded) {
           // Not onboarded - show onboarding
           return 'onboarding';
@@ -306,13 +306,13 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
             // Allow chat preview - show app UI, AIChat will handle limit logic
             return 'app';
           }
-          
+
           // If onboarding was just completed (recent localStorage flag), give session time to propagate
           // Check if onboardingCompleted flag was set very recently (within last 5 seconds)
-          const onboardingTimestamp = typeof window !== 'undefined' 
+          const onboardingTimestamp = typeof window !== 'undefined'
             ? localStorage.getItem('onboardingCompletedTimestamp')
             : null;
-          
+
           if (onboardingTimestamp) {
             const timestamp = parseInt(onboardingTimestamp, 10);
             const timeSinceOnboarding = Date.now() - timestamp;
@@ -368,20 +368,21 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // Set up auth state change listener - this is the primary way we react to sign-in
   useEffect(() => {
     if (!isClient) return;
-    
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
-      
+
       if (event === 'SIGNED_IN' && session?.user) {
+        setCurrentUserId(session.user.id);
         // User just signed in - reload profile
         const { data: profileData } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
           .single();
-        
+
         if (profileData) {
           setUserProfile(profileData);
           // Update app state based on onboarding status
@@ -402,9 +403,9 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           search_distance_miles: 10,
         });
         // Check if onboarded as guest
-        const isOnboarded = typeof window !== 'undefined' 
+        const isOnboarded = typeof window !== 'undefined'
           ? localStorage.getItem('onboarded') === 'true' ||
-            localStorage.getItem('hasCompletedOnboarding') === 'true'
+          localStorage.getItem('hasCompletedOnboarding') === 'true'
           : false;
         setAppState(isOnboarded ? 'app' : 'auth');
       }
@@ -453,7 +454,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
             const newHistory = [...prev];
             newHistory.pop(); // Remove current screen
             const previousScreen = newHistory[newHistory.length - 1];
-            
+
             // Update current screen to previous
             setCurrentScreen(previousScreen);
             if (typeof window !== 'undefined') {
@@ -560,7 +561,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   const handleNavigate = (screen: Screen) => {
     // Update activity on navigation
     updateActivity();
-    
+
     // Only add to history if it's a different screen
     if (screen !== currentScreen) {
       setNavHistory((prev) => {
@@ -603,7 +604,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           const newHistory = [...prev];
           newHistory.pop(); // Remove current screen
           const previousScreen = newHistory[newHistory.length - 1];
-          
+
           // Update current screen to previous
           setCurrentScreen(previousScreen);
           if (typeof window !== 'undefined') {
@@ -628,16 +629,16 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       // Persist to localStorage
       if (typeof window !== 'undefined') {
         localStorage.setItem('seekeatz_favorite_meals', JSON.stringify(updated));
-        
+
         // Also store/remove meal data
         if (meal) {
           setFavoriteMealsData((prevData) => {
             const updatedData = isCurrentlyFavorite
               ? (() => {
-                  const newData = { ...prevData };
-                  delete newData[mealId];
-                  return newData;
-                })()
+                const newData = { ...prevData };
+                delete newData[mealId];
+                return newData;
+              })()
               : { ...prevData, [mealId]: meal };
             localStorage.setItem('seekeatz_favorite_meals_data', JSON.stringify(updatedData));
             return updatedData;
@@ -650,21 +651,21 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
   const handleLogMeal = (meal: Meal) => {
     updateActivity(); // Update activity on meal logging
-    
+
     // Debug log
     const todayStr = new Date().toISOString().split('T')[0];
     const todayMeals = loggedMeals.filter(log => log.date === todayStr);
     const todaysConsumed = todayMeals.reduce((sum, log) => sum + log.meal.calories, 0);
     const targetCalories = userProfile?.target_calories || 0;
     const remainingIfEatMeal = targetCalories - (todaysConsumed + meal.calories);
-    
+
     console.log('[MainApp] Logging meal:', {
       targetCalories,
       todaysConsumedCalories: todaysConsumed,
       mealCalories: meal.calories,
       remainingIfEatMeal,
     });
-    
+
     const loggedMeal: LoggedMeal = {
       id: `log-${Date.now()}-${Math.random()}`,
       meal,
@@ -714,7 +715,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
   // Main app with navigation
   console.log('MainApp rendering, screen:', currentScreen, 'view:', currentView);
-  
+
   // NutritionProvider is now at root layout level, so we don't need to wrap here
   // However, we can still pass props to update it if needed via context methods
   return (
@@ -778,7 +779,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           />
         )}
       </div>
-      
+
       <Navigation
         currentScreen={currentScreen}
         onNavigate={handleNavigate}

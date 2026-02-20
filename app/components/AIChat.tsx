@@ -194,9 +194,12 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   }, [updateActivity]);
 
 
+  // Track if Supabase chat persistence is available (avoid repeated RLS errors)
+  const supabaseChatAvailable = useRef(true);
+
   // Ensure chat session is owned by authenticated user
   const ensureChatSessionOwned = useCallback(async (userId: string, sessionId: string) => {
-    if (!sessionId) return;
+    if (!sessionId || !supabaseChatAvailable.current) return;
 
     try {
       const supabase = createClient();
@@ -212,7 +215,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         });
 
       if (sessionError) {
-        console.error('Failed to claim chat session:', sessionError);
+        // RLS policy likely missing — disable Supabase chat persistence to avoid repeated errors
+        console.warn('Chat session persistence unavailable (RLS policy may be missing). Chat will work without server persistence.');
+        supabaseChatAvailable.current = false;
         return;
       }
 
@@ -235,7 +240,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             .insert(messagesToInsert);
 
           if (messagesError) {
-            console.error('Failed to migrate guest messages:', messagesError);
+            console.warn('Guest message migration skipped (RLS policy may be missing).');
           } else {
             // Clear guest messages from sessionStorage after successful migration
             saveGuestChatMessages([]);
@@ -243,7 +248,8 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         }
       }
     } catch (error) {
-      console.error('Error claiming chat session:', error);
+      console.warn('Chat session persistence unavailable:', error);
+      supabaseChatAvailable.current = false;
     }
   }, []);
 
@@ -334,11 +340,12 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
   // Log to Supabase (only for authenticated users)
   const logChatMessage = useCallback(async (role: 'user' | 'assistant', content: string, meals?: any[], mealSearchContext?: any) => {
-    if (!isSignedIn || !userId || !currentSessionId) return;
+    if (!isSignedIn || !userId || !currentSessionId || !supabaseChatAvailable.current) return;
 
     try {
       // Ensure session is owned
       await ensureChatSessionOwned(userId, currentSessionId);
+      if (!supabaseChatAvailable.current) return; // May have been disabled by ensureChatSessionOwned
 
       const supabase = createClient();
       const { error } = await supabase
@@ -352,7 +359,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         });
 
       if (error) {
-        console.error('Failed to log chat message to Supabase:', error);
+        console.warn('Chat message logging skipped (RLS policy may be missing).');
       } else {
         // Update chat_sessions updated_at timestamp
         await supabase
@@ -361,7 +368,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           .eq('session_id', currentSessionId);
       }
     } catch (e) {
-      console.error('Error logging chat message:', e);
+      console.warn('Chat message logging unavailable:', e);
     }
   }, [isSignedIn, userId, currentSessionId, ensureChatSessionOwned]);
 

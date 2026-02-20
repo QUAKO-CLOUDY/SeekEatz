@@ -1,40 +1,40 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import LandingPage from './components/LandingPage';
 
 export default function RootPage() {
   const router = useRouter();
+  const [showLanding, setShowLanding] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    // Only redirect authenticated users with completed onboarding
-    // This only runs when landing on root /, not when manually visiting /get-started
     const checkReturningUser = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
 
-      // Only redirect if user is authenticated
       if (user) {
-        // Check localStorage flags for completed onboarding (only for authenticated users)
-        const onboardingCompleted = 
+        const onboardingCompleted =
           localStorage.getItem('onboardingCompleted') === 'true' ||
           localStorage.getItem('hasCompletedOnboarding') === 'true';
 
         if (onboardingCompleted) {
-          // Authenticated user with completed onboarding - redirect to chat
           router.replace('/chat');
           return;
         }
       }
 
-      // Default: redirect to get-started (for new users or signed-out users)
-      router.replace('/get-started');
+      // Not authenticated or hasn't completed onboarding → show landing page
+      setShowLanding(true);
+      setChecking(false);
     };
 
     checkReturningUser();
   }, [router]);
 
-  // Show nothing while checking (redirect will happen quickly)
-  return null;
+  if (checking && !showLanding) return null;
+
+  return <LandingPage />;
 }

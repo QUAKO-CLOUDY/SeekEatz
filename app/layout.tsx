@@ -10,8 +10,22 @@ import { AppContainer } from "./components/AppContainer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://seekeatz.com'),
   title: "SeekEatz",
-  description: "AI-Powered Meal Recommendations",
+  description: "AI-Powered Meal Recommendations — find meals that fit your macros from real restaurant menus.",
+  openGraph: {
+    title: "SeekEatz — AI-Powered Meal Recommendations",
+    description: "Find meals that fit your macros — instantly. Verified restaurant nutrition + AI recommendations.",
+    type: "website",
+    siteName: "SeekEatz",
+    images: [{ url: "/logos/waitlist_photo.png", width: 800, height: 1422, alt: "SeekEatz app screenshot" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SeekEatz — AI-Powered Meal Recommendations",
+    description: "Find meals that fit your macros — instantly. Verified restaurant nutrition + AI recommendations.",
+    images: ["/logos/waitlist_photo.png"],
+  },
 };
 
 export const viewport: Viewport = {
@@ -26,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning> 
+    <html lang="en" suppressHydrationWarning>
       {/* suppressHydrationWarning is needed for theme switching to not throw warnings */}
       <head>
         <script

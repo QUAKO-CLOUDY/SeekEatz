@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient } from '@supabase/supabase-js';
 
 export async function POST(request: Request) {
   try {
@@ -23,7 +23,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const supabase = await createClient();
+    // Use service role client to bypass RLS for waitlist inserts
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
     // Call the atomic RPC function
     const { data, error } = await supabase.rpc('join_waitlist', {

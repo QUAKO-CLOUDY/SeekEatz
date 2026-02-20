@@ -13,7 +13,7 @@ import { resetFreeUseCount } from './freeUses';
 export async function claimAnonymousData(): Promise<boolean> {
   try {
     const deviceId = getDeviceId();
-    
+
     if (!deviceId) {
       console.warn('No device ID found - nothing to claim');
       return false;
@@ -29,7 +29,7 @@ export async function claimAnonymousData(): Promise<boolean> {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-      console.error('Failed to claim anonymous data:', errorData);
+      console.warn('Anonymous data claim skipped (server endpoint may not be configured).');
       return false;
     }
 

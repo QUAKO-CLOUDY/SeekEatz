@@ -146,7 +146,7 @@ export default function WaitlistPage() {
               {/* Glow backdrop */}
               <div className="absolute -inset-4 bg-gradient-to-br from-cyan-400/20 via-blue-400/10 to-violet-400/20 rounded-[3rem] blur-2xl" />
               <Image
-                src="/logos/waitlist_photo.png"
+                src="/waitlist_photo.png"
                 alt="SeekEatz app — AI finding meals that fit your macros"
                 width={400}
                 height={711}

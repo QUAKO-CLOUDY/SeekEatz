@@ -1,0 +1,389 @@
+{
+    "restaurant_name": "Olive Garden",
+    "items": [
+        {
+            "name": "Calamari",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 670,
+                "protein": 24,
+                "carbs": 48,
+                "fat": 42
+            }
+        },
+        {
+            "name": "Calamari - add marinara",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 35,
+                "protein": 1,
+                "carbs": 4,
+                "fat": 2
+            }
+        },
+        {
+            "name": "Calamari - add spicy ranch",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 240,
+                "protein": 1,
+                "carbs": 2,
+                "fat": 26
+            }
+        },
+        {
+            "name": "Shrimp Fritto Misto",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 1280,
+                "protein": 41,
+                "carbs": 101,
+                "fat": 79
+            }
+        },
+        {
+            "name": "Shrimp Fritto Misto - add marinara",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 35,
+                "protein": 1,
+                "carbs": 4,
+                "fat": 2
+            }
+        },
+        {
+            "name": "Shrimp Fritto Misto - add spicy ranch",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 240,
+                "protein": 1,
+                "carbs": 2,
+                "fat": 26
+            }
+        },
+        {
+            "name": "Fried Mozzarella",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 800,
+                "protein": 33,
+                "carbs": 57,
+                "fat": 49
+            }
+        },
+        {
+            "name": "Fried Mozzarella - add marinara",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 35,
+                "protein": 1,
+                "carbs": 4,
+                "fat": 2
+            }
+        },
+        {
+            "name": "Lasagna Fritta",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 1130,
+                "protein": 39,
+                "carbs": 75,
+                "fat": 76
+            }
+        },
+        {
+            "name": "Meatballs Parmigiana",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 1040,
+                "protein": 51,
+                "carbs": 27,
+                "fat": 83
+            }
+        },
+        {
+            "name": "Spinach-Artichoke Dip with flatbread crisps",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 1160,
+                "protein": 33,
+                "carbs": 75,
+                "fat": 81
+            }
+        },
+        {
+            "name": "Stuffed Ziti Fritta",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 500,
+                "protein": 27,
+                "carbs": 40,
+                "fat": 26
+            }
+        },
+        {
+            "name": "Stuffed Ziti Fritta - add alfredo",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 220,
+                "protein": 4,
+                "carbs": 3,
+                "fat": 22
+            }
+        },
+        {
+            "name": "Stuffed Ziti Fritta - add marinara",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 35,
+                "protein": 1,
+                "carbs": 4,
+                "fat": 2
+            }
+        },
+        {
+            "name": "Toasted Ravioli",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 650,
+                "protein": 25,
+                "carbs": 69,
+                "fat": 31
+            }
+        },
+        {
+            "name": "Toasted Ravioli - add marinara",
+            "category": "Appetizers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 35,
+                "protein": 1,
+                "carbs": 4,
+                "fat": 2
+            }
+        },
+        {
+            "name": "Alfredo Dipping Sauce",
+            "category": "Dipping Sauces for Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 440,
+                "protein": 8,
+                "carbs": 5,
+                "fat": 43
+            }
+        },
+        {
+            "name": "Alfredo Dipping Sauce (Large)",
+            "category": "Dipping Sauces for Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 870,
+                "protein": 15,
+                "carbs": 11,
+                "fat": 87
+            }
+        },
+        {
+            "name": "Five Cheese Marinara Dipping Sauce",
+            "category": "Dipping Sauces for Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 200,
+                "protein": 5,
+                "carbs": 9,
+                "fat": 17
+            }
+        },
+        {
+            "name": "Five Cheese Marinara Dipping Sauce (Large)",
+            "category": "Dipping Sauces for Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 400,
+                "protein": 11,
+                "carbs": 17,
+                "fat": 33
+            }
+        },
+        {
+            "name": "Marinara Dipping Sauce",
+            "category": "Dipping Sauces for Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 70,
+                "protein": 2,
+                "carbs": 8,
+                "fat": 4.5
+            }
+        },
+        {
+            "name": "Marinara Dipping Sauce (Large)",
+            "category": "Dipping Sauces for Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 150,
+                "protein": 4,
+                "carbs": 17,
+                "fat": 9
+            }
+        },
+        {
+            "name": "Breadstick with garlic topping (1 ea.)",
+            "category": "Soups, Salad & Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 140,
+                "protein": 4,
+                "carbs": 25,
+                "fat": 2.5
+            }
+        },
+        {
+            "name": "Breadstick, plain (no garlic topping, 1 ea.)",
+            "category": "Soups, Salad & Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 130,
+                "protein": 4,
+                "carbs": 25,
+                "fat": 1
+            }
+        },
+        {
+            "name": "Chicken & Gnocchi Soup",
+            "category": "Soups, Salad & Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 230,
+                "protein": 11,
+                "carbs": 22,
+                "fat": 12
+            }
+        },
+        {
+            "name": "Minestrone Soup",
+            "category": "Soups, Salad & Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 110,
+                "protein": 5,
+                "carbs": 17,
+                "fat": 1
+            }
+        },
+        {
+            "name": "Pasta Fagioli Soup",
+            "category": "Soups, Salad & Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 150,
+                "protein": 8,
+                "carbs": 16,
+                "fat": 5
+            }
+        },
+        {
+            "name": "Zuppa Toscana Soup",
+            "category": "Soups, Salad & Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 220,
+                "protein": 7,
+                "carbs": 15,
+                "fat": 15
+            }
+        },
+        {
+            "name": "Stellini Soup (Regional)",
+            "category": "Soups, Salad & Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 200,
+                "protein": 9,
+                "carbs": 22,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Salad with Signature Italian Dressing",
+            "category": "Soups, Salad & Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 150,
+                "protein": 3,
+                "carbs": 13,
+                "fat": 10
+            }
+        },
+        {
+            "name": "Salad without Dressing",
+            "category": "Soups, Salad & Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 70,
+                "protein": 2,
+                "carbs": 11,
+                "fat": 2
+            }
+        },
+        {
+            "name": "Italian Dressing (1 fl oz)",
+            "category": "Soups, Salad & Breadsticks",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 80,
+                "protein": 0,
+                "carbs": 2,
+                "fat": 8
+            }
+        }
+    ]
+}

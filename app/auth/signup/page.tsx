@@ -27,7 +27,7 @@ export default function SignupPage() {
 
   // OTP verification state
   const [showOtpScreen, setShowOtpScreen] = useState(false);
-  const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
+  const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '', '', '']);
   const [otpError, setOtpError] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -106,7 +106,7 @@ export default function SignupPage() {
         // Show OTP verification screen
         setIsLoading(false);
         setShowOtpScreen(true);
-        setOtpDigits(['', '', '', '', '', '']);
+        setOtpDigits(['', '', '', '', '', '', '', '']);
         setOtpError(null);
         startResendCooldown();
       }
@@ -142,14 +142,14 @@ export default function SignupPage() {
   const handleOtpChange = (index: number, value: string) => {
     if (value.length > 1) {
       // Handle paste: distribute digits across inputs
-      const digits = value.replace(/\D/g, '').slice(0, 6).split('');
+      const digits = value.replace(/\D/g, '').slice(0, 8).split('');
       const newOtpDigits = [...otpDigits];
       digits.forEach((digit, i) => {
-        if (index + i < 6) newOtpDigits[index + i] = digit;
+        if (index + i < 8) newOtpDigits[index + i] = digit;
       });
       setOtpDigits(newOtpDigits);
       // Focus the next empty input or the last one
-      const nextIndex = Math.min(index + digits.length, 5);
+      const nextIndex = Math.min(index + digits.length, 7);
       otpInputRefs.current[nextIndex]?.focus();
       return;
     }
@@ -161,7 +161,7 @@ export default function SignupPage() {
     setOtpDigits(newOtpDigits);
 
     // Auto-focus next input
-    if (value && index < 5) {
+    if (value && index < 7) {
       otpInputRefs.current[index + 1]?.focus();
     }
   };
@@ -176,8 +176,8 @@ export default function SignupPage() {
   // Verify OTP and complete signup
   const handleVerifyOtp = async () => {
     const otpCode = otpDigits.join('');
-    if (otpCode.length !== 6) {
-      setOtpError("Please enter the full 6-digit code.");
+    if (otpCode.length !== 8) {
+      setOtpError("Please enter the full 8-digit code.");
       return;
     }
 
@@ -339,7 +339,7 @@ export default function SignupPage() {
       }
 
       startResendCooldown();
-      setOtpDigits(['', '', '', '', '', '']);
+      setOtpDigits(['', '', '', '', '', '', '', '']);
       otpInputRefs.current[0]?.focus();
     } catch (err: any) {
       setOtpError("Failed to resend code. Please try again.");
@@ -361,7 +361,7 @@ export default function SignupPage() {
               Verify Your Email
             </h1>
             <p className="text-gray-600">
-              We sent a 6-digit code to<br />
+              We sent an 8-digit code to<br />
               <span className="font-medium text-black">{email}</span>
             </p>
           </div>
@@ -374,7 +374,7 @@ export default function SignupPage() {
                 ref={(el) => { otpInputRefs.current[index] = el; }}
                 type="text"
                 inputMode="numeric"
-                maxLength={6}
+                maxLength={8}
                 value={digit}
                 onChange={(e) => handleOtpChange(index, e.target.value)}
                 onKeyDown={(e) => handleOtpKeyDown(index, e)}
@@ -395,7 +395,7 @@ export default function SignupPage() {
           {/* Verify Button */}
           <Button
             onClick={handleVerifyOtp}
-            disabled={isLoading || otpDigits.join('').length !== 6}
+            disabled={isLoading || otpDigits.join('').length !== 8}
             className="h-14 rounded-full w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 border-0 disabled:opacity-60 disabled:cursor-not-allowed mb-4"
           >
             {isLoading ? "Verifying..." : "Verify & Continue"}
@@ -423,7 +423,7 @@ export default function SignupPage() {
             onClick={() => {
               setShowOtpScreen(false);
               setOtpError(null);
-              setOtpDigits(['', '', '', '', '', '']);
+              setOtpDigits(['', '', '', '', '', '', '', '']);
             }}
             className="text-gray-500 hover:text-gray-700 text-sm text-center w-full mt-4 transition-colors"
           >

@@ -10,10 +10,10 @@ import { NextResponse } from 'next/server';
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
-    
+
     // Verify authenticated session
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
+
     if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized - must be authenticated' },
@@ -38,11 +38,14 @@ export async function POST(request: Request) {
     });
 
     if (error) {
-      console.error('Error claiming anonymous data:', error);
-      return NextResponse.json(
-        { error: 'Failed to claim anonymous data', details: error.message },
-        { status: 500 }
-      );
+      console.warn('Claim anon data skipped (DB function/column may not exist):', error.message);
+      // Return 200 with skipped status instead of 500 — this is non-critical
+      // and should never block the signup/login flow
+      return NextResponse.json({
+        success: false,
+        message: 'Anonymous data claim skipped — database not configured for this feature',
+        skipped: true,
+      });
     }
 
     // Return success

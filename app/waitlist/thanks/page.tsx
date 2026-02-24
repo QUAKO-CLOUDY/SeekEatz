@@ -36,8 +36,8 @@ export default function WaitlistThanksPage() {
           
           <p className="text-base sm:text-lg text-gray-600 max-w-md mx-auto leading-relaxed">
             Thanks for signing up for SeekEatz.
-            The first 50 people to join will receive one full month free when we launch.
-            We'll email you as soon as the app is ready — keep an eye on your inbox.
+            The first 50 people to join will receive two weeks free when we launch.
+            We'll email you as soon as the app is ready, keep an eye on your inbox.
           </p>
 
           <Link

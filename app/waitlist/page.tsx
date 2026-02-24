@@ -209,13 +209,7 @@ export default function WaitlistPage() {
               {/* Product Screenshot in Feature Block */}
               <div className="ml-[52px] mt-6 relative max-w-[280px]">
                 <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-2xl blur-sm" />
-                <Image
-                  src="/waitlist_final.png"
-                  alt="Personalized meal recommendations in SeekEatz"
-                  width={280}
-                  height={459}
-                  className="relative rounded-2xl shadow-lg border border-gray-100"
-                />
+                
               </div>
             </div>
 

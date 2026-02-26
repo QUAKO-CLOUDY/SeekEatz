@@ -28,18 +28,81 @@ const PROTEIN_KEYWORDS: Record<string, string[]> = {
   turkey: ['turkey'],
   shrimp: ['shrimp', 'prawn', 'prawns'],
   tofu: ['tofu'],
-  vegetarian: ['vegetarian', 'veggie', 'vegan', 'plant-based']
+  vegetarian: ['vegetarian', 'veggie', 'vegan', 'plant-based', 'plant based']
 };
+
+/**
+ * Dietary keywords for filtering by diet type
+ * These keywords match items by NAME when user requests a specific diet
+ */
+const DIETARY_NAME_KEYWORDS: Record<string, string[]> = {
+  vegetarian: [
+    'vegetarian', 'veggie', 'vegan', 'plant-based', 'plant based',
+    'tofu', 'tempeh', 'falafel', 'impossible', 'beyond',
+    'bean', 'beans', 'black bean', 'pinto bean', 'lentil', 'lentils',
+    'meatless', 'meatfree', 'meat-free'
+  ],
+  vegan: [
+    'vegan', 'plant-based', 'plant based',
+    'tofu', 'tempeh', 'falafel', 'impossible', 'beyond',
+    'meatless', 'meatfree', 'meat-free'
+  ]
+};
+
+/**
+ * Detects dietary intent from query text
+ * Returns the dietary type if detected, null otherwise
+ */
+function extractDietaryIntent(query: string): string | null {
+  if (!query || typeof query !== 'string') return null;
+
+  const lowerQuery = query.toLowerCase().trim();
+
+  // Check for vegan first (more specific)
+  if (/\bvegan\b/i.test(lowerQuery)) return 'vegan';
+  // Check for vegetarian
+  if (/\b(vegetarian|vegeterian|vegetrian|vegitarian|veggie|meatless|meat-free|meat free)\b/i.test(lowerQuery)) return 'vegetarian';
+  // Check for plant-based
+  if (/\bplant[- ]?based\b/i.test(lowerQuery)) return 'vegan';
+
+  return null;
+}
+
+/**
+ * Applies dietary filter — keeps only items whose name contains dietary keywords
+ * Used when user explicitly requests vegetarian/vegan meals
+ */
+function applyDietaryFilter(items: any[], dietaryType: string): any[] {
+  const keywords = DIETARY_NAME_KEYWORDS[dietaryType];
+  if (!keywords || keywords.length === 0) return items;
+
+  return items.filter((item: any) => {
+    const itemName = (item.name || item.item_name || '').toLowerCase();
+
+    // Check if item name contains any dietary keyword
+    return keywords.some(keyword => {
+      const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = new RegExp(`\\b${escapedKeyword}\\b`, 'i');
+      return pattern.test(itemName);
+    });
+  });
+}
 
 /**
  * Extracts protein keyword from query if present
  * Returns protein keyword string or null
  * Only matches if protein keyword appears as a whole word in the query
+ * NEGATION AWARE: "not chicken" / "no chicken" / "without chicken" will NOT match
  */
 function extractProteinKeyword(query: string): string | null {
   if (!query || typeof query !== 'string') return null;
 
   const lowerQuery = query.toLowerCase().trim();
+
+  // Negation patterns: words/phrases that negate the keyword that follows
+  const negationPatterns = [
+    /\b(not|no|without|except|exclude|excluding|avoid|don'?t\s+want|anything\s+but|nothing\s+with|hold\s+the)\s+/i,
+  ];
 
   // Check each protein type
   for (const [protein, keywords] of Object.entries(PROTEIN_KEYWORDS)) {
@@ -48,7 +111,19 @@ function extractProteinKeyword(query: string): string | null {
       // Escape special regex characters in keyword
       const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const pattern = new RegExp(`\\b${escapedKeyword}\\b`, 'i');
-      if (pattern.test(lowerQuery)) {
+      const match = pattern.exec(lowerQuery);
+      if (match) {
+        // NEGATION CHECK: If keyword is preceded by negation, skip it
+        const textBefore = lowerQuery.substring(0, match.index);
+        const isNegated = negationPatterns.some(negPattern => {
+          const negMatch = textBefore.match(new RegExp(negPattern.source + '$', 'i'));
+          return negMatch !== null;
+        });
+
+        if (isNegated) {
+          continue; // Skip negated keyword
+        }
+
         return protein;
       }
     }
@@ -89,11 +164,17 @@ function applyProteinFilter(items: any[], proteinKeyword: string): any[] {
  * Supports plurals and common misspellings (e.g., "sandwhich", "sandwiche")
  * Returns dishType string or null
  * Do NOT use embeddings to decide dish type - keyword matching only
+ * NEGATION AWARE: "but not chicken" / "no chicken" / "without chicken" will NOT match chicken
  */
 function extractDishType(query: string): string | null {
   if (!query || typeof query !== 'string') return null;
 
   const lowerQuery = query.toLowerCase().trim();
+
+  // Negation patterns: words/phrases that negate the keyword that follows
+  const negationPatterns = [
+    /\b(not|no|without|except|exclude|excluding|avoid|don'?t\s+want|anything\s+but|nothing\s+with|hold\s+the)\s+/i,
+  ];
 
   // Check each dish type in taxonomy
   for (const [dishType, { keywords }] of Object.entries(DISH_TAXONOMY)) {
@@ -102,13 +183,93 @@ function extractDishType(query: string): string | null {
       // Escape special regex characters in keyword
       const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const pattern = new RegExp(`\\b${escapedKeyword}\\b`, 'i');
-      if (pattern.test(lowerQuery)) {
+      const match = pattern.exec(lowerQuery);
+      if (match) {
+        // NEGATION CHECK: Look at the text before the matched keyword
+        // If a negation word appears right before it, skip this keyword
+        const textBefore = lowerQuery.substring(0, match.index);
+        const isNegated = negationPatterns.some(negPattern => {
+          // Check if negation pattern appears at the END of textBefore (right before keyword)
+          const negMatch = textBefore.match(new RegExp(negPattern.source + '$', 'i'));
+          return negMatch !== null;
+        });
+
+        if (isNegated) {
+          // This keyword is negated — skip it, don't return this dish type
+          continue;
+        }
+
         return dishType;
       }
     }
   }
 
   return null;
+}
+
+/**
+ * Extracts negated/excluded keywords from query
+ * Returns an array of keywords that should be EXCLUDED from results
+ * E.g., "not chicken" → excludes all chicken-related keywords
+ */
+function extractExcludedKeywords(query: string): string[] {
+  if (!query || typeof query !== 'string') return [];
+
+  const lowerQuery = query.toLowerCase().trim();
+  const excluded: string[] = [];
+
+  // Negation patterns
+  const negationPatterns = [
+    /\b(not|no|without|except|exclude|excluding|avoid|don'?t\s+want|anything\s+but|nothing\s+with|hold\s+the)\s+/i,
+  ];
+
+  // Check all taxonomy keywords AND protein keywords for negation
+  const allKeywordSources: Record<string, string[]> = {
+    ...Object.fromEntries(Object.entries(DISH_TAXONOMY).map(([k, v]) => [k, v.keywords])),
+    ...PROTEIN_KEYWORDS,
+  };
+
+  for (const [, keywords] of Object.entries(allKeywordSources)) {
+    for (const keyword of keywords) {
+      const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = new RegExp(`\\b${escapedKeyword}\\b`, 'i');
+      const match = pattern.exec(lowerQuery);
+      if (match) {
+        const textBefore = lowerQuery.substring(0, match.index);
+        const isNegated = negationPatterns.some(negPattern => {
+          const negMatch = textBefore.match(new RegExp(negPattern.source + '$', 'i'));
+          return negMatch !== null;
+        });
+
+        if (isNegated && !excluded.includes(keyword.toLowerCase())) {
+          excluded.push(keyword.toLowerCase());
+        }
+      }
+    }
+  }
+
+  return excluded;
+}
+
+/**
+ * Applies exclusion filter — removes items whose name contains any excluded keyword
+ * Used when user says "not chicken", "without beef", etc.
+ */
+function applyExclusionFilter(items: any[], excludedKeywords: string[]): any[] {
+  if (!excludedKeywords || excludedKeywords.length === 0) return items;
+
+  return items.filter((item: any) => {
+    const itemName = (item.name || item.item_name || '').toLowerCase();
+
+    // Check if name contains any excluded keyword
+    const isExcluded = excludedKeywords.some(keyword => {
+      const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = new RegExp(`\\b${escapedKeyword}\\b`, 'i');
+      return pattern.test(itemName);
+    });
+
+    return !isExcluded; // Keep items that do NOT contain excluded keywords
+  });
 }
 
 /**
@@ -502,7 +663,8 @@ function isDishItem(menuItem: any, dishType?: string | null): boolean {
     'signature bowl', 'power bowl', 'protein bowl', 'grain bowl',
     'breakfast', 'lunch', 'dinner', 'combo', 'meal', 'platter',
     'stir-fry', 'stir fry', 'curry', 'noodles', 'ramen', 'pho',
-    'omelet', 'omelette', 'skillet', 'hash', 'benedict', 'appetizer'
+    'omelet', 'omelette', 'skillet', 'hash', 'benedict', 'appetizer',
+    'dog', 'hot dog'
   ];
 
   // If category explicitly indicates a meal, include it
@@ -585,7 +747,7 @@ function isDishItem(menuItem: any, dishType?: string | null): boolean {
     'burger', 'sub', 'hoagie', 'panini', 'calzone', 'pita',
     'breakfast', 'lunch', 'dinner', 'platter', 'skillet', 'hash',
     'benedict', 'omelet', 'omelette', 'stir-fry', 'stir fry',
-    'curry', 'ramen', 'pho', 'noodles', 'sushi', 'roll'
+    'curry', 'ramen', 'pho', 'noodles', 'sushi', 'roll', 'dog', 'hot dog'
   ];
 
   if (mealKeywords.some(keyword => name.includes(keyword))) {
@@ -1501,6 +1663,18 @@ export async function searchHandler(params: SearchParams) {
     ? reconstructedDishType
     : (effectiveQuery ? extractDishType(effectiveQuery) : null);
 
+  // Extract excluded keywords from negation (e.g., "not chicken" → exclude chicken items)
+  const excludedKeywords = effectiveQuery ? extractExcludedKeywords(effectiveQuery) : [];
+  if (excludedKeywords.length > 0) {
+    console.log(`[searchHandler] Excluded keywords detected:`, excludedKeywords);
+  }
+
+  // Extract dietary intent (e.g., "vegetarian", "vegan")
+  const dietaryIntent = effectiveQuery ? extractDietaryIntent(effectiveQuery) : null;
+  if (dietaryIntent) {
+    console.log(`[searchHandler] Dietary intent detected: ${dietaryIntent}`);
+  }
+
   // Extract restaurant name/ID - ONLY resolve if explicitRestaurantQuery exists
   let restaurantName: string | undefined = undefined;
   let restaurantId: string | undefined = undefined;
@@ -1510,8 +1684,10 @@ export async function searchHandler(params: SearchParams) {
   if (explicitRestaurantQuery && !restaurantNameFromSearchKey) {
     console.log('[searchHandler] Resolving explicit restaurant query (universal):', explicitRestaurantQuery);
 
-    // Use universal resolver to find canonical restaurant
-    const resolution = await resolveRestaurantUniversal(explicitRestaurantQuery);
+    // Use universal resolver to find canonical restaurant.
+    // Pass explicitRestaurantQuery as BOTH arguments: first is userText, second is preExtractedQuery
+    // (since we already extracted it, we can effectively use it as both to skip internal extraction)
+    const resolution = await resolveRestaurantUniversal(explicitRestaurantQuery, explicitRestaurantQuery);
 
     if (resolution.status === 'MATCH') {
       restaurantName = resolution.canonicalName;
@@ -2401,7 +2577,23 @@ export async function searchHandler(params: SearchParams) {
   });
 
   // Diet filtering removed - use final macro filtered items (homepage may have applied fallback)
-  const itemsForRemainingFilters = finalMacroFilteredItems;
+  let itemsForRemainingFilters = finalMacroFilteredItems;
+
+  // EXCLUSION FILTER: Remove items that match negated keywords (e.g., "not chicken")
+  if (excludedKeywords.length > 0) {
+    const beforeExclusion = itemsForRemainingFilters.length;
+    itemsForRemainingFilters = applyExclusionFilter(itemsForRemainingFilters, excludedKeywords);
+    const afterExclusion = itemsForRemainingFilters.length;
+    console.log(`[searchHandler] Exclusion filter (${excludedKeywords.join(', ')}): ${beforeExclusion} → ${afterExclusion} items`);
+  }
+
+  // DIETARY FILTER: Keep only items matching dietary intent (e.g., "vegetarian", "vegan")
+  if (dietaryIntent) {
+    const beforeDietary = itemsForRemainingFilters.length;
+    itemsForRemainingFilters = applyDietaryFilter(itemsForRemainingFilters, dietaryIntent);
+    const afterDietary = itemsForRemainingFilters.length;
+    console.log(`[searchHandler] Dietary filter (${dietaryIntent}): ${beforeDietary} → ${afterDietary} items`);
+  }
 
   // 8. APPLY RESTAURANT FILTER (if restaurant filter exists)
   const filteredItems = restaurantFilter

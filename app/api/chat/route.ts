@@ -39,9 +39,124 @@ const routerSchema = z.object({
     restaurant: z.string().optional(),
     nearMe: z.boolean().optional(),
   }).optional(),
+  structuredIntent: z.object({
+    restaurantName: z.string().nullable().optional(),
+    dietaryRestrictions: z.array(z.string()).optional(),
+    excludedIngredients: z.array(z.string()).optional(),
+    minProtein: z.number().nullable().optional(),
+    maxCalories: z.number().nullable().optional(),
+    minCalories: z.number().nullable().optional(),
+    maxCarbs: z.number().nullable().optional(),
+    maxFat: z.number().nullable().optional(),
+    calorieRange: z.object({
+      min: z.number(),
+      max: z.number(),
+    }).nullable().optional(),
+    sortingIntent: z.string().nullable().optional(),
+    mealType: z.string().nullable().optional(),
+    cuisineType: z.string().nullable().optional(),
+  }).optional(),
   answer: z.string().optional(),
   question: z.string().optional(),
 });
+
+/**
+ * Maps structuredIntent fields from the enhanced router schema
+ * into the downstream-compatible constraints format.
+ * structuredIntent fields take priority over constraints when both exist.
+ */
+function mergeStructuredIntent(
+  constraints: {
+    calorieCap?: number;
+    minProtein?: number;
+    maxCarbs?: number;
+    maxFat?: number;
+    diet?: string;
+    restaurant?: string;
+    nearMe?: boolean;
+  } | undefined,
+  structuredIntent: {
+    restaurantName?: string | null;
+    dietaryRestrictions?: string[];
+    excludedIngredients?: string[];
+    minProtein?: number | null;
+    maxCalories?: number | null;
+    minCalories?: number | null;
+    maxCarbs?: number | null;
+    maxFat?: number | null;
+    calorieRange?: { min: number; max: number } | null;
+    sortingIntent?: string | null;
+    mealType?: string | null;
+    cuisineType?: string | null;
+  } | undefined
+): {
+  calorieCap?: number;
+  minProtein?: number;
+  maxCarbs?: number;
+  maxFat?: number;
+  minCalories?: number;
+  diet?: string;
+  restaurant?: string;
+  nearMe?: boolean;
+  sortingIntent?: string;
+  excludedIngredients?: string[];
+  mealType?: string;
+  cuisineType?: string;
+} {
+  const base = constraints || {};
+  if (!structuredIntent) return base;
+
+  const merged: any = { ...base };
+
+  // Macro constraints from structuredIntent take priority
+  if (structuredIntent.maxCalories != null) {
+    merged.calorieCap = structuredIntent.maxCalories;
+  }
+  if (structuredIntent.minProtein != null) {
+    merged.minProtein = structuredIntent.minProtein;
+  }
+  if (structuredIntent.maxCarbs != null) {
+    merged.maxCarbs = structuredIntent.maxCarbs;
+  }
+  if (structuredIntent.maxFat != null) {
+    merged.maxFat = structuredIntent.maxFat;
+  }
+  if (structuredIntent.minCalories != null) {
+    merged.minCalories = structuredIntent.minCalories;
+  }
+
+  // Calorie range: apply as calorieCap (max) and minCalories (min)
+  if (structuredIntent.calorieRange) {
+    merged.minCalories = structuredIntent.calorieRange.min;
+    merged.calorieCap = structuredIntent.calorieRange.max;
+  }
+
+  // Dietary restrictions → diet field (use first restriction)
+  if (structuredIntent.dietaryRestrictions && structuredIntent.dietaryRestrictions.length > 0) {
+    merged.diet = structuredIntent.dietaryRestrictions[0];
+  }
+
+  // Restaurant from structuredIntent
+  if (structuredIntent.restaurantName) {
+    merged.restaurant = structuredIntent.restaurantName;
+  }
+
+  // Pass through new fields
+  if (structuredIntent.sortingIntent) {
+    merged.sortingIntent = structuredIntent.sortingIntent;
+  }
+  if (structuredIntent.excludedIngredients && structuredIntent.excludedIngredients.length > 0) {
+    merged.excludedIngredients = structuredIntent.excludedIngredients;
+  }
+  if (structuredIntent.mealType) {
+    merged.mealType = structuredIntent.mealType;
+  }
+  if (structuredIntent.cuisineType) {
+    merged.cuisineType = structuredIntent.cuisineType;
+  }
+
+  return merged;
+}
 
 /**
  * Detects if message is ONLY location phrases (no other content)
@@ -341,7 +456,15 @@ function parseMealConstraintsFromText(message: string): {
     'nearby', 'me', 'my', 'the', 'a', 'an', 'or', 'for', 'to', 'from', 'in', 'on',
     'by', 'calories', 'calorie', 'cal', 'protein', 'carbs', 'carb', 'fat', 'fats',
     'grams', 'gram', 'g', 'lunch', 'dinner', 'breakfast', 'snack', 'meal', 'meals',
-    'food', 'find', 'show', 'get', 'want', 'looking', 'search', 'options'
+    'food', 'find', 'show', 'get', 'want', 'looking', 'search', 'options',
+    // Generic restaurant/cuisine types (should not be treated as specific restaurants)
+    'steakhouse', 'restaurant', 'diner', 'cafe', 'cafeteria', 'bistro', 'pizzeria',
+    'bakery', 'grill', 'bar', 'pub', 'tavern', 'eatery', 'joint', 'spot', 'chain',
+    'place', 'shop', 'stand', 'counter',
+    'italian', 'mexican', 'chinese', 'japanese', 'asian', 'indian', 'thai',
+    'greek', 'korean', 'vietnamese', 'french', 'mediterranean', 'american',
+    'southern', 'cajun', 'bbq', 'barbecue', 'seafood', 'sushi',
+    'burger', 'pizza', 'taco', 'sandwich', 'salad', 'noodle', 'ramen'
   ];
 
   const restaurantPatterns = [
@@ -415,6 +538,60 @@ function isMetaQuestion(message: string): boolean {
  * Pre-router heuristic: Determines if we can skip LLM routing
  * Returns { skipLLM: boolean, mode: string | null, answer?: string }
  */
+/**
+ * Detects if a message is a nutrition/informational question (not a meal search)
+ * These should go to the LLM router to be classified as NUTRITION_TEXT
+ */
+function isNutritionQuestion(message: string): boolean {
+  const lowerMessage = message.toLowerCase().trim();
+  const nutritionPatterns = [
+    /^how\s+many\s+(calories|cal|protein|carbs?|fat)\b/i,
+    /^how\s+much\s+(protein|calories|cal|carbs?|fat)\b/i,
+    /^what\s+(is|are)\s+the\s+(calories|nutrition|macros|protein|carbs?)\b/i,
+    /^is\s+(creatine|sodium|sugar|caffeine|gluten|cholesterol)\s+(safe|bad|good|healthy)\b/i,
+    /\bcalories\s+in\s+(a|an|the)?\s*\w/i, // "calories in a big mac"
+    /\bprotein\s+in\s+(a|an|the)?\s*\w/i, // "protein in a ..."
+    /\bhow\s+much\s+protein\s+do\s+I\s+need\b/i,
+    /\bis\s+\w+\s+(safe|bad|good|healthy|harmful|toxic)\b/i,
+  ];
+  return nutritionPatterns.some(p => p.test(lowerMessage));
+}
+
+/**
+ * Detects if a message is too vague to route without LLM
+ * Very short messages with generic terms should go to LLM for proper CLARIFY routing
+ */
+function isTooVague(message: string): boolean {
+  const trimmed = message.trim();
+  const words = trimmed.split(/\s+/).filter(w => w.length > 0);
+  // Single word queries that are just generic food terms
+  if (words.length <= 1) {
+    const vagueSingleWords = ['food', 'eat', 'hungry', 'meal', 'meals', 'snack', 'dinner', 'lunch', 'breakfast'];
+    return vagueSingleWords.includes(trimmed.toLowerCase());
+  }
+  return false;
+}
+
+/**
+ * Detects impossible/conflicting macro constraints that should go to LLM for CLARIFY
+ * e.g., "80g protein under 300 calories" is nearly impossible for restaurant meals
+ */
+function hasImpossibleConstraints(message: string): boolean {
+  const lower = message.toLowerCase();
+  // Extract protein minimum
+  const proteinMatch = lower.match(/(\d+)\s*g?\s*protein/);
+  const proteinMin = proteinMatch ? parseInt(proteinMatch[1], 10) : 0;
+  // Extract calorie maximum
+  const calorieMatch = lower.match(/(under|below|less\s+than|max|at\s+most)\s+(\d+)\s*(cal|calories?|kcal)?/i);
+  const calorieMax = calorieMatch ? parseInt(calorieMatch[2], 10) : Infinity;
+  // Check if ratio is impossible: very high protein + very low calories
+  // 80g protein at 4 cal/g = 320 cal minimum from protein alone
+  if (proteinMin >= 60 && calorieMax <= 300) {
+    return true;
+  }
+  return false;
+}
+
 function preRouterHeuristic(message: string): {
   skipLLM: boolean;
   mode: 'MEAL_SEARCH' | 'NUTRITION_TEXT' | 'CLARIFY' | null;
@@ -426,6 +603,32 @@ function preRouterHeuristic(message: string): {
       skipLLM: true,
       mode: 'NUTRITION_TEXT',
       answer: "SeekEatz helps you find meals that match your nutrition goals. You can search for meals by type (burgers, bowls, sandwiches), calories, protein, carbs, or restaurant. Just tell me what you're looking for! For pricing and account questions, please check the Settings page."
+    };
+  }
+
+  // CRITICAL: Nutrition questions must go to LLM (should NOT be routed as MEAL_SEARCH)
+  // This check runs BEFORE hasFoodIntent since nutrition questions contain food/macro keywords
+  if (isNutritionQuestion(message)) {
+    return {
+      skipLLM: false,
+      mode: null
+    };
+  }
+
+  // CRITICAL: Very vague queries must go to LLM for proper CLARIFY routing
+  if (isTooVague(message)) {
+    return {
+      skipLLM: false,
+      mode: null
+    };
+  }
+
+  // CRITICAL: Impossible constraint combinations must go to LLM for proper CLARIFY routing
+  // e.g., "80g protein under 300 calories" should get a helpful explanation
+  if (hasImpossibleConstraints(message)) {
+    return {
+      skipLLM: false,
+      mode: null
     };
   }
 
@@ -556,7 +759,8 @@ export async function POST(req: Request) {
         routerResult = {
           mode: 'MEAL_SEARCH',
           query: message,
-          constraints: {}
+          constraints: {},
+          structuredIntent: undefined
         };
       } else if (heuristic.mode === 'NUTRITION_TEXT' && heuristic.answer) {
         console.log(`[NO LLM] requestId=${requestId} heuristic=NUTRITION_TEXT`);
@@ -641,6 +845,34 @@ export async function POST(req: Request) {
     if (routerResult.mode === 'MEAL_SEARCH') {
       // PATH A: MEAL SEARCH
 
+      // Merge structuredIntent from enhanced router into constraints (backward-compatible)
+      const enhancedConstraints = mergeStructuredIntent(routerResult.constraints, routerResult.structuredIntent);
+      // Apply merged constraints back to routerResult for downstream use
+      routerResult.constraints = {
+        calorieCap: enhancedConstraints.calorieCap,
+        minProtein: enhancedConstraints.minProtein,
+        maxCarbs: enhancedConstraints.maxCarbs,
+        maxFat: enhancedConstraints.maxFat,
+        diet: enhancedConstraints.diet,
+        restaurant: enhancedConstraints.restaurant,
+        nearMe: enhancedConstraints.nearMe,
+      };
+
+      // Log enhanced intent extraction
+      if (routerResult.structuredIntent) {
+        console.log('[api/chat] Enhanced structuredIntent:', {
+          dietaryRestrictions: routerResult.structuredIntent.dietaryRestrictions,
+          excludedIngredients: routerResult.structuredIntent.excludedIngredients,
+          sortingIntent: routerResult.structuredIntent.sortingIntent,
+          mealType: routerResult.structuredIntent.mealType,
+          cuisineType: routerResult.structuredIntent.cuisineType,
+          calorieRange: routerResult.structuredIntent.calorieRange,
+          mergedCalorieCap: enhancedConstraints.calorieCap,
+          mergedMinProtein: enhancedConstraints.minProtein,
+          mergedDiet: enhancedConstraints.diet,
+        });
+      }
+
       // STEP 0: Deterministic intent detection (no LLM, regex only)
       const { detectExplicitRestaurantConstraint } = await import('@/lib/intent-detection');
 
@@ -683,8 +915,10 @@ export async function POST(req: Request) {
           reason: macroConstraintsDetected ? 'macro constraints detected' : 'no explicit restaurant marker'
         });
       } else {
-        // Use universal resolver for explicit restaurant queries (queries restaurants table first)
-        restaurantMatch = await resolveRestaurantUniversal(message);
+        // Use universal resolver with the EXTRACTED restaurant name, not the full message
+        // Pass restaurantQuery as pre-extracted so the resolver skips its internal extraction
+        // (which would reject names like 'Burger King' because 'burger' is a generic food term)
+        restaurantMatch = await resolveRestaurantUniversal(message, restaurantQuery);
 
         // Log resolution result
         const isDev = process.env.NODE_ENV === 'development';
@@ -808,19 +1042,20 @@ export async function POST(req: Request) {
       // NO_RESTAURANT means no restaurant intent was detected (e.g., "burger")
       // NOT_FOUND without restaurant intent should not happen, but handle gracefully
 
-      // Check for diet requests - return text-only response
+      // Check for diet requests that are NOT yet supported - return text-only response
+      // NOTE: vegetarian, vegan, veggie, plant-based ARE now supported via dietary filtering in searchHandler
       const lowerMessage = message.toLowerCase();
-      const dietKeywords = ['vegan', 'vegetarian', 'pescatarian', 'keto', 'dairy-free', 'gluten-free', 'nut-free', 'shellfish-free', 'soy-free', 'egg-free'];
-      const hasDietRequest = dietKeywords.some(keyword => lowerMessage.includes(keyword));
+      const unsupportedDietKeywords = ['pescatarian', 'keto', 'dairy-free', 'gluten-free', 'nut-free', 'shellfish-free', 'soy-free', 'egg-free'];
+      const hasUnsupportedDietRequest = unsupportedDietKeywords.some(keyword => lowerMessage.includes(keyword));
 
-      if (hasDietRequest) {
-        // Return text-only response for diet requests
+      if (hasUnsupportedDietRequest) {
+        // Return text-only response for unsupported diet requests
         if (!user) await incrementUsageCount();
         return NextResponse.json({
           error: false,
           message: "Diet filter request detected.",
           mode: "text",
-          answer: "Diet filters are coming soon (verified only). For now I can only filter by calories/macros, restaurant name, and dish type like burgers/bowls/sandwiches."
+          answer: "This specific diet filter is coming soon. For now I can filter by vegetarian/vegan, calories/macros, restaurant name, and dish type like burgers/bowls/sandwiches."
         }, {
           headers: createResponseHeaders(usedLLMRouter, 'MEAL_SEARCH', heuristicMode || 'none')
         });
@@ -894,13 +1129,79 @@ export async function POST(req: Request) {
         return originalMessage.trim() || 'find meals';
       }
 
+      /**
+       * Normalizes semantic shorthand slugs like "protein-dish" into human-readable
+       * vector search phrases like "high protein meal".
+       * This ensures the vector DB gets a meaningful query instead of returning 0 results.
+       * The macro constraints are enforced separately by extractMacroConstraintsFromText.
+       * 
+       * IMPORTANT: Preserves exclusion/negation phrases (e.g., "but not chicken", "no beef")
+       * so that extractExcludedKeywords in the search handler can detect them.
+       */
+      function normalizeSemanticQuery(q: string): string {
+        const lower = q.toLowerCase().trim();
+
+        // Extract exclusion phrases BEFORE normalization so we can re-append them
+        const exclusionPattern = /\b(but\s+)?(not|no|without|except|exclude|excluding|avoid|don'?t\s+want|anything\s+but|nothing\s+with|hold\s+the)\s+(\w+(?:\s+\w+)?)/gi;
+        const exclusionMatches: string[] = [];
+        let match;
+        while ((match = exclusionPattern.exec(q)) !== null) {
+          exclusionMatches.push(match[0].trim());
+        }
+        const exclusionSuffix = exclusionMatches.length > 0 ? ' ' + exclusionMatches.join(' ') : '';
+
+        // Extract dietary keywords BEFORE normalization so we can re-append them
+        // This ensures queries like "vegetarian high protein meal" preserve the dietary keyword
+        const dietaryKeywords = ['vegetarian', 'vegetrian', 'vegitarian', 'veggie', 'vegan', 'plant-based', 'plant based', 'meatless', 'meat-free', 'meat free', 'pescatarian', 'halal', 'kosher'];
+        const foundDietaryKeywords: string[] = [];
+        for (const keyword of dietaryKeywords) {
+          const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          if (new RegExp(`\\b${escapedKeyword}\\b`, 'i').test(lower)) {
+            foundDietaryKeywords.push(keyword);
+          }
+        }
+        const dietarySuffix = foundDietaryKeywords.length > 0 ? ' ' + foundDietaryKeywords.join(' ') : '';
+
+        // "protein-dish", "protein-meal", "protein-bowl", "protein-food", "protein-plate"
+        if (/\bprotein[-\s]+(dish|meal|bowl|food|plate|option|item|pick|choice)\b/i.test(lower)) {
+          return 'high protein meal' + dietarySuffix + exclusionSuffix;
+        }
+
+        // "high-protein-dish", "high-protein-meal", "high-protein-bowl"
+        if (/\bhigh[-\s]+protein[-\s]+(dish|meal|bowl|food|plate|option|item|pick|choice)\b/i.test(lower)) {
+          return 'high protein meal' + dietarySuffix + exclusionSuffix;
+        }
+
+        // "lean-dish", "lean-meal", "lean-bowl", "lean-food"
+        if (/\blean[-\s]+(dish|meal|bowl|food|plate|option|item|pick|choice)\b/i.test(lower)) {
+          return 'lean healthy meal' + dietarySuffix + exclusionSuffix;
+        }
+
+        // "low-cal-dish", "low-cal-meal", "low-cal-bowl", "low cal dish"
+        if (/\blow[-\s]+cal(orie)?s?[-\s]+(dish|meal|bowl|food|plate|option|item|pick|choice)\b/i.test(lower)) {
+          return 'low calorie meal' + dietarySuffix + exclusionSuffix;
+        }
+
+        // "low-carb-dish", "low-carb-meal"
+        if (/\blow[-\s]+carbs?[-\s]+(dish|meal|bowl|food|plate|option|item|pick|choice)\b/i.test(lower)) {
+          return 'low carb meal' + dietarySuffix + exclusionSuffix;
+        }
+
+        // "low-fat-dish", "low-fat-meal"
+        if (/\blow[-\s]+fat[-\s]+(dish|meal|bowl|food|plate|option|item|pick|choice)\b/i.test(lower)) {
+          return 'low fat meal' + dietarySuffix + exclusionSuffix;
+        }
+
+        return q; // No normalization needed — exclusion phrases already present
+      }
+
       // Determine query for search
       // If explicit restaurant constraint exists and restaurant-only, use generic query
-      // Otherwise, use sanitized message
+      // Otherwise, use sanitized message, then apply semantic normalization
       const sanitizedMessage = sanitizeMessageForSearch(message);
       const queryForSearch = (explicitRestaurantDetected && restaurantOnly)
         ? 'find meals'
-        : sanitizedMessage;
+        : normalizeSemanticQuery(sanitizedMessage);
 
       // Log message sanitization and restaurant-only detection
       if (isDev) {
@@ -922,15 +1223,16 @@ export async function POST(req: Request) {
 
       // Merge constraints: prioritize macro constraints from intent detection, then parsed constraints, then routerResult
       // STRICT: Only apply restaurant constraint if restaurantMatch is MATCH AND explicitRestaurant is true
-      // CRITICAL: If macro constraints are detected, DO NOT apply restaurant constraint (search globally)
+      // FIXED: Previously had !macroConstraintsDetected which dropped restaurant when macros present
+      // Now: if user explicitly says "at Burger King", always apply restaurant constraint
       // For NOT_FOUND, AMBIGUOUS, or NO_RESTAURANT, explicitly set restaurant to undefined
-      const canonicalRestaurant = (restaurantMatch.status === 'MATCH' && explicitRestaurant && !macroConstraintsDetected)
+      const canonicalRestaurant = (restaurantMatch.status === 'MATCH' && explicitRestaurant)
         ? restaurantMatch.canonicalName
         : undefined;
-      const restaurantId = (restaurantMatch.status === 'MATCH' && explicitRestaurant && !macroConstraintsDetected)
+      const restaurantId = (restaurantMatch.status === 'MATCH' && explicitRestaurant)
         ? restaurantMatch.restaurantId
         : undefined;
-      const restaurantVariants = (restaurantMatch.status === 'MATCH' && explicitRestaurant && !macroConstraintsDetected)
+      const restaurantVariants = (restaurantMatch.status === 'MATCH' && explicitRestaurant)
         ? restaurantMatch.variants
         : undefined;
 

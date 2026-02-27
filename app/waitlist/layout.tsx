@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Join the SeekEatz Waitlist — First 50 Get 3 Weeks FREE",
+    title: "Join the SeekEatz Waitlist — First 100 users get first month FREE",
     description:
         "Find meals that fit your macros — instantly. SeekEatz uses verified restaurant nutrition + AI to recommend real meals near you. Join the waitlist today.",
     openGraph: {
         title: "Find meals that fit your macros. Instantly.",
         description:
-            "AI-powered meal recommendations from verified restaurant menus. Join the waitlist — first 50 users get 3 weeks FREE.",
+            "AI-powered meal recommendations from verified restaurant menus. Join the waitlist — First 100 users get first month FREE.",
         type: "website",
         siteName: "SeekEatz",
         images: [

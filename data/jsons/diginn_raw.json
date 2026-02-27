@@ -1,511 +1,412 @@
 {
     "restaurant_name": "Dig Inn",
     "items": [
-      {
-        "name": "Hot Honey Chicken Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 850,
-          "protein": 48,
-          "carbs": 77,
-          "fat": 40
+        {
+            "name": "Hot Honey Chicken Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 850,
+                "protein": 48,
+                "carbs": 77,
+                "fat": 40
+            }
+        },
+        {
+            "name": "Classic Dig",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 800,
+                "protein": 38,
+                "carbs": 94,
+                "fat": 35
+            }
+        },
+        {
+            "name": "Vegan Dig Classic",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 940,
+                "protein": 31,
+                "carbs": 101,
+                "fat": 52
+            }
+        },
+        {
+            "name": "Spicy Salmon Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 860,
+                "protein": 33,
+                "carbs": 97,
+                "fat": 42
+            }
+        },
+        {
+            "name": "Spiced Pork Tenderloin Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 590,
+                "protein": 30,
+                "carbs": 51,
+                "fat": 37
+            }
+        },
+        {
+            "name": "Cider Herb Chicken Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 580,
+                "protein": 31,
+                "carbs": 47,
+                "fat": 37
+            }
+        },
+        {
+            "name": "Vegan Sweet Chili Tofu Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 740,
+                "protein": 28,
+                "carbs": 69,
+                "fat": 42
+            }
+        },
+        {
+            "name": "Charred Chicken & Rice",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 670,
+                "protein": 60,
+                "carbs": 43,
+                "fat": 34
+            }
+        },
+        {
+            "name": "Homestyle Caesar Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 610,
+                "protein": 36,
+                "carbs": 36,
+                "fat": 45
+            }
+        },
+        {
+            "name": "Fan Faves Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 390,
+                "protein": 29,
+                "carbs": 19,
+                "fat": 28
+            }
+        },
+        {
+            "name": "Vegan Favorites Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 510,
+                "protein": 25,
+                "carbs": 31,
+                "fat": 35
+            }
+        },
+        {
+            "name": "Digsgiving Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 910,
+                "protein": 37,
+                "carbs": 77,
+                "fat": 60
+            }
+        },
+        {
+            "name": "Kale Caesar Salad",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 550,
+                "protein": 12,
+                "carbs": 41,
+                "fat": 47
+            }
+        },
+        {
+            "name": "Avo Grain Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 540,
+                "protein": 5,
+                "carbs": 42,
+                "fat": 43
+            }
+        },
+        {
+            "name": "Kale Caesar Salad with Crispy Chicken",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 860,
+                "protein": 36,
+                "carbs": 61,
+                "fat": 62
+            }
+        },
+        {
+            "name": "Avo Grain Bowl with Crispy Tofu",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 820,
+                "protein": 24,
+                "carbs": 50,
+                "fat": 63
+            }
+        },
+        {
+            "name": "Seared Wild Salmon",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 270,
+                "protein": 23,
+                "carbs": 1,
+                "fat": 19
+            }
+        },
+        {
+            "name": "Crispy Tofu",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 280,
+                "protein": 19,
+                "carbs": 8,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Charred Chicken",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 230,
+                "protein": 28,
+                "carbs": 1,
+                "fat": 12
+            }
+        },
+        {
+            "name": "Herb Roasted Chicken",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 170,
+                "protein": 24,
+                "carbs": 0,
+                "fat": 8
+            }
+        },
+        {
+            "name": "Crispy Chicken",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 320,
+                "protein": 24,
+                "carbs": 20,
+                "fat": 15
+            }
+        },
+        {
+            "name": "Hot Honey Chicken",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 280,
+                "protein": 28,
+                "carbs": 13,
+                "fat": 12
+            }
+        },
+        {
+            "name": "Spiced Pork Tenderloin",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 170,
+                "protein": 23,
+                "carbs": 3,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Spiced Pork Tenderloin w/ Cider Onion Jam",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 190,
+                "protein": 23,
+                "carbs": 7,
+                "fat": 8
+            }
+        },
+        {
+            "name": "Thanksgiving Turkey",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 170,
+                "protein": 24,
+                "carbs": 0,
+                "fat": 8
+            }
+        },
+        {
+            "name": "Original Crispy Chicken Sandwich",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 670,
+                "protein": 31,
+                "carbs": 51,
+                "fat": 38
+            }
+        },
+        {
+            "name": "Original Crispy Tofu Sandwich",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 630,
+                "protein": 24,
+                "carbs": 41,
+                "fat": 42
+            }
+        },
+        {
+            "name": "Spicy Crispy Chicken Sandwich",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 680,
+                "protein": 31,
+                "carbs": 53,
+                "fat": 39
+            }
+        },
+        {
+            "name": "Spicy Crispy Tofu Sandwich",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 640,
+                "protein": 24,
+                "carbs": 42,
+                "fat": 42
+            }
+        },
+        {
+            "name": "Sweet Chili Crispy Chicken Sandwich",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 710,
+                "protein": 33,
+                "carbs": 61,
+                "fat": 37
+            }
+        },
+        {
+            "name": "Sweet Chili Crispy Tofu Sandwich",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 700,
+                "protein": 29,
+                "carbs": 55,
+                "fat": 42
+            }
+        },
+        {
+            "name": "Digsgiving Sandwich",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 480,
+                "protein": 30,
+                "carbs": 54,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Classic Brown Rice",
+            "category": "Base",
+            "price_estimate": null,
+            "macros": {
+                "calories": 210,
+                "protein": 4,
+                "carbs": 41,
+                "fat": 10
+            }
+        },
+        {
+            "name": "Spiced Farro",
+            "category": "Base",
+            "price_estimate": null,
+            "macros": {
+                "calories": 240,
+                "protein": 6,
+                "carbs": 39,
+                "fat": 8
+            }
+        },
+        {
+            "name": "Pesto",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 130,
+                "protein": 0,
+                "carbs": 0,
+                "fat": 14
+            }
+        },
+        {
+            "name": "Balsamic",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 110,
+                "protein": 0,
+                "carbs": 3,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Dig Inn Special Sauce",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 160,
+                "protein": 0,
+                "carbs": 6,
+                "fat": 16
+            }
         }
-      },
-      {
-        "name": "Classic Dig",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 800,
-          "protein": 38,
-          "carbs": 94,
-          "fat": 35
-        }
-      },
-      {
-        "name": "Vegan Dig Classic",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 940,
-          "protein": 31,
-          "carbs": 101,
-          "fat": 52
-        }
-      },
-      {
-        "name": "Spicy Salmon Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 860,
-          "protein": 33,
-          "carbs": 97,
-          "fat": 42
-        }
-      },
-      {
-        "name": "Spiced Pork Tenderloin Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 590,
-          "protein": 30,
-          "carbs": 51,
-          "fat": 37
-        }
-      },
-      {
-        "name": "Cider Herb Chicken Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 580,
-          "protein": 31,
-          "carbs": 47,
-          "fat": 37
-        }
-      },
-      {
-        "name": "Vegan Sweet Chili Tofu Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 740,
-          "protein": 28,
-          "carbs": 69,
-          "fat": 42
-        }
-      },
-      {
-        "name": "Charred Chicken & Rice",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 670,
-          "protein": 60,
-          "carbs": 43,
-          "fat": 34
-        }
-      },
-      {
-        "name": "Homestyle Caesar Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 610,
-          "protein": 36,
-          "carbs": 36,
-          "fat": 45
-        }
-      },
-      {
-        "name": "Fan Faves Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 390,
-          "protein": 29,
-          "carbs": 19,
-          "fat": 28
-        }
-      },
-      {
-        "name": "Vegan Favorites Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 510,
-          "protein": 25,
-          "carbs": 31,
-          "fat": 35
-        }
-      },
-      {
-        "name": "Digsgiving Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 910,
-          "protein": 37,
-          "carbs": 77,
-          "fat": 60
-        }
-      },
-      {
-        "name": "Kale Caesar Salad",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 550,
-          "protein": 12,
-          "carbs": 41,
-          "fat": 47
-        }
-      },
-      {
-        "name": "Avo Grain Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 540,
-          "protein": 5,
-          "carbs": 42,
-          "fat": 43
-        }
-      },
-      {
-        "name": "Kale Caesar Salad with Crispy Chicken",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 860,
-          "protein": 36,
-          "carbs": 61,
-          "fat": 62
-        }
-      },
-      {
-        "name": "Avo Grain Bowl with Crispy Tofu",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 820,
-          "protein": 24,
-          "carbs": 50,
-          "fat": 63
-        }
-      },
-      {
-        "name": "Seared Wild Salmon",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 270,
-          "protein": 23,
-          "carbs": 1,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Crispy Tofu",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 280,
-          "protein": 19,
-          "carbs": 8,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Charred Chicken",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 230,
-          "protein": 28,
-          "carbs": 1,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Herb Roasted Chicken",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 170,
-          "protein": 24,
-          "carbs": 0,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Crispy Chicken",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 320,
-          "protein": 24,
-          "carbs": 20,
-          "fat": 15
-        }
-      },
-      {
-        "name": "Hot Honey Chicken",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 280,
-          "protein": 28,
-          "carbs": 13,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Spiced Pork Tenderloin",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 170,
-          "protein": 23,
-          "carbs": 3,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Spiced Pork Tenderloin w/ Cider Onion Jam",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 190,
-          "protein": 23,
-          "carbs": 7,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Thanksgiving Turkey",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 170,
-          "protein": 24,
-          "carbs": 0,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Original Crispy Chicken Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 670,
-          "protein": 31,
-          "carbs": 51,
-          "fat": 38
-        }
-      },
-      {
-        "name": "Original Crispy Tofu Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 630,
-          "protein": 24,
-          "carbs": 41,
-          "fat": 42
-        }
-      },
-      {
-        "name": "Spicy Crispy Chicken Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 680,
-          "protein": 31,
-          "carbs": 53,
-          "fat": 39
-        }
-      },
-      {
-        "name": "Spicy Crispy Tofu Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 640,
-          "protein": 24,
-          "carbs": 42,
-          "fat": 42
-        }
-      },
-      {
-        "name": "Sweet Chili Crispy Chicken Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 710,
-          "protein": 33,
-          "carbs": 61,
-          "fat": 37
-        }
-      },
-      {
-        "name": "Sweet Chili Crispy Tofu Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 700,
-          "protein": 29,
-          "carbs": 55,
-          "fat": 42
-        }
-      },
-      {
-        "name": "Digsgiving Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 480,
-          "protein": 30,
-          "carbs": 54,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Classic Brown Rice",
-        "category": "Base",
-        "price_estimate": null,
-        "macros": {
-          "calories": 210,
-          "protein": 4,
-          "carbs": 41,
-          "fat": 10
-        }
-      },
-      {
-        "name": "Spiced Farro",
-        "category": "Base",
-        "price_estimate": null,
-        "macros": {
-          "calories": 240,
-          "protein": 6,
-          "carbs": 39,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Garlic Aioli",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 90,
-          "protein": 2,
-          "carbs": 0,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Lemon Wedge",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 0,
-          "protein": 0,
-          "carbs": 1,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Toasted Breadcrumbs",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 70,
-          "protein": 2,
-          "carbs": 11,
-          "fat": 2.5
-        }
-      },
-      {
-        "name": "Hot Honey",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 50,
-          "protein": 0,
-          "carbs": 12,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Pesto",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 130,
-          "protein": 0,
-          "carbs": 0,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Sriracha",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 20,
-          "protein": 0,
-          "carbs": 3,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Balsamic",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 110,
-          "protein": 0,
-          "carbs": 3,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Dig Inn Special Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 160,
-          "protein": 0,
-          "carbs": 6,
-          "fat": 16
-        }
-      },
-      {
-        "name": "Gravy",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 10,
-          "protein": 0,
-          "carbs": 1.5,
-          "fat": 1.5
-        }
-      },
-      {
-        "name": "Sweet Chili Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 90,
-          "protein": 0,
-          "carbs": 14,
-          "fat": 6.5
-        }
-      },
-      {
-        "name": "Cider Onion Jam",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 40,
-          "protein": 0,
-          "carbs": 5.5,
-          "fat": 1.5
-        }
-      },
-      {
-        "name": "Cranberry Compote",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 30,
-          "protein": 0,
-          "carbs": 8,
-          "fat": 0
-        }
-      }
     ]
-  }
+}

@@ -51,11 +51,11 @@ export async function detectRestaurantIntent(
   if (!userText || typeof userText !== 'string') {
     return { intent: false, reason: 'none' };
   }
-  
+
   const trimmed = userText.trim();
   const lowerText = trimmed.toLowerCase();
   const normalizedText = normalizeRestaurantName(trimmed);
-  
+
   // HARD STOP: Generic phrases like "find me lunch/dinner/breakfast" must NOT trigger restaurant resolution
   const genericPhrases = ['find me lunch', 'find me dinner', 'find me breakfast', 'find me food'];
   const isGenericPhrase = genericPhrases.some(phrase => lowerText.includes(phrase));
@@ -63,39 +63,39 @@ export async function detectRestaurantIntent(
     console.log('[restaurantResolver] Hard stop: generic phrase detected');
     return { intent: false, reason: 'dishGuard' };
   }
-  
+
   // DISH GUARD: If normalized text is only dish terms, return false unless explicit markers
   const normalizedWords = normalizedText.split(/\s+/).filter(w => w.length > 0);
-  const isOnlyDishTerms = normalizedWords.every(word => 
-    GENERIC_FOOD_TERMS.has(word) || 
+  const isOnlyDishTerms = normalizedWords.every(word =>
+    GENERIC_FOOD_TERMS.has(word) ||
     MACRO_TERMS.has(word) ||
     GENERIC_FOOD_TERMS.has(normalizedText) // Check full phrase too
   );
-  
+
   // Check if message contains dish nouns
   const hasDishNoun = Array.from(GENERIC_FOOD_TERMS).some(term => {
     const pattern = new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
     return pattern.test(trimmed);
   });
-  
+
   // Explicit restaurant markers
   const explicitMarkers = [
     /\b(from|at|in)\s+[a-z0-9\s&'-]+/i,  // "from X", "at X", "in X"
     /\b[a-z0-9\s&'-]+\s+(menu|restaurant|order|near me)\b/i,  // "X menu", "X restaurant", "X order"
   ];
-  
+
   const hasExplicitMarker = explicitMarkers.some(pattern => pattern.test(trimmed));
-  
+
   // Rule A: Explicit markers always trigger restaurant intent
   if (hasExplicitMarker) {
     return { intent: true, reason: 'marker' };
   }
-  
+
   // DISH GUARD: If message is only dish terms (or dish terms + macro terms), return false
   if (isOnlyDishTerms || (hasDishNoun && !hasExplicitMarker)) {
     return { intent: false, reason: 'dishGuard' };
   }
-  
+
   // Rule B: For short messages (<=28 chars), check if it matches a known restaurant
   if (trimmed.length <= 28) {
     // Get restaurant candidates if not provided
@@ -103,23 +103,23 @@ export async function detectRestaurantIntent(
     if (!candidates) {
       candidates = await getRestaurantCandidates();
     }
-    
+
     // Use normalizedIndex if available, fallback to normalizedToCanonical for backward compatibility
-    const normalizedToCanonical = candidates.normalizedIndex 
+    const normalizedToCanonical = candidates.normalizedIndex
       ? new Map(Array.from(candidates.normalizedIndex.entries()).map(([k, v]) => [k, v.canonicalName]))
       : candidates.normalizedToCanonical;
     const normalizedRestaurantNames = candidates.normalizedIndex
       ? Array.from(candidates.normalizedIndex.keys())
       : Array.from(normalizedToCanonical.keys());
-    
+
     // Try to match against known restaurants
     const normalizedCandidate = normalizedText;
-    
+
     // Check exact match
     if (normalizedToCanonical.has(normalizedCandidate)) {
       return { intent: true, reason: 'matchedRestaurant' };
     }
-    
+
     // Check contains match
     for (const normalizedRestaurant of normalizedRestaurantNames) {
       if (normalizedRestaurant.includes(normalizedCandidate) || normalizedCandidate.includes(normalizedRestaurant)) {
@@ -128,7 +128,7 @@ export async function detectRestaurantIntent(
         }
       }
     }
-    
+
     // Check fuzzy match (high confidence only) - use token Jaccard similarity
     if (normalizedRestaurantNames.length > 0) {
       let bestScore = 0;
@@ -150,14 +150,14 @@ export async function detectRestaurantIntent(
       }
     }
   }
-  
+
   // Default: no restaurant intent
   return { intent: false, reason: 'none' };
 }
 
 // computeFuzzyScore is defined later in the file (exported)
 
-export type RestaurantMatchResult = 
+export type RestaurantMatchResult =
   | { status: 'MATCH'; canonicalName: string; restaurantId?: string; variants: string[]; matchType: 'exact' | 'tokenSubset' | 'fuzzy' }
   | { status: 'NOT_FOUND'; missingRestaurantQuery?: string }  // Missing restaurant query for pendingAction
   | { status: 'NO_RESTAURANT' }  // No restaurant intent - proceed with normal dish search
@@ -184,7 +184,7 @@ const CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
  */
 export function normalizeRestaurantName(name: string): string {
   if (!name || typeof name !== 'string') return '';
-  
+
   return name
     .toLowerCase()
     .trim()
@@ -244,29 +244,29 @@ export async function getRestaurantCandidates(): Promise<{
       normalizedIndex: restaurantCache.normalizedIndex,
     };
   }
-  
+
   try {
     const supabase = await createClient();
-    
+
     // Fetch restaurant names with counts
     const { data, error } = await supabase
       .from('menu_items')
       .select('restaurant_name')
       .not('restaurant_name', 'is', null);
-    
+
     if (error) {
       console.error('[restaurantResolver] Error fetching restaurants:', error);
-      return { 
-        normalizedToCanonical: new Map(), 
+      return {
+        normalizedToCanonical: new Map(),
         canonicalNames: [],
         normalizedIndex: new Map(),
       };
     }
-    
+
     // Count occurrences of each restaurant name variant
     const variantCounts = new Map<string, number>();
     const allVariants: string[] = [];
-    
+
     for (const item of data || []) {
       const name = item.restaurant_name;
       if (typeof name === 'string' && name.length > 0) {
@@ -274,7 +274,7 @@ export async function getRestaurantCandidates(): Promise<{
         variantCounts.set(name, (variantCounts.get(name) || 0) + 1);
       }
     }
-    
+
     // Group variants by normalized name
     const normalizedGroups = new Map<string, string[]>();
     for (const variant of Array.from(variantCounts.keys())) {
@@ -284,17 +284,17 @@ export async function getRestaurantCandidates(): Promise<{
       }
       normalizedGroups.get(normalized)!.push(variant);
     }
-    
+
     // Build normalized index: select canonicalName (most frequent, else longest)
     const normalizedIndex = new Map<string, { canonicalName: string; variants: string[] }>();
     const normalizedToCanonical = new Map<string, string>();
     const canonicalNames: string[] = [];
-    
+
     for (const [normalized, variants] of normalizedGroups.entries()) {
       // Select canonical: prefer most frequent, else longest
       let canonicalName = variants[0];
       let maxCount = variantCounts.get(canonicalName) || 0;
-      
+
       for (const variant of variants) {
         const count = variantCounts.get(variant) || 0;
         if (count > maxCount || (count === maxCount && variant.length > canonicalName.length)) {
@@ -302,18 +302,18 @@ export async function getRestaurantCandidates(): Promise<{
           maxCount = count;
         }
       }
-      
+
       // Sort variants for consistency
       const sortedVariants = [...variants].sort();
-      
+
       normalizedIndex.set(normalized, { canonicalName, variants: sortedVariants });
       normalizedToCanonical.set(normalized, canonicalName);
       canonicalNames.push(canonicalName);
     }
-    
+
     // Sort canonical names for consistency
     canonicalNames.sort();
-    
+
     // Update cache
     restaurantCache = {
       normalizedToCanonical,
@@ -321,7 +321,7 @@ export async function getRestaurantCandidates(): Promise<{
       normalizedIndex,
       timestamp: Date.now(),
     };
-    
+
     // Debug logging (dev only)
     const isDev = process.env.NODE_ENV === 'development';
     if (isDev) {
@@ -339,7 +339,7 @@ export async function getRestaurantCandidates(): Promise<{
     } else {
       console.log(`[restaurantResolver] Loaded ${canonicalNames.length} restaurants with variants (cached)`);
     }
-    
+
     return {
       normalizedToCanonical,
       canonicalNames,
@@ -347,8 +347,8 @@ export async function getRestaurantCandidates(): Promise<{
     };
   } catch (error) {
     console.error('[restaurantResolver] Exception fetching restaurants:', error);
-    return { 
-      normalizedToCanonical: new Map(), 
+    return {
+      normalizedToCanonical: new Map(),
       canonicalNames: [],
       normalizedIndex: new Map(),
     };
@@ -361,20 +361,20 @@ export async function getRestaurantCandidates(): Promise<{
  * This is called when restaurant intent is already confirmed
  */
 function extractRestaurantCandidateFromMarkers(
-  userText: string, 
+  userText: string,
   normalizedRestaurantNames: string[]
 ): string | null {
   if (!userText || typeof userText !== 'string') return null;
-  
+
   const trimmed = userText.trim();
-  
+
   // Pattern 1: "from X", "at X", "in X" - improved to capture everything after "from" until end or punctuation
   const prepositionPatterns = [
     /\bfrom\s+([a-z0-9\s&'-]+?)(?:\s|$|,|\.|!|\?|$)/i,  // More permissive - capture until end if no punctuation
     /\bat\s+([a-z0-9\s&'-]+?)(?:\s|$|,|\.|!|\?|$)/i,
     /\bin\s+([a-z0-9\s&'-]+?)(?:\s|$|,|\.|!|\?|$)/i,
   ];
-  
+
   for (const pattern of prepositionPatterns) {
     const match = trimmed.match(pattern);
     if (match && match[1]) {
@@ -388,7 +388,7 @@ function extractRestaurantCandidateFromMarkers(
       }
     }
   }
-  
+
   // Fallback: if text ends with "from X", extract X (handles "meals from chipotle" case)
   const fromEndPattern = /\bfrom\s+([a-z0-9\s&'-]+)$/i;
   const fromEndMatch = trimmed.match(fromEndPattern);
@@ -399,7 +399,7 @@ function extractRestaurantCandidateFromMarkers(
       return candidate;
     }
   }
-  
+
   // Pattern 2: "X menu", "X restaurant", "X order", "X near me"
   const menuPattern = /\b([a-z0-9\s&'-]+?)\s+(menu|meals?|restaurant|order|near me)\b/i;
   const menuMatch = trimmed.match(menuPattern);
@@ -409,7 +409,7 @@ function extractRestaurantCandidateFromMarkers(
       return candidate;
     }
   }
-  
+
   // Pattern 3: For short messages that matched a restaurant, extract the matching phrase
   // This handles cases like "jimmy johns" (short message that matched)
   const normalizedUserText = normalizeRestaurantName(trimmed);
@@ -422,13 +422,13 @@ function extractRestaurantCandidateFromMarkers(
       }
     }
   }
-  
+
   if (bestMatch) {
     // Try to extract the matching words from original text
     const lowerUserText = trimmed.toLowerCase();
     const userWords = lowerUserText.split(/\s+/);
     const restaurantWords = bestMatch.words;
-    
+
     // Find consecutive matching words (check normalized versions)
     for (let i = 0; i <= userWords.length - restaurantWords.length; i++) {
       const slice = userWords.slice(i, i + restaurantWords.length).join(' ');
@@ -440,7 +440,7 @@ function extractRestaurantCandidateFromMarkers(
       }
     }
   }
-  
+
   return null;
 }
 
@@ -451,13 +451,13 @@ function extractRestaurantCandidateFromMarkers(
 function tokenJaccardSimilarity(str1: string, str2: string): number {
   const tokens1 = new Set(str1.toLowerCase().split(/\s+/).filter(t => t.length > 0));
   const tokens2 = new Set(str2.toLowerCase().split(/\s+/).filter(t => t.length > 0));
-  
+
   if (tokens1.size === 0 && tokens2.size === 0) return 1;
   if (tokens1.size === 0 || tokens2.size === 0) return 0;
-  
+
   const intersection = new Set([...tokens1].filter(t => tokens2.has(t)));
   const union = new Set([...tokens1, ...tokens2]);
-  
+
   return intersection.size / union.size;
 }
 
@@ -468,14 +468,14 @@ function tokenJaccardSimilarity(str1: string, str2: string): number {
  */
 export function computeFuzzyScore(userNormalized: string, restaurantNormalized: string): number {
   if (!userNormalized || !restaurantNormalized) return 0;
-  
+
   // Base score: Jaccard similarity
   const jaccard = tokenJaccardSimilarity(userNormalized, restaurantNormalized);
-  
+
   // Prefix bonus: if restaurant tokens appear in order at the start of user text
   const userTokens = userNormalized.split(/\s+/).filter(t => t.length > 0);
   const restaurantTokens = restaurantNormalized.split(/\s+/).filter(t => t.length > 0);
-  
+
   let prefixBonus = 0;
   if (restaurantTokens.length > 0 && userTokens.length >= restaurantTokens.length) {
     const userPrefix = userTokens.slice(0, restaurantTokens.length).join(' ');
@@ -494,7 +494,7 @@ export function computeFuzzyScore(userNormalized: string, restaurantNormalized: 
       }
     }
   }
-  
+
   return Math.min(1.0, jaccard + prefixBonus);
 }
 
@@ -509,10 +509,10 @@ export function computeFuzzyScore(userNormalized: string, restaurantNormalized: 
 export function isRestaurantOnlyQuery(userText: string, hasRestaurantMatch: boolean): boolean {
   if (!hasRestaurantMatch) return false;
   if (!userText || typeof userText !== 'string') return false;
-  
+
   const trimmed = userText.trim();
   const lowerText = trimmed.toLowerCase();
-  
+
   // Check for dish keywords
   const dishKeywords = [
     'burger', 'burgers', 'burrito', 'burritos', 'pizza', 'pizzas', 'taco', 'tacos',
@@ -521,43 +521,43 @@ export function isRestaurantOnlyQuery(userText: string, hasRestaurantMatch: bool
     'quesadilla', 'nachos', 'soup', 'soups', 'pasta', 'noodles',
     'breakfast', 'lunch', 'dinner', 'snack', 'sushi', 'poke'
   ];
-  
+
   for (const keyword of dishKeywords) {
     const pattern = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
     if (pattern.test(lowerText)) {
       return false; // Contains dish keyword, not restaurant-only
     }
   }
-  
+
   // Check for macro terms
   const macroKeywords = [
     'calories', 'calorie', 'cal', 'protein', 'carbs', 'carb', 'carbohydrates',
     'fat', 'fats', 'macros', 'macro', 'grams', 'gram', 'g'
   ];
-  
+
   for (const keyword of macroKeywords) {
     const pattern = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
     if (pattern.test(lowerText)) {
       return false; // Contains macro terms, not restaurant-only
     }
   }
-  
+
   // Check for explicit restaurant markers
   const explicitMarkers = [
     /\b(from|at|in)\s+[a-z0-9\s&'-]+/i,
     /\b[a-z0-9\s&'-]+\s+(menu|meals?|restaurant)\b/i,
   ];
-  
+
   const hasExplicitMarker = explicitMarkers.some(pattern => pattern.test(trimmed));
   if (hasExplicitMarker) {
     return true; // Has explicit marker, restaurant-only
   }
-  
+
   // If message is short (<=28 chars), treat as restaurant-only
   if (trimmed.length <= 28) {
     return true;
   }
-  
+
   return false;
 }
 
@@ -573,7 +573,7 @@ export async function resolveRestaurantFromText(
   if (!userText || typeof userText !== 'string' || userText.trim().length === 0) {
     return { status: 'NO_RESTAURANT' };
   }
-  
+
   // Detect restaurant intent if not provided
   let intentResult: { intent: boolean; reason: string };
   if (restaurantIntent === undefined) {
@@ -584,19 +584,19 @@ export async function resolveRestaurantFromText(
   } else {
     intentResult = restaurantIntent;
   }
-  
+
   const hasRestaurantIntent = intentResult.intent;
-  
+
   // Get restaurant candidates with normalized index
   const { normalizedIndex, canonicalNames } = await getRestaurantCandidates();
-  
+
   if (canonicalNames.length === 0) {
     console.warn('[restaurantResolver] No restaurants found in database');
     return { status: 'NO_RESTAURANT' };
   }
-  
+
   const normalizedRestaurantNames = Array.from(normalizedIndex.keys());
-  
+
   // Diagnostics (dev only)
   const isDev = process.env.NODE_ENV === 'development';
   if (isDev) {
@@ -606,7 +606,7 @@ export async function resolveRestaurantFromText(
       intentReason: intentResult.reason,
     });
   }
-  
+
   // If no restaurant intent, return NO_RESTAURANT (proceed with normal dish search)
   if (!hasRestaurantIntent) {
     if (isDev) {
@@ -614,15 +614,15 @@ export async function resolveRestaurantFromText(
     }
     return { status: 'NO_RESTAURANT' };
   }
-  
+
   // Extract candidate phrase ONLY from marker patterns (when restaurant intent is true)
   const candidatePhrase = extractRestaurantCandidateFromMarkers(userText, normalizedRestaurantNames);
-  
+
   if (isDev) {
     console.log('[restaurantResolver] Extracted candidate phrase:', candidatePhrase);
     console.log('[restaurantResolver] Available normalized keys (first 30):', normalizedRestaurantNames.slice(0, 30));
   }
-  
+
   if (!candidatePhrase) {
     if (isDev) {
       console.log('[restaurantResolver] No candidate phrase extracted from markers');
@@ -632,10 +632,10 @@ export async function resolveRestaurantFromText(
     const fallbackQuery = fromMatch?.[1]?.trim();
     return { status: 'NOT_FOUND', missingRestaurantQuery: fallbackQuery || undefined };
   }
-  
+
   const normalizedCandidate = normalizeRestaurantName(candidatePhrase);
   const queryLength = candidatePhrase.trim().length;
-  
+
   if (isDev) {
     console.log('[restaurantResolver] Matching:', {
       candidatePhrase,
@@ -644,7 +644,7 @@ export async function resolveRestaurantFromText(
       hasExactMatch: normalizedIndex.has(normalizedCandidate),
     });
   }
-  
+
   // Define query-length-aware minScore
   // len <= 4: minScore = 0.55 (prefer exact/prefix/contains, trigram is LAST resort)
   // len 5-7: minScore = 0.40
@@ -657,17 +657,17 @@ export async function resolveRestaurantFromText(
   } else {
     minScore = 0.32;
   }
-  
+
   // Generate ALL candidates with scores (exact, contains, fuzzy)
-  type Candidate = { 
-    canonicalName: string; 
+  type Candidate = {
+    canonicalName: string;
     variants: string[];
-    normalized: string; 
-    score: number; 
-    matchType: 'exact' | 'tokenSubset' | 'fuzzy' 
+    normalized: string;
+    score: number;
+    matchType: 'exact' | 'tokenSubset' | 'fuzzy'
   };
   const candidates: Candidate[] = [];
-  
+
   // A) Exact normalized key match (score = 1.0)
   const exactMatch = normalizedIndex.get(normalizedCandidate);
   if (exactMatch) {
@@ -679,12 +679,12 @@ export async function resolveRestaurantFromText(
       matchType: 'exact',
     });
   }
-  
+
   // B) Contains matches on normalized keys (score = 0.8)
   for (const [normalized, entry] of normalizedIndex.entries()) {
     // Skip if already added as exact match
     if (normalized === normalizedCandidate) continue;
-    
+
     if (normalized.includes(normalizedCandidate) || normalizedCandidate.includes(normalized)) {
       // Only accept if the match is substantial (at least 3 characters)
       if (Math.min(normalized.length, normalizedCandidate.length) >= 3) {
@@ -698,26 +698,26 @@ export async function resolveRestaurantFromText(
       }
     }
   }
-  
+
   // C) Fuzzy matches with typo tolerance (only if query length > 4 or no exact/contains matches)
   // For queries <= 4, prefer exact/contains over fuzzy
   if (queryLength > 4 || candidates.length === 0) {
     // Compute similarity scores for all normalized keys
     const similarityScores: Array<{ normalized: string; entry: { canonicalName: string; variants: string[] }; score: number }> = [];
-    
+
     for (const [normalized, entry] of normalizedIndex.entries()) {
       // Skip if already added
       if (candidates.some(c => c.normalized === normalized)) continue;
-      
+
       const fuzzyScore = computeFuzzyScore(normalizedCandidate, normalized);
       if (fuzzyScore > 0) {
         similarityScores.push({ normalized, entry, score: fuzzyScore });
       }
     }
-    
+
     // Sort by score descending
     similarityScores.sort((a, b) => b.score - a.score);
-    
+
     // Add candidates that meet minScore threshold
     for (const { normalized, entry, score } of similarityScores) {
       if (score >= minScore) {
@@ -731,13 +731,13 @@ export async function resolveRestaurantFromText(
       }
     }
   }
-  
+
   // Filter candidates by minScore (DO NOT include candidates with score <= 0)
   const candidatesUsed = candidates.filter(c => c.score > 0 && c.score >= minScore);
-  
+
   // Sort by score descending
   candidatesUsed.sort((a, b) => b.score - a.score);
-  
+
   if (isDev) {
     console.log('[restaurantResolver] Candidates generated:', {
       candidatePhrase,
@@ -745,15 +745,15 @@ export async function resolveRestaurantFromText(
       minScore,
       totalCandidates: candidates.length,
       candidatesUsed: candidatesUsed.length,
-      top5: candidatesUsed.slice(0, 5).map(c => ({ 
-        canonicalName: c.canonicalName, 
+      top5: candidatesUsed.slice(0, 5).map(c => ({
+        canonicalName: c.canonicalName,
         variants: c.variants.length,
-        score: c.score, 
-        matchType: c.matchType 
+        score: c.score,
+        matchType: c.matchType
       })),
     });
   }
-  
+
   // Decide MATCH/AMBIGUOUS/NOT_FOUND
   if (candidatesUsed.length === 0) {
     // No candidates meet the threshold
@@ -766,11 +766,11 @@ export async function resolveRestaurantFromText(
     }
     return { status: 'NOT_FOUND', missingRestaurantQuery: candidatePhrase };
   }
-  
+
   if (candidatesUsed.length === 1) {
     // Single candidate - MATCH
     const match = candidatesUsed[0];
-    
+
     if (isDev) {
       console.log('[restaurantResolver] MATCH (single candidate):', {
         candidatePhrase,
@@ -787,12 +787,12 @@ export async function resolveRestaurantFromText(
       matchType: match.matchType,
     };
   }
-  
+
   // Multiple candidates - check if top one is clearly better
   const top = candidatesUsed[0];
   const second = candidatesUsed[1];
   const scoreDiff = top.score - second.score;
-  
+
   // If top score - second score >= 0.15, treat as MATCH
   if (scoreDiff >= 0.15) {
     if (isDev) {
@@ -813,7 +813,7 @@ export async function resolveRestaurantFromText(
       matchType: top.matchType,
     };
   }
-  
+
   // Ambiguous - multiple strong candidates with similar scores
   const ambiguousCandidates = candidatesUsed.slice(0, 5).map(c => ({ name: c.canonicalName, score: c.score }));
   if (isDev) {
@@ -839,35 +839,35 @@ async function verifyRestaurantAvailability(canonicalName: string): Promise<bool
   try {
     const supabase = await createClient();
     const normalizedTarget = normalizeRestaurantName(canonicalName);
-    
+
     // Fetch distinct restaurant names from menu_items
     const { data, error } = await supabase
       .from('menu_items')
       .select('restaurant_name')
       .not('restaurant_name', 'is', null)
       .limit(1000); // Reasonable limit
-    
+
     if (error) {
       console.error('[restaurantResolver] Error verifying restaurant availability:', error);
       return false;
     }
-    
+
     if (!data || data.length === 0) {
       return false;
     }
-    
+
     // Check if any restaurant_name normalizes to the target
     const uniqueNames = Array.from(new Set(
       data.map(item => item.restaurant_name).filter((name): name is string => typeof name === 'string')
     ));
-    
+
     for (const name of uniqueNames) {
       const normalized = normalizeRestaurantName(name);
       if (normalized === normalizedTarget) {
         return true;
       }
     }
-    
+
     return false;
   } catch (error) {
     console.error('[restaurantResolver] Exception verifying restaurant availability:', error);
@@ -895,22 +895,22 @@ function tokenizeExcludingStopwords(normalized: string): string[] {
 function diceCoefficient(str1: string, str2: string): number {
   if (!str1 || !str2) return 0;
   if (str1 === str2) return 1;
-  
+
   const bigrams1 = new Set<string>();
   const bigrams2 = new Set<string>();
-  
+
   for (let i = 0; i < str1.length - 1; i++) {
     bigrams1.add(str1.slice(i, i + 2));
   }
   for (let i = 0; i < str2.length - 1; i++) {
     bigrams2.add(str2.slice(i, i + 2));
   }
-  
+
   let intersection = 0;
   for (const bigram of bigrams1) {
     if (bigrams2.has(bigram)) intersection++;
   }
-  
+
   const union = bigrams1.size + bigrams2.size;
   return union > 0 ? (2 * intersection) / union : 0;
 }
@@ -924,10 +924,10 @@ function diceCoefficient(str1: string, str2: string): number {
  */
 export function extractExplicitRestaurantQuery(message: string): string | null {
   if (!message || typeof message !== 'string') return null;
-  
+
   const trimmed = message.trim();
   const lowerTrimmed = trimmed.toLowerCase();
-  
+
   // Pattern 1: (meals|menu|food|lunch|dinner|breakfast)?\s*(from|at|in)\s+(.+)
   const pattern1 = /(?:meals|menu|food|lunch|dinner|breakfast)?\s*(?:from|at|in)\s+(.+)/i;
   const match1 = trimmed.match(pattern1);
@@ -940,7 +940,7 @@ export function extractExplicitRestaurantQuery(message: string): string | null {
       return query;
     }
   }
-  
+
   // Pattern 2: ^(.+?)\s+(menu|meals)$
   const pattern2 = /^(.+?)\s+(?:menu|meals)$/i;
   const match2 = trimmed.match(pattern2);
@@ -950,7 +950,7 @@ export function extractExplicitRestaurantQuery(message: string): string | null {
       return query;
     }
   }
-  
+
   // Pattern 3: Exact message that looks like a restaurant (1-6 tokens, no macro terms)
   const tokens = trimmed.split(/\s+/).filter(t => t.length > 0);
   if (tokens.length >= 1 && tokens.length <= 6) {
@@ -959,14 +959,14 @@ export function extractExplicitRestaurantQuery(message: string): string | null {
     const hasMacroTerm = macroTerms.some(term => lowerTrimmed.includes(term));
     if (!hasMacroTerm) {
       // Check if it's not a generic dish term
-      const isGenericDish = GENERIC_FOOD_TERMS.has(lowerTrimmed) || 
-                           tokens.some(t => GENERIC_FOOD_TERMS.has(t.toLowerCase()));
+      const isGenericDish = GENERIC_FOOD_TERMS.has(lowerTrimmed) ||
+        tokens.some(t => GENERIC_FOOD_TERMS.has(t.toLowerCase()));
       if (!isGenericDish) {
         return trimmed;
       }
     }
   }
-  
+
   return null;
 }
 
@@ -975,51 +975,52 @@ export function extractExplicitRestaurantQuery(message: string): string | null {
  * This is the primary resolver for explicit restaurant queries
  */
 export async function resolveRestaurantUniversal(
-  userText: string
+  userText: string,
+  preExtractedQuery?: string // Optional: if provided, skip internal extraction
 ): Promise<RestaurantMatchResult> {
   if (!userText || typeof userText !== 'string' || userText.trim().length === 0) {
     return { status: 'NO_RESTAURANT' };
   }
-  
-  // PART A: Extract restaurant query deterministically
-  const restaurantQuery = extractExplicitRestaurantQuery(userText);
+
+  // PART A: Use pre-extracted query if provided, otherwise extract from text
+  const restaurantQuery = preExtractedQuery || extractExplicitRestaurantQuery(userText);
   if (!restaurantQuery) {
     return { status: 'NO_RESTAURANT' };
   }
-  
+
   const qNorm = normalizeRestaurantName(restaurantQuery);
   const qTokens = tokenizeExcludingStopwords(qNorm);
-  
+
   if (qTokens.length === 0) {
     return { status: 'NOT_FOUND', missingRestaurantQuery: restaurantQuery };
   }
-  
+
   const isDev = process.env.NODE_ENV === 'development';
-    console.log('[restaurantResolver] Universal resolver starting:', {
-      restaurantQuery,
-      qNorm,
-      qTokens,
-    });
-  
+  console.log('[restaurantResolver] Universal resolver starting:', {
+    restaurantQuery,
+    qNorm,
+    qTokens,
+  });
+
   // PART B: Query restaurants table for canonical matching
   try {
     const supabase = await createClient();
-    
+
     // Fetch all restaurants (can be cached, but for now query directly)
     const { data: restaurants, error } = await supabase
       .from('restaurants')
       .select('id, name')
       .not('name', 'is', null);
-    
+
     if (error) {
       console.error('[restaurantResolver] Error fetching restaurants:', error);
       return { status: 'NOT_FOUND', missingRestaurantQuery: restaurantQuery };
     }
-    
+
     if (!restaurants || restaurants.length === 0) {
       return { status: 'NOT_FOUND', missingRestaurantQuery: restaurantQuery };
     }
-    
+
     // Normalize all restaurant names and build candidates
     type Candidate = {
       id: string;
@@ -1029,9 +1030,9 @@ export async function resolveRestaurantUniversal(
       score: number;
       matchType: 'exact' | 'tokenSubset' | 'fuzzy';
     };
-    
+
     const candidates: Candidate[] = [];
-    
+
     // 1) Exact normalized match
     for (const restaurant of restaurants) {
       const rNorm = normalizeRestaurantName(restaurant.name);
@@ -1046,28 +1047,28 @@ export async function resolveRestaurantUniversal(
         });
       }
     }
-    
+
     // 2) Token subset match - run for all restaurants (like CAVA works)
     // This catches partial matches like "playa" -> "Playa Bowls" or "chipotle" -> "Chipotle Mexican Grill"
     for (const restaurant of restaurants) {
       // Skip if already matched exactly
       const alreadyCandidate = candidates.some(c => c.id === restaurant.id);
       if (alreadyCandidate) continue;
-      
+
       const rNorm = normalizeRestaurantName(restaurant.name);
       const rTokens = tokenizeExcludingStopwords(rNorm);
-      
+
       // Check if ALL qTokens are contained in rTokens (token subset match)
       // This allows "playa" to match "Playa Bowls" because "playa" is in ["playa", "bowls"]
-      const allTokensMatch = qTokens.every(qToken => 
+      const allTokensMatch = qTokens.every(qToken =>
         rTokens.some(rToken => rToken === qToken)
       );
-      
+
       if (allTokensMatch && qTokens.length > 0) {
         // Compute score: (#matchedTokens / #qTokens) + 0.25*(#matchedTokens / #rTokens)
         const matchedCount = qTokens.length;
         const score = (matchedCount / qTokens.length) + 0.25 * (matchedCount / Math.max(rTokens.length, 1));
-        
+
         console.log('[restaurantResolver] Token subset match found:', {
           query: restaurantQuery,
           qTokens,
@@ -1075,7 +1076,7 @@ export async function resolveRestaurantUniversal(
           rTokens,
           score,
         });
-        
+
         candidates.push({
           id: restaurant.id,
           name: restaurant.name,
@@ -1086,18 +1087,18 @@ export async function resolveRestaurantUniversal(
         });
       }
     }
-    
+
     // 3) Soft scoring to rank candidates
     candidates.sort((a, b) => b.score - a.score);
-    
+
     // 4) Typo tolerance (if no token hits and query length allows)
     if (candidates.length === 0 && restaurantQuery.length >= 5) {
-      const minScore = restaurantQuery.length <= 7 ? 0.4 : 0.32;
-      
+      const minScore = restaurantQuery.length <= 7 ? 0.65 : 0.6;
+
       for (const restaurant of restaurants) {
         const rNorm = normalizeRestaurantName(restaurant.name);
         const diceScore = diceCoefficient(qNorm, rNorm);
-        
+
         if (diceScore >= minScore) {
           candidates.push({
             id: restaurant.id,
@@ -1109,20 +1110,20 @@ export async function resolveRestaurantUniversal(
           });
         }
       }
-      
+
       candidates.sort((a, b) => b.score - a.score);
     }
-    
+
     console.log('[restaurantResolver] Candidates found:', {
       count: candidates.length,
       top5: candidates.slice(0, 5).map(c => ({ name: c.name, score: c.score, matchType: c.matchType })),
     });
-    
+
     // Decide MATCH/AMBIGUOUS/NOT_FOUND
     if (candidates.length === 0) {
       return { status: 'NOT_FOUND', missingRestaurantQuery: restaurantQuery };
     }
-    
+
     if (candidates.length === 1) {
       const match = candidates[0];
       console.log('[restaurantResolver] Single candidate match, building variants:', {
@@ -1130,16 +1131,16 @@ export async function resolveRestaurantUniversal(
         restaurantId: match.id,
         matchType: match.matchType,
       });
-      
+
       // PART C: Build variants from menu_items (does not use restaurant_id)
       const variants = await buildRestaurantVariants(match.name, supabase);
-      
+
       console.log('[restaurantResolver] Variants built for single match:', {
         canonicalName: match.name,
         variantsCount: variants.length,
         variants: variants.slice(0, 5),
       });
-      
+
       // If variants is empty, return NO_MEALS
       if (variants.length === 0) {
         console.warn('[restaurantResolver] NO_MEALS: Restaurant matched but no variants found:', match.name);
@@ -1148,7 +1149,7 @@ export async function resolveRestaurantUniversal(
           canonicalName: match.name,
         };
       }
-      
+
       return {
         status: 'MATCH',
         canonicalName: match.name,
@@ -1157,13 +1158,13 @@ export async function resolveRestaurantUniversal(
         matchType: match.matchType,
       };
     }
-    
+
     // Multiple candidates - check if top one is clearly better
     // Use same logic as CAVA: if we have a reasonable match, use it
     const top = candidates[0];
     const second = candidates[1];
     const scoreDiff = second ? (top.score - second.score) : top.score;
-    
+
     // If top score >= 1.0 and (topScore - secondScore) >= 0.15, treat as MATCH (exact match)
     if (top.score >= 1.0 && scoreDiff >= 0.15) {
       console.log('[restaurantResolver] Clear winner match (exact), building variants:', {
@@ -1172,15 +1173,15 @@ export async function resolveRestaurantUniversal(
         topScore: top.score,
         secondScore: second?.score,
       });
-      
+
       const variants = await buildRestaurantVariants(top.name, supabase);
-      
+
       console.log('[restaurantResolver] Variants built for clear winner:', {
         canonicalName: top.name,
         variantsCount: variants.length,
         variants: variants.slice(0, 5),
       });
-      
+
       // If variants is empty, return NO_MEALS
       if (variants.length === 0) {
         console.warn('[restaurantResolver] NO_MEALS: Restaurant matched but no variants found:', top.name);
@@ -1189,7 +1190,7 @@ export async function resolveRestaurantUniversal(
           canonicalName: top.name,
         };
       }
-      
+
       return {
         status: 'MATCH',
         canonicalName: top.name,
@@ -1198,7 +1199,7 @@ export async function resolveRestaurantUniversal(
         matchType: top.matchType,
       };
     }
-    
+
     // For token subset matches (like "playa" -> "Playa Bowls"), if top score is reasonable
     // and clearly better than second, treat as MATCH (same logic as CAVA)
     if (top.score >= 0.7 && (!second || scoreDiff >= 0.1)) {
@@ -1209,15 +1210,15 @@ export async function resolveRestaurantUniversal(
         secondScore: second?.score,
         scoreDiff,
       });
-      
+
       const variants = await buildRestaurantVariants(top.name, supabase);
-      
+
       console.log('[restaurantResolver] Variants built for token subset winner:', {
         canonicalName: top.name,
         variantsCount: variants.length,
         variants: variants.slice(0, 5),
       });
-      
+
       // If variants is empty, return NO_MEALS
       if (variants.length === 0) {
         console.warn('[restaurantResolver] NO_MEALS: Restaurant matched but no variants found:', top.name);
@@ -1226,7 +1227,7 @@ export async function resolveRestaurantUniversal(
           canonicalName: top.name,
         };
       }
-      
+
       return {
         status: 'MATCH',
         canonicalName: top.name,
@@ -1235,7 +1236,7 @@ export async function resolveRestaurantUniversal(
         matchType: top.matchType,
       };
     }
-    
+
     // AMBIGUOUS - return top 5 candidates with scores
     return {
       status: 'AMBIGUOUS',
@@ -1260,68 +1261,68 @@ async function buildRestaurantVariants(
   try {
     const canonicalNorm = normalizeRestaurantName(canonicalName);
     const canonicalTokens = tokenizeExcludingStopwords(canonicalNorm);
-    
+
     // Check if canonicalNorm is only stopwords (guard for partial brand match)
-    const isOnlyStopwords = canonicalTokens.length === 0 || 
+    const isOnlyStopwords = canonicalTokens.length === 0 ||
       canonicalTokens.every(token => STOPWORDS.has(token));
     const allowPartialMatch = canonicalNorm.length >= 4 && !isOnlyStopwords;
-    
+
     // Fetch DISTINCT restaurant_name from menu_items (must paginate / no implicit limit)
     const variantSet = new Set<string>();
     let offset = 0;
     const pageSize = 1000;
     let hasMore = true;
-    
+
     while (hasMore) {
       const { data: menuItems, error } = await supabase
         .from('menu_items')
         .select('restaurant_name')
         .not('restaurant_name', 'is', null)
         .range(offset, offset + pageSize - 1);
-      
+
       if (error) {
         console.warn('[restaurantResolver] Error fetching menu_items variants:', error);
         break;
       }
-      
+
       if (!menuItems || menuItems.length === 0) {
         hasMore = false;
         break;
       }
-      
+
       // Process this page of menu items
       for (const item of menuItems) {
         const itemName = item.restaurant_name;
         if (typeof itemName !== 'string' || itemName.length === 0) continue;
-        
+
         const itemNorm = normalizeRestaurantName(itemName);
-        
+
         // a) Exact normalized match
         if (itemNorm === canonicalNorm) {
           variantSet.add(itemName);
           continue;
         }
-        
+
         // b) Token subset match: tokens(canonicalNorm) subset of tokens(itemNorm)
         const itemTokens = tokenizeExcludingStopwords(itemNorm);
-        const isTokenSubset = canonicalTokens.length > 0 && 
+        const isTokenSubset = canonicalTokens.length > 0 &&
           canonicalTokens.every(ct => itemTokens.some(it => it === ct));
-        
+
         if (isTokenSubset) {
           variantSet.add(itemName);
           continue;
         }
-        
+
         // c) Reverse token subset: tokens(itemNorm) subset of tokens(canonicalNorm)
         // This handles cases where menu_items has "Chipotle" and canonical is "Chipotle Mexican Grill"
-        const isReverseTokenSubset = itemTokens.length > 0 && 
+        const isReverseTokenSubset = itemTokens.length > 0 &&
           itemTokens.every(it => canonicalTokens.some(ct => ct === it));
-        
+
         if (isReverseTokenSubset) {
           variantSet.add(itemName);
           continue;
         }
-        
+
         // d) Partial brand match (with guard)
         if (allowPartialMatch) {
           if (itemNorm.includes(canonicalNorm) || canonicalNorm.includes(itemNorm)) {
@@ -1329,7 +1330,7 @@ async function buildRestaurantVariants(
           }
         }
       }
-      
+
       // Check if we need to fetch more
       if (menuItems.length < pageSize) {
         hasMore = false;
@@ -1337,9 +1338,9 @@ async function buildRestaurantVariants(
         offset += pageSize;
       }
     }
-    
+
     const variants = Array.from(variantSet).sort();
-    
+
     // Logging (always log for debugging)
     console.log('[restaurantResolver] REST_VARIANTS_BUILT:', {
       canonicalName,
@@ -1348,7 +1349,7 @@ async function buildRestaurantVariants(
       sampleVariants: variants.slice(0, 5),
       totalPagesProcessed: Math.floor(offset / pageSize) + (hasMore ? 1 : 0),
     });
-    
+
     if (variants.length === 0) {
       console.warn('[restaurantResolver] Restaurant matched canonically but no menu_items variants found:', {
         canonicalName,
@@ -1356,7 +1357,7 @@ async function buildRestaurantVariants(
         canonicalTokens,
       });
     }
-    
+
     // IMPORTANT: Return [] if no variants found (not [canonicalName])
     return variants;
   } catch (error) {
@@ -1374,20 +1375,20 @@ export async function findSimilarRestaurants(
   limit: number = 5
 ): Promise<string[]> {
   if (!query || typeof query !== 'string') return [];
-  
+
   const { normalizedIndex } = await getRestaurantCandidates();
   const queryNormalized = normalizeRestaurantName(query);
-  
+
   // Compute similarity scores for all normalized keys
   const similarityScores: Array<{ canonicalName: string; score: number }> = [];
-  
+
   for (const [normalized, entry] of normalizedIndex.entries()) {
     const fuzzyScore = computeFuzzyScore(queryNormalized, normalized);
     if (fuzzyScore > 0) {
       similarityScores.push({ canonicalName: entry.canonicalName, score: fuzzyScore });
     }
   }
-  
+
   // Sort by score descending and return top N canonical names
   similarityScores.sort((a, b) => b.score - a.score);
   return similarityScores.slice(0, limit).map(item => item.canonicalName);

@@ -1,973 +1,852 @@
 {
     "restaurant_name": "WaBa Grill",
     "items": [
-      {
-        "name": "Chicken Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 640,
-          "protein": 38,
-          "carbs": 100,
-          "fat": 11
+        {
+            "name": "Chicken Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 640,
+                "protein": 38,
+                "carbs": 100,
+                "fat": 11
+            }
+        },
+        {
+            "name": "White Meat Chicken Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 630,
+                "protein": 46,
+                "carbs": 100,
+                "fat": 5
+            }
+        },
+        {
+            "name": "Sweet & Spicy Chicken Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 680,
+                "protein": 38,
+                "carbs": 120,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Rib-Eye Steak Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 720,
+                "protein": 29,
+                "carbs": 110,
+                "fat": 18
+            }
+        },
+        {
+            "name": "WaBa (Chicken & Steak) Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 710,
+                "protein": 37,
+                "carbs": 100,
+                "fat": 16
+            }
+        },
+        {
+            "name": "WaBa (White Meat Chicken & Steak) Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 710,
+                "protein": 42,
+                "carbs": 100,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Wild Caught Salmon Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 540,
+                "protein": 29,
+                "carbs": 90,
+                "fat": 5
+            }
+        },
+        {
+            "name": "Shrimp Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 490,
+                "protein": 19,
+                "carbs": 90,
+                "fat": 1
+            }
+        },
+        {
+            "name": "Organic Tofu Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 590,
+                "protein": 23,
+                "carbs": 90,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Plantspired Steak Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 660,
+                "protein": 22,
+                "carbs": 110,
+                "fat": 15
+            }
+        },
+        {
+            "name": "Chicken Mini Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 320,
+                "protein": 17,
+                "carbs": 50,
+                "fat": 5
+            }
+        },
+        {
+            "name": "White Meat Chicken Mini Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 320,
+                "protein": 21,
+                "carbs": 50,
+                "fat": 2
+            }
+        },
+        {
+            "name": "Organic Tofu Mini Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 330,
+                "protein": 14,
+                "carbs": 50,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Sweet & Spicy Mini Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 320,
+                "protein": 21,
+                "carbs": 50,
+                "fat": 6
+            }
+        },
+        {
+            "name": "Chicken Veggies Mini Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 290,
+                "protein": 18,
+                "carbs": 40,
+                "fat": 5
+            }
+        },
+        {
+            "name": "White Meat Chicken Veggies Mini Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 290,
+                "protein": 21,
+                "carbs": 40,
+                "fat": 2
+            }
+        },
+        {
+            "name": "Organic Tofu Veggies Mini Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 300,
+                "protein": 14,
+                "carbs": 40,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Sweet & Spicy Chicken Veggies Mini Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 290,
+                "protein": 21,
+                "carbs": 40,
+                "fat": 6
+            }
+        },
+        {
+            "name": "Plantspired Steak Mini Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 320,
+                "protein": 10,
+                "carbs": 50,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Chicken Veggie Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 590,
+                "protein": 39,
+                "carbs": 90,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Sweet & Spicy Chicken Veggie Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 580,
+                "protein": 47,
+                "carbs": 90,
+                "fat": 5
+            }
+        },
+        {
+            "name": "Rib-Eye Steak Veggie Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 640,
+                "protein": 39,
+                "carbs": 110,
+                "fat": 11
+            }
+        },
+        {
+            "name": "WaBa (Chicken & Steak) Veggie Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 620,
+                "protein": 29,
+                "carbs": 80,
+                "fat": 17
+            }
+        },
+        {
+            "name": "WaBa (White Meat Chicken & Steak) Veggie Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 660,
+                "protein": 38,
+                "carbs": 90,
+                "fat": 16
+            }
+        },
+        {
+            "name": "Wild Caught Salmon Veggie Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 660,
+                "protein": 42,
+                "carbs": 90,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Shrimp Veggie Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 500,
+                "protein": 30,
+                "carbs": 80,
+                "fat": 5
+            }
+        },
+        {
+            "name": "Organic Tofu Veggie Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 450,
+                "protein": 20,
+                "carbs": 80,
+                "fat": 1
+            }
+        },
+        {
+            "name": "Plantspired Steak Veggie Bowl",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 520,
+                "protein": 22,
+                "carbs": 80,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Chicken Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 820,
+                "protein": 54,
+                "carbs": 110,
+                "fat": 15
+            }
+        },
+        {
+            "name": "White Meat Chicken Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 800,
+                "protein": 65,
+                "carbs": 100,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Sweet & Spicy Chicken Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 860,
+                "protein": 54,
+                "carbs": 140,
+                "fat": 15
+            }
+        },
+        {
+            "name": "Rib-Eye Steak Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 980,
+                "protein": 44,
+                "carbs": 130,
+                "fat": 27
+            }
+        },
+        {
+            "name": "WaBa (Chicken & Steak) Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 890,
+                "protein": 53,
+                "carbs": 120,
+                "fat": 21
+            }
+        },
+        {
+            "name": "WaBa (White Meat Chicken & Steak) Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 880,
+                "protein": 61,
+                "carbs": 120,
+                "fat": 15
+            }
+        },
+        {
+            "name": "Wild Caught Salmon Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 700,
+                "protein": 41,
+                "carbs": 110,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Shrimp Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 680,
+                "protein": 25,
+                "carbs": 120,
+                "fat": 1
+            }
+        },
+        {
+            "name": "Organic Tofu Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 740,
+                "protein": 30,
+                "carbs": 110,
+                "fat": 14
+            }
+        },
+        {
+            "name": "Plantspired Steak Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 870,
+                "protein": 30,
+                "carbs": 140,
+                "fat": 22
+            }
+        },
+        {
+            "name": "K-Ribs Plate",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 1090,
+                "protein": 36,
+                "carbs": 140,
+                "fat": 38
+            }
+        },
+        {
+            "name": "Chicken Taco",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 210,
+                "protein": 13,
+                "carbs": 20,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Steak Taco",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 240,
+                "protein": 10,
+                "carbs": 20,
+                "fat": 14
+            }
+        },
+        {
+            "name": "Shrimp Taco",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 170,
+                "protein": 9,
+                "carbs": 20,
+                "fat": 8
+            }
+        },
+        {
+            "name": "Organic Tofu Taco",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 200,
+                "protein": 8,
+                "carbs": 20,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Plantspired Steak Taco",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 230,
+                "protein": 7,
+                "carbs": 20,
+                "fat": 12
+            }
+        },
+        {
+            "name": "Signature House (Served With White Meat Chicken) Salad Entree",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 320,
+                "protein": 44,
+                "carbs": 20,
+                "fat": 8
+            }
+        },
+        {
+            "name": "Spicy Asian (Served With White Meat Chicken) Salad Entree",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 420,
+                "protein": 49,
+                "carbs": 30,
+                "fat": 10
+            }
+        },
+        {
+            "name": "Chicken A La Carte",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 1050,
+                "protein": 140,
+                "carbs": 30,
+                "fat": 45
+            }
+        },
+        {
+            "name": "White Meat Chicken A La Carte",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 950,
+                "protein": 176,
+                "carbs": 10,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Sweet & Spicy Chicken A La Carte",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 1100,
+                "protein": 140,
+                "carbs": 70,
+                "fat": 45
+            }
+        },
+        {
+            "name": "Rib-Eye Steak A La Carte",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 1570,
+                "protein": 104,
+                "carbs": 100,
+                "fat": 78
+            }
+        },
+        {
+            "name": "WaBa (Chicken & Steak) A La Carte",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 1390,
+                "protein": 136,
+                "carbs": 60,
+                "fat": 66
+            }
+        },
+        {
+            "name": "WaBa (White Meat Chicken & Steak) A La Carte",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 1360,
+                "protein": 157,
+                "carbs": 60,
+                "fat": 51
+            }
+        },
+        {
+            "name": "Organic Tofu A La Carte",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 720,
+                "protein": 59,
+                "carbs": 10,
+                "fat": 37
+            }
+        },
+        {
+            "name": "White Rice (2 Servings)",
+            "category": "Base",
+            "price_estimate": null,
+            "macros": {
+                "calories": 740,
+                "protein": 14,
+                "carbs": 160,
+                "fat": 2
+            }
+        },
+        {
+            "name": "Brown Rice (2 Servings)",
+            "category": "Base",
+            "price_estimate": null,
+            "macros": {
+                "calories": 640,
+                "protein": 14,
+                "carbs": 140,
+                "fat": 4
+            }
+        },
+        {
+            "name": "All Broccoli",
+            "category": "Vegetable",
+            "price_estimate": null,
+            "macros": {
+                "calories": 120,
+                "protein": 10,
+                "carbs": 24,
+                "fat": 1
+            }
+        },
+        {
+            "name": "Broccoli & Carrots",
+            "category": "Vegetable",
+            "price_estimate": null,
+            "macros": {
+                "calories": 130,
+                "protein": 7,
+                "carbs": 30,
+                "fat": 1
+            }
+        },
+        {
+            "name": "Pork Veggie Dumplings (20 pc)",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 840,
+                "protein": 28,
+                "carbs": 150,
+                "fat": 30
+            }
+        },
+        {
+            "name": "Salad",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 300,
+                "protein": 2,
+                "carbs": 30,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Loaded Miso Soup (w/ Chicken)",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 150,
+                "protein": 14,
+                "carbs": 20,
+                "fat": 1
+            }
+        },
+        {
+            "name": "Loaded Miso Soup (w/ White Meat Chicken)",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 150,
+                "protein": 14,
+                "carbs": 20,
+                "fat": 1
+            }
+        },
+        {
+            "name": "Loaded Miso Soup (w/ Tofu)",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 160,
+                "protein": 11,
+                "carbs": 20,
+                "fat": 4
+            }
+        },
+        {
+            "name": "Half-Ocado",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 150,
+                "protein": 2,
+                "carbs": 6,
+                "fat": 14
+            }
+        },
+        {
+            "name": "Pork Veggie Dumplings (5 pc)",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 210,
+                "protein": 7,
+                "carbs": 40,
+                "fat": 8
+            }
+        },
+        {
+            "name": "Pork Veggie Dumplings (10 pc)",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 420,
+                "protein": 14,
+                "carbs": 80,
+                "fat": 15
+            }
+        },
+        {
+            "name": "Side | Chicken (4.5 oz)",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 220,
+                "protein": 32,
+                "carbs": 0,
+                "fat": 10
+            }
+        },
+        {
+            "name": "Side | White Meat Chicken (4.5 oz)",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 220,
+                "protein": 40,
+                "carbs": 0,
+                "fat": 5
+            }
+        },
+        {
+            "name": "Side | Sweet & Spicy Chicken (4.5 oz)",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 240,
+                "protein": 32,
+                "carbs": 10,
+                "fat": 10
+            }
+        },
+        {
+            "name": "Side | Steak (3.5 oz)",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 260,
+                "protein": 22,
+                "carbs": 10,
+                "fat": 17
+            }
+        },
+        {
+            "name": "Side | Salmon (4 oz)",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 150,
+                "protein": 22,
+                "carbs": 0,
+                "fat": 5
+            }
+        },
+        {
+            "name": "Side | Tofu (6 oz)",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 200,
+                "protein": 16,
+                "carbs": 0,
+                "fat": 10
+            }
+        },
+        {
+            "name": "Side | White Rice (10 oz)",
+            "category": "Base",
+            "price_estimate": null,
+            "macros": {
+                "calories": 370,
+                "protein": 7,
+                "carbs": 80,
+                "fat": 1
+            }
+        },
+        {
+            "name": "Side | Brown Rice (10 oz)",
+            "category": "Base",
+            "price_estimate": null,
+            "macros": {
+                "calories": 320,
+                "protein": 7,
+                "carbs": 70,
+                "fat": 2
+            }
+        },
+        {
+            "name": "Side | K-Ribs (1 Strip)",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 190,
+                "protein": 9,
+                "carbs": 10,
+                "fat": 11
+            }
+        },
+        {
+            "name": "WaBa Sesame Dressing",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 110,
+                "protein": 0,
+                "carbs": 8,
+                "fat": 10
+            }
+        },
+        {
+            "name": "Ranch Dressing",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 150,
+                "protein": 1,
+                "carbs": 1,
+                "fat": 16
+            }
+        },
+        {
+            "name": "Boom Boom Sauce",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 150,
+                "protein": 0,
+                "carbs": 2,
+                "fat": 16
+            }
         }
-      },
-      {
-        "name": "White Meat Chicken Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 630,
-          "protein": 46,
-          "carbs": 100,
-          "fat": 5
-        }
-      },
-      {
-        "name": "Sweet & Spicy Chicken Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 680,
-          "protein": 38,
-          "carbs": 120,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Rib-Eye Steak Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 720,
-          "protein": 29,
-          "carbs": 110,
-          "fat": 18
-        }
-      },
-      {
-        "name": "WaBa (Chicken & Steak) Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 710,
-          "protein": 37,
-          "carbs": 100,
-          "fat": 16
-        }
-      },
-      {
-        "name": "WaBa (White Meat Chicken & Steak) Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 710,
-          "protein": 42,
-          "carbs": 100,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Wild Caught Salmon Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 540,
-          "protein": 29,
-          "carbs": 90,
-          "fat": 5
-        }
-      },
-      {
-        "name": "Shrimp Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 490,
-          "protein": 19,
-          "carbs": 90,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Organic Tofu Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 590,
-          "protein": 23,
-          "carbs": 90,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Plantspired Steak Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 660,
-          "protein": 22,
-          "carbs": 110,
-          "fat": 15
-        }
-      },
-      {
-        "name": "Chicken Mini Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 320,
-          "protein": 17,
-          "carbs": 50,
-          "fat": 5
-        }
-      },
-      {
-        "name": "White Meat Chicken Mini Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 320,
-          "protein": 21,
-          "carbs": 50,
-          "fat": 2
-        }
-      },
-      {
-        "name": "Organic Tofu Mini Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 330,
-          "protein": 14,
-          "carbs": 50,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Sweet & Spicy Mini Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 320,
-          "protein": 21,
-          "carbs": 50,
-          "fat": 6
-        }
-      },
-      {
-        "name": "Chicken Veggies Mini Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 290,
-          "protein": 18,
-          "carbs": 40,
-          "fat": 5
-        }
-      },
-      {
-        "name": "White Meat Chicken Veggies Mini Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 290,
-          "protein": 21,
-          "carbs": 40,
-          "fat": 2
-        }
-      },
-      {
-        "name": "Organic Tofu Veggies Mini Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 300,
-          "protein": 14,
-          "carbs": 40,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Sweet & Spicy Chicken Veggies Mini Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 290,
-          "protein": 21,
-          "carbs": 40,
-          "fat": 6
-        }
-      },
-      {
-        "name": "Plantspired Steak Mini Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 320,
-          "protein": 10,
-          "carbs": 50,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Chicken Veggie Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 590,
-          "protein": 39,
-          "carbs": 90,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Sweet & Spicy Chicken Veggie Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 580,
-          "protein": 47,
-          "carbs": 90,
-          "fat": 5
-        }
-      },
-      {
-        "name": "Rib-Eye Steak Veggie Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 640,
-          "protein": 39,
-          "carbs": 110,
-          "fat": 11
-        }
-      },
-      {
-        "name": "WaBa (Chicken & Steak) Veggie Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 620,
-          "protein": 29,
-          "carbs": 80,
-          "fat": 17
-        }
-      },
-      {
-        "name": "WaBa (White Meat Chicken & Steak) Veggie Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 660,
-          "protein": 38,
-          "carbs": 90,
-          "fat": 16
-        }
-      },
-      {
-        "name": "Wild Caught Salmon Veggie Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 660,
-          "protein": 42,
-          "carbs": 90,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Shrimp Veggie Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 500,
-          "protein": 30,
-          "carbs": 80,
-          "fat": 5
-        }
-      },
-      {
-        "name": "Organic Tofu Veggie Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 450,
-          "protein": 20,
-          "carbs": 80,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Plantspired Steak Veggie Bowl",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 520,
-          "protein": 22,
-          "carbs": 80,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Chicken Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 820,
-          "protein": 54,
-          "carbs": 110,
-          "fat": 15
-        }
-      },
-      {
-        "name": "White Meat Chicken Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 800,
-          "protein": 65,
-          "carbs": 100,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Sweet & Spicy Chicken Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 860,
-          "protein": 54,
-          "carbs": 140,
-          "fat": 15
-        }
-      },
-      {
-        "name": "Rib-Eye Steak Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 980,
-          "protein": 44,
-          "carbs": 130,
-          "fat": 27
-        }
-      },
-      {
-        "name": "WaBa (Chicken & Steak) Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 890,
-          "protein": 53,
-          "carbs": 120,
-          "fat": 21
-        }
-      },
-      {
-        "name": "WaBa (White Meat Chicken & Steak) Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 880,
-          "protein": 61,
-          "carbs": 120,
-          "fat": 15
-        }
-      },
-      {
-        "name": "Wild Caught Salmon Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 700,
-          "protein": 41,
-          "carbs": 110,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Shrimp Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 680,
-          "protein": 25,
-          "carbs": 120,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Organic Tofu Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 740,
-          "protein": 30,
-          "carbs": 110,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Plantspired Steak Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 870,
-          "protein": 30,
-          "carbs": 140,
-          "fat": 22
-        }
-      },
-      {
-        "name": "K-Ribs Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 1090,
-          "protein": 36,
-          "carbs": 140,
-          "fat": 38
-        }
-      },
-      {
-        "name": "Chicken Taco",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 210,
-          "protein": 13,
-          "carbs": 20,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Steak Taco",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 240,
-          "protein": 10,
-          "carbs": 20,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Shrimp Taco",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 170,
-          "protein": 9,
-          "carbs": 20,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Organic Tofu Taco",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 200,
-          "protein": 8,
-          "carbs": 20,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Plantspired Steak Taco",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 230,
-          "protein": 7,
-          "carbs": 20,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Signature House (Served With White Meat Chicken) Salad Entree",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 320,
-          "protein": 44,
-          "carbs": 20,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Spicy Asian (Served With White Meat Chicken) Salad Entree",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 420,
-          "protein": 49,
-          "carbs": 30,
-          "fat": 10
-        }
-      },
-      {
-        "name": "Chicken A La Carte",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 1050,
-          "protein": 140,
-          "carbs": 30,
-          "fat": 45
-        }
-      },
-      {
-        "name": "White Meat Chicken A La Carte",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 950,
-          "protein": 176,
-          "carbs": 10,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Sweet & Spicy Chicken A La Carte",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 1100,
-          "protein": 140,
-          "carbs": 70,
-          "fat": 45
-        }
-      },
-      {
-        "name": "Rib-Eye Steak A La Carte",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 1570,
-          "protein": 104,
-          "carbs": 100,
-          "fat": 78
-        }
-      },
-      {
-        "name": "WaBa (Chicken & Steak) A La Carte",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 1390,
-          "protein": 136,
-          "carbs": 60,
-          "fat": 66
-        }
-      },
-      {
-        "name": "WaBa (White Meat Chicken & Steak) A La Carte",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 1360,
-          "protein": 157,
-          "carbs": 60,
-          "fat": 51
-        }
-      },
-      {
-        "name": "Organic Tofu A La Carte",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 720,
-          "protein": 59,
-          "carbs": 10,
-          "fat": 37
-        }
-      },
-      {
-        "name": "White Rice (2 Servings)",
-        "category": "Base",
-        "price_estimate": null,
-        "macros": {
-          "calories": 740,
-          "protein": 14,
-          "carbs": 160,
-          "fat": 2
-        }
-      },
-      {
-        "name": "Brown Rice (2 Servings)",
-        "category": "Base",
-        "price_estimate": null,
-        "macros": {
-          "calories": 640,
-          "protein": 14,
-          "carbs": 140,
-          "fat": 4
-        }
-      },
-      {
-        "name": "Mixed Veggies",
-        "category": "Vegetable",
-        "price_estimate": null,
-        "macros": {
-          "calories": 50,
-          "protein": 2,
-          "carbs": 10,
-          "fat": 0
-        }
-      },
-      {
-        "name": "All Broccoli",
-        "category": "Vegetable",
-        "price_estimate": null,
-        "macros": {
-          "calories": 120,
-          "protein": 10,
-          "carbs": 24,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Broccoli & Carrots",
-        "category": "Vegetable",
-        "price_estimate": null,
-        "macros": {
-          "calories": 130,
-          "protein": 7,
-          "carbs": 30,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Pork Veggie Dumplings (20 pc)",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 840,
-          "protein": 28,
-          "carbs": 150,
-          "fat": 30
-        }
-      },
-      {
-        "name": "Salad",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 300,
-          "protein": 2,
-          "carbs": 30,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Loaded Miso Soup (w/ Chicken)",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 150,
-          "protein": 14,
-          "carbs": 20,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Loaded Miso Soup (w/ White Meat Chicken)",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 150,
-          "protein": 14,
-          "carbs": 20,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Loaded Miso Soup (w/ Tofu)",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 160,
-          "protein": 11,
-          "carbs": 20,
-          "fat": 4
-        }
-      },
-      {
-        "name": "Miso Soup",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 30,
-          "protein": 2,
-          "carbs": 3,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Half-Ocado",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 150,
-          "protein": 2,
-          "carbs": 6,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Pork Veggie Dumplings (5 pc)",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 210,
-          "protein": 7,
-          "carbs": 40,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Pork Veggie Dumplings (10 pc)",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 420,
-          "protein": 14,
-          "carbs": 80,
-          "fat": 15
-        }
-      },
-      {
-        "name": "Side | Chicken (4.5 oz)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 220,
-          "protein": 32,
-          "carbs": 0,
-          "fat": 10
-        }
-      },
-      {
-        "name": "Side | White Meat Chicken (4.5 oz)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 220,
-          "protein": 40,
-          "carbs": 0,
-          "fat": 5
-        }
-      },
-      {
-        "name": "Side | Sweet & Spicy Chicken (4.5 oz)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 240,
-          "protein": 32,
-          "carbs": 10,
-          "fat": 10
-        }
-      },
-      {
-        "name": "Side | Steak (3.5 oz)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 260,
-          "protein": 22,
-          "carbs": 10,
-          "fat": 17
-        }
-      },
-      {
-        "name": "Side | Salmon (4 oz)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 150,
-          "protein": 22,
-          "carbs": 0,
-          "fat": 5
-        }
-      },
-      {
-        "name": "Side | Shrimp (4pc)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 60,
-          "protein": 4,
-          "carbs": 0,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Side | Tofu (6 oz)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 200,
-          "protein": 16,
-          "carbs": 0,
-          "fat": 10
-        }
-      },
-      {
-        "name": "Side | Salad",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 30,
-          "protein": 2,
-          "carbs": 10,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Side | Steamed Veggies",
-        "category": "Vegetable",
-        "price_estimate": null,
-        "macros": {
-          "calories": 50,
-          "protein": 3,
-          "carbs": 10,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Side | White Rice (10 oz)",
-        "category": "Base",
-        "price_estimate": null,
-        "macros": {
-          "calories": 370,
-          "protein": 7,
-          "carbs": 80,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Side | Brown Rice (10 oz)",
-        "category": "Base",
-        "price_estimate": null,
-        "macros": {
-          "calories": 320,
-          "protein": 7,
-          "carbs": 70,
-          "fat": 2
-        }
-      },
-      {
-        "name": "Side | K-Ribs (1 Strip)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 190,
-          "protein": 9,
-          "carbs": 10,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Garlic Serrano Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 50,
-          "protein": 1,
-          "carbs": 8,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Sweet Chili Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 50,
-          "protein": 0,
-          "carbs": 13,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Waba Sauce Packet",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 30,
-          "protein": 0,
-          "carbs": 10,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Waba Hot Sauce Packet",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 0,
-          "protein": 0,
-          "carbs": 0,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Spicy Waba Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 60,
-          "protein": 0,
-          "carbs": 12,
-          "fat": 0
-        }
-      },
-      {
-        "name": "WaBa Sesame Dressing",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 110,
-          "protein": 0,
-          "carbs": 8,
-          "fat": 10
-        }
-      },
-      {
-        "name": "Spicy Sesame Dressing",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 70,
-          "protein": 1,
-          "carbs": 8,
-          "fat": 4
-        }
-      },
-      {
-        "name": "Ranch Dressing",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 150,
-          "protein": 1,
-          "carbs": 1,
-          "fat": 16
-        }
-      },
-      {
-        "name": "Boom Boom Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 150,
-          "protein": 0,
-          "carbs": 2,
-          "fat": 16
-        }
-      }
     ]
-  }
+}

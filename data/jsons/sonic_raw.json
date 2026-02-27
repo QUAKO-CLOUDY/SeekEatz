@@ -1,1109 +1,905 @@
 {
     "restaurant_name": "Sonic Drive-In",
     "items": [
-      {
-        "name": "Deluxe SuperSONIC Double Teriyaki Cheeseburger",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 1050,
-          "protein": 50,
-          "carbs": 60,
-          "fat": 68
+        {
+            "name": "Deluxe SuperSONIC Double Teriyaki Cheeseburger",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 1050,
+                "protein": 50,
+                "carbs": 60,
+                "fat": 68
+            }
+        },
+        {
+            "name": "Deluxe Teriyaki Cheeseburger",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 720,
+                "protein": 29,
+                "carbs": 58,
+                "fat": 41
+            }
+        },
+        {
+            "name": "Double Sonic Smasher",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 600,
+                "protein": 35,
+                "carbs": 30,
+                "fat": 37
+            }
+        },
+        {
+            "name": "Hatch Green Chile Cheeseburger With Mustard",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 650,
+                "protein": 30,
+                "carbs": 50,
+                "fat": 35
+            }
+        },
+        {
+            "name": "Jr. Double Cheeseburger",
+            "category": "Burgers",
+            "price_estimate": 3.89,
+            "image_url": null,
+            "macros": {
+                "calories": 390,
+                "protein": 21,
+                "carbs": 25,
+                "fat": 23
+            }
+        },
+        {
+            "name": "Sonic Cheeseburger With Ketchup & Mayo",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 700,
+                "protein": 30,
+                "carbs": 52,
+                "fat": 41
+            }
+        },
+        {
+            "name": "SuperSONIC Bacon Double Cheeseburger With Mayo",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 1090,
+                "protein": 55,
+                "carbs": 54,
+                "fat": 73
+            }
+        },
+        {
+            "name": "SuperSONIC Double Cheeseburger With Ketchup & Mayo",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 1040,
+                "protein": 50,
+                "carbs": 54,
+                "fat": 68
+            }
+        },
+        {
+            "name": "SuperSONIC Jalapeño Double Cheeseburger With Mustard",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 970,
+                "protein": 51,
+                "carbs": 51,
+                "fat": 61
+            }
+        },
+        {
+            "name": "Triple Sonic Smasher",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 780,
+                "protein": 48,
+                "carbs": 31,
+                "fat": 51
+            }
+        },
+        {
+            "name": "Crispy Tenders (2 Pc.)",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 170,
+                "protein": 14,
+                "carbs": 11,
+                "fat": 8
+            }
+        },
+        {
+            "name": "Corn Dog",
+            "category": "Snacks & Sides",
+            "price_estimate": 2.06,
+            "image_url": null,
+            "macros": {
+                "calories": 230,
+                "protein": 6,
+                "carbs": 23,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Jr. Burger",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 270,
+                "protein": 11,
+                "carbs": 24,
+                "fat": 14
+            }
+        },
+        {
+            "name": "Jr. Cheeseburger",
+            "category": "EntrBurgersee",
+            "price_estimate": 3.89,
+            "image_url": null,
+            "macros": {
+                "calories": 290,
+                "protein": 13,
+                "carbs": 25,
+                "fat": 16
+            }
+        },
+        {
+            "name": "BLT Toaster",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 450,
+                "protein": 16,
+                "carbs": 42,
+                "fat": 25
+            }
+        },
+        {
+            "name": "Chicken Club Toaster",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 670,
+                "protein": 33,
+                "carbs": 55,
+                "fat": 36
+            }
+        },
+        {
+            "name": "Crispy Tenders (3 Pc.)",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 260,
+                "protein": 21,
+                "carbs": 16,
+                "fat": 12
+            }
+        },
+        {
+            "name": "Crispy Tenders (5 Pc.)",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 430,
+                "protein": 35,
+                "carbs": 27,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Premium Chicken Bites Small",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 240,
+                "protein": 13,
+                "carbs": 19,
+                "fat": 12
+            }
+        },
+        {
+            "name": "Premium Chicken Bites Medium",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 350,
+                "protein": 19,
+                "carbs": 28,
+                "fat": 18
+            }
+        },
+        {
+            "name": "Premium Chicken Bites Large",
+            "category": "Chicken",
+            "price_estimate": 4.62,
+            "image_url": null,
+            "macros": {
+                "calories": 510,
+                "protein": 27,
+                "carbs": 41,
+                "fat": 26
+            }
+        },
+        {
+            "name": "Country Fried Steak Sandwich",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 640,
+                "protein": 16,
+                "carbs": 76,
+                "fat": 29
+            }
+        },
+        {
+            "name": "Crispy Chicken Sandwich",
+            "category": "Chicken",
+            "price_estimate": 6.33,
+            "image_url": null,
+            "macros": {
+                "calories": 520,
+                "protein": 24,
+                "carbs": 52,
+                "fat": 24
+            }
+        },
+        {
+            "name": "Grilled Cheese Sandwich",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 390,
+                "protein": 13,
+                "carbs": 42,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Philly Cheesesteak Sandwich",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 750,
+                "protein": 46,
+                "carbs": 53,
+                "fat": 39
+            }
+        },
+        {
+            "name": "Pork Tenderloin Sandwich",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 650,
+                "protein": 20,
+                "carbs": 69,
+                "fat": 30
+            }
+        },
+        {
+            "name": "All-American Dog",
+            "category": "Hot Dogs",
+            "price_estimate": 3.4,
+            "image_url": null,
+            "macros": {
+                "calories": 410,
+                "protein": 13,
+                "carbs": 42,
+                "fat": 21
+            }
+        },
+        {
+            "name": "Chicago Hot Dog",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 400,
+                "protein": 11,
+                "carbs": 42,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Chili Cheese Coney",
+            "category": "Hot Dogs",
+            "price_estimate": 3.4,
+            "image_url": null,
+            "macros": {
+                "calories": 470,
+                "protein": 18,
+                "carbs": 34,
+                "fat": 29
+            }
+        },
+        {
+            "name": "Footlong Quarter Pound Coney",
+            "category": "Hot Dogs",
+            "price_estimate": 6.09,
+            "image_url": null,
+            "macros": {
+                "calories": 770,
+                "protein": 31,
+                "carbs": 54,
+                "fat": 48
+            }
+        },
+        {
+            "name": "New York Hot Dog",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 400,
+                "protein": 13,
+                "carbs": 35,
+                "fat": 23
+            }
+        },
+        {
+            "name": "Regular Hot Dog",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 360,
+                "protein": 12,
+                "carbs": 31,
+                "fat": 21
+            }
+        },
+        {
+            "name": "Bagel Sandwich Bacon",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 530,
+                "protein": 25,
+                "carbs": 68,
+                "fat": 19
+            }
+        },
+        {
+            "name": "Bagel Sandwich Ham",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 530,
+                "protein": 29,
+                "carbs": 70,
+                "fat": 15
+            }
+        },
+        {
+            "name": "Bagel Sandwich Sausage",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 630,
+                "protein": 26,
+                "carbs": 68,
+                "fat": 29
+            }
+        },
+        {
+            "name": "Biscuit Sandwich Bacon",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 480,
+                "protein": 20,
+                "carbs": 40,
+                "fat": 24
+            }
+        },
+        {
+            "name": "Biscuit Sandwich Ham",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 500,
+                "protein": 23,
+                "carbs": 43,
+                "fat": 22
+            }
+        },
+        {
+            "name": "Biscuit Sandwich Sausage",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 580,
+                "protein": 21,
+                "carbs": 40,
+                "fat": 34
+            }
+        },
+        {
+            "name": "Breakfast Burrito Bacon",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 470,
+                "protein": 25,
+                "carbs": 35,
+                "fat": 25
+            }
+        },
+        {
+            "name": "Breakfast Burrito Ham",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 440,
+                "protein": 27,
+                "carbs": 38,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Breakfast Burrito Sausage",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 490,
+                "protein": 23,
+                "carbs": 35,
+                "fat": 28
+            }
+        },
+        {
+            "name": "Breakfast Toaster Bacon",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 470,
+                "protein": 22,
+                "carbs": 42,
+                "fat": 24
+            }
+        },
+        {
+            "name": "Breakfast Toaster Ham",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 470,
+                "protein": 26,
+                "carbs": 45,
+                "fat": 21
+            }
+        },
+        {
+            "name": "Breakfast Toaster Sausage",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 570,
+                "protein": 23,
+                "carbs": 42,
+                "fat": 34
+            }
+        },
+        {
+            "name": "Brioche Sandwich Bacon",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 440,
+                "protein": 20,
+                "carbs": 38,
+                "fat": 23
+            }
+        },
+        {
+            "name": "Brioche Sandwich Ham",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 450,
+                "protein": 24,
+                "carbs": 41,
+                "fat": 21
+            }
+        },
+        {
+            "name": "Brioche Sandwich Sausage",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 530,
+                "protein": 22,
+                "carbs": 38,
+                "fat": 33
+            }
+        },
+        {
+            "name": "Croissonic Sandwich Bacon",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 430,
+                "protein": 18,
+                "carbs": 29,
+                "fat": 27
+            }
+        },
+        {
+            "name": "Croissonic Sandwich Ham",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 430,
+                "protein": 22,
+                "carbs": 31,
+                "fat": 23
+            }
+        },
+        {
+            "name": "Croissonic Sandwich Sausage",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 530,
+                "protein": 19,
+                "carbs": 29,
+                "fat": 37
+            }
+        },
+        {
+            "name": "French Toast Sticks",
+            "category": "All Day Breakfast",
+            "price_estimate": 4.26,
+            "image_url": null,
+            "macros": {
+                "calories": 480,
+                "protein": 8,
+                "carbs": 54,
+                "fat": 25
+            }
+        },
+        {
+            "name": "Jr. Breakfast Burrito Bacon",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 270,
+                "protein": 13,
+                "carbs": 22,
+                "fat": 14
+            }
+        },
+        {
+            "name": "Jr. Breakfast Burrito Sausage",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 280,
+                "protein": 12,
+                "carbs": 22,
+                "fat": 16
+            }
+        },
+        {
+            "name": "SuperSONIC Breakfast Burrito",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 590,
+                "protein": 24,
+                "carbs": 49,
+                "fat": 33
+            }
+        },
+        {
+            "name": "Ultimate Meat & Cheese Breakfast Burrito",
+            "category": "All Day Breakfast",
+            "price_estimate": 5.48,
+            "image_url": null,
+            "macros": {
+                "calories": 820,
+                "protein": 29,
+                "carbs": 47,
+                "fat": 56
+            }
+        },
+        {
+            "name": "Ched 'R' Bites Small",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 280,
+                "protein": 13,
+                "carbs": 22,
+                "fat": 15
+            }
+        },
+        {
+            "name": "Ched 'R' Bites Medium",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 410,
+                "protein": 20,
+                "carbs": 32,
+                "fat": 23
+            }
+        },
+        {
+            "name": "Ched 'R' Bites Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 550,
+                "protein": 27,
+                "carbs": 43,
+                "fat": 30
+            }
+        },
+        {
+            "name": "Ched 'R' Peppers (4 Pc.) Small",
+            "category": "Snacks & Side",
+            "price_estimate": 4.87,
+            "image_url": null,
+            "macros": {
+                "calories": 330,
+                "protein": 8,
+                "carbs": 36,
+                "fat": 17
+            }
+        },
+        {
+            "name": "Ched 'R' Peppers (6 Pc.) Medium",
+            "category": "Snacks & Sides",
+            "price_estimate": 6.33,
+            "image_url": null,
+            "macros": {
+                "calories": 490,
+                "protein": 12,
+                "carbs": 54,
+                "fat": 25
+            }
+        },
+        {
+            "name": "Ched 'R' Peppers (8 Pc.) Large",
+            "category": "Snacks & Side",
+            "price_estimate": 7.67,
+            "image_url": null,
+            "macros": {
+                "calories": 660,
+                "protein": 17,
+                "carbs": 72,
+                "fat": 34
+            }
+        },
+        {
+            "name": "Corn Dog",
+            "category": "Snacks & Sides",
+            "price_estimate": 2.06,
+            "image_url": null,
+            "macros": {
+                "calories": 230,
+                "protein": 6,
+                "carbs": 23,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Fritos Chili Cheese Jr. Wrap",
+            "category": "Snacks & Sides",
+            "price_estimate": 2.43,
+            "image_url": null,
+            "macros": {
+                "calories": 380,
+                "protein": 10,
+                "carbs": 39,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Fritos Chili Cheese Wrap",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 650,
+                "protein": 19,
+                "carbs": 62,
+                "fat": 35
+            }
+        },
+        {
+            "name": "Fritos Chili Pie Small",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 270,
+                "protein": 8,
+                "carbs": 18,
+                "fat": 18
+            }
+        },
+        {
+            "name": "Fritos Chili Pie Medium",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 510,
+                "protein": 14,
+                "carbs": 35,
+                "fat": 34
+            }
+        },
+        {
+            "name": "Fritos Chili Pie Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 750,
+                "protein": 20,
+                "carbs": 53,
+                "fat": 50
+            }
+        },
+        {
+            "name": "Mozzarella Sticks (4 Pc.) Small",
+            "category": "Entree",
+            "price_estimate": 4.5,
+            "image_url": null,
+            "macros": {
+                "calories": 370,
+                "protein": 15,
+                "carbs": 36,
+                "fat": 19
+            }
+        },
+        {
+            "name": "Mozzarella Sticks (6 Pc.) Medium",
+            "category": "Entree",
+            "price_estimate": 5.72,
+            "image_url": null,
+            "macros": {
+                "calories": 560,
+                "protein": 22,
+                "carbs": 54,
+                "fat": 28
+            }
+        },
+        {
+            "name": "Mozzarella Sticks (8 Pc.) Large",
+            "category": "Entree",
+            "price_estimate": 6.94,
+            "image_url": null,
+            "macros": {
+                "calories": 750,
+                "protein": 29,
+                "carbs": 72,
+                "fat": 38
+            }
+        },
+        {
+            "name": "Country Gravy",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 130,
+                "protein": 0,
+                "carbs": 15,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Groovy Sauce",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 110,
+                "protein": 0,
+                "carbs": 2,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Jalapeño Ranch",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 130,
+                "protein": 0,
+                "carbs": 2,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Ranch",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 110,
+                "protein": 0,
+                "carbs": 1,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Signature Cheese",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 130,
+                "protein": 2,
+                "carbs": 6,
+                "fat": 11
+            }
         }
-      },
-      {
-        "name": "Deluxe Teriyaki Cheeseburger",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 720,
-          "protein": 29,
-          "carbs": 58,
-          "fat": 41
-        }
-      },
-      {
-        "name": "Double Sonic Smasher",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 600,
-          "protein": 35,
-          "carbs": 30,
-          "fat": 37
-        }
-      },
-      {
-        "name": "Hatch Green Chile Cheeseburger With Mustard",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 650,
-          "protein": 30,
-          "carbs": 50,
-          "fat": 35
-        }
-      },
-      {
-        "name": "Jr. Double Cheeseburger",
-        "category": "Burgers",
-        "price_estimate": 3.89,
-        "image_url": null,
-        "macros": {
-          "calories": 390,
-          "protein": 21,
-          "carbs": 25,
-          "fat": 23
-        }
-      },
-      {
-        "name": "Sonic Cheeseburger With Ketchup & Mayo",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 700,
-          "protein": 30,
-          "carbs": 52,
-          "fat": 41
-        }
-      },
-      {
-        "name": "SuperSONIC Bacon Double Cheeseburger With Mayo",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 1090,
-          "protein": 55,
-          "carbs": 54,
-          "fat": 73
-        }
-      },
-      {
-        "name": "SuperSONIC Double Cheeseburger With Ketchup & Mayo",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 1040,
-          "protein": 50,
-          "carbs": 54,
-          "fat": 68
-        }
-      },
-      {
-        "name": "SuperSONIC Jalapeño Double Cheeseburger With Mustard",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 970,
-          "protein": 51,
-          "carbs": 51,
-          "fat": 61
-        }
-      },
-      {
-        "name": "Triple Sonic Smasher",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 780,
-          "protein": 48,
-          "carbs": 31,
-          "fat": 51
-        }
-      },
-      {
-        "name": "American Cheese",
-        "category": "Topping",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 70,
-          "protein": 3,
-          "carbs": 2,
-          "fat": 6
-        }
-      },
-      {
-        "name": "Bacon",
-        "category": "Topping",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 60,
-          "protein": 4,
-          "carbs": 0,
-          "fat": 5
-        }
-      },
-      {
-        "name": "Grilled Onions",
-        "category": "Topping",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 15,
-          "protein": 0,
-          "carbs": 1,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Hatch Green Chiles",
-        "category": "Topping",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 5,
-          "protein": 0,
-          "carbs": 0,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Hot Chili",
-        "category": "Topping",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 60,
-          "protein": 3,
-          "carbs": 3,
-          "fat": 4
-        }
-      },
-      {
-        "name": "Jalapeños",
-        "category": "Topping",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 5,
-          "protein": 0,
-          "carbs": 1,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Crispy Tenders (2 Pc.)",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 170,
-          "protein": 14,
-          "carbs": 11,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Corn Dog",
-        "category": "Snacks & Sides",
-        "price_estimate": 2.06,
-        "image_url": null,
-        "macros": {
-          "calories": 230,
-          "protein": 6,
-          "carbs": 23,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Jr. Burger",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 270,
-          "protein": 11,
-          "carbs": 24,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Jr. Cheeseburger",
-        "category": "EntrBurgersee",
-        "price_estimate": 3.89,
-        "image_url": null,
-        "macros": {
-          "calories": 290,
-          "protein": 13,
-          "carbs": 25,
-          "fat": 16
-        }
-      },
-      {
-        "name": "BLT Toaster",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 450,
-          "protein": 16,
-          "carbs": 42,
-          "fat": 25
-        }
-      },
-      {
-        "name": "Chicken Club Toaster",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 670,
-          "protein": 33,
-          "carbs": 55,
-          "fat": 36
-        }
-      },
-      {
-        "name": "Crispy Tenders (3 Pc.)",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 260,
-          "protein": 21,
-          "carbs": 16,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Crispy Tenders (5 Pc.)",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 430,
-          "protein": 35,
-          "carbs": 27,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Premium Chicken Bites Small",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 240,
-          "protein": 13,
-          "carbs": 19,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Premium Chicken Bites Medium",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 350,
-          "protein": 19,
-          "carbs": 28,
-          "fat": 18
-        }
-      },
-      {
-        "name": "Premium Chicken Bites Large",
-        "category": "Chicken",
-        "price_estimate": 4.62,
-        "image_url": null,
-        "macros": {
-          "calories": 510,
-          "protein": 27,
-          "carbs": 41,
-          "fat": 26
-        }
-      },
-      {
-        "name": "Country Fried Steak Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 640,
-          "protein": 16,
-          "carbs": 76,
-          "fat": 29
-        }
-      },
-      {
-        "name": "Crispy Chicken Sandwich",
-        "category": "Chicken",
-        "price_estimate": 6.33,
-        "image_url": null,
-        "macros": {
-          "calories": 520,
-          "protein": 24,
-          "carbs": 52,
-          "fat": 24
-        }
-      },
-      {
-        "name": "Grilled Cheese Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 390,
-          "protein": 13,
-          "carbs": 42,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Philly Cheesesteak Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 750,
-          "protein": 46,
-          "carbs": 53,
-          "fat": 39
-        }
-      },
-      {
-        "name": "Pork Tenderloin Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 650,
-          "protein": 20,
-          "carbs": 69,
-          "fat": 30
-        }
-      },
-      {
-        "name": "All-American Dog",
-        "category": "Hot Dogs",
-        "price_estimate": 3.40,
-        "image_url": null,
-        "macros": {
-          "calories": 410,
-          "protein": 13,
-          "carbs": 42,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Chicago Hot Dog",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 400,
-          "protein": 11,
-          "carbs": 42,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Chili Cheese Coney",
-        "category": "Hot Dogs",
-        "price_estimate": 3.40,
-        "image_url": null,
-        "macros": {
-          "calories": 470,
-          "protein": 18,
-          "carbs": 34,
-          "fat": 29
-        }
-      },
-      {
-        "name": "Footlong Quarter Pound Coney",
-        "category": "Hot Dogs",
-        "price_estimate": 6.09,
-        "image_url": null,
-        "macros": {
-          "calories": 770,
-          "protein": 31,
-          "carbs": 54,
-          "fat": 48
-        }
-      },
-      {
-        "name": "New York Hot Dog",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 400,
-          "protein": 13,
-          "carbs": 35,
-          "fat": 23
-        }
-      },
-      {
-        "name": "Regular Hot Dog",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 360,
-          "protein": 12,
-          "carbs": 31,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Bagel Sandwich Bacon",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 530,
-          "protein": 25,
-          "carbs": 68,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Bagel Sandwich Ham",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 530,
-          "protein": 29,
-          "carbs": 70,
-          "fat": 15
-        }
-      },
-      {
-        "name": "Bagel Sandwich Sausage",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 630,
-          "protein": 26,
-          "carbs": 68,
-          "fat": 29
-        }
-      },
-      {
-        "name": "Biscuit Sandwich Bacon",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 480,
-          "protein": 20,
-          "carbs": 40,
-          "fat": 24
-        }
-      },
-      {
-        "name": "Biscuit Sandwich Ham",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 500,
-          "protein": 23,
-          "carbs": 43,
-          "fat": 22
-        }
-      },
-      {
-        "name": "Biscuit Sandwich Sausage",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 580,
-          "protein": 21,
-          "carbs": 40,
-          "fat": 34
-        }
-      },
-      {
-        "name": "Breakfast Burrito Bacon",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 470,
-          "protein": 25,
-          "carbs": 35,
-          "fat": 25
-        }
-      },
-      {
-        "name": "Breakfast Burrito Ham",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 440,
-          "protein": 27,
-          "carbs": 38,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Breakfast Burrito Sausage",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 490,
-          "protein": 23,
-          "carbs": 35,
-          "fat": 28
-        }
-      },
-      {
-        "name": "Breakfast Toaster Bacon",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 470,
-          "protein": 22,
-          "carbs": 42,
-          "fat": 24
-        }
-      },
-      {
-        "name": "Breakfast Toaster Ham",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 470,
-          "protein": 26,
-          "carbs": 45,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Breakfast Toaster Sausage",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 570,
-          "protein": 23,
-          "carbs": 42,
-          "fat": 34
-        }
-      },
-      {
-        "name": "Brioche Sandwich Bacon",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 440,
-          "protein": 20,
-          "carbs": 38,
-          "fat": 23
-        }
-      },
-      {
-        "name": "Brioche Sandwich Ham",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 450,
-          "protein": 24,
-          "carbs": 41,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Brioche Sandwich Sausage",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 530,
-          "protein": 22,
-          "carbs": 38,
-          "fat": 33
-        }
-      },
-      {
-        "name": "Croissonic Sandwich Bacon",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 430,
-          "protein": 18,
-          "carbs": 29,
-          "fat": 27
-        }
-      },
-      {
-        "name": "Croissonic Sandwich Ham",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 430,
-          "protein": 22,
-          "carbs": 31,
-          "fat": 23
-        }
-      },
-      {
-        "name": "Croissonic Sandwich Sausage",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 530,
-          "protein": 19,
-          "carbs": 29,
-          "fat": 37
-        }
-      },
-      {
-        "name": "French Toast Sticks",
-        "category": "All Day Breakfast",
-        "price_estimate": 4.26,
-        "image_url": null,
-        "macros": {
-          "calories": 480,
-          "protein": 8,
-          "carbs": 54,
-          "fat": 25
-        }
-      },
-      {
-        "name": "Jr. Breakfast Burrito Bacon",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 270,
-          "protein": 13,
-          "carbs": 22,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Jr. Breakfast Burrito Sausage",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 280,
-          "protein": 12,
-          "carbs": 22,
-          "fat": 16
-        }
-      },
-      {
-        "name": "SuperSONIC Breakfast Burrito",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 590,
-          "protein": 24,
-          "carbs": 49,
-          "fat": 33
-        }
-      },
-      {
-        "name": "Ultimate Meat & Cheese Breakfast Burrito",
-        "category": "All Day Breakfast",
-        "price_estimate": 5.48,
-        "image_url": null,
-        "macros": {
-          "calories": 820,
-          "protein": 29,
-          "carbs": 47,
-          "fat": 56
-        }
-      },
-      {
-        "name": "Ched 'R' Bites Small",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 280,
-          "protein": 13,
-          "carbs": 22,
-          "fat": 15
-        }
-      },
-      {
-        "name": "Ched 'R' Bites Medium",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 410,
-          "protein": 20,
-          "carbs": 32,
-          "fat": 23
-        }
-      },
-      {
-        "name": "Ched 'R' Bites Large",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 550,
-          "protein": 27,
-          "carbs": 43,
-          "fat": 30
-        }
-      },
-      {
-        "name": "Ched 'R' Peppers (4 Pc.) Small",
-        "category": "Snacks & Side",
-        "price_estimate": 4.87,
-        "image_url": null,
-        "macros": {
-          "calories": 330,
-          "protein": 8,
-          "carbs": 36,
-          "fat": 17
-        }
-      },
-      {
-        "name": "Ched 'R' Peppers (6 Pc.) Medium",
-        "category": "Snacks & Sides",
-        "price_estimate": 6.33,
-        "image_url": null,
-        "macros": {
-          "calories": 490,
-          "protein": 12,
-          "carbs": 54,
-          "fat": 25
-        }
-      },
-      {
-        "name": "Ched 'R' Peppers (8 Pc.) Large",
-        "category": "Snacks & Side",
-        "price_estimate": 7.67,
-        "image_url": null,
-        "macros": {
-          "calories": 660,
-          "protein": 17,
-          "carbs": 72,
-          "fat": 34
-        }
-      },
-      {
-        "name": "Corn Dog",
-        "category": "Snacks & Sides",
-        "price_estimate": 2.06,
-        "image_url": null,
-        "macros": {
-          "calories": 230,
-          "protein": 6,
-          "carbs": 23,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Fritos Chili Cheese Jr. Wrap",
-        "category": "Snacks & Sides",
-        "price_estimate": 2.43,
-        "image_url": null,
-        "macros": {
-          "calories": 380,
-          "protein": 10,
-          "carbs": 39,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Fritos Chili Cheese Wrap",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 650,
-          "protein": 19,
-          "carbs": 62,
-          "fat": 35
-        }
-      },
-      {
-        "name": "Fritos Chili Pie Small",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 270,
-          "protein": 8,
-          "carbs": 18,
-          "fat": 18
-        }
-      },
-      {
-        "name": "Fritos Chili Pie Medium",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 510,
-          "protein": 14,
-          "carbs": 35,
-          "fat": 34
-        }
-      },
-      {
-        "name": "Fritos Chili Pie Large",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 750,
-          "protein": 20,
-          "carbs": 53,
-          "fat": 50
-        }
-      },
-      {
-        "name": "Mozzarella Sticks (4 Pc.) Small",
-        "category": "Entree",
-        "price_estimate": 4.50,
-        "image_url": null,
-        "macros": {
-          "calories": 370,
-          "protein": 15,
-          "carbs": 36,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Mozzarella Sticks (6 Pc.) Medium",
-        "category": "Entree",
-        "price_estimate": 5.72,
-        "image_url": null,
-        "macros": {
-          "calories": 560,
-          "protein": 22,
-          "carbs": 54,
-          "fat": 28
-        }
-      },
-      {
-        "name": "Mozzarella Sticks (8 Pc.) Large",
-        "category": "Entree",
-        "price_estimate": 6.94,
-        "image_url": null,
-        "macros": {
-          "calories": 750,
-          "protein": 29,
-          "carbs": 72,
-          "fat": 38
-        }
-      },
-      {
-        "name": "Asian-Style Sweet Chili",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 60,
-          "protein": 1,
-          "carbs": 13,
-          "fat": 0
-        }
-      },
-      {
-        "name": "BBQ",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 50,
-          "protein": 0,
-          "carbs": 11,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Buffalo",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 60,
-          "protein": 0,
-          "carbs": 1,
-          "fat": 6
-        }
-      },
-      {
-        "name": "Country Gravy",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 130,
-          "protein": 0,
-          "carbs": 15,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Groovy Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 110,
-          "protein": 0,
-          "carbs": 2,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Honey Mustard",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 90,
-          "protein": 0,
-          "carbs": 6,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Jalapeño Ranch",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 130,
-          "protein": 0,
-          "carbs": 2,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Ketchup",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 10,
-          "protein": 0,
-          "carbs": 3,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Light Mayo",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 40,
-          "protein": 0,
-          "carbs": 3,
-          "fat": 3
-        }
-      },
-      {
-        "name": "Marinara",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 15,
-          "protein": 0,
-          "carbs": 4,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Mustard",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 5,
-          "protein": 0,
-          "carbs": 0,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Ranch",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 110,
-          "protein": 0,
-          "carbs": 1,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Salsa de Sonic",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 5,
-          "protein": 0,
-          "carbs": 1,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Signature Cheese",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 130,
-          "protein": 2,
-          "carbs": 6,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Sweet Relish",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 10,
-          "protein": 0,
-          "carbs": 3,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Syrup",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 90,
-          "protein": 0,
-          "carbs": 22,
-          "fat": 0
-        }
-      }
     ]
-  }
+}

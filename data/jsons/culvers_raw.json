@@ -1,699 +1,533 @@
 {
     "restaurant_name": "Culver's",
     "items": [
-      {
-        "name": "Chili Cheddar Fries",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 610,
-          "protein": 14,
-          "carbs": 70,
-          "fat": 31
+        {
+            "name": "Chili Cheddar Fries",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 610,
+                "protein": 14,
+                "carbs": 70,
+                "fat": 31
+            }
+        },
+        {
+            "name": "Crinkle Cut Fries, Small",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 220,
+                "protein": 3,
+                "carbs": 32,
+                "fat": 9
+            }
+        },
+        {
+            "name": "Crinkle Cut Fries, Medium",
+            "category": "Sides",
+            "price_estimate": 3.89,
+            "macros": {
+                "calories": 350,
+                "protein": 4,
+                "carbs": 50,
+                "fat": 14
+            }
+        },
+        {
+            "name": "Crinkle Cut Fries, Large",
+            "category": "Sides",
+            "price_estimate": 7.89,
+            "macros": {
+                "calories": 430,
+                "protein": 5,
+                "carbs": 62,
+                "fat": 18
+            }
+        },
+        {
+            "name": "Coleslaw, Medium",
+            "category": "Sides",
+            "price_estimate": 3.89,
+            "macros": {
+                "calories": 200,
+                "protein": 1,
+                "carbs": 15,
+                "fat": 16
+            }
+        },
+        {
+            "name": "Coleslaw, Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 600,
+                "protein": 3,
+                "carbs": 45,
+                "fat": 48
+            }
+        },
+        {
+            "name": "Mashed Potatoes & Gravy, Medium",
+            "category": "Sides",
+            "price_estimate": 3.89,
+            "macros": {
+                "calories": 130,
+                "protein": 4,
+                "carbs": 25,
+                "fat": 1.5
+            }
+        },
+        {
+            "name": "Mashed Potatoes & Gravy, Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 410,
+                "protein": 11,
+                "carbs": 73,
+                "fat": 8
+            }
+        },
+        {
+            "name": "Pretzel Bites with Cheese Sauce",
+            "category": "Sides",
+            "price_estimate": 5.69,
+            "macros": {
+                "calories": 440,
+                "protein": 15,
+                "carbs": 53,
+                "fat": 19
+            }
+        },
+        {
+            "name": "Onion Rings, Medium",
+            "category": "Sides",
+            "price_estimate": 4.69,
+            "macros": {
+                "calories": 420,
+                "protein": 5,
+                "carbs": 49,
+                "fat": 23
+            }
+        },
+        {
+            "name": "Onion Rings, Large",
+            "category": "Sides",
+            "price_estimate": 6.89,
+            "macros": {
+                "calories": 840,
+                "protein": 10,
+                "carbs": 98,
+                "fat": 46
+            }
+        },
+        {
+            "name": "Wisconsin Cheddar Cheese Sauce",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 130,
+                "protein": 6,
+                "carbs": 3,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Wisconsin Cheese Curds, Medium",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 490,
+                "protein": 17,
+                "carbs": 46,
+                "fat": 27
+            }
+        },
+        {
+            "name": "Wisconsin Cheese Curds, Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 980,
+                "protein": 34,
+                "carbs": 91,
+                "fat": 54
+            }
+        },
+        {
+            "name": "Chicken Cashew Salad with Grilled Chicken",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 430,
+                "protein": 41,
+                "carbs": 17,
+                "fat": 23
+            }
+        },
+        {
+            "name": "Cranberry Bacon Bleu Salad with Grilled Chicken",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 390,
+                "protein": 46,
+                "carbs": 18,
+                "fat": 16
+            }
+        },
+        {
+            "name": "Garden Fresco Salad with Grilled Chicken",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 330,
+                "protein": 39,
+                "carbs": 19,
+                "fat": 12
+            }
+        },
+        {
+            "name": "Strawberry Fields Salad with Grilled Chicken",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 370,
+                "protein": 35,
+                "carbs": 12,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Boston Clam Chowder Soup, Medium",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 290,
+                "protein": 13,
+                "carbs": 32,
+                "fat": 12
+            }
+        },
+        {
+            "name": "Boston Clam Chowder Soup, Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 390,
+                "protein": 19,
+                "carbs": 46,
+                "fat": 17
+            }
+        },
+        {
+            "name": "Broccoli Cheese Soup, Medium",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 220,
+                "protein": 11,
+                "carbs": 22,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Broccoli Cheese Soup, Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 330,
+                "protein": 16,
+                "carbs": 31,
+                "fat": 19
+            }
+        },
+        {
+            "name": "Chicken Noodle Soup, Medium",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 130,
+                "protein": 7,
+                "carbs": 20,
+                "fat": 2.5
+            }
+        },
+        {
+            "name": "Chicken Noodle Soup, Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 180,
+                "protein": 10,
+                "carbs": 28,
+                "fat": 3.5
+            }
+        },
+        {
+            "name": "George's Chili, Medium",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 310,
+                "protein": 18,
+                "carbs": 31,
+                "fat": 13
+            }
+        },
+        {
+            "name": "George's Chili, Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 450,
+                "protein": 26,
+                "carbs": 44,
+                "fat": 20
+            }
+        },
+        {
+            "name": "George's Chili Supreme, Medium",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 430,
+                "protein": 22,
+                "carbs": 33,
+                "fat": 23
+            }
+        },
+        {
+            "name": "George's Chili Supreme, Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 620,
+                "protein": 34,
+                "carbs": 47,
+                "fat": 34
+            }
+        },
+        {
+            "name": "Potato with Bacon Soup, Medium",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 270,
+                "protein": 10,
+                "carbs": 33,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Potato with Bacon Soup, Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 360,
+                "protein": 14,
+                "carbs": 47,
+                "fat": 16
+            }
+        },
+        {
+            "name": "Stuffed Green Pepper with Beef Soup, Medium",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 170,
+                "protein": 6,
+                "carbs": 29,
+                "fat": 2.5
+            }
+        },
+        {
+            "name": "Stuffed Green Pepper with Beef Soup, Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 219,
+                "protein": 8,
+                "carbs": 41,
+                "fat": 3.5
+            }
+        },
+        {
+            "name": "Tomato Florentine Soup, Medium",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 140,
+                "protein": 5,
+                "carbs": 27,
+                "fat": 1.5
+            }
+        },
+        {
+            "name": "Tomato Florentine Soup, Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 170,
+                "protein": 7,
+                "carbs": 38,
+                "fat": 2
+            }
+        },
+        {
+            "name": "Vegetable Beef Soup, Medium",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 190,
+                "protein": 9,
+                "carbs": 27,
+                "fat": 4.5
+            }
+        },
+        {
+            "name": "Vegetable Beef Soup, Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 240,
+                "protein": 13,
+                "carbs": 38,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Wild and Brown Rice with Chicken Soup, Medium",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 300,
+                "protein": 11,
+                "carbs": 31,
+                "fat": 15
+            }
+        },
+        {
+            "name": "Wild and Brown Rice with Chicken Soup, Large",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 410,
+                "protein": 16,
+                "carbs": 44,
+                "fat": 22
+            }
+        },
+        {
+            "name": "Buttermilk Ranch Dressing",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 180,
+                "protein": 1,
+                "carbs": 2,
+                "fat": 19
+            }
+        },
+        {
+            "name": "Culver's Signature Sauce",
+            "category": "Sauces & Dressings",
+            "price_estimate": 0.49,
+            "macros": {
+                "calories": 260,
+                "protein": 0,
+                "carbs": 3,
+                "fat": 27
+            }
+        },
+        {
+            "name": "Culver's Vinaigrette",
+            "category": "Sauces & Dressings",
+            "price_estimate": 0.49,
+            "macros": {
+                "calories": 120,
+                "protein": 0,
+                "carbs": 3,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Honey Mustard Dressing",
+            "category": "Sauces & Dressings",
+            "price_estimate": 0.49,
+            "macros": {
+                "calories": 130,
+                "protein": 0,
+                "carbs": 20,
+                "fat": 6
+            }
+        },
+        {
+            "name": "Ken's Blue Cheese Dressing",
+            "category": "Sauces & Dressings",
+            "price_estimate": 0.49,
+            "macros": {
+                "calories": 200,
+                "protein": 1,
+                "carbs": 2,
+                "fat": 21
+            }
+        },
+        {
+            "name": "Ken's Boom Boom Sauce",
+            "category": "Sauce",
+            "price_estimate": 0.49,
+            "macros": {
+                "calories": 310,
+                "protein": 0,
+                "carbs": 5,
+                "fat": 32
+            }
+        },
+        {
+            "name": "Ken's Country French",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 190,
+                "protein": 0,
+                "carbs": 13,
+                "fat": 15
+            }
+        },
+        {
+            "name": "Sweet Baby Ray's BBQ Sauce",
+            "category": "Sauces & Dressings",
+            "price_estimate": 0.49,
+            "macros": {
+                "calories": 110,
+                "protein": 1,
+                "carbs": 28,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Tartar Sauce Cup",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 360,
+                "protein": 1,
+                "carbs": 3,
+                "fat": 39
+            }
+        },
+        {
+            "name": "Wisconsin Cheddar Cheese Sauce",
+            "category": "Sauces & Dressings",
+            "price_estimate": 0.99,
+            "macros": {
+                "calories": 130,
+                "protein": 6,
+                "carbs": 3,
+                "fat": 11
+            }
         }
-      },
-      {
-        "name": "Crinkle Cut Fries, Small",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 220,
-          "protein": 3,
-          "carbs": 32,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Crinkle Cut Fries, Medium",
-        "category": "Sides",
-        "price_estimate": 3.89,
-        "macros": {
-          "calories": 350,
-          "protein": 4,
-          "carbs": 50,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Crinkle Cut Fries, Large",
-        "category": "Sides",
-        "price_estimate": 7.89,
-        "macros": {
-          "calories": 430,
-          "protein": 5,
-          "carbs": 62,
-          "fat": 18
-        }
-      },
-      {
-        "name": "Coleslaw, Medium",
-        "category": "Sides",
-        "price_estimate": 3.89,
-        "macros": {
-          "calories": 200,
-          "protein": 1,
-          "carbs": 15,
-          "fat": 16
-        }
-      },
-      {
-        "name": "Coleslaw, Large",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 600,
-          "protein": 3,
-          "carbs": 45,
-          "fat": 48
-        }
-      },
-      {
-        "name": "Garden Side Salad",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 50,
-          "protein": 3,
-          "carbs": 5,
-          "fat": 2.5
-        }
-      },
-      {
-        "name": "Mashed Potatoes & Gravy, Medium",
-        "category": "Sides",
-        "price_estimate": 3.89,
-        "macros": {
-          "calories": 130,
-          "protein": 4,
-          "carbs": 25,
-          "fat": 1.5
-        }
-      },
-      {
-        "name": "Mashed Potatoes & Gravy, Large",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 410,
-          "protein": 11,
-          "carbs": 73,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Pretzel Bites with Cheese Sauce",
-        "category": "Sides",
-        "price_estimate": 5.69,
-        "macros": {
-          "calories": 440,
-          "protein": 15,
-          "carbs": 53,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Onion Rings, Medium",
-        "category": "Sides",
-        "price_estimate": 4.69,
-        "macros": {
-          "calories": 420,
-          "protein": 5,
-          "carbs": 49,
-          "fat": 23
-        }
-      },
-      {
-        "name": "Onion Rings, Large",
-        "category": "Sides",
-        "price_estimate": 6.89,
-        "macros": {
-          "calories": 840,
-          "protein": 10,
-          "carbs": 98,
-          "fat": 46
-        }
-      },
-      {
-        "name": "Side of Thick Cut Bacon (2 Slices)",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 100,
-          "protein": 9,
-          "carbs": 0,
-          "fat": 6
-        }
-      },
-      {
-        "name": "Side of Dill Pickles",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 5,
-          "protein": 0,
-          "carbs": 0,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Steamed Broccoli",
-        "category": "Sides",
-        "price_estimate": 3.89,
-        "macros": {
-          "calories": 40,
-          "protein": 3,
-          "carbs": 7,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Wisconsin Cheddar Cheese Sauce",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 130,
-          "protein": 6,
-          "carbs": 3,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Wisconsin Cheese Curds, Medium",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 490,
-          "protein": 17,
-          "carbs": 46,
-          "fat": 27
-        }
-      },
-      {
-        "name": "Wisconsin Cheese Curds, Large",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 980,
-          "protein": 34,
-          "carbs": 91,
-          "fat": 54
-        }
-      },
-      {
-        "name": "Chicken Cashew Salad with Grilled Chicken",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 430,
-          "protein": 41,
-          "carbs": 17,
-          "fat": 23
-        }
-      },
-      {
-        "name": "Cranberry Bacon Bleu Salad with Grilled Chicken",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 390,
-          "protein": 46,
-          "carbs": 18,
-          "fat": 16
-        }
-      },
-      {
-        "name": "Garden Fresco Salad with Grilled Chicken",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 330,
-          "protein": 39,
-          "carbs": 19,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Strawberry Fields Salad with Grilled Chicken",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 370,
-          "protein": 35,
-          "carbs": 12,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Boston Clam Chowder Soup, Medium",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 290,
-          "protein": 13,
-          "carbs": 32,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Boston Clam Chowder Soup, Large",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 390,
-          "protein": 19,
-          "carbs": 46,
-          "fat": 17
-        }
-      },
-      {
-        "name": "Broccoli Cheese Soup, Medium",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 220,
-          "protein": 11,
-          "carbs": 22,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Broccoli Cheese Soup, Large",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 330,
-          "protein": 16,
-          "carbs": 31,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Chicken Noodle Soup, Medium",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 130,
-          "protein": 7,
-          "carbs": 20,
-          "fat": 2.5
-        }
-      },
-  {
-    "name": "Chicken Noodle Soup, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "macros": {
-      "calories": 180,
-      "protein": 10,
-      "carbs": 28,
-      "fat": 3.5
-    }
-  },
-      {
-        "name": "George's Chili, Medium",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 310,
-          "protein": 18,
-          "carbs": 31,
-          "fat": 13
-        }
-      },
-      {
-        "name": "George's Chili, Large",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 450,
-          "protein": 26,
-          "carbs": 44,
-          "fat": 20
-        }
-      },
-      {
-        "name": "George's Chili Supreme, Medium",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 430,
-          "protein": 22,
-          "carbs": 33,
-          "fat": 23
-        }
-      },
-    {
-      "name": "George's Chili Supreme, Large",
-      "category": "Entree",
-      "price_estimate": null,
-      "macros": {
-        "calories": 620,
-        "protein": 34,
-        "carbs": 47,
-        "fat": 34
-      }
-    },
-      {
-        "name": "Potato with Bacon Soup, Medium",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 270,
-          "protein": 10,
-          "carbs": 33,
-          "fat": 11
-        }
-      },
-  
-    {
-      "name": "Potato with Bacon Soup, Large",
-      "category": "Entree",
-      "price_estimate": null,
-      "macros": {
-        "calories": 360,
-        "protein": 14,
-        "carbs": 47,
-        "fat": 16
-      }
-    },
-      {
-        "name": "Stuffed Green Pepper with Beef Soup, Medium",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 170,
-          "protein": 6,
-          "carbs": 29,
-          "fat": 2.5
-        }
-      },
-    {
-      "name": "Stuffed Green Pepper with Beef Soup, Large",
-      "category": "Entree",
-      "price_estimate": null,
-      "macros": {
-        "calories": 219,
-        "protein": 8,
-        "carbs": 41,
-        "fat": 3.5
-      }
-    },
-    {
-        "name": "Tomato Florentine Soup, Medium",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 140,
-          "protein": 5,
-          "carbs": 27,
-          "fat": 1.5
-        }
-      },
-    {
-        "name": "Tomato Florentine Soup, Large",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 170,
-          "protein": 7,
-          "carbs": 38,
-          "fat": 2
-        }
-      },
-      {
-        "name": "Vegetable Beef Soup, Medium",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 190,
-          "protein": 9,
-          "carbs": 27,
-          "fat": 4.5
-        }
-      },
-    {
-      "name": "Vegetable Beef Soup, Large",
-      "category": "Entree",
-      "price_estimate": null,
-      "macros": {
-        "calories": 240,
-        "protein": 13,
-        "carbs": 38,
-        "fat": 7
-      }
-    },
-      {
-        "name": "Wild and Brown Rice with Chicken Soup, Medium",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 300,
-          "protein": 11,
-          "carbs": 31,
-          "fat": 15
-        }
-      },
-    {
-      "name": "Wild and Brown Rice with Chicken Soup, Large",
-      "category": "Entree",
-      "price_estimate": null,
-      "macros": {
-        "calories": 410,
-        "protein": 16,
-        "carbs": 44,
-        "fat": 22
-      }
-    },
-      {
-        "name": "Buttermilk Ranch Dressing",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 180,
-          "protein": 1,
-          "carbs": 2,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Cocktail Sauce",
-        "category": "Sauces & Dressings",
-        "price_estimate": 0.49,
-        "macros": {
-          "calories": 50,
-          "protein": 1,
-          "carbs": 13,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Culver's Signature Sauce",
-        "category": "Sauces & Dressings",
-        "price_estimate": 0.49,
-        "macros": {
-          "calories": 260,
-          "protein": 0,
-          "carbs": 3,
-          "fat": 27
-        }
-      },
-      {
-        "name": "Culver's Vinaigrette",
-        "category": "Sauces & Dressings",
-        "price_estimate": 0.49,
-        "macros": {
-          "calories": 120,
-          "protein": 0,
-          "carbs": 3,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Marinara Cup",
-        "category": "Sauces & Dressings",
-        "price_estimate": 0.49,
-        "macros": {
-          "calories": 40,
-          "protein": 1,
-          "carbs": 9,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Dip & Squeeze Ketchup",
-        "category": "Sauces & Dressings",
-        "price_estimate": 0.00,
-        "macros": {
-          "calories": 30,
-          "protein": 0,
-          "carbs": 8,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Frank's RedHot Buffalo Sauce",
-        "category": "Sauces & Dressings",
-        "price_estimate": 0.49,
-        "macros": {
-          "calories": 5,
-          "protein": 0,
-          "carbs": 1,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Honey Mustard Dressing",
-        "category": "Sauces & Dressings",
-        "price_estimate": 0.49,
-        "macros": {
-          "calories": 130,
-          "protein": 0,
-          "carbs": 20,
-          "fat": 6
-        }
-      },
-      {
-        "name": "Horseradish Sauce",
-        "category": "Sauces",
-        "price_estimate": null,
-        "macros": {
-          "calories": 60,
-          "protein": 0,
-          "carbs": 2,
-          "fat": 6
-        }
-      },
-      {
-        "name": "Hot Sauce",
-        "category": "Sauces",
-        "price_estimate": null,
-        "macros": {
-          "calories": 0,
-          "protein": 0,
-          "carbs": 0,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Ken's Blue Cheese Dressing",
-        "category": "Sauces & Dressings",
-        "price_estimate": 0.49,
-        "macros": {
-          "calories": 200,
-          "protein": 1,
-          "carbs": 2,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Ken's Boom Boom Sauce",
-        "category": "Sauce",
-        "price_estimate": 0.49,
-        "macros": {
-          "calories": 310,
-          "protein": 0,
-          "carbs": 5,
-          "fat": 32
-        }
-      },
-      {
-        "name": "Ken's Country French",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 190,
-          "protein": 0,
-          "carbs": 13,
-          "fat": 15
-        }
-      },
-      {
-        "name": "Ken's Raspberry Vinaigrette",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 50,
-          "protein": 0,
-          "carbs": 12,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Malt Vinegar",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 0,
-          "protein": 0,
-          "carbs": 0,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Mayonnaise Packet",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 80,
-          "protein": 0,
-          "carbs": 1,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Spicy Brown Mustard Packet",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 0,
-          "protein": 0,
-          "carbs": 0,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Sweet Baby Ray's BBQ Sauce",
-        "category": "Sauces & Dressings",
-        "price_estimate": 0.49,
-        "macros": {
-          "calories": 110,
-          "protein": 1,
-          "carbs": 28,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Tartar Sauce Cup",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 360,
-          "protein": 1,
-          "carbs": 3,
-          "fat": 39
-        }
-      },
-      {
-        "name": "Wisconsin Cheddar Cheese Sauce",
-        "category": "Sauces & Dressings",
-        "price_estimate": 0.99,
-        "macros": {
-          "calories": 130,
-          "protein": 6,
-          "carbs": 3,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Yellow Mustard Packet",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 0,
-          "protein": 0,
-          "carbs": 0,
-          "fat": 0
-        }
-      }
     ]
-  }
+}

@@ -190,22 +190,38 @@ export function extractMacroConstraintsFromText(query: string): MacroConstraints
   }
 
   // Fallback: If no explicit max or min calorie constraint was extracted,
-  // check for bare calorie mentions like "with 850 calories", "850 calories", "around 800 cal"
-  // Treat as maxCalories since in meal search "with 850 calories" naturally means "up to 850 calories"
+  // check for approximate calorie mentions like "around 800 cal", "about 600 calories"
+  // These create a ±15% range (e.g., "around 800" → 680-920)
+  // Also handles bare "850 calories" as maxCalories
   // IMPORTANT: This runs AFTER both max and min calorie patterns, so explicit directions always win
   if (result.maxCalories === undefined && result.minCalories === undefined) {
-    const caloriesFallbackPatterns = [
-      /\b(?:with|around|about|roughly|approximately)\s+(\d+)\s*(calories?|cal|kcal)\b/i,
-      /\b(\d+)\s*(calories?|cal|kcal)\b/i, // bare "850 calories"
-    ];
+    // "around/about/roughly/approximately X calories" → range ±15%
+    const approximatePattern = /\b(?:around|about|roughly|approximately|close\s+to|near)\s+(\d+)\s*(calories?|cal|kcal)\b/i;
+    const approxMatch = trimmed.match(approximatePattern);
+    if (approxMatch) {
+      const target = parseInt(approxMatch[1], 10);
+      if (!isNaN(target) && target >= 50 && target <= 5000) {
+        const margin = Math.round(target * 0.15); // ±15%
+        result.minCalories = target - margin;
+        result.maxCalories = target + margin;
+      }
+    }
 
-    for (const pattern of caloriesFallbackPatterns) {
-      const match = trimmed.match(pattern);
-      if (match) {
-        const value = parseInt(match[1], 10);
-        if (!isNaN(value) && value >= 50 && value <= 5000) {
-          result.maxCalories = value;
-          break;
+    // Bare calorie mention: "with 850 calories", "850 calories" → treat as maxCalories
+    if (result.maxCalories === undefined && result.minCalories === undefined) {
+      const caloriesFallbackPatterns = [
+        /\b(?:with)\s+(\d+)\s*(calories?|cal|kcal)\b/i,
+        /\b(\d+)\s*(calories?|cal|kcal)\b/i, // bare "850 calories"
+      ];
+
+      for (const pattern of caloriesFallbackPatterns) {
+        const match = trimmed.match(pattern);
+        if (match) {
+          const value = parseInt(match[1], 10);
+          if (!isNaN(value) && value >= 50 && value <= 5000) {
+            result.maxCalories = value;
+            break;
+          }
         }
       }
     }

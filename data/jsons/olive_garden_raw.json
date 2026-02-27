@@ -14,18 +14,6 @@
             }
         },
         {
-            "name": "Calamari - add marinara",
-            "category": "Appetizers",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 35,
-                "protein": 1,
-                "carbs": 4,
-                "fat": 2
-            }
-        },
-        {
             "name": "Calamari - add spicy ranch",
             "category": "Appetizers",
             "price_estimate": null,
@@ -50,18 +38,6 @@
             }
         },
         {
-            "name": "Shrimp Fritto Misto - add marinara",
-            "category": "Appetizers",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 35,
-                "protein": 1,
-                "carbs": 4,
-                "fat": 2
-            }
-        },
-        {
             "name": "Shrimp Fritto Misto - add spicy ranch",
             "category": "Appetizers",
             "price_estimate": null,
@@ -83,18 +59,6 @@
                 "protein": 33,
                 "carbs": 57,
                 "fat": 49
-            }
-        },
-        {
-            "name": "Fried Mozzarella - add marinara",
-            "category": "Appetizers",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 35,
-                "protein": 1,
-                "carbs": 4,
-                "fat": 2
             }
         },
         {
@@ -158,18 +122,6 @@
             }
         },
         {
-            "name": "Stuffed Ziti Fritta - add marinara",
-            "category": "Appetizers",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 35,
-                "protein": 1,
-                "carbs": 4,
-                "fat": 2
-            }
-        },
-        {
             "name": "Toasted Ravioli",
             "category": "Appetizers",
             "price_estimate": null,
@@ -179,18 +131,6 @@
                 "protein": 25,
                 "carbs": 69,
                 "fat": 31
-            }
-        },
-        {
-            "name": "Toasted Ravioli - add marinara",
-            "category": "Appetizers",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 35,
-                "protein": 1,
-                "carbs": 4,
-                "fat": 2
             }
         },
         {
@@ -239,18 +179,6 @@
                 "protein": 11,
                 "carbs": 17,
                 "fat": 33
-            }
-        },
-        {
-            "name": "Marinara Dipping Sauce",
-            "category": "Dipping Sauces for Breadsticks",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 70,
-                "protein": 2,
-                "carbs": 8,
-                "fat": 4.5
             }
         },
         {
@@ -359,30 +287,6 @@
                 "protein": 3,
                 "carbs": 13,
                 "fat": 10
-            }
-        },
-        {
-            "name": "Salad without Dressing",
-            "category": "Soups, Salad & Breadsticks",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 70,
-                "protein": 2,
-                "carbs": 11,
-                "fat": 2
-            }
-        },
-        {
-            "name": "Italian Dressing (1 fl oz)",
-            "category": "Soups, Salad & Breadsticks",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 80,
-                "protein": 0,
-                "carbs": 2,
-                "fat": 8
             }
         }
     ]

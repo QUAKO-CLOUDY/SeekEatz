@@ -242,13 +242,29 @@ function hasFoodIntent(message: string): boolean {
     'carbohydrates', 'fat', 'fats', 'macros', 'macro'
   ];
 
+  // Specific food item keywords (proteins, common foods)
+  // These indicate the user is searching for a specific food, not asking a question
+  const foodItemKeywords = [
+    'chicken', 'salmon', 'steak', 'beef', 'pork', 'turkey', 'fish', 'shrimp',
+    'tofu', 'tuna', 'wings', 'nuggets', 'ribs', 'lamb', 'meatball',
+    'grilled', 'fried', 'baked', 'roasted', 'smoked', 'crispy',
+    'rice', 'beans', 'avocado', 'cheese', 'egg', 'eggs',
+    'smoothie', 'shake', 'juice', 'acai', 'oatmeal', 'yogurt',
+    'fries', 'soup', 'chili', 'nachos', 'quesadilla',
+  ];
+
   // Check for any food intent indicators
   const hasFoodVerb = foodVerbs.some(verb => lowerMessage.includes(verb));
   const hasMealTime = mealTimeKeywords.some(keyword => lowerMessage.includes(keyword));
   const hasDishType = dishKeywords.some(keyword => lowerMessage.includes(keyword));
   const hasMacro = macroKeywords.some(keyword => lowerMessage.includes(keyword));
+  const hasFoodItem = foodItemKeywords.some(keyword => {
+    // Use word boundary check to avoid partial matches (e.g., "protein" in "protien")
+    const regex = new RegExp(`\\b${keyword}\\b`, 'i');
+    return regex.test(lowerMessage);
+  });
 
-  return hasFoodVerb || hasMealTime || hasDishType || hasMacro;
+  return hasFoodVerb || hasMealTime || hasDishType || hasMacro || hasFoodItem;
 }
 
 /**
@@ -505,6 +521,86 @@ function parseMealConstraintsFromText(message: string): {
 }
 
 /**
+ * Infers implicit macro constraints from semantic/natural language keywords.
+ * These have the LOWEST priority — explicit numbers always take precedence.
+ * 
+ * Maps common user intent patterns:
+ * - "post workout" / "muscle building" / "bulk" → high protein (≥30g)
+ * - "light" / "refreshing" / "lean" / "skinny" → low calorie (≤500)
+ * - "filling" / "hearty" / "satisfying" → high protein (≥25g)
+ * - "cutting" / "shredding" / "diet" → low calorie (≤600) + protein (≥25g)
+ * - "low cal" / "low calorie" (without explicit number) → ≤500 cal
+ * - "high protein" (without explicit number) → ≥30g protein
+ * - "low carb" (without explicit number) → ≤40g carbs
+ * - "low fat" (without explicit number) → ≤20g fat
+ */
+function inferSemanticConstraints(message: string): {
+  calorieCap?: number;
+  minProtein?: number;
+  maxCarbs?: number;
+  maxFat?: number;
+  sortBy?: 'HIGHEST_PROTEIN' | 'LOWEST_CALORIES' | 'BEST_RATIO';
+} {
+  const lower = message.toLowerCase();
+  const constraints: {
+    calorieCap?: number;
+    minProtein?: number;
+    maxCarbs?: number;
+    maxFat?: number;
+    sortBy?: 'HIGHEST_PROTEIN' | 'LOWEST_CALORIES' | 'BEST_RATIO';
+  } = {};
+
+  // Post-workout / muscle building → high protein
+  if (/\b(post[\s-]?workout|after[\s-]?(a\s+)?workout|muscle[\s-]?build|bulking|bulk\s+meal|gains)\b/i.test(lower)) {
+    constraints.minProtein = 30;
+    constraints.sortBy = 'HIGHEST_PROTEIN';
+  }
+
+  // Cutting / shredding / diet → low calorie + decent protein
+  if (/\b(cutting|shredding|diet|lean\s+bulk|recomp)\b/i.test(lower)) {
+    constraints.calorieCap = 600;
+    constraints.minProtein = 25;
+    constraints.sortBy = 'BEST_RATIO';
+  }
+
+  // Light / refreshing / skinny / lean → low calorie
+  if (/\b(light|refreshing|skinny|lean|slim|figure[\s-]?friendly|guilt[\s-]?free|clean\s+eat)\b/i.test(lower) &&
+    !/\b(light\s+roast|light\s+cream|light\s+sauce)\b/i.test(lower)) { // avoid false positives
+    constraints.calorieCap = 500;
+    constraints.sortBy = 'LOWEST_CALORIES';
+  }
+
+  // Filling / hearty / satisfying → ensure decent protein
+  if (/\b(filling|hearty|satisfying|substantial|big|loaded)\b/i.test(lower)) {
+    constraints.minProtein = 25;
+  }
+
+  // "high protein" / "lots of protein" / "tons of protein" without explicit grams → ≥30g
+  if (/\b(high[\s-]?protein|lots\s+of\s+protein|ton(s|ne)?\s+of\s+protein|packed\s+with\s+protein|protein[\s-]?packed|protein[\s-]?rich)\b/i.test(lower) && !/\d+\s*g?\s*protein/i.test(lower)) {
+    constraints.minProtein = 30;
+    constraints.sortBy = 'HIGHEST_PROTEIN';
+  }
+
+  // "low cal" / "low calorie" without explicit number → ≤500
+  if (/\blow[\s-]?(cal|calorie|calories)\b/i.test(lower) && !/\d+\s*(cal|calorie|calories)/i.test(lower)) {
+    constraints.calorieCap = 500;
+    constraints.sortBy = 'LOWEST_CALORIES';
+  }
+
+  // "low carb" without explicit number → ≤40g carbs
+  if (/\blow[\s-]?(carb|carbs|carbohydrate)\b/i.test(lower) && !/\d+\s*g?\s*(carb|carbs)/i.test(lower)) {
+    constraints.maxCarbs = 40;
+  }
+
+  // "low fat" without explicit number → ≤20g fat
+  if (/\blow[\s-]?(fat|fats)\b/i.test(lower) && !/\d+\s*g?\s*(fat|fats)/i.test(lower)) {
+    constraints.maxFat = 20;
+  }
+
+  return constraints;
+}
+
+/**
  * Pre-router heuristic: Detects meta/app questions
  * Returns true if message is clearly about the app itself, not food search
  */
@@ -553,8 +649,60 @@ function isNutritionQuestion(message: string): boolean {
     /\bprotein\s+in\s+(a|an|the)?\s*\w/i, // "protein in a ..."
     /\bhow\s+much\s+protein\s+do\s+I\s+need\b/i,
     /\bis\s+\w+\s+(safe|bad|good|healthy|harmful|toxic)\b/i,
+    // Multi-word subjects: "is a burrito bowl healthy", "is pizza bad for you"
+    /^is\s+(a|an|the)?\s*[\w\s]+\b(healthy|unhealthy|bad|good|safe|harmful|nutritious|fattening)\b/i,
   ];
   return nutritionPatterns.some(p => p.test(lowerMessage));
+}
+
+/**
+ * Detects superlative intent: queries asking for THE single best/worst result.
+ * When detected, limit should be set to 1 instead of the default 5.
+ * Handles common typos: heigest, highets, lowets, lowestt, etc.
+ */
+type SuperlativeSortType = 'HIGHEST_PROTEIN' | 'LOWEST_CALORIES' | 'HIGHEST_CALORIES' | 'LOWEST_CARBS' | 'LOWEST_FAT' | null;
+
+/**
+ * Detects superlative intent and returns the sort type.
+ * Returns null if no superlative detected.
+ */
+function detectSuperlativeSort(message: string): SuperlativeSortType {
+  const lower = message.toLowerCase().trim();
+
+  // HIGHEST patterns: "highest protein", "heigest protien", "most protein"
+  if (/\b(high?est|hig?est|heigest|highets|higest|most)\s+(protein|protien)\b/i.test(lower)) {
+    return 'HIGHEST_PROTEIN';
+  }
+  // HIGHEST CALORIE: "highest calorie", "most calories"
+  if (/\b(high?est|hig?est|heigest|highets|higest|most)\s+(calorie|calories|cal)\b/i.test(lower)) {
+    return 'HIGHEST_CALORIES';
+  }
+  // LOWEST CALORIE: "lowest calorie", "lowets calorie", "lowestt calorie"
+  if (/\b(low?est|lowets|lowestt|lowst|loweset|fewest)\s+(calorie|calories|cal)\b/i.test(lower)) {
+    return 'LOWEST_CALORIES';
+  }
+  // LOWEST PROTEIN: "lowest protein"
+  if (/\b(low?est|lowets|lowestt|lowst)\s+(protein|protien)\b/i.test(lower)) {
+    return 'LOWEST_CALORIES'; // unusual query, treat as low cal
+  }
+  // LOWEST CARBS: "lowest carb"
+  if (/\b(low?est|lowets|lowestt|lowst)\s+(carb|carbs)\b/i.test(lower)) {
+    return 'LOWEST_CARBS';
+  }
+  // LOWEST FAT: "lowest fat"
+  if (/\b(low?est|lowets|lowestt|lowst)\s+(fat|fats)\b/i.test(lower)) {
+    return 'LOWEST_FAT';
+  }
+  // LEANEST: "leanest meal", "leanest at McDonald's" → lowest calories
+  if (/\b(leanest|lean[ea]st)\b/i.test(lower)) {
+    return 'LOWEST_CALORIES';
+  }
+  return null;
+}
+
+/** Backward-compatible wrapper */
+function detectSuperlativeIntent(message: string): boolean {
+  return detectSuperlativeSort(message) !== null;
 }
 
 /**
@@ -1221,6 +1369,10 @@ export async function POST(req: Request) {
       // Parse constraints from message text (deterministic, regex-based, no LLM)
       const parsedConstraints = parseMealConstraintsFromText(message);
 
+      // Infer implicit constraints from semantic keywords (e.g., "post workout" → high protein)
+      // These have the LOWEST priority — they only fill in if no explicit constraints exist
+      const semanticConstraints = inferSemanticConstraints(message);
+
       // Merge constraints: prioritize macro constraints from intent detection, then parsed constraints, then routerResult
       // STRICT: Only apply restaurant constraint if restaurantMatch is MATCH AND explicitRestaurant is true
       // FIXED: Previously had !macroConstraintsDetected which dropped restaurant when macros present
@@ -1236,14 +1388,15 @@ export async function POST(req: Request) {
         ? restaurantMatch.variants
         : undefined;
 
-      // Merge macro constraints: extracted constraints (authoritative) > routerResult > parsed constraints
+      // Merge macro constraints: extracted (authoritative) > routerResult > parsed > semantic (lowest priority)
+      // Semantic constraints only fill in gaps — they never override explicit numbers
       const mergedConstraints = {
         ...routerResult.constraints,
-        // Macro constraints from authoritative extractor (highest priority)
-        minProtein: extractedConstraints.minProtein ?? routerResult.constraints?.minProtein ?? parsedConstraints.minProtein,
-        calorieCap: extractedConstraints.maxCalories ?? routerResult.constraints?.calorieCap ?? parsedConstraints.calorieCap,
-        maxCarbs: extractedConstraints.maxCarbs ?? routerResult.constraints?.maxCarbs ?? parsedConstraints.maxCarbs,
-        maxFat: extractedConstraints.maxFats ?? routerResult.constraints?.maxFat ?? parsedConstraints.maxFat,
+        // Macro constraints: extracted (authoritative) > router > parsed > semantic
+        minProtein: extractedConstraints.minProtein ?? routerResult.constraints?.minProtein ?? parsedConstraints.minProtein ?? semanticConstraints.minProtein,
+        calorieCap: extractedConstraints.maxCalories ?? routerResult.constraints?.calorieCap ?? parsedConstraints.calorieCap ?? semanticConstraints.calorieCap,
+        maxCarbs: extractedConstraints.maxCarbs ?? routerResult.constraints?.maxCarbs ?? parsedConstraints.maxCarbs ?? semanticConstraints.maxCarbs,
+        maxFat: extractedConstraints.maxFats ?? routerResult.constraints?.maxFat ?? parsedConstraints.maxFat ?? semanticConstraints.maxFat,
         // Also handle minimum calories, carbs, fats from extracted constraints
         ...(extractedConstraints.minCalories && { minCalories: extractedConstraints.minCalories }),
         ...(extractedConstraints.minCarbs && { minCarbs: extractedConstraints.minCarbs }),
@@ -1325,7 +1478,7 @@ export async function POST(req: Request) {
           restaurantVariants: restaurantVariants, // Pass variants for filtering
           // MVP v1: Location filtering disabled - explicitly do NOT pass location
           // location is undefined (not passed) - this ensures no location filtering
-          limit: 5, // Fixed pagination parameters (same as quick-picks)
+          limit: detectSuperlativeIntent(message) ? 50 : 5, // 50 for superlative (sort+slice to 1 later), 5 otherwise
           offset: 0,
           searchKey: undefined, // Let searchHandler generate it
           isPagination: false,
@@ -1350,6 +1503,45 @@ export async function POST(req: Request) {
         // Call searchHandler and return response directly with consistent shape:
         // { mode: "meals", meals, hasMore, nextOffset, searchKey, summary?, message? }
         const result = await searchHandler(searchParams);
+
+        // SUPERLATIVE POST-PROCESSING: Sort by the correct macro and take top 1
+        const superlativeSort = detectSuperlativeSort(message);
+        if (superlativeSort && result.meals && result.meals.length > 0) {
+          const getMacro = (m: any, field: string) => {
+            // Try direct field, then nested macros object
+            if (m[field] !== undefined && m[field] !== null) return Number(m[field]) || 0;
+            if (m.macros && typeof m.macros === 'object') {
+              // Handle macros as JSON object
+              const macros = typeof m.macros === 'string' ? JSON.parse(m.macros) : m.macros;
+              return Number(macros[field]) || 0;
+            }
+            return 0;
+          };
+
+          result.meals.sort((a: any, b: any) => {
+            switch (superlativeSort) {
+              case 'HIGHEST_PROTEIN':
+                return getMacro(b, 'protein') - getMacro(a, 'protein');
+              case 'LOWEST_CALORIES':
+                return getMacro(a, 'calories') - getMacro(b, 'calories');
+              case 'HIGHEST_CALORIES':
+                return getMacro(b, 'calories') - getMacro(a, 'calories');
+              case 'LOWEST_CARBS':
+                return getMacro(a, 'carbs') - getMacro(b, 'carbs');
+              case 'LOWEST_FAT':
+                return getMacro(a, 'fats') - getMacro(b, 'fats');
+              default:
+                return 0;
+            }
+          });
+          // Keep only the top 1
+          result.meals = result.meals.slice(0, 1);
+          result.hasMore = false;
+          if (isDev) {
+            const top = result.meals[0];
+            console.log(`[api/chat] Superlative sort=${superlativeSort}: top result = ${top?.name || top?.item_name} (protein=${getMacro(top, 'protein')}, cal=${getMacro(top, 'calories')})`);
+          }
+        }
 
         // Add debug log: log keys of response object and restaurant-only info
         if (isDev) {

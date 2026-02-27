@@ -1,607 +1,449 @@
 {
     "restaurant_name": "Wendy's",
     "items": [
-      
-      {
-        "name": "9.99",
-        "category": "Hamburgers",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 879,
-          "protein": 54,
-          "carbs": 39,
-          "fat": 56
+        {
+            "name": "9.99",
+            "category": "Hamburgers",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 879,
+                "protein": 54,
+                "carbs": 39,
+                "fat": 56
+            }
+        },
+        {
+            "name": "Dave's Triple",
+            "category": "Hamburgers",
+            "price_estimate": 11.21,
+            "image_url": null,
+            "macros": {
+                "calories": 1195,
+                "protein": 77,
+                "carbs": 41,
+                "fat": 80
+            }
+        },
+        {
+            "name": "Baconator",
+            "category": "Hamburgers",
+            "price_estimate": 11.46,
+            "image_url": null,
+            "macros": {
+                "calories": 1001,
+                "protein": 63,
+                "carbs": 38,
+                "fat": 66
+            }
+        },
+        {
+            "name": "Curry Bean Burger",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 535,
+                "protein": 17,
+                "carbs": 57,
+                "fat": 25
+            }
+        },
+        {
+            "name": "Spicy Chicken",
+            "category": "Chicken, Nuggets & More",
+            "price_estimate": 9.02,
+            "image_url": null,
+            "macros": {
+                "calories": 400,
+                "protein": 20,
+                "carbs": 45,
+                "fat": 15
+            }
+        },
+        {
+            "name": "Classic Chicken",
+            "category": "Chicken, Nuggets & More",
+            "price_estimate": 9.02,
+            "image_url": null,
+            "macros": {
+                "calories": 404,
+                "protein": 20,
+                "carbs": 46,
+                "fat": 15
+            }
+        },
+        {
+            "name": "Grilled Chicken",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 337,
+                "protein": 26,
+                "carbs": 35,
+                "fat": 10
+            }
+        },
+        {
+            "name": "Avocado Chicken Club",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 583,
+                "protein": 30,
+                "carbs": 47,
+                "fat": 30
+            }
+        },
+        {
+            "name": "4 Pc Chicken Nuggets",
+            "category": "Chicken, Nuggets & More",
+            "price_estimate": 2.43,
+            "image_url": null,
+            "macros": {
+                "calories": 114,
+                "protein": 11,
+                "carbs": 4.9,
+                "fat": 5.6
+            }
+        },
+        {
+            "name": "6 Pc Chicken Nuggets",
+            "category": "Chicken, Nuggets & More",
+            "price_estimate": 4.01,
+            "image_url": null,
+            "macros": {
+                "calories": 173,
+                "protein": 17,
+                "carbs": 7.4,
+                "fat": 8.4
+            }
+        },
+        {
+            "name": "10 Pc Chicken Nuggets",
+            "category": "Entree",
+            "price_estimate": 7.55,
+            "image_url": null,
+            "macros": {
+                "calories": 286,
+                "protein": 28,
+                "carbs": 12,
+                "fat": 14
+            }
+        },
+        {
+            "name": "20 Pc Chicken Nuggets",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 572,
+                "protein": 55,
+                "carbs": 25,
+                "fat": 28
+            }
+        },
+        {
+            "name": "6 Pc Spicy Chicken Nuggets",
+            "category": "Entree",
+            "price_estimate": 4.01,
+            "image_url": null,
+            "macros": {
+                "calories": 152,
+                "protein": 19,
+                "carbs": 9.8,
+                "fat": 4.1
+            }
+        },
+        {
+            "name": "10 Pc Spicy Chicken Nuggets",
+            "category": "Entree",
+            "price_estimate": 7.55,
+            "image_url": null,
+            "macros": {
+                "calories": 250,
+                "protein": 31,
+                "carbs": 16,
+                "fat": 6.8
+            }
+        },
+        {
+            "name": "20 Pc Spicy Chicken Nuggets",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 499,
+                "protein": 62,
+                "carbs": 33,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Spicy Chicken Mayo Wrap",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 341,
+                "protein": 12,
+                "carbs": 27,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Spicy Chicken Avocado Wrap",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 252,
+                "protein": 10,
+                "carbs": 27,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Spicy Chicken BBQ Wrap",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 268,
+                "protein": 12,
+                "carbs": 32,
+                "fat": 9.7
+            }
+        },
+        {
+            "name": "Cheeseburger Deluxe",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 366,
+                "protein": 17,
+                "carbs": 31,
+                "fat": 19
+            }
+        },
+        {
+            "name": "Bacon Cheeseburger",
+            "category": "Entree",
+            "price_estimate": 3.04,
+            "image_url": null,
+            "macros": {
+                "calories": 410,
+                "protein": 20,
+                "carbs": 30,
+                "fat": 23
+            }
+        },
+        {
+            "name": "Caesar Chicken Salad",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 411,
+                "protein": 28,
+                "carbs": 4.2,
+                "fat": 31
+            }
+        },
+        {
+            "name": "Avocado Chicken Salad",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 485,
+                "protein": 32,
+                "carbs": 7.5,
+                "fat": 36
+            }
+        },
+        {
+            "name": "Chili",
+            "category": "Entree",
+            "price_estimate": 3.4,
+            "image_url": null,
+            "macros": {
+                "calories": 253,
+                "protein": 19,
+                "carbs": 14,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Sausage, Egg, & Cheese Croissant",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 492,
+                "protein": 20,
+                "carbs": 28,
+                "fat": 33
+            }
+        },
+        {
+            "name": "Bacon, Egg, & Cheese Croissant",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 403,
+                "protein": 17,
+                "carbs": 27,
+                "fat": 25
+            }
+        },
+        {
+            "name": "Breakfast Baconator",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 704,
+                "protein": 37,
+                "carbs": 39,
+                "fat": 44
+            }
+        },
+        {
+            "name": "Egg & Cheese Muffin",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 319,
+                "protein": 14,
+                "carbs": 27,
+                "fat": 16
+            }
+        },
+        {
+            "name": "Sausage & Cheese Muffin",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 477,
+                "protein": 23,
+                "carbs": 28,
+                "fat": 29
+            }
+        },
+        {
+            "name": "Bacon & Cheese Muffin",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 384,
+                "protein": 19,
+                "carbs": 27,
+                "fat": 21
+            }
+        },
+        {
+            "name": "Pain au Chocolat",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 206,
+                "protein": 4.1,
+                "carbs": 24,
+                "fat": 10
+            }
+        },
+        {
+            "name": "Small Patty",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 122,
+                "protein": 9.5,
+                "carbs": 0,
+                "fat": 9.3
+            }
+        },
+        {
+            "name": "Large Patty",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 273,
+                "protein": 21,
+                "carbs": 0,
+                "fat": 21
+            }
+        },
+        {
+            "name": "Sub Classic Chicken",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 162,
+                "protein": 13,
+                "carbs": 12,
+                "fat": 6.7
+            }
+        },
+        {
+            "name": "Sausage",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 158,
+                "protein": 8.8,
+                "carbs": 1.5,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Sub Spicy",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 156,
+                "protein": 13,
+                "carbs": 11,
+                "fat": 6.5
+            }
+        },
+        {
+            "name": "Caesar Salad Dressing",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 209,
+                "protein": 1.3,
+                "carbs": 1.5,
+                "fat": 22
+            }
+        },
+        {
+            "name": "Southwest Ranch Salad Dressing",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 131,
+                "protein": 1.1,
+                "carbs": 2.3,
+                "fat": 13
+            }
         }
-      },
-      {
-        "name": "Dave's Triple",
-        "category": "Hamburgers",
-        "price_estimate": 11.21,
-        "image_url": null,
-        "macros": {
-          "calories": 1195,
-          "protein": 77,
-          "carbs": 41,
-          "fat": 80
-        }
-      },
-      {
-        "name": "Baconator",
-        "category": "Hamburgers",
-        "price_estimate": 11.46,
-        "image_url": null,
-        "macros": {
-          "calories": 1001,
-          "protein": 63,
-          "carbs": 38,
-          "fat": 66
-        }
-      },
-      {
-        "name": "Curry Bean Burger",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 535,
-          "protein": 17,
-          "carbs": 57,
-          "fat": 25
-        }
-      },
-      {
-        "name": "Spicy Chicken",
-        "category": "Chicken, Nuggets & More",
-        "price_estimate": 9.02,
-        "image_url": null,
-        "macros": {
-          "calories": 400,
-          "protein": 20,
-          "carbs": 45,
-          "fat": 15
-        }
-      },
-      {
-        "name": "Classic Chicken",
-        "category": "Chicken, Nuggets & More",
-        "price_estimate": 9.02,
-        "image_url": null,
-        "macros": {
-          "calories": 404,
-          "protein": 20,
-          "carbs": 46,
-          "fat": 15
-        }
-      },
-      {
-        "name": "Grilled Chicken",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 337,
-          "protein": 26,
-          "carbs": 35,
-          "fat": 10
-        }
-      },
-      {
-        "name": "Avocado Chicken Club",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 583,
-          "protein": 30,
-          "carbs": 47,
-          "fat": 30
-        }
-      },
-      {
-        "name": "4 Pc Chicken Nuggets",
-        "category": "Chicken, Nuggets & More",
-        "price_estimate": 2.43,
-        "image_url": null,
-        "macros": {
-          "calories": 114,
-          "protein": 11,
-          "carbs": 4.9,
-          "fat": 5.6
-        }
-      },
-      {
-        "name": "6 Pc Chicken Nuggets",
-        "category": "Chicken, Nuggets & More",
-        "price_estimate": 4.01,
-        "image_url": null,
-        "macros": {
-          "calories": 173,
-          "protein": 17,
-          "carbs": 7.4,
-          "fat": 8.4
-        }
-      },
-      {
-        "name": "10 Pc Chicken Nuggets",
-        "category": "Entree",
-        "price_estimate": 7.55,
-        "image_url": null,
-        "macros": {
-          "calories": 286,
-          "protein": 28,
-          "carbs": 12,
-          "fat": 14
-        }
-      },
-      {
-        "name": "20 Pc Chicken Nuggets",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 572,
-          "protein": 55,
-          "carbs": 25,
-          "fat": 28
-        }
-      },
-      {
-        "name": "4 Pc Spicy Chicken Nuggets",
-        "category": "Entree",
-        "price_estimate": 2.43,
-        "image_url": null,
-        "macros": {
-          "calories": 99,
-          "protein": 12,
-          "carbs": 6.5,
-          "fat": 2.8
-        }
-      },
-      {
-        "name": "6 Pc Spicy Chicken Nuggets",
-        "category": "Entree",
-        "price_estimate": 4.01,
-        "image_url": null,
-        "macros": {
-          "calories": 152,
-          "protein": 19,
-          "carbs": 9.8,
-          "fat": 4.1
-        }
-      },
-      {
-        "name": "10 Pc Spicy Chicken Nuggets",
-        "category": "Entree",
-        "price_estimate": 7.55,
-        "image_url": null,
-        "macros": {
-          "calories": 250,
-          "protein": 31,
-          "carbs": 16,
-          "fat": 6.8
-        }
-      },
-      {
-        "name": "20 Pc Spicy Chicken Nuggets",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 499,
-          "protein": 62,
-          "carbs": 33,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Spicy Chicken Mayo Wrap",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 341,
-          "protein": 12,
-          "carbs": 27,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Spicy Chicken Avocado Wrap",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 252,
-          "protein": 10,
-          "carbs": 27,
-          "fat": 11
-        }
-      },
-      
-      {
-        "name": "Spicy Chicken BBQ Wrap",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 268,
-          "protein": 12,
-          "carbs": 32,
-          "fat": 9.7
-        }
-      },
-      {
-        "name": "Cheeseburger Deluxe",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 366,
-          "protein": 17,
-          "carbs": 31,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Bacon Cheeseburger",
-        "category": "Entree",
-        "price_estimate": 3.04,
-        "image_url": null,
-        "macros": {
-          "calories": 410,
-          "protein": 20,
-          "carbs": 30,
-          "fat": 23
-        }
-      },
-      {
-        "name": "Caesar Chicken Salad",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 411,
-          "protein": 28,
-          "carbs": 4.2,
-          "fat": 31
-        }
-      },
-      {
-        "name": "Avocado Chicken Salad",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 485,
-          "protein": 32,
-          "carbs": 7.5,
-          "fat": 36
-        }
-      },
-      {
-        "name": "Chili",
-        "category": "Entree",
-        "price_estimate": 3.40,
-        "image_url": null,
-        "macros": {
-          "calories": 253,
-          "protein": 19,
-          "carbs": 14,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Kid's Cheeseburger",
-        "category": "Entree",
-        "price_estimate": 5.60,
-        "image_url": null,
-        "macros": {
-          "calories": 317,
-          "protein": 17,
-          "carbs": 30,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Kid's Hamburger",
-        "category": "Entree",
-        "price_estimate": 5.23,
-        "image_url": null,
-        "macros": {
-          "calories": 278,
-          "protein": 15,
-          "carbs": 29,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Sausage, Egg, & Cheese Croissant",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 492,
-          "protein": 20,
-          "carbs": 28,
-          "fat": 33
-        }
-      },
-      {
-        "name": "Bacon, Egg, & Cheese Croissant",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 403,
-          "protein": 17,
-          "carbs": 27,
-          "fat": 25
-        }
-      },
-      {
-        "name": "Breakfast Baconator",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 704,
-          "protein": 37,
-          "carbs": 39,
-          "fat": 44
-        }
-      },
-      {
-        "name": "Egg & Cheese Muffin",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 319,
-          "protein": 14,
-          "carbs": 27,
-          "fat": 16
-        }
-      },
-      {
-        "name": "Sausage & Cheese Muffin",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 477,
-          "protein": 23,
-          "carbs": 28,
-          "fat": 29
-        }
-      },
-      {
-        "name": "Bacon & Cheese Muffin",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 384,
-          "protein": 19,
-          "carbs": 27,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Pain au Chocolat",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 206,
-          "protein": 4.1,
-          "carbs": 24,
-          "fat": 10
-        }
-      },
-      {
-        "name": "Small Patty",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 122,
-          "protein": 9.5,
-          "carbs": 0,
-          "fat": 9.3
-        }
-      },
-      {
-        "name": "Large Patty",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 273,
-          "protein": 21,
-          "carbs": 0,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Bacon 2 Pieces",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 42,
-          "protein": 3.3,
-          "carbs": 0,
-          "fat": 3.2
-        }
-      },
-      {
-        "name": "Bacon 3 Pieces",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 63,
-          "protein": 4.9,
-          "carbs": 0,
-          "fat": 5
-        }
-      },
-      {
-        "name": "Sub Classic Chicken",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 162,
-          "protein": 13,
-          "carbs": 12,
-          "fat": 6.7
-        }
-      },
-      {
-        "name": "Sub Grilled",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 93,
-          "protein": 19,
-          "carbs": 0,
-          "fat": 1.9
-        }
-      },
-      {
-        "name": "Sausage",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 158,
-          "protein": 8.8,
-          "carbs": 1.5,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Sub Spicy",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 156,
-          "protein": 13,
-          "carbs": 11,
-          "fat": 6.5
-        }
-      },
-      {
-        "name": "Strawberry Jam",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 38,
-          "protein": 0,
-          "carbs": 9.6,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Ketchup Packet",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 11,
-          "protein": 0,
-          "carbs": 2.8,
-          "fat": 0
-        }
-      },
-      {
-        "name": "BBQ Dip Pot",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 32,
-          "protein": 0,
-          "carbs": 8,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Garlic Sauce Dip Pot",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 100,
-          "protein": 0,
-          "carbs": 3,
-          "fat": 9.8
-        }
-      },
-      {
-        "name": "Sweet Chili Dip Pot",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 48,
-          "protein": 0,
-          "carbs": 12,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Caesar Salad Dressing",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 209,
-          "protein": 1.3,
-          "carbs": 1.5,
-          "fat": 22
-        }
-      },
-      {
-        "name": "Pomegranate Vinaigrette",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 100,
-          "protein": 0,
-          "carbs": 17,
-          "fat": 3.3
-        }
-      },
-      {
-        "name": "Southwest Ranch Salad Dressing",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 131,
-          "protein": 1.1,
-          "carbs": 2.3,
-          "fat": 13
-        }
-      },
-      {
-        "name": "BBQ Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 22,
-          "protein": 0,
-          "carbs": 5.4,
-          "fat": 0
-        }
-      }
     ]
-  }
+}

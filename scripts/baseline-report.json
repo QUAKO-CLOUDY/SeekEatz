@@ -1,0 +1,187 @@
+[
+  {
+    "query": "What’s the leanest thing at an Italian restaurant?",
+    "status": 200,
+    "routing": {
+      "mode": "MEAL_SEARCH",
+      "heuristic": "MEAL_SEARCH",
+      "llm": false
+    },
+    "response": {
+      "mode": "meals",
+      "message": "We don't have an Italian restaurant in our database yet.",
+      "cardsCount": 0
+    }
+  },
+  {
+    "query": "What should I get at a burger place if I’m cutting?",
+    "status": 200,
+    "routing": {
+      "mode": "MEAL_SEARCH",
+      "heuristic": "MEAL_SEARCH",
+      "llm": false
+    },
+    "response": {
+      "mode": "text",
+      "message": "Restaurant not found: a",
+      "cardsCount": 0,
+      "answer": "Sorry — we don't have a in our database yet. Want me to show similar options from restaurants we do have?"
+    }
+  },
+  {
+    "query": "Healthy airport meal.",
+    "status": 200,
+    "routing": {
+      "mode": "MEAL_SEARCH",
+      "heuristic": "MEAL_SEARCH",
+      "llm": false
+    },
+    "response": {
+      "mode": "meals",
+      "cardsCount": 5
+    }
+  },
+  {
+    "query": "I have 900 calories left, what should I do?",
+    "status": 200,
+    "routing": {
+      "mode": "MEAL_SEARCH",
+      "heuristic": "MEAL_SEARCH",
+      "llm": false
+    },
+    "response": {
+      "mode": "meals",
+      "cardsCount": 5
+    }
+  },
+  {
+    "query": "Show me meals between 540-600 calories with at least 45g protein.",
+    "status": 200,
+    "routing": {
+      "mode": "MEAL_SEARCH",
+      "heuristic": "MEAL_SEARCH",
+      "llm": false
+    },
+    "response": {
+      "mode": "meals",
+      "cardsCount": 1
+    }
+  },
+  {
+    "query": "Under 475 calories, minimum 40g protein, no seafood.",
+    "status": 200,
+    "routing": {
+      "mode": "MEAL_SEARCH",
+      "heuristic": "MEAL_SEARCH",
+      "llm": false
+    },
+    "response": {
+      "mode": "meals",
+      "cardsCount": 5
+    }
+  },
+  {
+    "query": "Between 700-750 calories, at least 50g protein, under 60g carbs.",
+    "status": 200,
+    "routing": {
+      "mode": "MEAL_SEARCH",
+      "heuristic": "MEAL_SEARCH",
+      "llm": false
+    },
+    "response": {
+      "mode": "meals",
+      "cardsCount": 5
+    }
+  },
+  {
+    "query": "Highest protein meal under 500 calories.",
+    "status": 200,
+    "routing": {
+      "mode": "MEAL_SEARCH",
+      "heuristic": "MEAL_SEARCH",
+      "llm": false
+    },
+    "response": {
+      "mode": "meals",
+      "cardsCount": 5
+    }
+  },
+  {
+    "query": "Best protein-to-calorie ratio at Chipotle.",
+    "status": 200,
+    "routing": {
+      "mode": "MEAL_SEARCH",
+      "heuristic": "MEAL_SEARCH",
+      "llm": false
+    },
+    "response": {
+      "mode": "meals",
+      "cardsCount": 0
+    }
+  },
+  {
+    "query": "Chicken meals under 500 calories with 40g protein.",
+    "status": 200,
+    "routing": {
+      "mode": "MEAL_SEARCH",
+      "heuristic": "MEAL_SEARCH",
+      "llm": false
+    },
+    "response": {
+      "mode": "meals",
+      "cardsCount": 5
+    }
+  },
+  {
+    "query": "Lowest calorie meals.",
+    "status": 200,
+    "routing": {
+      "mode": "MEAL_SEARCH",
+      "heuristic": "MEAL_SEARCH",
+      "llm": false
+    },
+    "response": {
+      "mode": "meals",
+      "cardsCount": 5
+    }
+  },
+  {
+    "query": "Mexican food under 600 calories.",
+    "status": 200,
+    "routing": {
+      "mode": "MEAL_SEARCH",
+      "heuristic": "MEAL_SEARCH",
+      "llm": false
+    },
+    "response": {
+      "mode": "meals",
+      "cardsCount": 5
+    }
+  },
+  {
+    "query": "Italian meals under 600 calories with 30g protein.",
+    "status": 200,
+    "routing": {
+      "mode": "MEAL_SEARCH",
+      "heuristic": "MEAL_SEARCH",
+      "llm": false
+    },
+    "response": {
+      "mode": "meals",
+      "cardsCount": 5
+    }
+  },
+  {
+    "query": "Show me the highest protein meal in the entire database.",
+    "status": 200,
+    "routing": {
+      "mode": "MEAL_SEARCH",
+      "heuristic": "MEAL_SEARCH",
+      "llm": false
+    },
+    "response": {
+      "mode": "meals",
+      "cardsCount": 5
+    }
+  }
+]

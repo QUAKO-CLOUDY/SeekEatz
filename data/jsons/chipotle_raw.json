@@ -1,293 +1,185 @@
 {
     "restaurant_name": "Chipotle Mexican Grill",
     "items": [
-      {
-        "name": "Flour Tortilla (Burrito)",
-        "category": "Base",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 320,
-          "protein": 8,
-          "carbs": 50,
-          "fat": 9
+        {
+            "name": "Flour Tortilla (Burrito)",
+            "category": "Base",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 320,
+                "protein": 8,
+                "carbs": 50,
+                "fat": 9
+            }
+        },
+        {
+            "name": "Cilantro-Lime Brown Rice",
+            "category": "Base",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 210,
+                "protein": 4,
+                "carbs": 36,
+                "fat": 6
+            }
+        },
+        {
+            "name": "Cilantro-Lime White Rice",
+            "category": "Base",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 210,
+                "protein": 4,
+                "carbs": 40,
+                "fat": 4
+            }
+        },
+        {
+            "name": "Black Beans",
+            "category": "Base",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 130,
+                "protein": 8,
+                "carbs": 22,
+                "fat": 1.5
+            }
+        },
+        {
+            "name": "Pinto Beans",
+            "category": "Base",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 130,
+                "protein": 8,
+                "carbs": 21,
+                "fat": 1.5
+            }
+        },
+        {
+            "name": "Barbacoa",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 170,
+                "protein": 24,
+                "carbs": 2,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Chicken",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 180,
+                "protein": 32,
+                "carbs": 0,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Carnitas",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 210,
+                "protein": 23,
+                "carbs": 0,
+                "fat": 12
+            }
+        },
+        {
+            "name": "Steak",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 150,
+                "protein": 21,
+                "carbs": 1,
+                "fat": 6
+            }
+        },
+        {
+            "name": "Sofritas",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 150,
+                "protein": 8,
+                "carbs": 9,
+                "fat": 10
+            }
+        },
+        {
+            "name": "Cheese",
+            "category": "Topping",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 110,
+                "protein": 6,
+                "carbs": 1,
+                "fat": 8
+            }
+        },
+        {
+            "name": "Sour Cream",
+            "category": "Topping",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 110,
+                "protein": 2,
+                "carbs": 2,
+                "fat": 9
+            }
+        },
+        {
+            "name": "Side of Guacamole",
+            "category": "Sides",
+            "price_estimate": 3.5,
+            "image_url": null,
+            "macros": {
+                "calories": 230,
+                "protein": 2,
+                "carbs": 8,
+                "fat": 22
+            }
+        },
+        {
+            "name": "Side of Queso Blanco",
+            "category": "Sides",
+            "price_estimate": 3.5,
+            "image_url": null,
+            "macros": {
+                "calories": 120,
+                "protein": 5,
+                "carbs": 4,
+                "fat": 9
+            }
+        },
+        {
+            "name": "Chipotle-Honey Vinaigrette",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 220,
+                "protein": 1,
+                "carbs": 18,
+                "fat": 16
+            }
         }
-      },
-      {
-        "name": "Flour Tortilla (Taco)",
-        "category": "Base",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 80,
-          "protein": 2,
-          "carbs": 13,
-          "fat": 3
-        }
-      },
-      {
-        "name": "Crispy Corn Tortilla",
-        "category": "Base",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 70,
-          "protein": 1,
-          "carbs": 10,
-          "fat": 3
-        }
-      },
-      {
-        "name": "Cilantro-Lime Brown Rice",
-        "category": "Base",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 210,
-          "protein": 4,
-          "carbs": 36,
-          "fat": 6
-        }
-      },
-      {
-        "name": "Cilantro-Lime White Rice",
-        "category": "Base",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 210,
-          "protein": 4,
-          "carbs": 40,
-          "fat": 4
-        }
-      },
-      {
-        "name": "Black Beans",
-        "category": "Base",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 130,
-          "protein": 8,
-          "carbs": 22,
-          "fat": 1.5
-        }
-      },
-      {
-        "name": "Pinto Beans",
-        "category": "Base",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 130,
-          "protein": 8,
-          "carbs": 21,
-          "fat": 1.5
-        }
-      },
-      {
-        "name": "Fajita Vegetables",
-        "category": "Topping",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 20,
-          "protein": 1,
-          "carbs": 5,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Barbacoa",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 170,
-          "protein": 24,
-          "carbs": 2,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Chicken",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 180,
-          "protein": 32,
-          "carbs": 0,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Carnitas",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 210,
-          "protein": 23,
-          "carbs": 0,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Steak",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 150,
-          "protein": 21,
-          "carbs": 1,
-          "fat": 6
-        }
-      },
-      {
-        "name": "Sofritas",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 150,
-          "protein": 8,
-          "carbs": 9,
-          "fat": 10
-        }
-      },
-      {
-        "name": "Fresh Tomato Salsa",
-        "category": "Sides",
-        "price_estimate": 3.00,
-        "image_url": null,
-        "macros": {
-          "calories": 25,
-          "protein": 0,
-          "carbs": 4,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Roasted Chili-Corn Salsa",
-        "category": "Sides",
-        "price_estimate": 3.00,
-        "image_url": null,
-        "macros": {
-          "calories": 80,
-          "protein": 3,
-          "carbs": 16,
-          "fat": 1.5
-        }
-      },
-      {
-        "name": "Tomatillo-Green Chili Salsa",
-        "category": "Sides",
-        "price_estimate": 3.00,
-        "image_url": null,
-        "macros": {
-          "calories": 15,
-          "protein": 0,
-          "carbs": 4,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Tomatillo-Red Chili Salsa",
-        "category": "Sides",
-        "price_estimate": 3.00,
-        "image_url": null,
-        "macros": {
-          "calories": 30,
-          "protein": 0,
-          "carbs": 4,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Cheese",
-        "category": "Topping",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 110,
-          "protein": 6,
-          "carbs": 1,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Sour Cream",
-        "category": "Topping",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 110,
-          "protein": 2,
-          "carbs": 2,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Side of Guacamole",
-        "category": "Sides",
-        "price_estimate": 3.50,
-        "image_url": null,
-        "macros": {
-          "calories": 230,
-          "protein": 2,
-          "carbs": 8,
-          "fat": 22
-        }
-      },
-      {
-        "name": "Side of Queso Blanco",
-        "category": "Sides",
-        "price_estimate": 3.50,
-        "image_url": null,
-        "macros": {
-          "calories": 120,
-          "protein": 5,
-          "carbs": 4,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Supergreens Salad Mix",
-        "category": "Base",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 15,
-          "protein": 1,
-          "carbs": 3,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Romaine Lettuce",
-        "category": "Topping",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 5,
-          "protein": 0,
-          "carbs": 1,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Chipotle-Honey Vinaigrette",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 220,
-          "protein": 1,
-          "carbs": 18,
-          "fat": 16
-        }
-      }
     ]
-  }
+}

@@ -1,0 +1,273 @@
+[
+  {
+    "query": "Find me a meal from McDonald's.",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Buffalo Ranch McChicken (McDonald's)",
+      "Southern Style Buttermilk Crispy Chicken Sandwich (McDonald's)",
+      "Premium Asian Salad with Buttermilk Crispy Chicken (McDonald's)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Low calorie meal at a steakhouse.",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Chick-fil-A Chicken Biscuit (Chick-fil-A)",
+      "Chicken Legs (2) (El Pollo Loco)",
+      "Turkey Sausage Wake-Up Wrap (1 Wrap) (Dunkin')"
+    ],
+    "answer": null
+  },
+  {
+    "query": "What’s the leanest thing at an Italian restaurant?",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": null
+  },
+  {
+    "query": "What should I get at a burger place if I’m cutting?",
+    "mode": "text",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": "Sorry — we don't have a in our database yet. Want me to show similar options from restaurants we do have?"
+  },
+  {
+    "query": "Healthy airport meal.",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Cranberry Bacon Bleu Salad with Grilled Chicken (Culver's)",
+      "Harvest Chopped (The Habit Burger & Grill)",
+      "Southwestern Steak (Chopt Creative Salad Co.)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "I have 900 calories left, what should I do?",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Salmon Buddha Bowl (Carrot Express)",
+      "Crispy Chicken Bites (10pc) (The Habit Burger & Grill)",
+      "Market Salad (Chick-fil-A)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Show me meals between 540–600 calories with at least 45g protein.",
+    "mode": "meals",
+    "mealCount": 1,
+    "topItems": [
+      "Classic Cobb (Chopt Creative Salad Co.)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Under 475 calories, minimum 40g protein, no seafood.",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Cranberry Bacon Bleu Salad with Grilled Chicken (Culver's)",
+      "Firehouse Chopped Salad with Grilled Chicken (Firehouse Subs)",
+      "Citrus Avocado Fresca Salad (El Pollo Loco)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Between 700–750 calories, at least 50g protein, under 60g carbs.",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "#6 Roast Beef & Provolone (Wheat Wrap) (Jersey Mike's Subs)",
+      "Chicken Boneless 14 Pc (Domino's Pizza)",
+      "Avo Tuna Melt (Carrot Express)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Highest protein meal under 600 calories.",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Double Chicken Avocado Salad (El Pollo Loco)",
+      "Garden Fresco Salad with Grilled Chicken (Culver's)",
+      "Smokehouse Brisket (Arby's)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Best protein-to-calorie ratio at Chipotle.",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": null
+  },
+  {
+    "query": "Specific protein options with macro and calorie filtering",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Sweet Chili Crispy Tofu Sandwich (Dig Inn)",
+      "Turkey Sausage Sandwich On English Muffin (Dunkin')",
+      "Street Corn Double Chicken Burrito Bowl (El Pollo Loco)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Lowest calorie meals",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Chicken Sandwich On Ciabatta (The Habit Burger & Grill)",
+      "Blackened Salmon (Clean Eatz)",
+      "Wings 8 Pc (Domino's Pizza)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Cuisine meals over/under calories or macros",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Crispy Chicken Sandwich On Ciabatta (The Habit Burger & Grill)",
+      "Sausage Biscuit (Arby's)",
+      "Fan Faves Plate (Dig Inn)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Multi stack test: cuisine, macros, and calories",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Italian Oven Baked Sandwich (Domino's Pizza)",
+      "Double Cheeseburger (Burger King)",
+      "Garden Ranch Salad (The Habit Burger & Grill)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Show me the highest protein meal in the entire database.",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Greek Chicken (CAVA)",
+      "Ultimate Hummus Harissa Bowl (Warm Grains) (Chopt Creative Salad Co.)",
+      "Southwest Bison (Clean Eatz)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "high protein meals from Taco Bell with under 600 calories",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": null
+  },
+  {
+    "query": "Best high-protein option at Burger King",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Egg-Normous Burrito (Burger King)",
+      "Bacon King (Burger King)",
+      "Crispy Onion Whopper (Burger King)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "show me lunch at olive garden",
+    "mode": "text",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": "Sorry — we don't have olive in our database yet. Want me to show similar options from restaurants we do have?"
+  },
+  {
+    "query": "i wanna eat a vegetrian high protein meal",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Vegan Dig Classic (Dig Inn)",
+      "#14 The Veggie (Wheat Giant) (Jersey Mike's Subs)",
+      "Kosher Dunkin' Double Veggie Sausage Sandwich (Dunkin')"
+    ],
+    "answer": null
+  },
+  {
+    "query": "vegan high protein bowls",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": null
+  },
+  {
+    "query": "Find me a meal with at least 30g protein and max 500 calories",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Chick-fil-A Deluxe Sandwich (Chick-fil-A)",
+      "Turkey Burger (Carrot Express)",
+      "Flatbreads (Clean Eatz)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "High protein vegetarian meals under 500 calories",
+    "mode": "meals",
+    "mealCount": 1,
+    "topItems": [
+      "#14 The Veggie (In a Tub) (Jersey Mike's Subs)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Leanest thing at chipotle",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": null
+  },
+  {
+    "query": "Highest protein vegan option at taco bell",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": null
+  },
+  {
+    "query": "Food",
+    "mode": "text",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": "What kind of food are you looking for? Any preferences like meal type, calories, protein, or a specific restaurant?"
+  },
+  {
+    "query": "How many calories in a big mac",
+    "mode": "text",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": "A Big Mac from McDonald's contains approximately 550 calories. Exact values vary by location and portion size."
+  },
+  {
+    "query": "80g protein under 300 calories",
+    "mode": "text",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": "That's a very challenging combination — 80g protein under 300 calories is extremely difficult to find in restaurant meals. Would you like to relax either the protein minimum or calorie cap?"
+  },
+  {
+    "query": "Not chicken, high protein",
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Mango Miso Crunch (The Habit Burger & Grill)",
+      "Deep Fried Turkey Club (Arby's)",
+      "Spicy Avotuna (Chopt Creative Salad Co.)"
+    ],
+    "answer": null
+  }
+]

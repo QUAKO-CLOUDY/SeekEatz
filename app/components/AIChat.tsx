@@ -795,7 +795,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   // Send message function
   const sendMessage = async (messageText: string) => {
     const trimmedText = messageText.trim();
-    if (!trimmedText || isLoading) {
+    if (!trimmedText) {
       return;
     }
 
@@ -840,6 +840,15 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     // Create new AbortController for this request
     const abortController = new AbortController();
     abortControllerRef.current = abortController;
+
+    // Safety timeout to prevent UI hanging forever
+    const timeoutId = setTimeout(() => {
+      // Only abort if this is still the active request
+      if (abortControllerRef.current === abortController) {
+        // Pass reason to distinguish timeout from manual cancel
+        abortController.abort(new Error('REQUEST_TIMEOUT'));
+      }
+    }, 45000); // 45 seconds max
 
     // Clear error
     setError(null);
@@ -893,10 +902,15 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           }),
           signal: abortController.signal,
         });
-      } catch (fetchError) {
+      } catch (fetchError: any) {
         // Handle abort
         if (abortController.signal.aborted) {
           console.log('Request was aborted');
+          // If aborted due to timeout, show error pointing to long delay
+          if (abortController.signal.reason?.message === 'REQUEST_TIMEOUT') {
+            setError('Request timed out. The server took too long to respond.');
+            setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
+          }
           return;
         }
         console.error('Fetch error:', fetchError);
@@ -1239,9 +1253,14 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       // Remove user message on error
       setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
     } finally {
+      // Clear safety timeout
+      clearTimeout(timeoutId);
       // Always set loading to false, regardless of success or error
-      setIsLoading(false);
-      abortControllerRef.current = null;
+      // Only clear loading state if this is still the active request
+      if (abortControllerRef.current === abortController) {
+        setIsLoading(false);
+        abortControllerRef.current = null;
+      }
     }
   };
 
@@ -1570,7 +1589,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                 <button
                   key={index}
                   onClick={() => sendQuickPrompt(item.prompt)}
-                  disabled={isLoading || (isLimitReached && !isSignedIn)}
+                  disabled={isLimitReached && !isSignedIn}
                   className={`flex-shrink-0 px-[6px] py-[6px] h-[18px] leading-[1px] md:px-[10px] md:py-[10px] md:h-[30px] md:leading-[2px] border rounded-full text-xs md:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap ${isDark ? 'bg-gray-800 hover:bg-gray-700 active:bg-gray-600 border-gray-700 text-gray-200' : 'bg-gray-50 hover:bg-gray-100 active:bg-gray-200 border-gray-200 text-gray-700'}`}
                 >
                   {item.display}
@@ -1582,7 +1601,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       </div>
 
       {/* Input Bar */}
-      <div className={`border-t fixed bottom-0 left-0 right-0 w-full mb-[60px] z-30 flex items-center justify-center transition-all duration-300 ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'} ${isAtBottom ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}>
+      <div className={`border-t fixed bottom-0 left-0 right-0 w-full mb-[60px] z-30 flex items-center justify-center transition-all duration-300 ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
         <div className="w-full max-w-2xl p-2 md:p-4">
           <form onSubmit={onSubmit} className="flex items-center gap-2">
             <input
@@ -1591,12 +1610,12 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder={isLimitReached && !isSignedIn ? "You've used your 3 free chats. Create an account to continue." : "Ask AI to find meals, macros, or cravings..."}
-              disabled={isLoading || (isLimitReached && !isSignedIn)}
+              disabled={isLimitReached && !isSignedIn}
               autoComplete="off"
             />
             <button
               type="submit"
-              disabled={!inputText.trim() || isLoading || (isLimitReached && !isSignedIn)}
+              disabled={!inputText.trim() || (isLimitReached && !isSignedIn)}
               className={`flex-shrink-0 p-1.5 md:p-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all ${isLimitReached && !isSignedIn ? 'cursor-not-allowed' : ''}`}
             >
               <Send size={16} className="md:w-[18px] md:h-[18px]" />

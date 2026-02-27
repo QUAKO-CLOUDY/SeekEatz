@@ -4,6 +4,23 @@
  */
 
 /**
+ * Cleans up a restaurant query extracted by greedy regex
+ * Trims trailing punctuation and common non-restaurant trailing words
+ */
+function cleanRestaurantQuery(raw: string): string {
+  let cleaned = raw.trim().replace(/[,.!?]+$/, '');
+  const trailingWords = [
+    /\s+(with|and|but|or|for|that|which|where|when|please|thanks|thx|pls)(\s.*)?$/i,
+    /\s+(under|over|below|above|less|more|around|about|at\s+least|at\s+most)(\s.*)?$/i,
+    /\s+(\d+\s*(g|grams?|calories?|cal|kcal|carbs?|protein|fat|fats))(\s.*)?$/i,
+  ];
+  for (const pattern of trailingWords) {
+    cleaned = cleaned.replace(pattern, '');
+  }
+  return cleaned.trim();
+}
+
+/**
  * Extracts explicit restaurant query from message text
  * Only returns restaurantQuery when explicit patterns exist
  */
@@ -17,24 +34,28 @@ export function extractExplicitRestaurant(message: string): {
   const trimmed = message.trim();
   const lowerMessage = trimmed.toLowerCase();
 
-  // Pattern 1: "from X" - matches "from <restaurant>" anywhere in the message
-  // Supports: "lunch from chipotle", "find me lunch from chipotle", "meals from chipotle", "from chipotle"
-  const pattern1 = /\bfrom\s+([a-z0-9&' .-]+?)(?:\s|$|,|\.|!|\?)/i;
+  // Pattern 1: "from X" - greedy match to end, then clean trailing words
+  const pattern1 = /\bfrom\s+([a-z0-9&' .\-]+)/i;
   const match1 = trimmed.match(pattern1);
   if (match1 && match1[1]) {
-    const restaurantQuery = match1[1].trim().replace(/[,\.!?]+$/, '');
+    const restaurantQuery = cleanRestaurantQuery(match1[1]);
     if (restaurantQuery.length > 0) {
       return { restaurantQuery };
     }
   }
 
-  // Pattern 2: "at X" - matches "at <restaurant>" anywhere in the message
-  // Supports: "lunch at chipotle", "find me lunch at chipotle", "meals at chipotle", "at chipotle"
-  const pattern2 = /\bat\s+([a-z0-9&' .-]+?)(?:\s|$|,|\.|!|\?)/i;
+  // Pattern 2: "at X" - greedy match, then clean trailing words
+  // GUARD: Must not match common macro/nutritional phrases like "at least", "at most"
+  const forbiddenAfterAt = [
+    'least', 'most', 'around', 'about', 'approximately', 'roughly',
+    'under', 'over', 'above', 'below', 'home', 'work', 'school',
+  ];
+  const pattern2 = /\bat\s+([a-z0-9&' .\-]+)/i;
   const match2 = trimmed.match(pattern2);
   if (match2 && match2[1]) {
-    const restaurantQuery = match2[1].trim().replace(/[,\.!?]+$/, '');
-    if (restaurantQuery.length > 0) {
+    const restaurantQuery = cleanRestaurantQuery(match2[1]);
+    const firstWord = restaurantQuery.toLowerCase().split(/\s+/)[0];
+    if (restaurantQuery.length > 0 && !forbiddenAfterAt.includes(firstWord)) {
       return { restaurantQuery };
     }
   }
@@ -102,12 +123,12 @@ export function extractMacroFilters(message: string): {
     /\b(meals?|food|find\s+me|show\s+me|lunch|dinner|breakfast)\s+(with|over|above|at\s+least)\s+(\d+)\s*(grams?\s+)?(protein|pro)\b/i,
     /\b(\d+)\s*(g|grams?)\s+(protein|pro)\b/i, // Shorthand: "40g protein" (assumes minimum)
     /\b(\d+)\s+(protein|pro)\b/i, // Shorthand: "40 protein" (assumes minimum, no unit)
-    /\bhigh\s+protein\b/i, // "high protein" -> assume min 30g
+    /\bhigh[\s-]+protein\b/i, // "high protein" or "high-protein" -> assume min 30g
   ];
   for (const pattern of proteinMinPatterns) {
     const match = trimmed.match(pattern);
     if (match) {
-      if (match[0].toLowerCase().includes('high protein')) {
+      if (match[0].toLowerCase().match(/high[\s-]+protein/)) {
         result.proteinMin = 30;
       } else {
         const value = parseInt(match[2] || match[3] || match[1], 10);
@@ -127,17 +148,24 @@ export function extractMacroFilters(message: string): {
     /\b(meals?|food|find\s+me|show\s+me)\s+(under|below|less\s+than|at\s+most)\s+(\d+)\s*(calories?|cal)\b/i,
     /\b(meals?|food|find\s+me|show\s+me)\s+(\d+)\s*(calories?|cal)\b/i, // Shorthand: "meal under 600 cal"
     /\b(\d+)\s*(cal|calories?)\b/i, // Shorthand: "600 cal" or "600 calories" (assumes maximum if no other context)
+    /\blow\s+(calorie|calories|cal)\b/i, // "low calorie" -> assume max 500
   ];
   for (const pattern of caloriesMaxPatterns) {
     const match = trimmed.match(pattern);
     if (match) {
+      // Handle "low calorie" without a number
+      if (match[0].toLowerCase().match(/\blow\s+(calorie|calories|cal)\b/)) {
+        result.caloriesMax = 500;
+        hasAnyFilter = true;
+        break;
+      }
       const value = parseInt(match[2] || match[3] || match[1], 10);
       if (!isNaN(value) && value >= 50 && value <= 5000) {
-        const isMaxContext = match[0].toLowerCase().includes('under') || 
-                            match[0].toLowerCase().includes('below') || 
-                            match[0].toLowerCase().includes('less') ||
-                            match[0].toLowerCase().includes('max') ||
-                            match[0].toLowerCase().includes('at most');
+        const isMaxContext = match[0].toLowerCase().includes('under') ||
+          match[0].toLowerCase().includes('below') ||
+          match[0].toLowerCase().includes('less') ||
+          match[0].toLowerCase().includes('max') ||
+          match[0].toLowerCase().includes('at most');
         if (isMaxContext || !trimmed.match(/\b(at\s+least|minimum|min|>=|over|above)\s+(\d+)\s*(calories?|cal)\b/i)) {
           result.caloriesMax = value;
           hasAnyFilter = true;
@@ -170,7 +198,7 @@ export function extractMacroFilters(message: string): {
     /\b(meals?|food|find\s+me|show\s+me)\s+(under|below|less\s+than|at\s+most)\s+(\d+)\s*(grams?\s+)?(carbs?|carbohydrates?)\b/i,
     /\blow\s+carbs?\b/i, // "low carb" -> assume max 30g
   ];
-  
+
   // Pattern: "over Xg carbs" or "above Xg carbs" or "at least Xg carbs" (for minimum)
   const carbsMinPatterns = [
     /\b(at\s+least|minimum|min|>=|over|above)\s+(\d+)\s*(grams?\s+)?(carbs?|carbohydrates?)\b/i,
@@ -208,7 +236,7 @@ export function extractMacroFilters(message: string): {
     /\b(under|below|less\s+than|at\s+most|max|maximum|<=)\s+(\d+)\s*(grams?\s+)?(fat|fats)\b/i,
     /\blow\s+fat\b/i, // "low fat" -> assume max 20g
   ];
-  
+
   // Pattern: "over Xg fat" or "above Xg fat" or "at least Xg fat" (for minimum)
   const fatsMinPatterns = [
     /\b(at\s+least|minimum|min|>=|over|above)\s+(\d+)\s*(grams?\s+)?(fat|fats)\b/i,

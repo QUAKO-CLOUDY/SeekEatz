@@ -1,0 +1,218 @@
+[
+  {
+    "query": "Find me a meal from McDonald's.",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Buffalo Ranch McChicken (McDonald's)",
+      "Southern Style Buttermilk Crispy Chicken Sandwich (McDonald's)",
+      "Premium Asian Salad with Buttermilk Crispy Chicken (McDonald's)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Low calorie meal at a steakhouse.",
+    "mode": "text",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": "I found multiple restaurants that might match. Did you mean: Steak 'n Shake, Firehouse Subs? Please specify which one."
+  },
+  {
+    "query": "What’s the leanest thing at an Italian restaurant?",
+    "mode": "text",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": "What specific meal type are you interested in? For example, pasta, pizza, or salad?"
+  },
+  {
+    "query": "What should I get at a burger place if I’m cutting?",
+    "mode": "text",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": "I found multiple restaurants that might match. Did you mean: Burger King, In-N-Out Burger, The Habit Burger & Grill, Smashburger, Whataburger? Please specify which one."
+  },
+  {
+    "query": "Healthy airport meal.",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Cranberry Bacon Bleu Salad with Grilled Chicken (Culver's)",
+      "Harvest Chopped (The Habit Burger & Grill)",
+      "Southwestern Steak (Chopt Creative Salad Co.)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "I have 900 calories left, what should I do?",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Salmon Buddha Bowl (Carrot Express)",
+      "Crispy Chicken Bites (10pc) (The Habit Burger & Grill)",
+      "Market Salad (Chick-fil-A)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Show me meals between 540–600 calories with at least 45g protein.",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Classic Cobb (Chopt Creative Salad Co.)",
+      "Firehouse Chopped Salad with Grilled Chicken (Firehouse Subs)",
+      "Cranberry Bacon Bleu Salad with Grilled Chicken (Culver's)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Under 475 calories, minimum 40g protein, no seafood.",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Cranberry Bacon Bleu Salad with Grilled Chicken (Culver's)",
+      "Firehouse Chopped Salad with Grilled Chicken (Firehouse Subs)",
+      "Citrus Avocado Fresca Salad (El Pollo Loco)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Between 700–750 calories, at least 50g protein, under 60g carbs.",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Firehouse Chopped Salad with Grilled Chicken (Firehouse Subs)",
+      "Wings 14 Pc (Domino's Pizza)",
+      "#6 Roast Beef & Provolone (Reduced Carb Wrap) (Jersey Mike's Subs)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Highest protein meal under 600 calories.",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Crispy Onion Whopper Jr. (Burger King)",
+      "Wings 8 Pc (Domino's Pizza)",
+      "#1 BLT (White Regular) (Jersey Mike's Subs)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Best protein-to-calorie ratio at Chipotle.",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": null
+  },
+  {
+    "query": "Specific protein options with macro and calorie filtering",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Sweet Chili Crispy Tofu Sandwich (Dig Inn)",
+      "Turkey Sausage Sandwich On English Muffin (Dunkin')",
+      "Street Corn Double Chicken Burrito Bowl (El Pollo Loco)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Lowest calorie meals",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Chicken Sandwich On Ciabatta (The Habit Burger & Grill)",
+      "Blackened Salmon (Clean Eatz)",
+      "Wings 8 Pc (Domino's Pizza)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Cuisine meals over/under calories or macros",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Crispy Chicken Sandwich On Ciabatta (The Habit Burger & Grill)",
+      "Sausage Biscuit (Arby's)",
+      "Fan Faves Plate (Dig Inn)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Multi stack test: cuisine, macros, and calories",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Italian Oven Baked Sandwich (Domino's Pizza)",
+      "Double Cheeseburger (Burger King)",
+      "Garden Ranch Salad (The Habit Burger & Grill)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "Show me the highest protein meal in the entire database.",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Engineer - Large (Firehouse Subs)",
+      "Kosher Dunkin' Double Veggie Sausage Sandwich (Dunkin')",
+      "Greek Salad (CAVA)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "high protein meals from Taco Bell with under 600 calories",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": null
+  },
+  {
+    "query": "Best high-protein option at Burger King",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Crispy Onion Whopper (Burger King)",
+      "Double Whopper (Burger King)",
+      "Triple Whopper (Burger King)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "show me lunch at olive garden",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Hamburger (Five Guys)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "i wanna eat a vegetrian high protein meal",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Double-Double w/Onion (In-N-Out Burger)",
+      "Deep Fried Turkey Gobbler (Arby's)",
+      "Spicy Chicken + Avocado (CAVA)"
+    ],
+    "answer": null
+  },
+  {
+    "query": "vegan high protein bowls",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [],
+    "answer": null
+  },
+  {
+    "query": "Find me a meal with at least 30g protein and max 500 calories",
+    "mode": "meals",
+    "mealCount": 0,
+    "topItems": [
+      "Chick-fil-A Deluxe Sandwich (Chick-fil-A)",
+      "Turkey Burger (Carrot Express)",
+      "Flatbreads (Clean Eatz)"
+    ],
+    "answer": null
+  }
+]

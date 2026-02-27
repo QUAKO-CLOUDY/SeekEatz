@@ -1,258 +1,236 @@
 {
     "restaurant_name": "Tropical Smoothie Cafe",
     "items": [
-      {
-        "name": "Acai Bowl",
-        "category": "BOWLS",
-        "price_estimate": 15.19,
-        "macros": {
-          "calories": 530,
-          "protein": 4,
-          "carbs": 100,
-          "fat": 17
+        {
+            "name": "Acai Bowl",
+            "category": "BOWLS",
+            "price_estimate": 15.19,
+            "macros": {
+                "calories": 530,
+                "protein": 4,
+                "carbs": 100,
+                "fat": 17
+            }
+        },
+        {
+            "name": "Acai Bowl with Nutella",
+            "category": "BOWLS",
+            "price_estimate": 16.09,
+            "macros": {
+                "calories": 680,
+                "protein": 6,
+                "carbs": 116,
+                "fat": 26
+            }
+        },
+        {
+            "name": "Bahama Mama Bowl",
+            "category": "BOWLS",
+            "price_estimate": 14.29,
+            "macros": {
+                "calories": 400,
+                "protein": 3,
+                "carbs": 75,
+                "fat": 11
+            }
+        },
+        {
+            "name": "PB Protein Crunch",
+            "category": "BOWLS",
+            "price_estimate": 12.49,
+            "macros": {
+                "calories": 800,
+                "protein": 32,
+                "carbs": 71,
+                "fat": 45
+            }
+        },
+        {
+            "name": "ALL AMERICAN WRAP",
+            "category": "BREAKFAST",
+            "price_estimate": 6.09,
+            "macros": {
+                "calories": 410,
+                "protein": 17,
+                "carbs": 35,
+                "fat": 21
+            }
+        },
+        {
+            "name": "CALI BREAKFAST FLATBREAD",
+            "category": "BREAKFAST",
+            "price_estimate": 8.89,
+            "macros": {
+                "calories": 560,
+                "protein": 27,
+                "carbs": 47,
+                "fat": 30
+            }
+        },
+        {
+            "name": "PB Banana Crunch Flatbread",
+            "category": "BREAKFAST",
+            "price_estimate": 8.39,
+            "macros": {
+                "calories": 640,
+                "protein": 17,
+                "carbs": 87,
+                "fat": 26
+            }
+        },
+        {
+            "name": "Southwest Wrap - Chicken",
+            "category": "BREAKFAST",
+            "price_estimate": 8.19,
+            "macros": {
+                "calories": 590,
+                "protein": 24,
+                "carbs": 38,
+                "fat": 38
+            }
+        },
+        {
+            "name": "SPINACH FETA & PESTO WRAP",
+            "category": "BREAKFAST",
+            "price_estimate": 8.39,
+            "macros": {
+                "calories": 450,
+                "protein": 17,
+                "carbs": 38,
+                "fat": 26
+            }
+        },
+        {
+            "name": "BAJA CHICKEN",
+            "category": "WRAPS",
+            "price_estimate": 13.09,
+            "macros": {
+                "calories": 760,
+                "protein": 38,
+                "carbs": 83,
+                "fat": 30
+            }
+        },
+        {
+            "name": "Buffalo Chicken",
+            "category": "WRAPS",
+            "price_estimate": 13.09,
+            "macros": {
+                "calories": 620,
+                "protein": 33,
+                "carbs": 59,
+                "fat": 27
+            }
+        },
+        {
+            "name": "Caribbean Jerk Chicken",
+            "category": "WRAPS",
+            "price_estimate": 13.09,
+            "macros": {
+                "calories": 700,
+                "protein": 38,
+                "carbs": 91,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Hummus Veggie",
+            "category": "WRAPS",
+            "price_estimate": 13.09,
+            "macros": {
+                "calories": 830,
+                "protein": 23,
+                "carbs": 95,
+                "fat": 41
+            }
+        },
+        {
+            "name": "Supergreen Caesar Chicken",
+            "category": "WRAPS",
+            "price_estimate": 13.09,
+            "macros": {
+                "calories": 750,
+                "protein": 43,
+                "carbs": 55,
+                "fat": 39
+            }
+        },
+        {
+            "name": "Thai Chicken Wrap",
+            "category": "WRAPS",
+            "price_estimate": 13.09,
+            "macros": {
+                "calories": 600,
+                "protein": 31,
+                "carbs": 77,
+                "fat": 19
+            }
+        },
+        {
+            "name": "Turkey Bacon Ranch",
+            "category": "Sandwich",
+            "price_estimate": 12.59,
+            "macros": {
+                "calories": 500,
+                "protein": 39,
+                "carbs": 51,
+                "fat": 18
+            }
+        },
+        {
+            "name": "Chicken Bacon Ranch",
+            "category": "Flatbread",
+            "price_estimate": 11.19,
+            "macros": {
+                "calories": 510,
+                "protein": 28,
+                "carbs": 47,
+                "fat": 23
+            }
+        },
+        {
+            "name": "Chipotle Chicken Club",
+            "category": "Flatbread",
+            "price_estimate": 11.19,
+            "macros": {
+                "calories": 520,
+                "protein": 27,
+                "carbs": 46,
+                "fat": 25
+            }
+        },
+        {
+            "name": "Santa Fe Chicken Quesadilla",
+            "category": "'DILLAS",
+            "price_estimate": 11.09,
+            "macros": {
+                "calories": 600,
+                "protein": 33,
+                "carbs": 49,
+                "fat": 29
+            }
+        },
+        {
+            "name": "Three Cheese Chicken Quesadilla",
+            "category": "'DILLAS",
+            "price_estimate": 10.69,
+            "macros": {
+                "calories": 540,
+                "protein": 31,
+                "carbs": 39,
+                "fat": 27
+            }
+        },
+        {
+            "name": "Thai Chicken Salad",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 380,
+                "protein": 23,
+                "carbs": 41,
+                "fat": 14
+            }
         }
-      },
-      {
-        "name": "Acai Bowl with Nutella",
-        "category": "BOWLS",
-        "price_estimate": 16.09,
-        "macros": {
-          "calories": 680,
-          "protein": 6,
-          "carbs": 116,
-          "fat": 26
-        }
-      },
-      {
-        "name": "Bahama Mama Bowl",
-        "category": "BOWLS",
-        "price_estimate": 14.29,
-        "macros": {
-          "calories": 400,
-          "protein": 3,
-          "carbs": 75,
-          "fat": 11
-        }
-      },
-      {
-        "name": "PB Protein Crunch",
-        "category": "BOWLS",
-        "price_estimate": 12.49,
-        "macros": {
-          "calories": 800,
-          "protein": 32,
-          "carbs": 71,
-          "fat": 45
-        }
-      },
-      {
-        "name": "ALL AMERICAN WRAP",
-        "category": "BREAKFAST",
-        "price_estimate": 6.09,
-        "macros": {
-          "calories": 410,
-          "protein": 17,
-          "carbs": 35,
-          "fat": 21
-        }
-      },
-      {
-        "name": "CALI BREAKFAST FLATBREAD",
-        "category": "BREAKFAST",
-        "price_estimate": 8.89,
-        "macros": {
-          "calories": 560,
-          "protein": 27,
-          "carbs": 47,
-          "fat": 30
-        }
-      },
-      {
-        "name": "PB Banana Crunch Flatbread",
-        "category": "BREAKFAST",
-        "price_estimate": 8.39,
-        "macros": {
-          "calories": 640,
-          "protein": 17,
-          "carbs": 87,
-          "fat": 26
-        }
-      },
-      {
-        "name": "Southwest Wrap - Chicken",
-        "category": "BREAKFAST",
-        "price_estimate": 8.19,
-        "macros": {
-          "calories": 590,
-          "protein": 24,
-          "carbs": 38,
-          "fat": 38
-        }
-      },
-      {
-        "name": "SPINACH FETA & PESTO WRAP",
-        "category": "BREAKFAST",
-        "price_estimate": 8.39,
-        "macros": {
-          "calories": 450,
-          "protein": 17,
-          "carbs": 38,
-          "fat": 26
-        }
-      },
-      {
-        "name": "BAJA CHICKEN",
-        "category": "WRAPS",
-        "price_estimate": 13.09,
-        "macros": {
-          "calories": 760,
-          "protein": 38,
-          "carbs": 83,
-          "fat": 30
-        }
-      },
-      {
-        "name": "Buffalo Chicken",
-        "category": "WRAPS",
-        "price_estimate": 13.09,
-        "macros": {
-          "calories": 620,
-          "protein": 33,
-          "carbs": 59,
-          "fat": 27
-        }
-      },
-      {
-        "name": "Caribbean Jerk Chicken",
-        "category": "WRAPS",
-        "price_estimate": 13.09,
-        "macros": {
-          "calories": 700,
-          "protein": 38,
-          "carbs": 91,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Hummus Veggie",
-        "category": "WRAPS",
-        "price_estimate": 13.09,
-        "macros": {
-          "calories": 830,
-          "protein": 23,
-          "carbs": 95,
-          "fat": 41
-        }
-      },
-      {
-        "name": "Supergreen Caesar Chicken",
-        "category": "WRAPS",
-        "price_estimate": 13.09,
-        "macros": {
-          "calories": 750,
-          "protein": 43,
-          "carbs": 55,
-          "fat": 39
-        }
-      },
-      {
-        "name": "Thai Chicken Wrap",
-        "category": "WRAPS",
-        "price_estimate": 13.09,
-        "macros": {
-          "calories": 600,
-          "protein": 31,
-          "carbs": 77,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Turkey Bacon Ranch",
-        "category": "Sandwich",
-        "price_estimate": 12.59,
-        "macros": {
-          "calories": 500,
-          "protein": 39,
-          "carbs": 51,
-          "fat": 18
-        }
-      },
-      {
-        "name": "Chicken Bacon Ranch",
-        "category": "Flatbread",
-        "price_estimate": 11.19,
-        "macros": {
-          "calories": 510,
-          "protein": 28,
-          "carbs": 47,
-          "fat": 23
-        }
-      },
-      {
-        "name": "Chipotle Chicken Club",
-        "category": "Flatbread",
-        "price_estimate": 11.19,
-        "macros": {
-          "calories": 520,
-          "protein": 27,
-          "carbs": 46,
-          "fat": 25
-        }
-      },
-      {
-        "name": "Santa Fe Chicken Quesadilla",
-        "category": "'DILLAS",
-        "price_estimate": 11.09,
-        "macros": {
-          "calories": 600,
-          "protein": 33,
-          "carbs": 49,
-          "fat": 29
-        }
-      },
-      {
-        "name": "Three Cheese Chicken Quesadilla",
-        "category": "'DILLAS",
-        "price_estimate": 10.69,
-        "macros": {
-          "calories": 540,
-          "protein": 31,
-          "carbs": 39,
-          "fat": 27
-        }
-      },
-      {
-        "name": "Thai Chicken Salad",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 380,
-          "protein": 23,
-          "carbs": 41,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Cheese 'Dilla",
-        "category": "KIDS",
-        "price_estimate": 8.39,
-        "macros": {
-          "calories": 400,
-          "protein": 17,
-          "carbs": 35,
-          "fat": 22
-        }
-      },
-      {
-        "name": "Turkey & Cheddar Wrap",
-        "category": "KIDS",
-        "price_estimate": 7.49,
-        "macros": {
-          "calories": 360,
-          "protein": 23,
-          "carbs": 35,
-          "fat": 15
-        }
-      }
     ]
-  }
+}

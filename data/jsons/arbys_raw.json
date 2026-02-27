@@ -1,869 +1,737 @@
 {
     "restaurant_name": "Arby's",
     "items": [
-      {
-        "name": "Deep Fried Turkey Gobbler",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 690,
-          "protein": 36,
-          "carbs": 74,
-          "fat": 28
+        {
+            "name": "Deep Fried Turkey Gobbler",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 690,
+                "protein": 36,
+                "carbs": 74,
+                "fat": 28
+            }
+        },
+        {
+            "name": "Deep Fried Turkey Club",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 650,
+                "protein": 40,
+                "carbs": 46,
+                "fat": 35
+            }
+        },
+        {
+            "name": "Steak Nuggets (5)",
+            "category": "Steak Nuggets",
+            "price_estimate": 6.59,
+            "image_url": null,
+            "macros": {
+                "calories": 340,
+                "protein": 17,
+                "carbs": 5,
+                "fat": 27
+            }
+        },
+        {
+            "name": "Steak Nuggets (9)",
+            "category": "Steak Nuggets",
+            "price_estimate": 11.39,
+            "image_url": null,
+            "macros": {
+                "calories": 600,
+                "protein": 30,
+                "carbs": 8,
+                "fat": 49
+            }
+        },
+        {
+            "name": "Steak Nugget Sandwich",
+            "category": "Steak Nuggets",
+            "price_estimate": 13.69,
+            "image_url": null,
+            "macros": {
+                "calories": 720,
+                "protein": 30,
+                "carbs": 52,
+                "fat": 42
+            }
+        },
+        {
+            "name": "Steak Nugget Bowl",
+            "category": "Steak Nuggets",
+            "price_estimate": 11.79,
+            "image_url": null,
+            "macros": {
+                "calories": 880,
+                "protein": 34,
+                "carbs": 51,
+                "fat": 60
+            }
+        },
+        {
+            "name": "Loaded Italian",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 600,
+                "protein": 29,
+                "carbs": 46,
+                "fat": 33
+            }
+        },
+        {
+            "name": "White Cheddar Mac 'N Cheese",
+            "category": "Sides & Snacks",
+            "price_estimate": 2.99,
+            "image_url": null,
+            "macros": {
+                "calories": 470,
+                "protein": 17,
+                "carbs": 40,
+                "fat": 27
+            }
+        },
+        {
+            "name": "Classic Beef 'N Cheddar",
+            "category": "Slow Roasted Beef",
+            "price_estimate": 7.19,
+            "image_url": null,
+            "macros": {
+                "calories": 450,
+                "protein": 23,
+                "carbs": 45,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Double Beef 'N Cheddar",
+            "category": "Slow Roasted Beef",
+            "price_estimate": 8.79,
+            "image_url": null,
+            "macros": {
+                "calories": 630,
+                "protein": 39,
+                "carbs": 48,
+                "fat": 32
+            }
+        },
+        {
+            "name": "Half Pound Beef 'N Cheddar",
+            "category": "Slow Roasted Beef",
+            "price_estimate": 10.09,
+            "image_url": null,
+            "macros": {
+                "calories": 740,
+                "protein": 49,
+                "carbs": 48,
+                "fat": 39
+            }
+        },
+        {
+            "name": "Classic Roast Beef",
+            "category": "Slow Roasted Beef",
+            "price_estimate": 5.99,
+            "image_url": null,
+            "macros": {
+                "calories": 360,
+                "protein": 23,
+                "carbs": 37,
+                "fat": 14
+            }
+        },
+        {
+            "name": "Double Roast Beef",
+            "category": "Slow Roasted Beef",
+            "price_estimate": 7.89,
+            "image_url": null,
+            "macros": {
+                "calories": 510,
+                "protein": 38,
+                "carbs": 38,
+                "fat": 24
+            }
+        },
+        {
+            "name": "Half Pound Roast Beef",
+            "category": "Slow Roasted Beef",
+            "price_estimate": 9.19,
+            "image_url": null,
+            "macros": {
+                "calories": 610,
+                "protein": 48,
+                "carbs": 38,
+                "fat": 30
+            }
+        },
+        {
+            "name": "Classic French Dip & Swiss",
+            "category": "Slow Roasted Beef",
+            "price_estimate": 7.99,
+            "image_url": null,
+            "macros": {
+                "calories": 530,
+                "protein": 34,
+                "carbs": 50,
+                "fat": 21
+            }
+        },
+        {
+            "name": "Deluxe Burger",
+            "category": "Burgers",
+            "price_estimate": 9.09,
+            "image_url": null,
+            "macros": {
+                "calories": 600,
+                "protein": 31,
+                "carbs": 45,
+                "fat": 33
+            }
+        },
+        {
+            "name": "Big Cheesy Bacon Burger",
+            "category": "Burgers",
+            "price_estimate": 10.29,
+            "image_url": null,
+            "macros": {
+                "calories": 710,
+                "protein": 37,
+                "carbs": 50,
+                "fat": 41
+            }
+        },
+        {
+            "name": "Crispy Chicken Sandwich",
+            "category": "Crispy Juicy Chicken",
+            "price_estimate": 7.49,
+            "image_url": null,
+            "macros": {
+                "calories": 530,
+                "protein": 24,
+                "carbs": 59,
+                "fat": 22
+            }
+        },
+        {
+            "name": "Buffalo Chicken Sandwich",
+            "category": "Crispy Juicy Chicken",
+            "price_estimate": 8.29,
+            "image_url": null,
+            "macros": {
+                "calories": 530,
+                "protein": 24,
+                "carbs": 59,
+                "fat": 22
+            }
+        },
+        {
+            "name": "Chicken Bacon Swiss Sandwich",
+            "category": "Crispy Juicy Chicken",
+            "price_estimate": 8.49,
+            "image_url": null,
+            "macros": {
+                "calories": 650,
+                "protein": 35,
+                "carbs": 61,
+                "fat": 30
+            }
+        },
+        {
+            "name": "Chicken Cordon Bleu",
+            "category": "Crispy Juicy Chicken",
+            "price_estimate": 7.39,
+            "image_url": null,
+            "macros": {
+                "calories": 650,
+                "protein": 35,
+                "carbs": 59,
+                "fat": 30
+            }
+        },
+        {
+            "name": "Chicken Tenders (3)",
+            "category": "Crispy Juicy Chicken",
+            "price_estimate": 7.09,
+            "image_url": null,
+            "macros": {
+                "calories": 370,
+                "protein": 23,
+                "carbs": 28,
+                "fat": 18
+            }
+        },
+        {
+            "name": "Chicken Tenders (5)",
+            "category": "Crispy Juicy Chicken",
+            "price_estimate": 9.09,
+            "image_url": null,
+            "macros": {
+                "calories": 610,
+                "protein": 39,
+                "carbs": 47,
+                "fat": 30
+            }
+        },
+        {
+            "name": "Honey Mustard Dipping Sauce",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 130,
+                "protein": 0,
+                "carbs": 5,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Greek Gyro",
+            "category": "Crafted Sandwiches",
+            "price_estimate": 7.19,
+            "image_url": null,
+            "macros": {
+                "calories": 700,
+                "protein": 23,
+                "carbs": 55,
+                "fat": 44
+            }
+        },
+        {
+            "name": "Roast Beef Gyro",
+            "category": "Crafted Sandwiches",
+            "price_estimate": 7.19,
+            "image_url": null,
+            "macros": {
+                "calories": 540,
+                "protein": 24,
+                "carbs": 48,
+                "fat": 29
+            }
+        },
+        {
+            "name": "Reuben",
+            "category": "Crafted Sandwiches",
+            "price_estimate": 8.79,
+            "image_url": null,
+            "macros": {
+                "calories": 680,
+                "protein": 37,
+                "carbs": 62,
+                "fat": 31
+            }
+        },
+        {
+            "name": "Roast Turkey Ranch & Bacon Sandwich",
+            "category": "Entree",
+            "price_estimate": 9.39,
+            "image_url": null,
+            "macros": {
+                "calories": 810,
+                "protein": 46,
+                "carbs": 79,
+                "fat": 35
+            }
+        },
+        {
+            "name": "Smokehouse Brisket",
+            "category": "Crafted Sandwiches",
+            "price_estimate": 9.19,
+            "image_url": null,
+            "macros": {
+                "calories": 590,
+                "protein": 35,
+                "carbs": 48,
+                "fat": 29
+            }
+        },
+        {
+            "name": "Ham & Swiss Melt",
+            "category": "Crafted Sandwiches",
+            "price_estimate": 3.89,
+            "image_url": null,
+            "macros": {
+                "calories": 380,
+                "protein": 26,
+                "carbs": 40,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Roast Beef Slider",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 180,
+                "protein": 11,
+                "carbs": 18,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Chicken Slider",
+            "category": "Value Menu",
+            "price_estimate": 2.69,
+            "image_url": null,
+            "macros": {
+                "calories": 230,
+                "protein": 11,
+                "carbs": 25,
+                "fat": 9
+            }
+        },
+        {
+            "name": "Ham Slider",
+            "category": "Value Menu",
+            "price_estimate": 2.69,
+            "image_url": null,
+            "macros": {
+                "calories": 170,
+                "protein": 11,
+                "carbs": 19,
+                "fat": 6
+            }
+        },
+        {
+            "name": "Buffalo Chicken Slider",
+            "category": "Value Menu",
+            "price_estimate": 2.69,
+            "image_url": null,
+            "macros": {
+                "calories": 260,
+                "protein": 10,
+                "carbs": 26,
+                "fat": 12
+            }
+        },
+        {
+            "name": "Ranch Chicken Wrap",
+            "category": "Value Menu",
+            "price_estimate": 4.59,
+            "image_url": null,
+            "macros": {
+                "calories": 400,
+                "protein": 16,
+                "carbs": 32,
+                "fat": 23
+            }
+        },
+        {
+            "name": "Honey Mustard Chicken Wrap",
+            "category": "Value Menu",
+            "price_estimate": 4.59,
+            "image_url": null,
+            "macros": {
+                "calories": 390,
+                "protein": 16,
+                "carbs": 33,
+                "fat": 22
+            }
+        },
+        {
+            "name": "Sausage Biscuit",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 500,
+                "protein": 12,
+                "carbs": 36,
+                "fat": 33
+            }
+        },
+        {
+            "name": "Bacon Biscuit",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 340,
+                "protein": 10,
+                "carbs": 36,
+                "fat": 17
+            }
+        },
+        {
+            "name": "Ham Biscuit",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 340,
+                "protein": 13,
+                "carbs": 37,
+                "fat": 16
+            }
+        },
+        {
+            "name": "Chicken Biscuit",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 390,
+                "protein": 13,
+                "carbs": 44,
+                "fat": 18
+            }
+        },
+        {
+            "name": "Bacon, Egg & Cheese Sourdough",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 470,
+                "protein": 23,
+                "carbs": 46,
+                "fat": 22
+            }
+        },
+        {
+            "name": "Bacon, Egg & Cheese Croissant",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 430,
+                "protein": 18,
+                "carbs": 29,
+                "fat": 26
+            }
+        },
+        {
+            "name": "Bacon, Egg & Cheese Biscuit",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 470,
+                "protein": 18,
+                "carbs": 37,
+                "fat": 28
+            }
+        },
+        {
+            "name": "Bacon, Egg & Cheese Wrap",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 410,
+                "protein": 18,
+                "carbs": 29,
+                "fat": 24
+            }
+        },
+        {
+            "name": "Sausage, Egg & Cheese Sourdough",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 630,
+                "protein": 24,
+                "carbs": 47,
+                "fat": 38
+            }
+        },
+        {
+            "name": "Sausage, Egg & Cheese Croissant",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 580,
+                "protein": 19,
+                "carbs": 30,
+                "fat": 43
+            }
+        },
+        {
+            "name": "Sausage, Egg & Cheese Biscuit",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 630,
+                "protein": 19,
+                "carbs": 39,
+                "fat": 44
+            }
+        },
+        {
+            "name": "Sausage, Egg & Cheese Wrap",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 550,
+                "protein": 17,
+                "carbs": 30,
+                "fat": 39
+            }
+        },
+        {
+            "name": "Ham, Egg & Cheese Sourdough",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 460,
+                "protein": 26,
+                "carbs": 47,
+                "fat": 18
+            }
+        },
+        {
+            "name": "Ham, Egg & Cheese Croissant",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 410,
+                "protein": 21,
+                "carbs": 30,
+                "fat": 23
+            }
+        },
+        {
+            "name": "Ham, Egg & Cheese Biscuit",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 460,
+                "protein": 21,
+                "carbs": 38,
+                "fat": 24
+            }
+        },
+        {
+            "name": "Ham, Egg & Cheese Wrap",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 400,
+                "protein": 20,
+                "carbs": 31,
+                "fat": 21
+            }
+        },
+        {
+            "name": "Ham & Swiss Croissant",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 340,
+                "protein": 17,
+                "carbs": 29,
+                "fat": 17
+            }
+        },
+        {
+            "name": "Bacon & Cheese Croissant",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 330,
+                "protein": 14,
+                "carbs": 27,
+                "fat": 19
+            }
+        },
+        {
+            "name": "Sausage & Cheese Croissant",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 490,
+                "protein": 15,
+                "carbs": 28,
+                "fat": 35
+            }
+        },
+        {
+            "name": "French Toast Sticks",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 590,
+                "protein": 8,
+                "carbs": 82,
+                "fat": 25
+            }
+        },
+        {
+            "name": "Sausage Gravy Biscuit",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 480,
+                "protein": 9,
+                "carbs": 48,
+                "fat": 28
+            }
+        },
+        {
+            "name": "Sausage Gravy Biscuit-Double",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 960,
+                "protein": 18,
+                "carbs": 95,
+                "fat": 56
+            }
+        },
+        {
+            "name": "Super Roast Beef",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 440,
+                "protein": 23,
+                "carbs": 43,
+                "fat": 19
+            }
+        },
+        {
+            "name": "Arby's Melt",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 330,
+                "protein": 18,
+                "carbs": 39,
+                "fat": 12
+            }
+        },
+        {
+            "name": "Ham & Swiss Sandwich",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 730,
+                "protein": 37,
+                "carbs": 81,
+                "fat": 29
+            }
         }
-      },
-      {
-        "name": "Deep Fried Turkey Club",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 650,
-          "protein": 40,
-          "carbs": 46,
-          "fat": 35
-        }
-      },
-      {
-        "name": "Steak Nuggets (5)",
-        "category": "Steak Nuggets",
-        "price_estimate": 6.59,
-        "image_url": null,
-        "macros": {
-          "calories": 340,
-          "protein": 17,
-          "carbs": 5,
-          "fat": 27
-        }
-      },
-      {
-        "name": "Steak Nuggets (9)",
-        "category": "Steak Nuggets",
-        "price_estimate": 11.39,
-        "image_url": null,
-        "macros": {
-          "calories": 600,
-          "protein": 30,
-          "carbs": 8,
-          "fat": 49
-        }
-      },
-      {
-        "name": "Steak Nugget Sandwich",
-        "category": "Steak Nuggets",
-        "price_estimate": 13.69,
-        "image_url": null,
-        "macros": {
-          "calories": 720,
-          "protein": 30,
-          "carbs": 52,
-          "fat": 42
-        }
-      },
-      {
-        "name": "Steak Nugget Bowl",
-        "category": "Steak Nuggets",
-        "price_estimate": 11.79,
-        "image_url": null,
-        "macros": {
-          "calories": 880,
-          "protein": 34,
-          "carbs": 51,
-          "fat": 60
-        }
-      },
-      {
-        "name": "Loaded Italian",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 600,
-          "protein": 29,
-          "carbs": 46,
-          "fat": 33
-        }
-      },
-      {
-        "name": "White Cheddar Mac 'N Cheese",
-        "category": "Sides & Snacks",
-        "price_estimate": 2.99,
-        "image_url": null,
-        "macros": {
-          "calories": 470,
-          "protein": 17,
-          "carbs": 40,
-          "fat": 27
-        }
-      },
-      {
-        "name": "Classic Beef 'N Cheddar",
-        "category": "Slow Roasted Beef",
-        "price_estimate": 7.19,
-        "image_url": null,
-        "macros": {
-          "calories": 450,
-          "protein": 23,
-          "carbs": 45,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Double Beef 'N Cheddar",
-        "category": "Slow Roasted Beef",
-        "price_estimate": 8.79,
-        "image_url": null,
-        "macros": {
-          "calories": 630,
-          "protein": 39,
-          "carbs": 48,
-          "fat": 32
-        }
-      },
-      {
-        "name": "Half Pound Beef 'N Cheddar",
-        "category": "Slow Roasted Beef",
-        "price_estimate": 10.09,
-        "image_url": null,
-        "macros": {
-          "calories": 740,
-          "protein": 49,
-          "carbs": 48,
-          "fat": 39
-        }
-      },
-      {
-        "name": "Classic Roast Beef",
-        "category": "Slow Roasted Beef",
-        "price_estimate": 5.99,
-        "image_url": null,
-        "macros": {
-          "calories": 360,
-          "protein": 23,
-          "carbs": 37,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Double Roast Beef",
-        "category": "Slow Roasted Beef",
-        "price_estimate": 7.89,
-        "image_url": null,
-        "macros": {
-          "calories": 510,
-          "protein": 38,
-          "carbs": 38,
-          "fat": 24
-        }
-      },
-      {
-        "name": "Half Pound Roast Beef",
-        "category": "Slow Roasted Beef",
-        "price_estimate": 9.19,
-        "image_url": null,
-        "macros": {
-          "calories": 610,
-          "protein": 48,
-          "carbs": 38,
-          "fat": 30
-        }
-      },
-      {
-        "name": "Arby's Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 15,
-          "protein": 0,
-          "carbs": 3,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Horsey Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 60,
-          "protein": 0,
-          "carbs": 3,
-          "fat": 5
-        }
-      },
-      {
-        "name": "Classic French Dip & Swiss",
-        "category": "Slow Roasted Beef",
-        "price_estimate": 7.99,
-        "image_url": null,
-        "macros": {
-          "calories": 530,
-          "protein": 34,
-          "carbs": 50,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Deluxe Burger",
-        "category": "Burgers",
-        "price_estimate": 9.09,
-        "image_url": null,
-        "macros": {
-          "calories": 600,
-          "protein": 31,
-          "carbs": 45,
-          "fat": 33
-        }
-      },
-      {
-        "name": "Big Cheesy Bacon Burger",
-        "category": "Burgers",
-        "price_estimate": 10.29,
-        "image_url": null,
-        "macros": {
-          "calories": 710,
-          "protein": 37,
-          "carbs": 50,
-          "fat": 41
-        }
-      },
-      {
-        "name": "Crispy Chicken Sandwich",
-        "category": "Crispy Juicy Chicken",
-        "price_estimate": 7.49,
-        "image_url": null,
-        "macros": {
-          "calories": 530,
-          "protein": 24,
-          "carbs": 59,
-          "fat": 22
-        }
-      },
-      {
-        "name": "Buffalo Chicken Sandwich",
-        "category": "Crispy Juicy Chicken",
-        "price_estimate": 8.29,
-        "image_url": null,
-        "macros": {
-          "calories": 530,
-          "protein": 24,
-          "carbs": 59,
-          "fat": 22
-        }
-      },
-      {
-        "name": "Chicken Bacon Swiss Sandwich",
-        "category": "Crispy Juicy Chicken",
-        "price_estimate": 8.49,
-        "image_url": null,
-        "macros": {
-          "calories": 650,
-          "protein": 35,
-          "carbs": 61,
-          "fat": 30
-        }
-      },
-      {
-        "name": "Chicken Cordon Bleu",
-        "category": "Crispy Juicy Chicken",
-        "price_estimate": 7.39,
-        "image_url": null,
-        "macros": {
-          "calories": 650,
-          "protein": 35,
-          "carbs": 59,
-          "fat": 30
-        }
-      },
-      {
-        "name": "Chicken Tenders (3)",
-        "category": "Crispy Juicy Chicken",
-        "price_estimate": 7.09,
-        "image_url": null,
-        "macros": {
-          "calories": 370,
-          "protein": 23,
-          "carbs": 28,
-          "fat": 18
-        }
-      },
-      {
-        "name": "Chicken Tenders (5)",
-        "category": "Crispy Juicy Chicken",
-        "price_estimate": 9.09,
-        "image_url": null,
-        "macros": {
-          "calories": 610,
-          "protein": 39,
-          "carbs": 47,
-          "fat": 30
-        }
-      },
-      {
-        "name": "BBQ Dipping Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 70,
-          "protein": 0,
-          "carbs": 16,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Buffalo Dipping Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 10,
-          "protein": 0,
-          "carbs": 2,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Honey Mustard Dipping Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 130,
-          "protein": 0,
-          "carbs": 5,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Ranch Dipping Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 100,
-          "protein": 1,
-          "carbs": 1,
-          "fat": 10
-        }
-      },
-      {
-        "name": "Greek Gyro",
-        "category": "Crafted Sandwiches",
-        "price_estimate": 7.19,
-        "image_url": null,
-        "macros": {
-          "calories": 700,
-          "protein": 23,
-          "carbs": 55,
-          "fat": 44
-        }
-      },
-      {
-        "name": "Roast Beef Gyro",
-        "category": "Crafted Sandwiches",
-        "price_estimate": 7.19,
-        "image_url": null,
-        "macros": {
-          "calories": 540,
-          "protein": 24,
-          "carbs": 48,
-          "fat": 29
-        }
-      },
-      {
-        "name": "Reuben",
-        "category": "Crafted Sandwiches",
-        "price_estimate": 8.79,
-        "image_url": null,
-        "macros": {
-          "calories": 680,
-          "protein": 37,
-          "carbs": 62,
-          "fat": 31
-        }
-      },
-      {
-        "name": "Roast Turkey Ranch & Bacon Sandwich",
-        "category": "Entree",
-        "price_estimate": 9.39,
-        "image_url": null,
-        "macros": {
-          "calories": 810,
-          "protein": 46,
-          "carbs": 79,
-          "fat": 35
-        }
-      },
-      {
-        "name": "Smokehouse Brisket",
-        "category": "Crafted Sandwiches",
-        "price_estimate": 9.19,
-        "image_url": null,
-        "macros": {
-          "calories": 590,
-          "protein": 35,
-          "carbs": 48,
-          "fat": 29
-        }
-      },
-      {
-        "name": "Ham & Swiss Melt",
-        "category": "Crafted Sandwiches",
-        "price_estimate": 3.89,
-        "image_url": null,
-        "macros": {
-          "calories": 380,
-          "protein": 26,
-          "carbs": 40,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Ketchup",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 10,
-          "protein": 0,
-          "carbs": 3,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Cheddar Cheese Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 50,
-          "protein": 1,
-          "carbs": 4,
-          "fat": 3.5
-        }
-      },
-      {
-        "name": "Marinara Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 20,
-          "protein": 1,
-          "carbs": 4,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Bronco Berry Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 60,
-          "protein": 0,
-          "carbs": 15,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Roast Beef Slider",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 180,
-          "protein": 11,
-          "carbs": 18,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Chicken Slider",
-        "category": "Value Menu",
-        "price_estimate": 2.69,
-        "image_url": null,
-        "macros": {
-          "calories": 230,
-          "protein": 11,
-          "carbs": 25,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Ham Slider",
-        "category": "Value Menu",
-        "price_estimate": 2.69,
-        "image_url": null,
-        "macros": {
-          "calories": 170,
-          "protein": 11,
-          "carbs": 19,
-          "fat": 6
-        }
-      },
-      {
-        "name": "Buffalo Chicken Slider",
-        "category": "Value Menu",
-        "price_estimate": 2.69,
-        "image_url": null,
-        "macros": {
-          "calories": 260,
-          "protein": 10,
-          "carbs": 26,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Ranch Chicken Wrap",
-        "category": "Value Menu",
-        "price_estimate": 4.59,
-        "image_url": null,
-        "macros": {
-          "calories": 400,
-          "protein": 16,
-          "carbs": 32,
-          "fat": 23
-        }
-      },
-      {
-        "name": "Honey Mustard Chicken Wrap",
-        "category": "Value Menu",
-        "price_estimate": 4.59,
-        "image_url": null,
-        "macros": {
-          "calories": 390,
-          "protein": 16,
-          "carbs": 33,
-          "fat": 22
-        }
-      },
-      {
-        "name": "Chicken Tenders (2) (Kids Menu)",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 160,
-          "protein": 13,
-          "carbs": 7,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Sausage Biscuit",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 500,
-          "protein": 12,
-          "carbs": 36,
-          "fat": 33
-        }
-      },
-      {
-        "name": "Bacon Biscuit",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 340,
-          "protein": 10,
-          "carbs": 36,
-          "fat": 17
-        }
-      },
-      {
-        "name": "Ham Biscuit",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 340,
-          "protein": 13,
-          "carbs": 37,
-          "fat": 16
-        }
-      },
-      {
-        "name": "Chicken Biscuit",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 390,
-          "protein": 13,
-          "carbs": 44,
-          "fat": 18
-        }
-      },
-      {
-        "name": "Bacon, Egg & Cheese Sourdough",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 470,
-          "protein": 23,
-          "carbs": 46,
-          "fat": 22
-        }
-      },
-      {
-        "name": "Bacon, Egg & Cheese Croissant",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 430,
-          "protein": 18,
-          "carbs": 29,
-          "fat": 26
-        }
-      },
-      {
-        "name": "Bacon, Egg & Cheese Biscuit",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 470,
-          "protein": 18,
-          "carbs": 37,
-          "fat": 28
-        }
-      },
-      {
-        "name": "Bacon, Egg & Cheese Wrap",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 410,
-          "protein": 18,
-          "carbs": 29,
-          "fat": 24
-        }
-      },
-      {
-        "name": "Sausage, Egg & Cheese Sourdough",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 630,
-          "protein": 24,
-          "carbs": 47,
-          "fat": 38
-        }
-      },
-      {
-        "name": "Sausage, Egg & Cheese Croissant",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 580,
-          "protein": 19,
-          "carbs": 30,
-          "fat": 43
-        }
-      },
-      {
-        "name": "Sausage, Egg & Cheese Biscuit",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 630,
-          "protein": 19,
-          "carbs": 39,
-          "fat": 44
-        }
-      },
-      {
-        "name": "Sausage, Egg & Cheese Wrap",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 550,
-          "protein": 17,
-          "carbs": 30,
-          "fat": 39
-        }
-      },
-      {
-        "name": "Ham, Egg & Cheese Sourdough",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 460,
-          "protein": 26,
-          "carbs": 47,
-          "fat": 18
-        }
-      },
-      {
-        "name": "Ham, Egg & Cheese Croissant",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 410,
-          "protein": 21,
-          "carbs": 30,
-          "fat": 23
-        }
-      },
-      {
-        "name": "Ham, Egg & Cheese Biscuit",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 460,
-          "protein": 21,
-          "carbs": 38,
-          "fat": 24
-        }
-      },
-      {
-        "name": "Ham, Egg & Cheese Wrap",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 400,
-          "protein": 20,
-          "carbs": 31,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Ham & Swiss Croissant",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 340,
-          "protein": 17,
-          "carbs": 29,
-          "fat": 17
-        }
-      },
-      {
-        "name": "Bacon & Cheese Croissant",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 330,
-          "protein": 14,
-          "carbs": 27,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Sausage & Cheese Croissant",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 490,
-          "protein": 15,
-          "carbs": 28,
-          "fat": 35
-        }
-      },
-      {
-        "name": "French Toast Sticks",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 590,
-          "protein": 8,
-          "carbs": 82,
-          "fat": 25
-        }
-      },
-      {
-        "name": "Sausage Gravy Biscuit",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 480,
-          "protein": 9,
-          "carbs": 48,
-          "fat": 28
-        }
-      },
-      {
-        "name": "Sausage Gravy Biscuit-Double",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 960,
-          "protein": 18,
-          "carbs": 95,
-          "fat": 56
-        }
-      },
-      {
-        "name": "Red Ranch Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 70,
-          "protein": 0,
-          "carbs": 5,
-          "fat": 6
-        }
-      },
-      {
-        "name": "Super Roast Beef",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 440,
-          "protein": 23,
-          "carbs": 43,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Arby's Melt",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 330,
-          "protein": 18,
-          "carbs": 39,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Ham & Swiss Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 730,
-          "protein": 37,
-          "carbs": 81,
-          "fat": 29
-        }
-      }
     ]
-  }
+}

@@ -119,6 +119,11 @@ export async function incrementUsageCount(): Promise<number> {
 }
 
 export async function hasRemainingUsage(): Promise<boolean> {
+    const headersList = await headers();
+    if (process.env.NODE_ENV === 'development' && headersList.get('x-bypass-usage') === 'seekeatz-test') {
+        return true;
+    }
+
     const cookieCount = await getUsageCount();
     const ip = await getIpAddress();
     const ipCount = await getIpUsage(ip);

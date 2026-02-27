@@ -1,456 +1,313 @@
 {
     "restaurant_name": "Clean Eatz",
     "items": [
-      {
-        "name": "Epic Chicken",
-        "category": "Wraps",
-        "price_estimate": 11.75,
-        "macros": {
-          "calories": 697,
-          "protein": 34,
-          "carbs": 75,
-          "fat": 29
+        {
+            "name": "Epic Chicken",
+            "category": "Wraps",
+            "price_estimate": 11.75,
+            "macros": {
+                "calories": 697,
+                "protein": 34,
+                "carbs": 75,
+                "fat": 29
+            }
+        },
+        {
+            "name": "Blackened Salmon",
+            "category": "Wraps",
+            "price_estimate": 12.95,
+            "macros": {
+                "calories": 449,
+                "protein": 31,
+                "carbs": 52,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Southwest Bison",
+            "category": "Wraps",
+            "price_estimate": 15.35,
+            "macros": {
+                "calories": 629,
+                "protein": 50,
+                "carbs": 60,
+                "fat": 21
+            }
+        },
+        {
+            "name": "Bang Bang Shrimp",
+            "category": "Wraps",
+            "price_estimate": 1.75,
+            "macros": {
+                "calories": 443,
+                "protein": 26,
+                "carbs": 51,
+                "fat": 15
+            }
+        },
+        {
+            "name": "Buffalo Chicken",
+            "category": "Wraps",
+            "price_estimate": 11.75,
+            "macros": {
+                "calories": 648,
+                "protein": 28,
+                "carbs": 80,
+                "fat": 24
+            }
+        },
+        {
+            "name": "Chicken Pesto",
+            "category": "Wraps",
+            "price_estimate": 11.75,
+            "macros": {
+                "calories": 545,
+                "protein": 38,
+                "carbs": 51,
+                "fat": 21
+            }
+        },
+        {
+            "name": "Cleaneatz Burger",
+            "category": "Entree",
+            "price_estimate": 11.75,
+            "macros": {
+                "calories": 392,
+                "protein": 18,
+                "carbs": 44,
+                "fat": 16
+            }
+        },
+        {
+            "name": "Bunless Burger",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 403,
+                "protein": 13,
+                "carbs": 36,
+                "fat": 23
+            }
+        },
+        {
+            "name": "BBQ Swiss Burger",
+            "category": "Burgers",
+            "price_estimate": 11.75,
+            "macros": {
+                "calories": 346,
+                "protein": 14,
+                "carbs": 48,
+                "fat": 10
+            }
+        },
+        {
+            "name": "BBQ Chicken Flatbread",
+            "category": "Flatbreads",
+            "price_estimate": 11.75,
+            "macros": {
+                "calories": 453,
+                "protein": 38,
+                "carbs": 46,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Philly Flatbread",
+            "category": "Flatbreads",
+            "price_estimate": 12.95,
+            "macros": {
+                "calories": 425,
+                "protein": 32,
+                "carbs": 36,
+                "fat": 17
+            }
+        },
+        {
+            "name": "Flatbreads",
+            "category": "Entree",
+            "price_estimate": null,
+            "macros": {
+                "calories": 414,
+                "protein": 39,
+                "carbs": 33,
+                "fat": 14
+            }
+        },
+        {
+            "name": "Turkey Burnt End Cuban",
+            "category": "Flatbreads",
+            "price_estimate": 12.95,
+            "macros": {
+                "calories": 600,
+                "protein": 42,
+                "carbs": 45,
+                "fat": 28
+            }
+        },
+        {
+            "name": "Nugget Dinner (Excludes Sauce)",
+            "category": "Makin' Muscle",
+            "price_estimate": 13.45,
+            "macros": {
+                "calories": 501,
+                "protein": 26,
+                "carbs": 52,
+                "fat": 21
+            }
+        },
+        {
+            "name": "Arnold",
+            "category": "Makin' Muscle",
+            "price_estimate": 15.35,
+            "macros": {
+                "calories": 664,
+                "protein": 51,
+                "carbs": 53,
+                "fat": 28
+            }
+        },
+        {
+            "name": "Big Boy 2.0",
+            "category": "Makin' Muscle",
+            "price_estimate": 14.15,
+            "macros": {
+                "calories": 752,
+                "protein": 58,
+                "carbs": 90,
+                "fat": 18
+            }
+        },
+        {
+            "name": "Black Bean Patty (per 4oz)",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 166,
+                "protein": 7,
+                "carbs": 21,
+                "fat": 6
+            }
+        },
+        {
+            "name": "Diced Chicken (per 4oz)",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 102,
+                "protein": 20,
+                "carbs": 1,
+                "fat": 2
+            }
+        },
+        {
+            "name": "Breaded Chicken (per 4oz)",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 272,
+                "protein": 18,
+                "carbs": 23,
+                "fat": 12
+            }
+        },
+        {
+            "name": "Shredded Beef (per 4oz)",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 175,
+                "protein": 25,
+                "carbs": 3,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Bison (per 4oz)",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 217,
+                "protein": 34,
+                "carbs": 0,
+                "fat": 9
+            }
+        },
+        {
+            "name": "Salmon (per 4oz)",
+            "category": "Protein",
+            "price_estimate": null,
+            "macros": {
+                "calories": 147,
+                "protein": 21,
+                "carbs": 0,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Turkey Burnt Ends (per 4oz)",
+            "category": "Flatbreads",
+            "price_estimate": 12.95,
+            "macros": {
+                "calories": 171,
+                "protein": 22,
+                "carbs": 5,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Epic Sauce (PER OZ)",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 127,
+                "protein": 1,
+                "carbs": 6,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Brown Rice (per 4oz)",
+            "category": "Base",
+            "price_estimate": null,
+            "macros": {
+                "calories": 169,
+                "protein": 4,
+                "carbs": 18,
+                "fat": 1
+            }
+        },
+        {
+            "name": "Rosemary Potatoes (per 4oz)",
+            "category": "Base",
+            "price_estimate": null,
+            "macros": {
+                "calories": 119,
+                "protein": 3,
+                "carbs": 20,
+                "fat": 3
+            }
+        },
+        {
+            "name": "Kale & Quinoa (Per 4oz)",
+            "category": "Base",
+            "price_estimate": null,
+            "macros": {
+                "calories": 156,
+                "protein": 4,
+                "carbs": 26,
+                "fat": 4
+            }
+        },
+        {
+            "name": "Penne Pasta (Per 4oz)",
+            "category": "Base",
+            "price_estimate": null,
+            "macros": {
+                "calories": 177,
+                "protein": 6,
+                "carbs": 36,
+                "fat": 1
+            }
         }
-      },
-      {
-        "name": "Blackened Salmon",
-        "category": "Wraps",
-        "price_estimate": 12.95,
-        "macros": {
-          "calories": 449,
-          "protein": 31,
-          "carbs": 52,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Southwest Bison",
-        "category": "Wraps",
-        "price_estimate": 15.35,
-        "macros": {
-          "calories": 629,
-          "protein": 50,
-          "carbs": 60,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Bang Bang Shrimp",
-        "category": "Wraps",
-        "price_estimate": 1.75,
-        "macros": {
-          "calories": 443,
-          "protein": 26,
-          "carbs": 51,
-          "fat": 15
-        }
-      },
-      {
-        "name": "Buffalo Chicken",
-        "category": "Wraps",
-        "price_estimate": 11.75,
-        "macros": {
-          "calories": 648,
-          "protein": 28,
-          "carbs": 80,
-          "fat": 24
-        }
-      },
-      {
-        "name": "Chicken Pesto",
-        "category": "Wraps",
-        "price_estimate": 11.75,
-        "macros": {
-          "calories": 545,
-          "protein": 38,
-          "carbs": 51,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Cleaneatz Burger",
-        "category": "Entree",
-        "price_estimate": 11.75,
-        "macros": {
-          "calories": 392,
-          "protein": 18,
-          "carbs": 44,
-          "fat": 16
-        }
-      },
-      {
-        "name": "Bunless Burger",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 403,
-          "protein": 13,
-          "carbs": 36,
-          "fat": 23
-        }
-      },
-      {
-        "name": "BBQ Swiss Burger",
-        "category": "Burgers",
-        "price_estimate": 11.75,
-        "macros": {
-          "calories": 346,
-          "protein": 14,
-          "carbs": 48,
-          "fat": 10
-        }
-      },
-      {
-        "name": "BBQ Chicken Flatbread",
-        "category": "Flatbreads",
-        "price_estimate": 11.75,
-        "macros": {
-          "calories": 453,
-          "protein": 38,
-          "carbs": 46,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Philly Flatbread",
-        "category": "Flatbreads",
-        "price_estimate": 12.95,
-        "macros": {
-          "calories": 425,
-          "protein": 32,
-          "carbs": 36,
-          "fat": 17
-        }
-      },
-      {
-        "name": "Flatbreads",
-        "category": "Entree",
-        "price_estimate": null,
-        "macros": {
-          "calories": 414,
-          "protein": 39,
-          "carbs": 33,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Turkey Burnt End Cuban",
-        "category": "Flatbreads",
-        "price_estimate": 12.95,
-        "macros": {
-          "calories": 600,
-          "protein": 42,
-          "carbs": 45,
-          "fat": 28
-        }
-      },
-      {
-        "name": "Nugget Dinner (Excludes Sauce)",
-        "category": "Makin' Muscle",
-        "price_estimate": 13.45,
-        "macros": {
-          "calories": 501,
-          "protein": 26,
-          "carbs": 52,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Arnold",
-        "category": "Makin' Muscle",
-        "price_estimate": 15.35,
-        "macros": {
-          "calories": 664,
-          "protein": 51,
-          "carbs": 53,
-          "fat": 28
-        }
-      },
-      {
-        "name": "Big Boy 2.0",
-        "category": "Makin' Muscle",
-        "price_estimate": 14.15,
-        "macros": {
-          "calories": 752,
-          "protein": 58,
-          "carbs": 90,
-          "fat": 18
-        }
-      },
-      {
-        "name": "Black Bean Patty (per 4oz)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 166,
-          "protein": 7,
-          "carbs": 21,
-          "fat": 6
-        }
-      },
-      {
-        "name": "Diced Chicken (per 4oz)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 102,
-          "protein": 20,
-          "carbs": 1,
-          "fat": 2
-        }
-      },
-      {
-        "name": "Breaded Chicken (per 4oz)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 272,
-          "protein": 18,
-          "carbs": 23,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Shredded Beef (per 4oz)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 175,
-          "protein": 25,
-          "carbs": 3,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Bison (per 4oz)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 217,
-          "protein": 34,
-          "carbs": 0,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Salmon (per 4oz)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 147,
-          "protein": 21,
-          "carbs": 0,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Turkey Burger (per patty)",
-        "category": "Kids",
-        "price_estimate": 7.19,
-        "macros": {
-          "calories": 244,
-          "protein": 32,
-          "carbs": 2,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Shrimp (per 6 shrimp)",
-        "category": "Protein",
-        "price_estimate": null,
-        "macros": {
-          "calories": 56,
-          "protein": 14,
-          "carbs": 0,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Turkey Burnt Ends (per 4oz)",
-        "category": "Flatbreads",
-        "price_estimate": 12.95,
-        "macros": {
-          "calories": 171,
-          "protein": 22,
-          "carbs": 5,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Epic Sauce (PER OZ)",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 127,
-          "protein": 1,
-          "carbs": 6,
-          "fat": 11
-        }
-      },
-      {
-        "name": "NSA BBQ (PER OZ)",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 20,
-          "protein": 1,
-          "carbs": 4,
-          "fat": 0
-        }
-      },
-      {
-        "name": "CE Chipotle Ranch (PER OZ)",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 96,
-          "protein": 1,
-          "carbs": 5,
-          "fat": 8
-        }
-      },
-      {
-        "name": "CE Thai Peanut (PER OZ)",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 100,
-          "protein": 1,
-          "carbs": 15,
-          "fat": 4
-        }
-      },
-      {
-        "name": "CE Sweet Chili (PER OZ)",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 76,
-          "protein": 0,
-          "carbs": 19,
-          "fat": 0
-        }
-      },
-      {
-        "name": "CE Teriyaki (PER OZ)",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 52,
-          "protein": 0,
-          "carbs": 13,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Queso Sauce (PER OZ)",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 56,
-          "protein": 3,
-          "carbs": 2,
-          "fat": 4
-        }
-      },
-      {
-        "name": "CE Buffalo (PER OZ)",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 97,
-          "protein": 1,
-          "carbs": 3,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Kale Pesto (PER OZ)",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 57,
-          "protein": 2,
-          "carbs": 1,
-          "fat": 5
-        }
-      },
-      {
-        "name": "CE Ranch (PER OZ)",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 97,
-          "protein": 1,
-          "carbs": 3,
-          "fat": 9
-        }
-      },
-      {
-        "name": "CE Marinara (PER OZ)",
-        "category": "Sauce",
-        "price_estimate": null,
-        "macros": {
-          "calories": 21,
-          "protein": 1,
-          "carbs": 2,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Brown Rice (per 4oz)",
-        "category": "Base",
-        "price_estimate": null,
-        "macros": {
-          "calories": 169,
-          "protein": 4,
-          "carbs": 18,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Rosemary Potatoes (per 4oz)",
-        "category": "Base",
-        "price_estimate": null,
-        "macros": {
-          "calories": 119,
-          "protein": 3,
-          "carbs": 20,
-          "fat": 3
-        }
-      },
-      {
-        "name": "Kale & Quinoa (Per 4oz)",
-        "category": "Base",
-        "price_estimate": null,
-        "macros": {
-          "calories": 156,
-          "protein": 4,
-          "carbs": 26,
-          "fat": 4
-        }
-      },
-      {
-        "name": "Penne Pasta (Per 4oz)",
-        "category": "Base",
-        "price_estimate": null,
-        "macros": {
-          "calories": 177,
-          "protein": 6,
-          "carbs": 36,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Spinach (Per 1oz)",
-        "category": "Base",
-        "price_estimate": null,
-        "macros": {
-          "calories": 11,
-          "protein": 1,
-          "carbs": 1,
-          "fat": 0.5
-        }
-      }
     ]
-  }
+}

@@ -1,845 +1,629 @@
 {
     "restaurant_name": "Jimmy John's",
     "items": [
-      {
-        "name": "Little John 1",
-        "category": "LITTLE JOHNS",
-        "price_estimate": 6.05,
-        "image_url": null,
-        "macros": {
-          "calories": 300,
-          "protein": 15,
-          "carbs": 25,
-          "fat": 15
+        {
+            "name": "Little John 1",
+            "category": "LITTLE JOHNS",
+            "price_estimate": 6.05,
+            "image_url": null,
+            "macros": {
+                "calories": 300,
+                "protein": 15,
+                "carbs": 25,
+                "fat": 15
+            }
+        },
+        {
+            "name": "Little John 2",
+            "category": "LITTLE JOHNS",
+            "price_estimate": 6.05,
+            "image_url": null,
+            "macros": {
+                "calories": 250,
+                "protein": 13,
+                "carbs": 24,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Little John 3",
+            "category": "LITTLE JOHNS",
+            "price_estimate": 6.05,
+            "image_url": null,
+            "macros": {
+                "calories": 250,
+                "protein": 10,
+                "carbs": 26,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Little John 4",
+            "category": "LITTLE JOHNS",
+            "price_estimate": 6.05,
+            "image_url": null,
+            "macros": {
+                "calories": 240,
+                "protein": 12,
+                "carbs": 24,
+                "fat": 10
+            }
+        },
+        {
+            "name": "Little John 5",
+            "category": "LITTLE JOHNS",
+            "price_estimate": 6.05,
+            "image_url": null,
+            "macros": {
+                "calories": 290,
+                "protein": 16,
+                "carbs": 26,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Little John 6",
+            "category": "LITTLE JOHNS",
+            "price_estimate": 6.05,
+            "image_url": null,
+            "macros": {
+                "calories": 340,
+                "protein": 13,
+                "carbs": 25,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Slim 1",
+            "category": "Regular PLAIN SLIMS",
+            "price_estimate": 7.3,
+            "image_url": null,
+            "macros": {
+                "calories": 540,
+                "protein": 33,
+                "carbs": 69,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Slim 2",
+            "category": "Regular PLAIN SLIMS",
+            "price_estimate": 7.3,
+            "image_url": null,
+            "macros": {
+                "calories": 440,
+                "protein": 30,
+                "carbs": 66,
+                "fat": 5
+            }
+        },
+        {
+            "name": "Slim 3",
+            "category": "Regular PLAIN SLIMS",
+            "price_estimate": 7.3,
+            "image_url": null,
+            "macros": {
+                "calories": 600,
+                "protein": 24,
+                "carbs": 70,
+                "fat": 23
+            }
+        },
+        {
+            "name": "Slim 4",
+            "category": "Regular PLAIN SLIMS",
+            "price_estimate": 7.3,
+            "image_url": null,
+            "macros": {
+                "calories": 420,
+                "protein": 27,
+                "carbs": 68,
+                "fat": 3
+            }
+        },
+        {
+            "name": "Slim 5",
+            "category": "Regular PLAIN SLIMS",
+            "price_estimate": 7.3,
+            "image_url": null,
+            "macros": {
+                "calories": 630,
+                "protein": 35,
+                "carbs": 69,
+                "fat": 23
+            }
+        },
+        {
+            "name": "Slim 6",
+            "category": "Regular PLAIN SLIMS",
+            "price_estimate": 7.3,
+            "image_url": null,
+            "macros": {
+                "calories": 590,
+                "protein": 30,
+                "carbs": 68,
+                "fat": 21
+            }
+        },
+        {
+            "name": "The Pepe",
+            "category": "Regular ORIGINALS",
+            "price_estimate": 9.3,
+            "image_url": null,
+            "macros": {
+                "calories": 600,
+                "protein": 29,
+                "carbs": 50,
+                "fat": 29
+            }
+        },
+        {
+            "name": "Big John",
+            "category": "Regular ORIGINALS",
+            "price_estimate": 9.3,
+            "image_url": null,
+            "macros": {
+                "calories": 500,
+                "protein": 26,
+                "carbs": 47,
+                "fat": 21
+            }
+        },
+        {
+            "name": "Totally Tuna",
+            "category": "Regular ORIGINALS",
+            "price_estimate": 9.3,
+            "image_url": null,
+            "macros": {
+                "calories": 510,
+                "protein": 21,
+                "carbs": 51,
+                "fat": 22
+            }
+        },
+        {
+            "name": "Turkey Tom",
+            "category": "Regular ORIGINALS",
+            "price_estimate": 9.3,
+            "image_url": null,
+            "macros": {
+                "calories": 480,
+                "protein": 23,
+                "carbs": 48,
+                "fat": 19
+            }
+        },
+        {
+            "name": "Vito",
+            "category": "Regular ORIGINALS",
+            "price_estimate": 9.3,
+            "image_url": null,
+            "macros": {
+                "calories": 570,
+                "protein": 32,
+                "carbs": 52,
+                "fat": 26
+            }
+        },
+        {
+            "name": "The Veggie",
+            "category": "Regular ORIGINALS",
+            "price_estimate": 9.3,
+            "image_url": null,
+            "macros": {
+                "calories": 670,
+                "protein": 27,
+                "carbs": 50,
+                "fat": 38
+            }
+        },
+        {
+            "name": "J.J.B.L.T.",
+            "category": "Regular FAVORITES",
+            "price_estimate": 10.75,
+            "image_url": null,
+            "macros": {
+                "calories": 710,
+                "protein": 28,
+                "carbs": 70,
+                "fat": 33
+            }
+        },
+        {
+            "name": "Spicy East Coast Italian",
+            "category": "Regular FAVORITES",
+            "price_estimate": 10.75,
+            "image_url": null,
+            "macros": {
+                "calories": 1020,
+                "protein": 50,
+                "carbs": 77,
+                "fat": 54
+            }
+        },
+        {
+            "name": "Billy Club",
+            "category": "Regular FAVORITES",
+            "price_estimate": 10.75,
+            "image_url": null,
+            "macros": {
+                "calories": 810,
+                "protein": 50,
+                "carbs": 73,
+                "fat": 32
+            }
+        },
+        {
+            "name": "Italian Night Club",
+            "category": "Regular FAVORITES",
+            "price_estimate": 10.75,
+            "image_url": null,
+            "macros": {
+                "calories": 930,
+                "protein": 48,
+                "carbs": 77,
+                "fat": 46
+            }
+        },
+        {
+            "name": "Hunter's Club",
+            "category": "Regular FAVORITES",
+            "price_estimate": 10.75,
+            "image_url": null,
+            "macros": {
+                "calories": 830,
+                "protein": 55,
+                "carbs": 70,
+                "fat": 34
+            }
+        },
+        {
+            "name": "Country Club",
+            "category": "Regular FAVORITES",
+            "price_estimate": 10.75,
+            "image_url": null,
+            "macros": {
+                "calories": 780,
+                "protein": 48,
+                "carbs": 74,
+                "fat": 30
+            }
+        },
+        {
+            "name": "Beach Club",
+            "category": "Regular FAVORITES",
+            "price_estimate": 10.75,
+            "image_url": null,
+            "macros": {
+                "calories": 850,
+                "protein": 45,
+                "carbs": 75,
+                "fat": 39
+            }
+        },
+        {
+            "name": "Jimmy Cubano",
+            "category": "Regular FAVORITES",
+            "price_estimate": 10.75,
+            "image_url": null,
+            "macros": {
+                "calories": 830,
+                "protein": 43,
+                "carbs": 71,
+                "fat": 38
+            }
+        },
+        {
+            "name": "Bootlegger Club",
+            "category": "Regular FAVORITES",
+            "price_estimate": 10.75,
+            "image_url": null,
+            "macros": {
+                "calories": 680,
+                "protein": 44,
+                "carbs": 71,
+                "fat": 23
+            }
+        },
+        {
+            "name": "Club Tuna",
+            "category": "Giant FAVORITES",
+            "price_estimate": 20.62,
+            "image_url": null,
+            "macros": {
+                "calories": 860,
+                "protein": 42,
+                "carbs": 76,
+                "fat": 40
+            }
+        },
+        {
+            "name": "Club Lulu",
+            "category": "Giant FAVORITES",
+            "price_estimate": 20.62,
+            "image_url": null,
+            "macros": {
+                "calories": 690,
+                "protein": 35,
+                "carbs": 71,
+                "fat": 26
+            }
+        },
+        {
+            "name": "Ultimate Porker",
+            "category": "Giant FAVORITES",
+            "price_estimate": 20.62,
+            "image_url": null,
+            "macros": {
+                "calories": 690,
+                "protein": 33,
+                "carbs": 72,
+                "fat": 28
+            }
+        },
+        {
+            "name": "The J.J. Gargantuan",
+            "category": "GARGANTUAN",
+            "price_estimate": 14.05,
+            "image_url": null,
+            "macros": {
+                "calories": 1080,
+                "protein": 78,
+                "carbs": 78,
+                "fat": 49
+            }
+        },
+        {
+            "name": "Chicken Caesar",
+            "category": "WRAPS",
+            "price_estimate": 12.55,
+            "image_url": null,
+            "macros": {
+                "calories": 870,
+                "protein": 39,
+                "carbs": 79,
+                "fat": 43
+            }
+        },
+        {
+            "name": "Kickin' Ranch Chicken Wrap",
+            "category": "WRAPS",
+            "price_estimate": 12.55,
+            "image_url": null,
+            "macros": {
+                "calories": 800,
+                "protein": 39,
+                "carbs": 60,
+                "fat": 42
+            }
+        },
+        {
+            "name": "Tuscan Italian",
+            "category": "WRAPS",
+            "price_estimate": 12.55,
+            "image_url": null,
+            "macros": {
+                "calories": 840,
+                "protein": 45,
+                "carbs": 62,
+                "fat": 45
+            }
+        },
+        {
+            "name": "Ham, Egg & Cheese Breakfast Sandwich",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 440,
+                "protein": 27,
+                "carbs": 37,
+                "fat": 19
+            }
+        },
+        {
+            "name": "Bacon, Egg & Cheese Breakfast Sandwich",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 430,
+                "protein": 20,
+                "carbs": 35,
+                "fat": 22
+            }
+        },
+        {
+            "name": "Vito, Egg & Cheese Breakfast Sandwich",
+            "category": "Regular ORIGINALS",
+            "price_estimate": 9.3,
+            "image_url": null,
+            "macros": {
+                "calories": 490,
+                "protein": 29,
+                "carbs": 36,
+                "fat": 24
+            }
+        },
+        {
+            "name": "Sicilian Pizza Sandwich",
+            "category": "LIMITED TIME OFFER",
+            "price_estimate": 23.2,
+            "image_url": null,
+            "macros": {
+                "calories": 820,
+                "protein": 49,
+                "carbs": 80,
+                "fat": 30
+            }
+        },
+        {
+            "name": "3 Cheese Pizza Sandwich",
+            "category": "LIMITED TIME OFFER",
+            "price_estimate": 23.2,
+            "image_url": null,
+            "macros": {
+                "calories": 830,
+                "protein": 47,
+                "carbs": 79,
+                "fat": 32
+            }
+        },
+        {
+            "name": "Ham Picklewich",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 220,
+                "protein": 22,
+                "carbs": 10,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Roast Beef Picklewich",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 240,
+                "protein": 26,
+                "carbs": 7,
+                "fat": 12
+            }
+        },
+        {
+            "name": "Tuna Picklewich",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 410,
+                "protein": 21,
+                "carbs": 12,
+                "fat": 29
+            }
+        },
+        {
+            "name": "Turkey Picklewich",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 210,
+                "protein": 24,
+                "carbs": 9,
+                "fat": 9
+            }
+        },
+        {
+            "name": "Vito Picklewich",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 310,
+                "protein": 24,
+                "carbs": 10,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Veggie Picklewich",
+            "category": "Entree",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 290,
+                "protein": 19,
+                "carbs": 10,
+                "fat": 20
+            }
+        },
+        {
+            "name": "Pickle Ranch Side Portion",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 160,
+                "protein": 0.5,
+                "carbs": 2,
+                "fat": 16
+            }
+        },
+        {
+            "name": "Salami & Capocollo",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 160,
+                "protein": 14,
+                "carbs": 2,
+                "fat": 11
+            }
+        },
+        {
+            "name": "Tuna Salad",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 260,
+                "protein": 11,
+                "carbs": 4,
+                "fat": 20
+            }
+        },
+        {
+            "name": "All-Natural Chicken",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 110,
+                "protein": 18,
+                "carbs": 1,
+                "fat": 3.5
+            }
+        },
+        {
+            "name": "Provolone Cheese",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 120,
+                "protein": 8,
+                "carbs": 0.5,
+                "fat": 9
+            }
+        },
+        {
+            "name": "Cheddar Cheese",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 170,
+                "protein": 11,
+                "carbs": 0.5,
+                "fat": 14
+            }
+        },
+        {
+            "name": "Sliced Mozzarella",
+            "category": "Protein",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 260,
+                "protein": 21,
+                "carbs": 5,
+                "fat": 17
+            }
         }
-      },
-      {
-        "name": "Little John 2",
-        "category": "LITTLE JOHNS",
-        "price_estimate": 6.05,
-        "image_url": null,
-        "macros": {
-          "calories": 250,
-          "protein": 13,
-          "carbs": 24,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Little John 3",
-        "category": "LITTLE JOHNS",
-        "price_estimate": 6.05,
-        "image_url": null,
-        "macros": {
-          "calories": 250,
-          "protein": 10,
-          "carbs": 26,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Little John 4",
-        "category": "LITTLE JOHNS",
-        "price_estimate": 6.05,
-        "image_url": null,
-        "macros": {
-          "calories": 240,
-          "protein": 12,
-          "carbs": 24,
-          "fat": 10
-        }
-      },
-      {
-        "name": "Little John 5",
-        "category": "LITTLE JOHNS",
-        "price_estimate": 6.05,
-        "image_url": null,
-        "macros": {
-          "calories": 290,
-          "protein": 16,
-          "carbs": 26,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Little John 6",
-        "category": "LITTLE JOHNS",
-        "price_estimate": 6.05,
-        "image_url": null,
-        "macros": {
-          "calories": 340,
-          "protein": 13,
-          "carbs": 25,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Slim 1",
-        "category": "Regular PLAIN SLIMS",
-        "price_estimate": 7.30,
-        "image_url": null,
-        "macros": {
-          "calories": 540,
-          "protein": 33,
-          "carbs": 69,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Slim 2",
-        "category": "Regular PLAIN SLIMS",
-        "price_estimate": 7.30,
-        "image_url": null,
-        "macros": {
-          "calories": 440,
-          "protein": 30,
-          "carbs": 66,
-          "fat": 5
-        }
-      },
-      {
-        "name": "Slim 3",
-        "category": "Regular PLAIN SLIMS",
-        "price_estimate": 7.30,
-        "image_url": null,
-        "macros": {
-          "calories": 600,
-          "protein": 24,
-          "carbs": 70,
-          "fat": 23
-        }
-      },
-      {
-        "name": "Slim 4",
-        "category": "Regular PLAIN SLIMS",
-        "price_estimate": 7.30,
-        "image_url": null,
-        "macros": {
-          "calories": 420,
-          "protein": 27,
-          "carbs": 68,
-          "fat": 3
-        }
-      },
-      {
-        "name": "Slim 5",
-        "category": "Regular PLAIN SLIMS",
-        "price_estimate": 7.30,
-        "image_url": null,
-        "macros": {
-          "calories": 630,
-          "protein": 35,
-          "carbs": 69,
-          "fat": 23
-        }
-      },
-      {
-        "name": "Slim 6",
-        "category": "Regular PLAIN SLIMS",
-        "price_estimate": 7.30,
-        "image_url": null,
-        "macros": {
-          "calories": 590,
-          "protein": 30,
-          "carbs": 68,
-          "fat": 21
-        }
-      },
-      {
-        "name": "The Pepe",
-        "category": "Regular ORIGINALS",
-        "price_estimate": 9.30,
-        "image_url": null,
-        "macros": {
-          "calories": 600,
-          "protein": 29,
-          "carbs": 50,
-          "fat": 29
-        }
-      },
-      {
-        "name": "Big John",
-        "category": "Regular ORIGINALS",
-        "price_estimate": 9.30,
-        "image_url": null,
-        "macros": {
-          "calories": 500,
-          "protein": 26,
-          "carbs": 47,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Totally Tuna",
-        "category": "Regular ORIGINALS",
-        "price_estimate": 9.30,
-        "image_url": null,
-        "macros": {
-          "calories": 510,
-          "protein": 21,
-          "carbs": 51,
-          "fat": 22
-        }
-      },
-      {
-        "name": "Turkey Tom",
-        "category": "Regular ORIGINALS",
-        "price_estimate": 9.30,
-        "image_url": null,
-        "macros": {
-          "calories": 480,
-          "protein": 23,
-          "carbs": 48,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Vito",
-        "category": "Regular ORIGINALS",
-        "price_estimate": 9.30,
-        "image_url": null,
-        "macros": {
-          "calories": 570,
-          "protein": 32,
-          "carbs": 52,
-          "fat": 26
-        }
-      },
-      {
-        "name": "The Veggie",
-        "category": "Regular ORIGINALS",
-        "price_estimate": 9.30,
-        "image_url": null,
-        "macros": {
-          "calories": 670,
-          "protein": 27,
-          "carbs": 50,
-          "fat": 38
-        }
-      },
-      {
-        "name": "J.J.B.L.T.",
-        "category": "Regular FAVORITES",
-        "price_estimate": 10.75,
-        "image_url": null,
-        "macros": {
-          "calories": 710,
-          "protein": 28,
-          "carbs": 70,
-          "fat": 33
-        }
-      },
-      {
-        "name": "Spicy East Coast Italian",
-        "category": "Regular FAVORITES",
-        "price_estimate": 10.75,
-        "image_url": null,
-        "macros": {
-          "calories": 1020,
-          "protein": 50,
-          "carbs": 77,
-          "fat": 54
-        }
-      },
-      {
-        "name": "Billy Club",
-        "category": "Regular FAVORITES",
-        "price_estimate": 10.75,
-        "image_url": null,
-        "macros": {
-          "calories": 810,
-          "protein": 50,
-          "carbs": 73,
-          "fat": 32
-        }
-      },
-      {
-        "name": "Italian Night Club",
-        "category": "Regular FAVORITES",
-        "price_estimate": 10.75,
-        "image_url": null,
-        "macros": {
-          "calories": 930,
-          "protein": 48,
-          "carbs": 77,
-          "fat": 46
-        }
-      },
-      {
-        "name": "Hunter's Club",
-        "category": "Regular FAVORITES",
-        "price_estimate": 10.75,
-        "image_url": null,
-        "macros": {
-          "calories": 830,
-          "protein": 55,
-          "carbs": 70,
-          "fat": 34
-        }
-      },
-      {
-        "name": "Country Club",
-        "category": "Regular FAVORITES",
-        "price_estimate": 10.75,
-        "image_url": null,
-        "macros": {
-          "calories": 780,
-          "protein": 48,
-          "carbs": 74,
-          "fat": 30
-        }
-      },
-      {
-        "name": "Beach Club",
-        "category": "Regular FAVORITES",
-        "price_estimate": 10.75,
-        "image_url": null,
-        "macros": {
-          "calories": 850,
-          "protein": 45,
-          "carbs": 75,
-          "fat": 39
-        }
-      },
-      {
-        "name": "Jimmy Cubano",
-        "category": "Regular FAVORITES",
-        "price_estimate": 10.75,
-        "image_url": null,
-        "macros": {
-          "calories": 830,
-          "protein": 43,
-          "carbs": 71,
-          "fat": 38
-        }
-      },
-      {
-        "name": "Bootlegger Club",
-        "category": "Regular FAVORITES",
-        "price_estimate": 10.75,
-        "image_url": null,
-        "macros": {
-          "calories": 680,
-          "protein": 44,
-          "carbs": 71,
-          "fat": 23
-        }
-      },
-      {
-        "name": "Club Tuna",
-        "category": "Giant FAVORITES",
-        "price_estimate": 20.62,
-        "image_url": null,
-        "macros": {
-          "calories": 860,
-          "protein": 42,
-          "carbs": 76,
-          "fat": 40
-        }
-      },
-      {
-        "name": "Club Lulu",
-        "category": "Giant FAVORITES",
-        "price_estimate": 20.62,
-        "image_url": null,
-        "macros": {
-          "calories": 690,
-          "protein": 35,
-          "carbs": 71,
-          "fat": 26
-        }
-      },
-      {
-        "name": "Ultimate Porker",
-        "category": "Giant FAVORITES",
-        "price_estimate":  20.62,
-        "image_url": null,
-        "macros": {
-          "calories": 690,
-          "protein": 33,
-          "carbs": 72,
-          "fat": 28
-        }
-      },
-      {
-        "name": "The J.J. Gargantuan",
-        "category": "GARGANTUAN",
-        "price_estimate": 14.05,
-        "image_url": null,
-        "macros": {
-          "calories": 1080,
-          "protein": 78,
-          "carbs": 78,
-          "fat": 49
-        }
-      },
-      {
-        "name": "Chicken Caesar",
-        "category": "WRAPS",
-        "price_estimate": 12.55,
-        "image_url": null,
-        "macros": {
-          "calories": 870,
-          "protein": 39,
-          "carbs": 79,
-          "fat": 43
-        }
-      },
-      {
-        "name": "Kickin' Ranch Chicken Wrap",
-        "category": "WRAPS",
-        "price_estimate": 12.55,
-        "image_url": null,
-        "macros": {
-          "calories": 800,
-          "protein": 39,
-          "carbs": 60,
-          "fat": 42
-        }
-      },
-      {
-        "name": "Tuscan Italian",
-        "category": "WRAPS",
-        "price_estimate": 12.55,
-        "image_url": null,
-        "macros": {
-          "calories": 840,
-          "protein": 45,
-          "carbs": 62,
-          "fat": 45
-        }
-      },
-      {
-        "name": "Ham, Egg & Cheese Breakfast Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 440,
-          "protein": 27,
-          "carbs": 37,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Bacon, Egg & Cheese Breakfast Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 430,
-          "protein": 20,
-          "carbs": 35,
-          "fat": 22
-        }
-      },
-      {
-        "name": "Vito, Egg & Cheese Breakfast Sandwich",
-        "category": "Regular ORIGINALS",
-        "price_estimate": 9.30,
-        "image_url": null,
-        "macros": {
-          "calories": 490,
-          "protein": 29,
-          "carbs": 36,
-          "fat": 24
-        }
-      },
-      {
-        "name": "Sicilian Pizza Sandwich",
-        "category": "LIMITED TIME OFFER",
-        "price_estimate": 23.20,
-        "image_url": null,
-        "macros": {
-          "calories": 820,
-          "protein": 49,
-          "carbs": 80,
-          "fat": 30
-        }
-      },
-      {
-        "name": "3 Cheese Pizza Sandwich",
-        "category": "LIMITED TIME OFFER",
-        "price_estimate": 23.20,
-        "image_url": null,
-        "macros": {
-          "calories": 830,
-          "protein": 47,
-          "carbs": 79,
-          "fat": 32
-        }
-      },
-      {
-        "name": "Ham Picklewich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 220,
-          "protein": 22,
-          "carbs": 10,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Roast Beef Picklewich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 240,
-          "protein": 26,
-          "carbs": 7,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Tuna Picklewich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 410,
-          "protein": 21,
-          "carbs": 12,
-          "fat": 29
-        }
-      },
-      {
-        "name": "Turkey Picklewich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 210,
-          "protein": 24,
-          "carbs": 9,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Vito Picklewich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 310,
-          "protein": 24,
-          "carbs": 10,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Veggie Picklewich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 290,
-          "protein": 19,
-          "carbs": 10,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Pickle Ranch Side Portion",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 160,
-          "protein": 0.5,
-          "carbs": 2,
-          "fat": 16
-        }
-      },
-      {
-        "name": "Yellow Mustard",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 5,
-          "protein": 0,
-          "carbs": 0,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Hellmann's Mayo",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 90,
-          "protein": 0,
-          "carbs": 0,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Oil & Vinegar",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 20,
-          "protein": 0,
-          "carbs": 0,
-          "fat": 2.5
-        }
-      },
-      {
-        "name": "Oregano-Basil",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 0,
-          "protein": 0,
-          "carbs": 0,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Caesar Dressing",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 60,
-          "protein": 0,
-          "carbs": 0.5,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Kickin' Ranch",
-        "category": "WRAPS",
-        "price_estimate": 12.55,
-        "image_url": null,
-        "macros": {
-          "calories": 50,
-          "protein": 0,
-          "carbs": 0.5,
-          "fat": 5
-        }
-      },
-      {
-        "name": "Pickle Ranch",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 90,
-          "protein": 0,
-          "carbs": 1,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Marinara Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 45,
-          "protein": 0.5,
-          "carbs": 6,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Homestyle Ranch",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 100,
-          "protein": 0,
-          "carbs": 0.5,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Horseradish Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 90,
-          "protein": 0,
-          "carbs": 3,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Ham",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 70,
-          "protein": 11,
-          "carbs": 2,
-          "fat": 1.5
-        }
-      },
-      {
-        "name": "Roast Beef",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 90,
-          "protein": 16,
-          "carbs": 0,
-          "fat": 3
-        }
-      },
-      {
-        "name": "Turkey",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 60,
-          "protein": 14,
-          "carbs": 1,
-          "fat": 0.5
-        }
-      },
-      {
-        "name": "Salami & Capocollo",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 160,
-          "protein": 14,
-          "carbs": 2,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Salami",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 100,
-          "protein": 8,
-          "carbs": 1,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Capocollo",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 60,
-          "protein": 6,
-          "carbs": 0.5,
-          "fat": 4
-        }
-      },
-      {
-        "name": "Tuna Salad",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 260,
-          "protein": 11,
-          "carbs": 4,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Bacon",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 90,
-          "protein": 7,
-          "carbs": 0,
-          "fat": 7
-        }
-      },
-      {
-        "name": "All-Natural Chicken",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 110,
-          "protein": 18,
-          "carbs": 1,
-          "fat": 3.5
-        }
-      },
-      {
-        "name": "Provolone Cheese",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 120,
-          "protein": 8,
-          "carbs": 0.5,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Shaved Parmesan",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 60,
-          "protein": 5,
-          "carbs": 0,
-          "fat": 4
-        }
-      },
-      {
-        "name": "Avocado Spread",
-        "category": "Sides",
-        "price_estimate": 2.50,
-        "image_url": null,
-        "macros": {
-          "calories": 20,
-          "protein": 0,
-          "carbs": 2,
-          "fat": 2
-        }
-      },
-      {
-        "name": "Cheddar Cheese",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 170,
-          "protein": 11,
-          "carbs": 0.5,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Sliced Mozzarella",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 260,
-          "protein": 21,
-          "carbs": 5,
-          "fat": 17
-        }
-      }
     ]
-  }
+}

@@ -24,7 +24,7 @@ export const DISH_TAXONOMY: Record<string, { keywords: string[] }> = {
     },
     bowls: {
         keywords: [
-            "bowl", "bowls", "salad", "salads", "greens", "grain"
+            "bowl", "bowls", "greens", "grain"
         ]
     },
     sandwiches: {

@@ -5,9 +5,10 @@ import { usePathname } from 'next/navigation';
 export function AppContainer({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isWaitlist = pathname?.startsWith('/waitlist');
+  const isLanding = pathname === '/';
 
-  if (isWaitlist) {
-    // Full-width layout for waitlist page
+  if (isWaitlist || isLanding) {
+    // Full-width layout for waitlist and landing pages
     return <>{children}</>;
   }
 

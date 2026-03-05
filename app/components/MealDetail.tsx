@@ -24,6 +24,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useNutrition } from '../contexts/NutritionContext';
 import { calculateCalorieRemaining } from '@/utils/calorie-calculator';
 import type { UserProfile } from '../types';
+import { getLogo } from '@/utils/logos';
 
 // --- TYPES ---
 type Props = {
@@ -500,35 +501,29 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
         <div className="flex-1 overflow-y-auto scrollbar-hide pb-6 pb-safe"> 
         
         {/* HEADER IMAGE */}
-        <div className="relative h-64 w-full shrink-0 bg-gradient-to-br from-cyan-500/20 via-blue-500/20 to-indigo-500/20">
+        <div className="relative h-80 w-full shrink-0 bg-gradient-to-br from-cyan-500/20 via-blue-500/20 to-indigo-500/20">
           {meal.image && meal.image !== '/placeholder-food.jpg' && meal.image !== '' ? (
             <img 
               src={meal.image} 
               alt={meal.name}
               className="w-full h-full object-cover"
               onError={(e) => {
-                // Fallback to default.png if meal image fails
-                e.currentTarget.src = '/logos/default.png';
+                e.currentTarget.src = getLogo(meal.restaurant || '');
+                e.currentTarget.className = 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-h-52 max-w-[80%] object-contain drop-shadow-xl';
                 e.currentTarget.onerror = null;
               }}
             />
           ) : (
             <img 
-              src="/logos/default.png" 
-              alt="Default meal"
-              className="w-full h-full object-cover"
+              src={getLogo(meal.restaurant || '')}
+              alt={meal.restaurant || 'Restaurant logo'}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-h-52 max-w-[80%] object-contain drop-shadow-xl"
               onError={(e) => {
-                // Final fallback - hide image if default.png also fails
                 e.currentTarget.style.display = 'none';
               }}
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
-          <div className="absolute bottom-6 left-6 right-6 z-10">
-            <h2 className="text-white text-xl font-bold drop-shadow-lg">{meal.name}</h2>
-            <p className="text-white/80 text-sm mt-2">{meal.restaurant}</p>
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent pointer-events-none"></div>
           
           <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
             <button onClick={onBack} className="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 hover:bg-black/60">
@@ -550,35 +545,33 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
         </div>
 
         {/* MAIN CONTENT */}
-        <div className="px-5 -mt-6 relative z-10 space-y-6">
+        <div className="px-5 pt-5 relative z-10 space-y-5">
           
           {/* TITLE & INFO */}
           <div>
-            <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start justify-between gap-3">
               <div className="flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-foreground text-2xl font-bold leading-tight">{meal.name}</h1>
-                  {proteinDensity.badge && (
-                    <span className={`${proteinDensity.badge.bg} border px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shrink-0`}>
-                      <span>{proteinDensity.badge.emoji}</span>
-                      <span>{proteinDensity.badge.text}</span>
-                    </span>
-                  )}
-                </div>
+                <h1 className="text-foreground text-2xl font-extrabold leading-tight tracking-tight">{meal.name}</h1>
+                {proteinDensity.badge && (
+                  <span className={`${proteinDensity.badge.bg} border px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 mt-2`}>
+                    <span>{proteinDensity.badge.emoji}</span>
+                    <span>{proteinDensity.badge.text}</span>
+                  </span>
+                )}
               </div>
-              <div className="flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/30 px-2 py-1 rounded-lg shrink-0">
+              <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-xl shrink-0">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-300 text-[10px] font-semibold">93% Match</span>
+                <span className="text-emerald-400 text-xs font-bold">93% Match</span>
               </div>
             </div>
-            <p className="text-muted-foreground text-sm mt-1 italic">"{whyText}"</p>
-            <div className="flex items-center gap-3 mt-3 text-xs text-foreground/80">
-               <span className="font-semibold text-foreground">{meal.restaurant}</span>
+            <p className="text-muted-foreground text-sm mt-2 italic leading-relaxed">"{whyText}"</p>
+            <div className="flex items-center flex-wrap gap-2 mt-3">
+               <span className="font-bold text-sm text-foreground">{meal.restaurant}</span>
                {distance && (
                  <>
                    <span className="w-1 h-1 rounded-full bg-border"></span>
-                   <div className="flex items-center gap-1">
-                     <MapPin className="w-3 h-3 text-muted-foreground" />
+                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                     <MapPin className="w-3 h-3" />
                      {distance} away
                    </div>
                  </>
@@ -586,8 +579,8 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                {prepTime && (
                  <>
                    <span className="w-1 h-1 rounded-full bg-border"></span>
-                   <div className="flex items-center gap-1">
-                     <Clock className="w-3 h-3 text-muted-foreground" />
+                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                     <Clock className="w-3 h-3" />
                      {prepTime} pickup
                    </div>
                  </>
@@ -595,9 +588,7 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                {locationLabel && (
                  <>
                    <span className="w-1 h-1 rounded-full bg-border"></span>
-                   <div className="flex items-center gap-1">
-                     <span className="text-xs text-muted-foreground">{locationLabel}</span>
-                   </div>
+                   <span className="text-xs text-muted-foreground">{locationLabel}</span>
                  </>
                )}
             </div>
@@ -605,10 +596,10 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
 
           {/* SMART TAGS */}
           <div>
-            <p className="text-foreground text-sm font-semibold mb-3">Highlights</p>
+            <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest mb-2.5">Highlights</p>
             <div className="flex flex-wrap gap-2">
               {smartTags.map((tag, i) => (
-                <span key={i} className={`${tag.bg} border px-3 py-1.5 rounded-full text-xs font-medium`}>
+                <span key={i} className={`${tag.bg} border px-3.5 py-1.5 rounded-full text-xs font-semibold`}>
                   {tag.text}
                 </span>
               ))}
@@ -848,29 +839,29 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
           )}
           
           {/* --- ACTION BUTTONS (Inside scrollable content, only visible when scrolled to bottom) --- */}
-          <div className="mt-6 mb-6 space-y-2" style={{ height: '120px' }}>
+          <div className="mt-4 mb-8 space-y-3" style={{ height: '140px' }}>
             <button 
               onClick={() => setShowLogModal(true)}
-              className="w-full bg-emerald-500 hover:bg-emerald-400 text-[#020617] font-bold text-xs py-2 rounded-full shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+              className="w-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-[#020617] font-bold text-sm py-4 rounded-2xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4" />
               Log to Daily Tracker
             </button>
             
             <button 
               onClick={() => setShowManualModal(true)}
-              className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs py-2 rounded-full shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+              className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-sm py-4 rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4" />
               Add Meal Manually
             </button>
 
             <button 
               onClick={handleOrderOnline}
-              className="w-full rounded-full bg-muted border border-border text-foreground hover:bg-muted/80 font-medium text-xs py-2 flex items-center justify-center gap-2 transition-colors"
+              className="w-full rounded-2xl bg-muted border border-border text-foreground hover:bg-muted/80 font-semibold text-sm py-3.5 flex items-center justify-center gap-2 transition-colors"
             >
               Order Online
-              <ExternalLink className="w-3.5 h-3.5 ml-1 text-muted-foreground" />
+              <ExternalLink className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
         </div>

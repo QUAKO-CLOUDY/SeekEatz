@@ -1,0 +1,558 @@
+
+{
+    "restaurant_name": "Einstein Bros. Bagels",
+    "items": [
+    {
+    "name": "Country Bagels and Gravy Egg Sandwich 1 Egg",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 890,
+    "protein": 38,
+    "carbs": 57,
+    "fat": 56
+    }
+    },
+    {
+    "name": "Country Bagels and Gravy Egg Sandwich 2 Eggs",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 970,
+    "protein": 44,
+    "carbs": 58,
+    "fat": 62
+    }
+    },
+    {
+    "name": "Country Sausage Gourmet Bagel",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 440,
+    "protein": 16,
+    "carbs": 53,
+    "fat": 18
+    }
+    },
+    {
+    "name": "Classic 1 Egg Bacon and Cheddar Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 450,
+    "protein": 25,
+    "carbs": 58,
+    "fat": 16
+    }
+    },
+    {
+    "name": "Classic 1 Egg Cheddar Cheese Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 400,
+    "protein": 20,
+    "carbs": 57,
+    "fat": 11
+    }
+    },
+    {
+    "name": "Classic 1 Egg Ham and Swiss Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 450,
+    "protein": 26,
+    "carbs": 59,
+    "fat": 12
+    }
+    },
+    {
+    "name": "Classic 1 Egg Pork Sausage and Cheddar Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 580,
+    "protein": 26,
+    "carbs": 57,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Classic 1 Egg Turkey Sausage and Cheddar Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 490,
+    "protein": 27,
+    "carbs": 57,
+    "fat": 18
+    }
+    },
+    {
+    "name": "Chorizo Sunrise on Green Chile Egg Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 790,
+    "protein": 34,
+    "carbs": 64,
+    "fat": 46
+    }
+    },
+    {
+    "name": "Farmhouse on Cheesy Hash Brown Egg Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 690,
+    "protein": 35,
+    "carbs": 65,
+    "fat": 32
+    }
+    },
+    {
+    "name": "Garden Avocado on Everything Egg Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 500,
+    "protein": 18,
+    "carbs": 64,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Maplehouse Egg Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 860,
+    "protein": 31,
+    "carbs": 92,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Santa Fe Sandwich on Asiago",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 580,
+    "protein": 31,
+    "carbs": 59,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Texas Brisket on Cheddar Jalapeno Egg Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 760,
+    "protein": 30,
+    "carbs": 56,
+    "fat": 48
+    }
+    },
+    {
+    "name": "Big Bros Burrito",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1250,
+    "protein": 48,
+    "carbs": 94,
+    "fat": 76
+    }
+    },
+    {
+    "name": "Avocado Veg Out on Sesame Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 410,
+    "protein": 14,
+    "carbs": 66,
+    "fat": 11
+    }
+    },
+    {
+    "name": "Ham and Swiss on Plain Bagel Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 540,
+    "protein": 27,
+    "carbs": 63,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Nova Lox on Plain Bagel Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 500,
+    "protein": 24,
+    "carbs": 60,
+    "fat": 18
+    }
+    },
+    {
+    "name": "Tasty Turkey on Asiago Bagel Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 520,
+    "protein": 32,
+    "carbs": 71,
+    "fat": 16
+    }
+    },
+    {
+    "name": "Turkey and Cheddar on Plain Bagel Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 540,
+    "protein": 29,
+    "carbs": 68,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Turkey, Bacon and Avocado on Plain Bagel Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 640,
+    "protein": 31,
+    "carbs": 73,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Pizza Bagel Cheese on Plain",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 460,
+    "protein": 25,
+    "carbs": 61,
+    "fat": 13
+    }
+    },
+    {
+    "name": "Pizza Bagel Pepperoni on Plain",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 560,
+    "protein": 28,
+    "carbs": 61,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Albuquerque Turkey on Six Cheese",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 710,
+    "protein": 44,
+    "carbs": 68,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Cheesy Veggie Melt on Ciabatta",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 620,
+    "protein": 23,
+    "carbs": 50,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Chicken and Pepperoni on Ciabatta",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 650,
+    "protein": 43,
+    "carbs": 47,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Spicy Chicken on Ciabatta",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 610,
+    "protein": 41,
+    "carbs": 53,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Avocado Toast",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 380,
+    "protein": 11,
+    "carbs": 63,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Muscle Freak Protein Shake",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 619,
+    "protein": 56,
+    "carbs": 40,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Green Beast Protein Shake",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 381,
+    "protein": 33,
+    "carbs": 35,
+    "fat": 15
+    }
+    },
+    {
+    "name": "Swole Man Protein Shake",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 566,
+    "protein": 76,
+    "carbs": 6,
+    "fat": 6
+    }
+    },
+    {
+    "name": "Chocolate PB Crush Protein Shake",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 608,
+    "protein": 41,
+    "carbs": 63,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Peanut Butter Dream Protein Shake",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 650,
+    "protein": 47,
+    "carbs": 73,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Strawberry Banana Smoothie 16 oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 280,
+    "protein": 1,
+    "carbs": 67,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Chipotle Salsa",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 5,
+    "protein": 0,
+    "carbs": 1,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Chipotle Mayo",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 90,
+    "protein": 0,
+    "carbs": 1,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Double Egg Mayo",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 100,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 12
+    }
+    },
+    {
+    "name": "Roasted Tomato Spread",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 80,
+    "protein": 0,
+    "carbs": 1,
+    "fat": 8
+    }
+    },
+    {
+    "name": "Spicy Brown Mustard",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 15,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Garden Veggie Reduced Fat Shmear",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 100,
+    "protein": 2,
+    "carbs": 5,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Garlic and Herb Shmear",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 110,
+    "protein": 2,
+    "carbs": 5,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Honey Almond Reduced Fat Shmear",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 120,
+    "protein": 2,
+    "carbs": 10,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Jalapeno Salsa Reduced Fat Shmear",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 100,
+    "protein": 2,
+    "carbs": 5,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Onion and Chive Shmear",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 110,
+    "protein": 2,
+    "carbs": 4,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Plain Shmear",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 120,
+    "protein": 2,
+    "carbs": 2,
+    "fat": 12
+    }
+    },
+    {
+    "name": "Strawberry Reduced Fat Shmear",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 120,
+    "protein": 1,
+    "carbs": 9,
+    "fat": 9
+    }
+    }
+    ]
+    }

@@ -1,0 +1,918 @@
+
+{
+    "restaurant_name": "Protein Bar & Kitchen",
+    "items": [
+    {
+    "name": "Triple Berry Acai",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 510,
+    "protein": 4,
+    "carbs": 98,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Chia Berry Parfait",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 330,
+    "protein": 17,
+    "carbs": 50,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Honey Granola Parfait",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 310,
+    "protein": 16,
+    "carbs": 44,
+    "fat": 10
+    }
+    },
+    {
+    "name": "The Elvis Acai",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 780,
+    "protein": 12,
+    "carbs": 124,
+    "fat": 30
+    }
+    },
+    {
+    "name": "Green Machine",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 490,
+    "protein": 20,
+    "carbs": 52,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Sundae Fundae",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 600,
+    "protein": 23,
+    "carbs": 55,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Power Berry Crunch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 650,
+    "protein": 17,
+    "carbs": 113,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Beach Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 420,
+    "protein": 6,
+    "carbs": 80,
+    "fat": 12
+    }
+    },
+    {
+    "name": "Mexicali Bowl Biggie",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 720,
+    "protein": 58,
+    "carbs": 55,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Chicago Med Bowl Biggie",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 670,
+    "protein": 44,
+    "carbs": 68,
+    "fat": 27
+    }
+    },
+    {
+    "name": "Saigon Chicken Bowl Biggie",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 660,
+    "protein": 41,
+    "carbs": 61,
+    "fat": 29
+    }
+    },
+    {
+    "name": "Saigon Tofu Bowl Biggie",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 620,
+    "protein": 26,
+    "carbs": 65,
+    "fat": 30
+    }
+    },
+    {
+    "name": "Japanese BBQ Salmon Biggie",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 950,
+    "protein": 56,
+    "carbs": 68,
+    "fat": 54
+    }
+    },
+    {
+    "name": "Spinach & Pesto Bowl Biggie",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 830,
+    "protein": 59,
+    "carbs": 51,
+    "fat": 46
+    }
+    },
+    {
+    "name": "Buffalo Bowl Biggie",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 580,
+    "protein": 51,
+    "carbs": 52,
+    "fat": 21
+    }
+    },
+    {
+    "name": "Black Bean Bowl Biggie",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 720,
+    "protein": 63,
+    "carbs": 74,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Basic Black Bean Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 600,
+    "protein": 44,
+    "carbs": 73,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Black Bean Barrito",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 710,
+    "protein": 43,
+    "carbs": 100,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Buffalo Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 400,
+    "protein": 29,
+    "carbs": 38,
+    "fat": 16
+    }
+    },
+    {
+    "name": "Buffalo Barrito",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 570,
+    "protein": 35,
+    "carbs": 78,
+    "fat": 17
+    }
+    },
+    {
+    "name": "Mexicali Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 600,
+    "protein": 39,
+    "carbs": 53,
+    "fat": 29
+    }
+    },
+    {
+    "name": "Mexicali Barrito",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 820,
+    "protein": 45,
+    "carbs": 103,
+    "fat": 32
+    }
+    },
+    {
+    "name": "Spinach & Pesto Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 690,
+    "protein": 39,
+    "carbs": 49,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Spinach & Pesto Barrito",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 730,
+    "protein": 40,
+    "carbs": 77,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Chicago Med Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 570,
+    "protein": 28,
+    "carbs": 67,
+    "fat": 23
+    }
+    },
+    {
+    "name": "Chicago Med Barrito",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 860,
+    "protein": 39,
+    "carbs": 120,
+    "fat": 30
+    }
+    },
+    {
+    "name": "Saigon Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 540,
+    "protein": 18,
+    "carbs": 57,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Saigon Barrito",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 840,
+    "protein": 29,
+    "carbs": 115,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Spring Pro Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 750,
+    "protein": 31,
+    "carbs": 47,
+    "fat": 52
+    }
+    },
+    {
+    "name": "Baja Salmon Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 650,
+    "protein": 36,
+    "carbs": 63,
+    "fat": 30
+    }
+    },
+    {
+    "name": "Baja Salmon Barrito",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 940,
+    "protein": 47,
+    "carbs": 115,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Seasonal Pro Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 620,
+    "protein": 33,
+    "carbs": 54,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Morning Mexicali Scramble",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 320,
+    "protein": 22,
+    "carbs": 14,
+    "fat": 21
+    }
+    },
+    {
+    "name": "Morning Mexicali Barrito",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 540,
+    "protein": 34,
+    "carbs": 52,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Sunrise Pesto Scramble",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 240,
+    "protein": 20,
+    "carbs": 3,
+    "fat": 17
+    }
+    },
+    {
+    "name": "Sunrise Pesto Barrito",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 440,
+    "protein": 27,
+    "carbs": 39,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Bacon, Egg & Cheese Scramble",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 350,
+    "protein": 36,
+    "carbs": 4,
+    "fat": 21
+    }
+    },
+    {
+    "name": "Bacon, Egg & Cheese Barrito",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 550,
+    "protein": 40,
+    "carbs": 40,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Morning Goddess Scramble",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 330,
+    "protein": 19,
+    "carbs": 6,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Morning Goddess Barrito",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 520,
+    "protein": 26,
+    "carbs": 42,
+    "fat": 31
+    }
+    },
+    {
+    "name": "Quinoa Chicken Chili Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 400,
+    "protein": 32,
+    "carbs": 46,
+    "fat": 13
+    }
+    },
+    {
+    "name": "Quinoa Chicken Chili Cup",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 180,
+    "protein": 14,
+    "carbs": 21,
+    "fat": 6
+    }
+    },
+    {
+    "name": "Almost Naked Oatmeal",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 360,
+    "protein": 14,
+    "carbs": 63,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Peanut Butter Acai Oatmeal",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 460,
+    "protein": 13,
+    "carbs": 72,
+    "fat": 17
+    }
+    },
+    {
+    "name": "Overnight Oats",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 370,
+    "protein": 17,
+    "carbs": 70,
+    "fat": 6
+    }
+    },
+    {
+    "name": "Superfood Vegan Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 510,
+    "protein": 21,
+    "carbs": 48,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Superfood Vegan Wrap",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 780,
+    "protein": 30,
+    "carbs": 98,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Salmon Caesar Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 690,
+    "protein": 39,
+    "carbs": 12,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Salmon Caesar Wrap",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 940,
+    "protein": 47,
+    "carbs": 60,
+    "fat": 60
+    }
+    },
+    {
+    "name": "Chicken Caesar Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 640,
+    "protein": 33,
+    "carbs": 18,
+    "fat": 50
+    }
+    },
+    {
+    "name": "Chicken Caesar Wrap",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 910,
+    "protein": 42,
+    "carbs": 67,
+    "fat": 56
+    }
+    },
+    {
+    "name": "Southwest Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 620,
+    "protein": 40,
+    "carbs": 57,
+    "fat": 31
+    }
+    },
+    {
+    "name": "Southwest Wrap",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 770,
+    "protein": 43,
+    "carbs": 92,
+    "fat": 31
+    }
+    },
+    {
+    "name": "Cobb Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 530,
+    "protein": 45,
+    "carbs": 19,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Cobb Wrap",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 940,
+    "protein": 52,
+    "carbs": 67,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Green Goddess Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 570,
+    "protein": 32,
+    "carbs": 21,
+    "fat": 42
+    }
+    },
+    {
+    "name": "Green Goddess Wrap",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 850,
+    "protein": 42,
+    "carbs": 72,
+    "fat": 49
+    }
+    },
+    {
+    "name": "Sonoma Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 480,
+    "protein": 27,
+    "carbs": 36,
+    "fat": 27
+    }
+    },
+    {
+    "name": "Sonoma Wrap",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 770,
+    "protein": 37,
+    "carbs": 87,
+    "fat": 34
+    }
+    },
+    {
+    "name": "PB&J Smoothie",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 330,
+    "protein": 21,
+    "carbs": 28,
+    "fat": 17
+    }
+    },
+    {
+    "name": "The Perk",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 190,
+    "protein": 24,
+    "carbs": 14,
+    "fat": 5
+    }
+    },
+    {
+    "name": "Hippie Shake",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 580,
+    "protein": 28,
+    "carbs": 72,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Jokes Acai'd",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 420,
+    "protein": 20,
+    "carbs": 70,
+    "fat": 4
+    }
+    },
+    {
+    "name": "Wrigley Peeled",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 520,
+    "protein": 26,
+    "carbs": 41,
+    "fat": 32
+    }
+    },
+    {
+    "name": "Keto Shake",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 530,
+    "protein": 28,
+    "carbs": 26,
+    "fat": 40
+    }
+    },
+    {
+    "name": "Very Berry Smoothie",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 290,
+    "protein": 20,
+    "carbs": 43,
+    "fat": 5
+    }
+    },
+    {
+    "name": "Baywatch Smoothie",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 330,
+    "protein": 16,
+    "carbs": 65,
+    "fat": 3
+    }
+    },
+    {
+    "name": "Cocoa Puff Smoothie",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 320,
+    "protein": 15,
+    "carbs": 30,
+    "fat": 18
+    }
+    },
+    {
+    "name": "Big Date Smoothie",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 330,
+    "protein": 15,
+    "carbs": 51,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Avo Matcha Smoothie",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 240,
+    "protein": 15,
+    "carbs": 30,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Gr8 Greens Smoothie",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 240,
+    "protein": 3,
+    "carbs": 62,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Mango Cure Smoothie",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 250,
+    "protein": 4,
+    "carbs": 62,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Berry Banana Smoothie",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 330,
+    "protein": 4,
+    "carbs": 66,
+    "fat": 8
+    }
+    },
+    {
+    "name": "Sonic Refresher",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 180,
+    "protein": 2,
+    "carbs": 46,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Out Of Office",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 330,
+    "protein": 12,
+    "carbs": 62,
+    "fat": 2
+    }
+    },
+    {
+    "name": "Mango Acai Smoothie",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 380,
+    "protein": 1,
+    "carbs": 85,
+    "fat": 5
+    }
+    }
+    ]
+    }

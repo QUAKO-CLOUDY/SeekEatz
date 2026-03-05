@@ -1,0 +1,1326 @@
+
+{
+    "restaurant_name": "Miller's Ale House",
+    "items": [
+    {
+    "name": "Zingers Mountain Melt",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 2010,
+    "protein": 71,
+    "carbs": 47,
+    "fat": 168
+    }
+    },
+    {
+    "name": "Miller's Size Mountain Melt",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 2660,
+    "protein": 118,
+    "carbs": 63,
+    "fat": 210
+    }
+    },
+    {
+    "name": "Zingers",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 750,
+    "protein": 58,
+    "carbs": 18,
+    "fat": 49
+    }
+    },
+    {
+    "name": "6 Wings",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 220,
+    "protein": 38,
+    "carbs": 0,
+    "fat": 6
+    }
+    },
+    {
+    "name": "12 Wings",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 440,
+    "protein": 76,
+    "carbs": 0,
+    "fat": 12
+    }
+    },
+    {
+    "name": "24 Wings",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 880,
+    "protein": 152,
+    "carbs": 0,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Mild Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 80,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Garlic Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 190,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 21
+    }
+    },
+    {
+    "name": "Honey BBQ Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 70,
+    "protein": 0,
+    "carbs": 17,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Garlic Parmesan Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 110,
+    "protein": 1,
+    "carbs": 2,
+    "fat": 11
+    }
+    },
+    {
+    "name": "Teriyaki Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 45,
+    "protein": 0,
+    "carbs": 8,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Honey Mustard Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 130,
+    "protein": 0,
+    "carbs": 6,
+    "fat": 11
+    }
+    },
+    {
+    "name": "Medium Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 120,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Caribbean Jerk Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 40,
+    "protein": 0,
+    "carbs": 10,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Hot Garlic Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 90,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Sweet Thai Chili Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 70,
+    "protein": 0,
+    "carbs": 17,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Tequila BBQ Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 80,
+    "protein": 0,
+    "carbs": 15,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Korean BBQ Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 70,
+    "protein": 1,
+    "carbs": 13,
+    "fat": 2
+    }
+    },
+    {
+    "name": "Mango Habanero Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 50,
+    "protein": 0,
+    "carbs": 12,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Potstickers - Pan Fried",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 810,
+    "protein": 19,
+    "carbs": 93,
+    "fat": 40
+    }
+    },
+    {
+    "name": "Potstickers - Steamed",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 550,
+    "protein": 19,
+    "carbs": 93,
+    "fat": 12
+    }
+    },
+    {
+    "name": "Fully Loaded Cheese Fries",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1850,
+    "protein": 18,
+    "carbs": 33,
+    "fat": 181
+    }
+    },
+    {
+    "name": "Fried Calamari",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 780,
+    "protein": 28,
+    "carbs": 79,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Fried Jalapenos",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 650,
+    "protein": 16,
+    "carbs": 103,
+    "fat": 17
+    }
+    },
+    {
+    "name": "Warm Bavarian Pretzel",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 490,
+    "protein": 13,
+    "carbs": 44,
+    "fat": 29
+    }
+    },
+    {
+    "name": "Creamy Spinach & Artichoke Dip",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 810,
+    "protein": 18,
+    "carbs": 66,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Mozzarella Sticks 12-Count",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1170,
+    "protein": 42,
+    "carbs": 78,
+    "fat": 73
+    }
+    },
+    {
+    "name": "Mozzarella Sticks 8-Count",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 800,
+    "protein": 28,
+    "carbs": 55,
+    "fat": 53
+    }
+    },
+    {
+    "name": "Miller's Size Tex-Mex Chicken Nachos",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 2260,
+    "protein": 82,
+    "carbs": 113,
+    "fat": 162
+    }
+    },
+    {
+    "name": "Tex-Mex Chicken Nachos",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1000,
+    "protein": 34,
+    "carbs": 57,
+    "fat": 70
+    }
+    },
+    {
+    "name": "Chicken Quesadilla",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 870,
+    "protein": 50,
+    "carbs": 67,
+    "fat": 46
+    }
+    },
+    {
+    "name": "French Onion Soup",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 290,
+    "protein": 14,
+    "carbs": 21,
+    "fat": 15
+    }
+    },
+    {
+    "name": "Beef and White Bean Chili",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 460,
+    "protein": 27,
+    "carbs": 27,
+    "fat": 27
+    }
+    },
+    {
+    "name": "Beer Cheese Soup",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 370,
+    "protein": 20,
+    "carbs": 16,
+    "fat": 24
+    }
+    },
+    {
+    "name": "Broccoli Cheese Soup",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 210,
+    "protein": 8,
+    "carbs": 15,
+    "fat": 13
+    }
+    },
+    {
+    "name": "Chicken and Poblano Pepper Soup",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 300,
+    "protein": 11,
+    "carbs": 24,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Chicken Tortilla Soup",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 90,
+    "protein": 6,
+    "carbs": 11,
+    "fat": 3
+    }
+    },
+    {
+    "name": "Clam Chowder",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 360,
+    "protein": 10,
+    "carbs": 20,
+    "fat": 23
+    }
+    },
+    {
+    "name": "Farmer's Market Vegetable Soup",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 120,
+    "protein": 3,
+    "carbs": 19,
+    "fat": 4
+    }
+    },
+    {
+    "name": "Hearty Vegetable Soup",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 90,
+    "protein": 0,
+    "carbs": 15,
+    "fat": 3
+    }
+    },
+    {
+    "name": "Italian Wedding Soup",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 160,
+    "protein": 8,
+    "carbs": 20,
+    "fat": 6
+    }
+    },
+    {
+    "name": "Premium Lobster Bisque",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 450,
+    "protein": 7,
+    "carbs": 15,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Roasted Poblano Corn Chowder",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 270,
+    "protein": 3,
+    "carbs": 29,
+    "fat": 16
+    }
+    },
+    {
+    "name": "Shrimp and Roasted Corn Chowder",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 300,
+    "protein": 8,
+    "carbs": 30,
+    "fat": 18
+    }
+    },
+    {
+    "name": "Tomato Bisque with Spinach and Orzo",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 350,
+    "protein": 8,
+    "carbs": 19,
+    "fat": 29
+    }
+    },
+    {
+    "name": "White Chicken Chili With Cilantro",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 350,
+    "protein": 24,
+    "carbs": 27,
+    "fat": 15
+    }
+    },
+    {
+    "name": "Zingers Salad",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 510,
+    "protein": 55,
+    "carbs": 28,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Cobb Salad",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 880,
+    "protein": 98,
+    "carbs": 17,
+    "fat": 44
+    }
+    },
+    {
+    "name": "Chicken Caesar Salad",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 760,
+    "protein": 56,
+    "carbs": 33,
+    "fat": 46
+    }
+    },
+    {
+    "name": "House Salad",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 410,
+    "protein": 21,
+    "carbs": 56,
+    "fat": 12
+    }
+    },
+    {
+    "name": "Caesar Salad",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 560,
+    "protein": 16,
+    "carbs": 32,
+    "fat": 45
+    }
+    },
+    {
+    "name": "Balsamic Vinaigrette Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 100,
+    "protein": 0,
+    "carbs": 3,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Blue Cheese Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 140,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 15
+    }
+    },
+    {
+    "name": "Caesar Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 130,
+    "protein": 2,
+    "carbs": 2,
+    "fat": 13
+    }
+    },
+    {
+    "name": "Cajun Ranch Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 190,
+    "protein": 0,
+    "carbs": 2,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Honey Mustard Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 130,
+    "protein": 0,
+    "carbs": 6,
+    "fat": 11
+    }
+    },
+    {
+    "name": "Thousand Island Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 137,
+    "protein": null,
+    "carbs": null,
+    "fat": null
+    }
+    },
+    {
+    "name": "Ranch Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 180,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Barbeque Baby Back Ribs",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1320,
+    "protein": 95,
+    "carbs": 43,
+    "fat": 83
+    }
+    },
+    {
+    "name": "Zingers Mac & Cheese",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 2110,
+    "protein": 76,
+    "carbs": 135,
+    "fat": 138
+    }
+    },
+    {
+    "name": "Cajun Chicken Pasta",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1670,
+    "protein": 72,
+    "carbs": 143,
+    "fat": 86
+    }
+    },
+    {
+    "name": "Pork Osso Buco",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1380,
+    "protein": 106,
+    "carbs": 41,
+    "fat": 86
+    }
+    },
+    {
+    "name": "Mimi's Fiesta Chicken & Shrimp",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 680,
+    "protein": 68,
+    "carbs": 34,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Atlantic Salmon - Grilled",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 500,
+    "protein": 53,
+    "carbs": 1,
+    "fat": 29
+    }
+    },
+    {
+    "name": "Atlantic Salmon - Blackened",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 550,
+    "protein": 54,
+    "carbs": 6,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Atlantic Salmon - Broiled",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 810,
+    "protein": 53,
+    "carbs": 0,
+    "fat": 63
+    }
+    },
+    {
+    "name": "Chicken Parmesan Pasta",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1660,
+    "protein": 77,
+    "carbs": 120,
+    "fat": 92
+    }
+    },
+    {
+    "name": "Chicken Pesto Raviolo",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1010,
+    "protein": 29,
+    "carbs": 55,
+    "fat": 72
+    }
+    },
+    {
+    "name": "Chicken Scampi Pasta Bake",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1570,
+    "protein": 80,
+    "carbs": 85,
+    "fat": 99
+    }
+    },
+    {
+    "name": "Shrimp Scampi Pasta Bake",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1430,
+    "protein": 66,
+    "carbs": 23,
+    "fat": 115
+    }
+    },
+    {
+    "name": "Lobster Ravioli",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 810,
+    "protein": 26,
+    "carbs": 62,
+    "fat": 49
+    }
+    },
+    {
+    "name": "Cilantro Lime Chicken",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 800,
+    "protein": 55,
+    "carbs": 67,
+    "fat": 34
+    }
+    },
+    {
+    "name": "English Pub Fish & Chips",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1765,
+    "protein": 47,
+    "carbs": 122,
+    "fat": 112
+    }
+    },
+    {
+    "name": "35 Fried Shrimp",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1770,
+    "protein": 85,
+    "carbs": 139,
+    "fat": 90
+    }
+    },
+    {
+    "name": "Snow Crab",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 890,
+    "protein": 108,
+    "carbs": 0,
+    "fat": 51
+    }
+    },
+    {
+    "name": "Choice Center Cut Sirloin 6oz - Grilled",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 290,
+    "protein": 37,
+    "carbs": 0,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Choice Center Cut Sirloin 10oz - Grilled",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 510,
+    "protein": 62,
+    "carbs": 2,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Ribeye - Grilled",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 990,
+    "protein": 63,
+    "carbs": 2,
+    "fat": 81
+    }
+    },
+    {
+    "name": "NY Strip - Grilled",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 870,
+    "protein": 66,
+    "carbs": 0,
+    "fat": 58
+    }
+    },
+    {
+    "name": "Filet Mignon - 6 oz Grilled",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 640,
+    "protein": 26,
+    "carbs": 1,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Flat Iron - 6 oz Grilled",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 310,
+    "protein": 32,
+    "carbs": 1,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Chicken Fajitas",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 810,
+    "protein": 60,
+    "carbs": 79,
+    "fat": 29
+    }
+    },
+    {
+    "name": "Classic Cheeseburger",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1010,
+    "protein": 53,
+    "carbs": 42,
+    "fat": 70
+    }
+    },
+    {
+    "name": "Millers Veggie Burger",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 600,
+    "protein": 11,
+    "carbs": 61,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Brunch Burger",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1440,
+    "protein": 56,
+    "carbs": 46,
+    "fat": 114
+    }
+    },
+    {
+    "name": "Prime Burger",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1280,
+    "protein": 64,
+    "carbs": 51,
+    "fat": 92
+    }
+    },
+    {
+    "name": "Cue Bacon Cheeseburger",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1160,
+    "protein": 58,
+    "carbs": 53,
+    "fat": 79
+    }
+    },
+    {
+    "name": "Big Red Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 820,
+    "protein": 56,
+    "carbs": 61,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Grilled Chicken BLT",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 610,
+    "protein": 57,
+    "carbs": 41,
+    "fat": 23
+    }
+    },
+    {
+    "name": "Mahi-Mahi - Grilled",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 390,
+    "protein": 50,
+    "carbs": 41,
+    "fat": 4
+    }
+    },
+    {
+    "name": "Mahi-Mahi - Blackened",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 450,
+    "protein": 51,
+    "carbs": 46,
+    "fat": 7
+    }
+    },
+    {
+    "name": "Mahi-Mahi - Broiled",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 710,
+    "protein": 50,
+    "carbs": 41,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Philly Cheese Steak",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 950,
+    "protein": 59,
+    "carbs": 58,
+    "fat": 50
+    }
+    },
+    {
+    "name": "Prime Rib French Dip",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1110,
+    "protein": 72,
+    "carbs": 63,
+    "fat": 61
+    }
+    },
+    {
+    "name": "Dad's Homemade Meatloaf",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 900,
+    "protein": 43,
+    "carbs": 80,
+    "fat": 50
+    }
+    },
+    {
+    "name": "Pork Tenderloin Cuban Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1250,
+    "protein": 53,
+    "carbs": 91,
+    "fat": 72
+    }
+    },
+    {
+    "name": "Chicken Enchiladas",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1220,
+    "protein": 45,
+    "carbs": 152,
+    "fat": 50
+    }
+    },
+    {
+    "name": "Cajun Chicken Salad",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 960,
+    "protein": 48,
+    "carbs": 114,
+    "fat": 35
+    }
+    },
+    {
+    "name": "Tush Push Burger",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1310,
+    "protein": 40,
+    "carbs": 146,
+    "fat": 65
+    }
+    },
+    {
+    "name": "The Field Goal Trio",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1410,
+    "protein": 164,
+    "carbs": 10,
+    "fat": 79
+    }
+    },
+    {
+    "name": "Buffalo Shrimp",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1170,
+    "protein": 61,
+    "carbs": 52,
+    "fat": 76
+    }
+    },
+    {
+    "name": "Big Red Zone",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1450,
+    "protein": 105,
+    "carbs": 59,
+    "fat": 85
+    }
+    },
+    {
+    "name": "Prime Rib- 12 oz",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 810,
+    "protein": 109,
+    "carbs": 6,
+    "fat": 39
+    }
+    },
+    {
+    "name": "Prime Rib- 16 oz",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1650,
+    "protein": 118,
+    "carbs": 7,
+    "fat": 127
+    }
+    },
+    {
+    "name": "Mini Burgers",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 10070,
+    "protein": 458,
+    "carbs": 1060,
+    "fat": 451
+    }
+    },
+    {
+    "name": "Zingers Mac & Cheese Platter",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 7430,
+    "protein": 255,
+    "carbs": 506,
+    "fat": 478
+    }
+    },
+    {
+    "name": "Tuna Melt",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 650,
+    "protein": 32,
+    "carbs": 60,
+    "fat": 32
+    }
+    },
+    {
+    "name": "Bone-In Wings (Sweet & Citrus)",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1100,
+    "protein": 75,
+    "carbs": 24,
+    "fat": 61
+    }
+    },
+    {
+    "name": "Bone-In Wings (Smokey BBQ)",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1080,
+    "protein": 75,
+    "carbs": 19,
+    "fat": 61
+    }
+    },
+    {
+    "name": "Bone-In Wings (Fire Sauce)",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1100,
+    "protein": 75,
+    "carbs": 32,
+    "fat": 67
+    }
+    }
+    ]
+    }

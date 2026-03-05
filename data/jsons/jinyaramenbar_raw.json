@@ -1,0 +1,846 @@
+
+{
+    "restaurant_name": "Jinya Ramen Bar",
+    "items": [
+    {
+    "name": "Hokkaido Scallop Sashimi With Dry Miso",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 120,
+    "protein": 9,
+    "carbs": 6,
+    "fat": 4
+    }
+    },
+    {
+    "name": "Salmon Jalapeno Sashimi With Yuzu Soy Sauce",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 170,
+    "protein": 17,
+    "carbs": 2,
+    "fat": 4
+    }
+    },
+    {
+    "name": "Ciao Ramen With Basil Oil And Parmesan",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 760,
+    "protein": 30,
+    "carbs": 107,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Chicken Yuzu Shio Delight",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 820,
+    "protein": 55,
+    "carbs": 94,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Tan Tan Men",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1070,
+    "protein": 55,
+    "carbs": 102,
+    "fat": 47
+    }
+    },
+    {
+    "name": "Birria Ramen",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 700,
+    "protein": 36,
+    "carbs": 93,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Cha Cha Cha",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1690,
+    "protein": 71,
+    "carbs": 140,
+    "fat": 91
+    }
+    },
+    {
+    "name": "Chicken Hot",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 850,
+    "protein": 51,
+    "carbs": 103,
+    "fat": 35
+    }
+    },
+    {
+    "name": "Chicken Mild",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 810,
+    "protein": 50,
+    "carbs": 98,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Chicken Spicy",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 840,
+    "protein": 51,
+    "carbs": 103,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Chicken Wonton Ramen",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 870,
+    "protein": 55,
+    "carbs": 116,
+    "fat": 32
+    }
+    },
+    {
+    "name": "Hiyashi Cold Ramen With Cold Ramen Sauce",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 870,
+    "protein": 36,
+    "carbs": 99,
+    "fat": 36
+    }
+    },
+    {
+    "name": "Hiyashi Cold Ramen With Sesame Sauce",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 990,
+    "protein": 36,
+    "carbs": 96,
+    "fat": 51
+    }
+    },
+    {
+    "name": "Jinya Chicken Ramen",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 740,
+    "protein": 47,
+    "carbs": 91,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Jinya Chicken Ramen With Cheese & Tomato",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 850,
+    "protein": 54,
+    "carbs": 96,
+    "fat": 35
+    }
+    },
+    {
+    "name": "Spicy Creamy V Ramen",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 790,
+    "protein": 22,
+    "carbs": 97,
+    "fat": 32
+    }
+    },
+    {
+    "name": "Jinya Tonkotsu Black",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 990,
+    "protein": 47,
+    "carbs": 101,
+    "fat": 53
+    }
+    },
+    {
+    "name": "Mountain Buta Garlic",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 2560,
+    "protein": 87,
+    "carbs": 168,
+    "fat": 173
+    }
+    },
+    {
+    "name": "Tonkotsu Spicy Hot",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1010,
+    "protein": 45,
+    "carbs": 111,
+    "fat": 42
+    }
+    },
+    {
+    "name": "Tonkotsu Spicy Mild",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 980,
+    "protein": 44,
+    "carbs": 106,
+    "fat": 40
+    }
+    },
+    {
+    "name": "Tonkotsu Spicy Spicy",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1010,
+    "protein": 45,
+    "carbs": 111,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Tonkotsu Original 2010",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1320,
+    "protein": 54,
+    "carbs": 111,
+    "fat": 72
+    }
+    },
+    {
+    "name": "V Red Fire Opal",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 860,
+    "protein": 24,
+    "carbs": 108,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Spicy Grilled Chicken Ramen",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 890,
+    "protein": 62,
+    "carbs": 95,
+    "fat": 36
+    }
+    },
+    {
+    "name": "Shrimp Wonton Ramen",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1220,
+    "protein": 40,
+    "carbs": 153,
+    "fat": 51
+    }
+    },
+    {
+    "name": "Flying V Harvest",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1000,
+    "protein": 36,
+    "carbs": 126,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Tonkotsu Red Level 1",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1080,
+    "protein": 50,
+    "carbs": 114,
+    "fat": 47
+    }
+    },
+    {
+    "name": "Tonkotsu Red Level 5",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1140,
+    "protein": 51,
+    "carbs": 117,
+    "fat": 52
+    }
+    },
+    {
+    "name": "Tonkotsu Red Level 10",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1250,
+    "protein": 53,
+    "carbs": 124,
+    "fat": 62
+    }
+    },
+    {
+    "name": "Tangy Shrimp Cilantro Ramen",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 940,
+    "protein": 34,
+    "carbs": 121,
+    "fat": 44
+    }
+    },
+    {
+    "name": "Yuzu Shio Delight Ramen",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 900,
+    "protein": 54,
+    "carbs": 93,
+    "fat": 44
+    }
+    },
+    {
+    "name": "Chicken Soup (340 Ml)",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 180,
+    "protein": 26,
+    "carbs": 10,
+    "fat": 4
+    }
+    },
+    {
+    "name": "Hokuriku Cabba-Chick",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 910,
+    "protein": 57,
+    "carbs": 125,
+    "fat": 17
+    }
+    },
+    {
+    "name": "Creamy Classic Tori-Paitan",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 850,
+    "protein": 49,
+    "carbs": 107,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Unagi Inari Sushi",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 260,
+    "protein": 13,
+    "carbs": 32,
+    "fat": 8
+    }
+    },
+    {
+    "name": "Buffalo Cauliflower",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 650,
+    "protein": 8,
+    "carbs": 54,
+    "fat": 45
+    }
+    },
+    {
+    "name": "Chilled Tan Tan Men",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1020,
+    "protein": 52,
+    "carbs": 104,
+    "fat": 42
+    }
+    },
+    {
+    "name": "Spicy Corn Ribs",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 350,
+    "protein": 6,
+    "carbs": 23,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Garlic Chicken",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 840,
+    "protein": 83,
+    "carbs": 9,
+    "fat": 50
+    }
+    },
+    {
+    "name": "Crispy Chicken Wings",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1460,
+    "protein": 67,
+    "carbs": 40,
+    "fat": 114
+    }
+    },
+    {
+    "name": "Pork Kimchee",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1230,
+    "protein": 48,
+    "carbs": 68,
+    "fat": 87
+    }
+    },
+    {
+    "name": "Pork Ginger",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1190,
+    "protein": 50,
+    "carbs": 63,
+    "fat": 85
+    }
+    },
+    {
+    "name": "Chicken Salad",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 290,
+    "protein": 15,
+    "carbs": 18,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Garlic Shrimp Spring Rolls",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 230,
+    "protein": 15,
+    "carbs": 9,
+    "fat": 13
+    }
+    },
+    {
+    "name": "Chicken Wings With Sweet Soy Glaze",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 490,
+    "protein": 22,
+    "carbs": 27,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Aburi Oshi-Sushi Shrimp",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 200,
+    "protein": 5,
+    "carbs": 26,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Aburi Oshi-Sushi Salmon",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 250,
+    "protein": 10,
+    "carbs": 26,
+    "fat": 12
+    }
+    },
+    {
+    "name": "Miso Glazed Eggplant",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 400,
+    "protein": 8,
+    "carbs": 29,
+    "fat": 30
+    }
+    },
+    {
+    "name": "Ebi-Katsu Bun",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 430,
+    "protein": 6,
+    "carbs": 45,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Nikuman",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 140,
+    "protein": 12,
+    "carbs": 37,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Corn Tempura",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 450,
+    "protein": 8,
+    "carbs": 60,
+    "fat": 23
+    }
+    },
+    {
+    "name": "Brussels Sprouts Tempura",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 320,
+    "protein": 4,
+    "carbs": 23,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Caramelized Cauliflower",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 260,
+    "protein": 5,
+    "carbs": 14,
+    "fat": 23
+    }
+    },
+    {
+    "name": "Creamy Shrimp Tempura",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 690,
+    "protein": 5,
+    "carbs": 58,
+    "fat": 49
+    }
+    },
+    {
+    "name": "Crispy Chicken (5 Pcs)",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 650,
+    "protein": 53,
+    "carbs": 7,
+    "fat": 44
+    }
+    },
+    {
+    "name": "Edamame",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 180,
+    "protein": 18,
+    "carbs": 13,
+    "fat": 8
+    }
+    },
+    {
+    "name": "Jinya Bun",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 400,
+    "protein": 10,
+    "carbs": 33,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Takoyaki",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 660,
+    "protein": 14,
+    "carbs": 43,
+    "fat": 46
+    }
+    },
+    {
+    "name": "Impossible Bun",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 320,
+    "protein": 8,
+    "carbs": 35,
+    "fat": 17
+    }
+    },
+    {
+    "name": "Crispy Rice With Spicy Tuna",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 450,
+    "protein": 15,
+    "carbs": 37,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Sauteed Shishito Peppers",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 130,
+    "protein": 5,
+    "carbs": 7,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Impossible Gyoza",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 190,
+    "protein": 8,
+    "carbs": 22,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Salmon Poke Tacos",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 130,
+    "protein": 10,
+    "carbs": 8,
+    "fat": 7
+    }
+    },
+    {
+    "name": "Spicy Tuna Tacos",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 150,
+    "protein": 9,
+    "carbs": 6,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Impossible Taco",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 130,
+    "protein": 5,
+    "carbs": 16,
+    "fat": 7
+    }
+    },
+    {
+    "name": "California Poke Bowl Regular",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 810,
+    "protein": 30,
+    "carbs": 111,
+    "fat": 29
+    }
+    },
+    {
+    "name": "Tokyo Curry Rice Regular",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 760,
+    "protein": 19,
+    "carbs": 115,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Pork Chashu Bowl Regular",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1180,
+    "protein": 45,
+    "carbs": 104,
+    "fat": 64
+    }
+    },
+    {
+    "name": "Chicken Chashu Bowl Regular",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 890,
+    "protein": 55,
+    "carbs": 120,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Impossible Rice Bowl Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1130,
+    "protein": 22,
+    "carbs": 111,
+    "fat": 59
+    }
+    }
+    ]
+    }

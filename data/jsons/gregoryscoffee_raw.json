@@ -1,0 +1,438 @@
+
+{
+    "restaurant_name": "Gregorys Coffee",
+    "items": [
+    {
+    "name": "Peanut Pleaser 16 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 470,
+    "protein": 22,
+    "carbs": 35,
+    "fat": 29
+    }
+    },
+    {
+    "name": "Peanut Pleaser 24 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 570,
+    "protein": 25,
+    "carbs": 41,
+    "fat": 36
+    }
+    },
+    {
+    "name": "Triple Fruit 16 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 230,
+    "protein": 3,
+    "carbs": 58,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Triple Fruit 24 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 270,
+    "protein": 4,
+    "carbs": 68,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Morning Boost 16 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 660,
+    "protein": 19,
+    "carbs": 93,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Morning Boost 24 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1300,
+    "protein": 45,
+    "carbs": 123,
+    "fat": 73
+    }
+    },
+    {
+    "name": "Cookies & Cream 16 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 680,
+    "protein": 12,
+    "carbs": 82,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Cookies & Cream 24 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1120,
+    "protein": 19,
+    "carbs": 137,
+    "fat": 62
+    }
+    },
+    {
+    "name": "Iced Maple Hazelnut Protein Latte 12 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 290,
+    "protein": 22,
+    "carbs": 25,
+    "fat": 12
+    }
+    },
+    {
+    "name": "Iced Maple Hazelnut Protein Latte 16 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 320,
+    "protein": 24,
+    "carbs": 28,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Iced Maple Hazelnut Protein Latte 24 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 400,
+    "protein": 28,
+    "carbs": 34,
+    "fat": 18
+    }
+    },
+    {
+    "name": "Vanilla Protein Cold Brew 12 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 160,
+    "protein": 17,
+    "carbs": 10,
+    "fat": 6
+    }
+    },
+    {
+    "name": "Vanilla Protein Cold Brew 16 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 160,
+    "protein": 17,
+    "carbs": 10,
+    "fat": 6
+    }
+    },
+    {
+    "name": "Vanilla Protein Cold Brew 24 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 160,
+    "protein": 17,
+    "carbs": 10,
+    "fat": 6
+    }
+    },
+    {
+    "name": "Berry Protein Refresher 12 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 300,
+    "protein": 17,
+    "carbs": 44,
+    "fat": 6
+    }
+    },
+    {
+    "name": "Berry Protein Refresher 16 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 310,
+    "protein": 17,
+    "carbs": 47,
+    "fat": 6
+    }
+    },
+    {
+    "name": "Berry Protein Refresher 24 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 380,
+    "protein": 17,
+    "carbs": 63,
+    "fat": 6
+    }
+    },
+    {
+    "name": "Iced Strawberry Protein Matcha 12 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 310,
+    "protein": 25,
+    "carbs": 30,
+    "fat": 12
+    }
+    },
+    {
+    "name": "Iced Strawberry Protein Matcha 16 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 350,
+    "protein": 27,
+    "carbs": 33,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Iced Strawberry Protein Matcha 24 Oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 420,
+    "protein": 32,
+    "carbs": 40,
+    "fat": 18
+    }
+    },
+    {
+    "name": "Parfait",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 410,
+    "protein": 25,
+    "carbs": 55,
+    "fat": 11
+    }
+    },
+    {
+    "name": "Coco-Oats",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 630,
+    "protein": 6,
+    "carbs": 62,
+    "fat": 39
+    }
+    },
+    {
+    "name": "Chia Pudding",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 290,
+    "protein": 9,
+    "carbs": 38,
+    "fat": 12
+    }
+    },
+    {
+    "name": "Tuna Melt",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 650,
+    "protein": 32,
+    "carbs": 60,
+    "fat": 32
+    }
+    },
+    {
+    "name": "The Deluxe",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 430,
+    "protein": 16,
+    "carbs": 33,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Ham & Cheese",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 350,
+    "protein": 11,
+    "carbs": 31,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Vegan Deluxe",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 560,
+    "protein": 23,
+    "carbs": 36,
+    "fat": 36
+    }
+    },
+    {
+    "name": "The New Yorker / Bacon Egg Cheese",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 430,
+    "protein": 21,
+    "carbs": 47,
+    "fat": 16
+    }
+    },
+    {
+    "name": "The Skinny",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 340,
+    "protein": 24,
+    "carbs": 35,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Vegan Burrito",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 490,
+    "protein": 22,
+    "carbs": 39,
+    "fat": 29
+    }
+    },
+    {
+    "name": "Spicy Avo",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 310,
+    "protein": 7,
+    "carbs": 35,
+    "fat": 16
+    }
+    },
+    {
+    "name": "Turkey Sausage Egg Bites",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 320,
+    "protein": 18,
+    "carbs": 7,
+    "fat": 24
+    }
+    },
+    {
+    "name": "3 Cheese Egg Bite",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 200,
+    "protein": 14,
+    "carbs": 6,
+    "fat": 12
+    }
+    },
+    {
+    "name": "White Cheddar & Bacon Egg Bite",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 220,
+    "protein": 18,
+    "carbs": 6,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Munster & Caramelized Onion Spinach Egg Bite",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 200,
+    "protein": 14,
+    "carbs": 6,
+    "fat": 12
+    }
+    },
+    {
+    "name": "Spinach Ricotta Croissant",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 220,
+    "protein": 7,
+    "carbs": 21,
+    "fat": 13
+    }
+    }
+    ]
+    }

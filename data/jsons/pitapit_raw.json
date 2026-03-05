@@ -1,0 +1,402 @@
+
+{
+    "restaurant_name": "Pita Pit",
+    "items": [
+    {
+    "name": "Ancho Chicken Pita Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 540,
+    "protein": 26,
+    "carbs": 50,
+    "fat": 27
+    }
+    },
+    {
+    "name": "Ancho Chicken Pita Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 920,
+    "protein": 46,
+    "carbs": 69,
+    "fat": 52
+    }
+    },
+    {
+    "name": "Cordon Bleu Pita Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 470,
+    "protein": 27,
+    "carbs": 33,
+    "fat": 27
+    }
+    },
+    {
+    "name": "Cordon Bleu Pita Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 800,
+    "protein": 49,
+    "carbs": 39,
+    "fat": 51
+    }
+    },
+    {
+    "name": "Chicken Crave 2.0 Pita Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 360,
+    "protein": 23,
+    "carbs": 48,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Chicken Crave 2.0 Pita Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 650,
+    "protein": 43,
+    "carbs": 71,
+    "fat": 24
+    }
+    },
+    {
+    "name": "Fiesta Steak Pita Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 580,
+    "protein": 22,
+    "carbs": 43,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Fiesta Steak Pita Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1210,
+    "protein": 45,
+    "carbs": 89,
+    "fat": 76
+    }
+    },
+    {
+    "name": "Halloumi & Falafel Pita Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 570,
+    "protein": 23,
+    "carbs": 43,
+    "fat": 36
+    }
+    },
+    {
+    "name": "Halloumi & Falafel Pita Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 870,
+    "protein": 41,
+    "carbs": 56,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Sweet Heat Pita Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 520,
+    "protein": 24,
+    "carbs": 55,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Sweet Heat Pita Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 900,
+    "protein": 42,
+    "carbs": 81,
+    "fat": 48
+    }
+    },
+    {
+    "name": "Jalapeno Club Pita Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 510,
+    "protein": 23,
+    "carbs": 54,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Jalapeno Club Pita Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 870,
+    "protein": 40,
+    "carbs": 80,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Lemon Pepper Chicken Pita Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 430,
+    "protein": 21,
+    "carbs": 36,
+    "fat": 23
+    }
+    },
+    {
+    "name": "Lemon Pepper Chicken Pita Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 700,
+    "protein": 37,
+    "carbs": 44,
+    "fat": 43
+    }
+    },
+    {
+    "name": "BBQ Brisket Pita Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 600,
+    "protein": 22,
+    "carbs": 57,
+    "fat": 32
+    }
+    },
+    {
+    "name": "BBQ Brisket Pita Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1050,
+    "protein": 39,
+    "carbs": 87,
+    "fat": 61
+    }
+    },
+    {
+    "name": "Southwest Baja Pita Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 630,
+    "protein": 18,
+    "carbs": 55,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Southwest Baja Pita Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1070,
+    "protein": 30,
+    "carbs": 79,
+    "fat": 73
+    }
+    },
+    {
+    "name": "Ancho Chicken Salad Bowl Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 380,
+    "protein": 21,
+    "carbs": 21,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Ancho Chicken Salad Bowl Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 760,
+    "protein": 41,
+    "carbs": 41,
+    "fat": 49
+    }
+    },
+    {
+    "name": "Ancho Chicken Rice Bowl Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 800,
+    "protein": 31,
+    "carbs": 108,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Ancho Chicken Rice Bowl Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1590,
+    "protein": 62,
+    "carbs": 215,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Berry Bliss Smoothie 12 oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 280,
+    "protein": 2,
+    "carbs": 49,
+    "fat": 2
+    }
+    },
+    {
+    "name": "Sunset Paradise Smoothie 12 oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 290,
+    "protein": 2,
+    "carbs": 48,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Chocolate Banana Smoothie 12 oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 300,
+    "protein": 9,
+    "carbs": 62,
+    "fat": 3
+    }
+    },
+    {
+    "name": "Strawberry & Banana Smoothie 12 oz",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 290,
+    "protein": 2,
+    "carbs": 52,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Ancho Chipotle Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 110,
+    "protein": 0,
+    "carbs": 8,
+    "fat": 8
+    }
+    },
+    {
+    "name": "Balsamic Gluten Free Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 100,
+    "protein": 0,
+    "carbs": 1,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Garlic Aioli",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 140,
+    "protein": 0,
+    "carbs": 2,
+    "fat": 15
+    }
+    },
+    {
+    "name": "Tzatziki Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 40,
+    "protein": 1,
+    "carbs": 3,
+    "fat": 3
+    }
+    },
+    {
+    "name": "Buffalo Hot Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 40,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 5
+    }
+    }
+    ]
+    }

@@ -1,0 +1,546 @@
+
+{
+    "restaurant_name": "Original ChopShop",
+    "items": [
+    {
+    "name": "Scottsdale Cobb",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 610,
+    "protein": 18,
+    "carbs": 39,
+    "fat": 43
+    }
+    },
+    {
+    "name": "Italian",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 630,
+    "protein": 20,
+    "carbs": 31,
+    "fat": 47
+    }
+    },
+    {
+    "name": "Beet",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 260,
+    "protein": 8,
+    "carbs": 29,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Danish",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 320,
+    "protein": 9,
+    "carbs": 34,
+    "fat": 18
+    }
+    },
+    {
+    "name": "Greek-Ish",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 298,
+    "protein": 13,
+    "carbs": 25,
+    "fat": 17
+    }
+    },
+    {
+    "name": "Kale Caesar",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 360,
+    "protein": 9,
+    "carbs": 31,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Citrus Thai",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 250,
+    "protein": 9,
+    "carbs": 33,
+    "fat": 11
+    }
+    },
+    {
+    "name": "Raw Vegetable",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 310,
+    "protein": 9,
+    "carbs": 28,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Chop-Rito Chicken Bowl With Salsa Roja",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 420,
+    "protein": 45,
+    "carbs": 9,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Hot Honey Chicken + Hummus Bowl",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 507,
+    "protein": 37,
+    "carbs": 51,
+    "fat": 18
+    }
+    },
+    {
+    "name": "Green Curry Chicken",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 300,
+    "protein": 36,
+    "carbs": 20,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Red Chili Lime Shrimp",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 322,
+    "protein": 34,
+    "carbs": 23,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Spicy Korean Steak",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 360,
+    "protein": 29,
+    "carbs": 19,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Teriyaki Chicken",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 403,
+    "protein": 34,
+    "carbs": 29,
+    "fat": 15
+    }
+    },
+    {
+    "name": "Thai Coconut Chicken",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 340,
+    "protein": 34,
+    "carbs": 20,
+    "fat": 15
+    }
+    },
+    {
+    "name": "Chicken & Prosciutto",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 750,
+    "protein": 64,
+    "carbs": 67,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Grilled Steak Sandwich",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 770,
+    "protein": 42,
+    "carbs": 72,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Grinder",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 980,
+    "protein": 56,
+    "carbs": 66,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Moroccan Turkey",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 630,
+    "protein": 37,
+    "carbs": 72,
+    "fat": 24
+    }
+    },
+    {
+    "name": "The Club",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 780,
+    "protein": 48,
+    "carbs": 68,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Avocado Toast",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 665,
+    "protein": 19,
+    "carbs": 38,
+    "fat": 49
+    }
+    },
+    {
+    "name": "Cheat Day Wrap",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1000,
+    "protein": 40,
+    "carbs": 81,
+    "fat": 60
+    }
+    },
+    {
+    "name": "HazelBerry Toast",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 280,
+    "protein": 5,
+    "carbs": 28,
+    "fat": 9
+    }
+    },
+    {
+    "name": "The Brekkie",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 893,
+    "protein": 30,
+    "carbs": 56,
+    "fat": 63
+    }
+    },
+    {
+    "name": "Coconut Chia Pudding Parfait",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 720,
+    "protein": 12,
+    "carbs": 56,
+    "fat": 48
+    }
+    },
+    {
+    "name": "Acai Bowl",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 560,
+    "protein": 7,
+    "carbs": 112,
+    "fat": 12
+    }
+    },
+    {
+    "name": "PB&J Parfait",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 560,
+    "protein": 27,
+    "carbs": 89,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Dragonfruit Bowl",
+    "category": "Main Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 550,
+    "protein": 8,
+    "carbs": 117,
+    "fat": 7
+    }
+    },
+    {
+    "name": "Glow Up",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 780,
+    "protein": 16,
+    "carbs": 116,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Jacked Up PB&J",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 550,
+    "protein": 32,
+    "carbs": 91,
+    "fat": 18
+    }
+    },
+    {
+    "name": "Muscle Malt",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 580,
+    "protein": 40,
+    "carbs": 67,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Pina-Kale-Ada",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 300,
+    "protein": 17,
+    "carbs": 47,
+    "fat": 5
+    }
+    },
+    {
+    "name": "Red Wine Vinaigrette",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 180,
+    "protein": 0,
+    "carbs": 13,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Lemon Dijon",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 298,
+    "protein": 2,
+    "carbs": 2,
+    "fat": 32
+    }
+    },
+    {
+    "name": "Thai Peanut Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 196,
+    "protein": 4,
+    "carbs": 22,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Italian Vinaigrette",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 290,
+    "protein": 0,
+    "carbs": 5,
+    "fat": 31
+    }
+    },
+    {
+    "name": "Lemon Vinaigrette",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 310,
+    "protein": 0,
+    "carbs": 2,
+    "fat": 35
+    }
+    },
+    {
+    "name": "Hot Honey",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 131,
+    "protein": 1,
+    "carbs": 27,
+    "fat": 3
+    }
+    },
+    {
+    "name": "Thai Coconut",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 140,
+    "protein": 2,
+    "carbs": 10,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Spicy Korean BBQ",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 60,
+    "protein": 0,
+    "carbs": 12,
+    "fat": 2
+    }
+    },
+    {
+    "name": "Red Chili Lime",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 100,
+    "protein": 2,
+    "carbs": 24,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Green Curry",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 120,
+    "protein": 2,
+    "carbs": 8,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Teriyaki",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 140,
+    "protein": 2,
+    "carbs": 32,
+    "fat": 2
+    }
+    },
+    {
+    "name": "Salsa Roja",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 15,
+    "protein": 1,
+    "carbs": 3,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Jalapeno Goat Cheese Spread",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 80,
+    "protein": 6,
+    "carbs": 0,
+    "fat": 6
+    }
+    }
+    ]
+    }

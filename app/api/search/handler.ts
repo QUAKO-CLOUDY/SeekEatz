@@ -3,9 +3,6 @@ import { openai } from '@ai-sdk/openai';
 import { embed } from 'ai';
 import { classifyMenuItem } from '@/lib/menu-item-classifier';
 
-// Dev-only counter for hard guard exclusions (tracks first 10)
-let hardGuardExclusionCount = 0;
-
 /**
  * Dish taxonomy mapping: dishType → { keywords[] }
  * Maps dish types to name keywords for filtering
@@ -16,7 +13,7 @@ const DISH_TAXONOMY: Record<string, { keywords: string[] }> = {
     keywords: ['burger', 'burgers', 'whopper', 'big mac', 'cheeseburger', 'hamburger']
   },
   sandwiches: {
-    keywords: ['sandwich', 'sandwiches', 'sandwhich', 'sandwiche', 'sandwhiches', 'sub', 'subs', 'hoagie', 'hoagies', 'hero', 'heroes']
+    keywords: ['sandwich', 'sandwiches', 'sandwhich', 'sandwiche', 'sub', 'subs', 'hoagie', 'hoagies', 'hero', 'heroes']
   },
   bowls: {
     keywords: ['bowl', 'bowls']
@@ -43,74 +40,6 @@ const DISH_TAXONOMY: Record<string, { keywords: string[] }> = {
     keywords: ['breakfast', 'pancake', 'pancakes', 'waffle', 'waffles', 'omelet', 'omelette', 'eggs', 'bacon', 'sausage']
   }
 };
-
-/**
- * Protein keywords mapping: protein → { keywords[] }
- * Maps protein types to name keywords for filtering menu items
- */
-const PROTEIN_KEYWORDS: Record<string, string[]> = {
-  fish: ['fish', 'salmon', 'tuna', 'cod', 'tilapia', 'mahi', 'halibut', 'trout', 'bass', 'seabass', 'sea bass'],
-  steak: ['steak', 'beef', 'ribeye', 'sirloin', 'filet', 'filet mignon', 'porterhouse', 't-bone', 'new york strip'],
-  chicken: ['chicken', 'poultry', 'breast', 'thigh', 'wing', 'drumstick'],
-  pork: ['pork', 'bacon', 'ham', 'sausage', 'chorizo', 'pancetta', 'prosciutto'],
-  turkey: ['turkey'],
-  shrimp: ['shrimp', 'prawn', 'prawns'],
-  tofu: ['tofu'],
-  vegetarian: ['vegetarian', 'veggie', 'vegan', 'plant-based']
-};
-
-/**
- * Extracts protein keyword from query if present
- * Returns protein keyword string or null
- * Only matches if protein keyword appears as a whole word in the query
- */
-function extractProteinKeyword(query: string): string | null {
-  if (!query || typeof query !== 'string') return null;
-  
-  const lowerQuery = query.toLowerCase().trim();
-  
-  // Check each protein type
-  for (const [protein, keywords] of Object.entries(PROTEIN_KEYWORDS)) {
-    // Check if any keyword matches (word boundary to avoid partial matches)
-    for (const keyword of keywords) {
-      // Escape special regex characters in keyword
-      const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const pattern = new RegExp(`\\b${escapedKeyword}\\b`, 'i');
-      if (pattern.test(lowerQuery)) {
-        return protein;
-      }
-    }
-  }
-  
-  return null;
-}
-
-/**
- * Applies protein filtering
- * Keeps only items where menu name contains the protein keyword
- * Applied after normalization to filter on meal names
- */
-function applyProteinFilter(items: any[], proteinKeyword: string): any[] {
-  if (!proteinKeyword || !PROTEIN_KEYWORDS[proteinKeyword]) {
-    return items; // No protein constraint
-  }
-  
-  const keywords = PROTEIN_KEYWORDS[proteinKeyword];
-  const lowerKeywords = keywords.map(k => k.toLowerCase());
-  
-  return items.filter((item: any) => {
-    const itemName = (item.name || item.item_name || '').toLowerCase();
-    
-    // Check if name contains any protein keyword (word boundary to avoid partial matches)
-    const nameMatches = lowerKeywords.some(keyword => {
-      const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const pattern = new RegExp(`\\b${escapedKeyword}\\b`, 'i');
-      return pattern.test(itemName);
-    });
-    
-    return nameMatches;
-  });
-}
 
 /**
  * Extracts dish type from query if present
@@ -180,144 +109,7 @@ function isDishItem(menuItem: any, dishType?: string | null): boolean {
   const name = (menuItem.name || menuItem.item_name || '').toLowerCase().trim();
   const words = name.split(/\s+/).filter((w: string) => w.length > 0);
 
-  // COMPONENT BLACKLIST: Check name for component tokens/phrases BEFORE all other checks
-  // This runs first to catch components even if category says "Entrees"
-  // Blacklist tokens: tortilla, shell, bun, bread, pita, wrap (plain only), rice, beans, protein, 
-  // steak only, chicken only, guacamole, salsa, sauce, dressing, cheese, packet, add-on, topping, 
-  // side of, side, fries, chips, cup of, serving of, scoop, mix-in, condiment, beverage, drink, utensil
-  const componentBlacklistTokens = [
-    'tortilla', 'tortillas',
-    'shell', 'shells',
-    'bun', 'buns',
-    'bread',
-    'pita',
-    'rice',
-    'beans',
-    'protein',
-    'guacamole',
-    'salsa',
-    'sauce',
-    'dressing',
-    'cheese',
-    'packet',
-    'add-on', 'addon', 'add on',
-    'topping',
-    'side',
-    'fries',
-    'chips',
-    'scoop',
-    'mix-in', 'mix in', 'mixin',
-    'condiment',
-    'beverage',
-    'drink',
-    'utensil', 'utensils'
-  ];
-  
-  // Normalize name for matching: remove punctuation, handle hyphens, collapse spaces
-  const normalizedName = name
-    .replace(/[^\w\s-]/g, ' ')  // Replace punctuation with spaces
-    .replace(/-/g, ' ')          // Replace hyphens with spaces
-    .replace(/\s+/g, ' ')         // Collapse multiple spaces
-    .trim();
-  
-  // Check for word-boundary matches of blacklist tokens
-  let matchedToken: string | null = null;
-  for (const token of componentBlacklistTokens) {
-    // Create pattern with word boundaries, case-insensitive
-    const escapedToken = token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const pattern = new RegExp(`\\b${escapedToken}\\b`, 'i');
-    
-    if (pattern.test(normalizedName)) {
-      matchedToken = token;
-      break;
-    }
-  }
-  
-  // Special handling for "wrap" - only blacklist if it's a plain wrap, not a wrap meal
-  // A wrap meal typically has additional descriptors (e.g., "Chicken Wrap", "Turkey Wrap")
-  if (!matchedToken) {
-    const wrapPattern = /\bwrap\b/i;
-    if (wrapPattern.test(normalizedName)) {
-      // Check if it's a plain wrap (just "wrap" or "tortilla wrap" or similar)
-      // If it has meal descriptors (chicken, turkey, veggie, etc.), it's a wrap meal
-      const hasMealDescriptor = /\b(chicken|turkey|beef|steak|pork|veggie|vegetarian|grilled|roasted|spicy|buffalo|caesar|club|blt|bbq|ranch|italian|greek|mediterranean|asian|mexican|southwest)\b/i.test(normalizedName);
-      if (!hasMealDescriptor) {
-        matchedToken = 'wrap';
-      }
-    }
-  }
-  
-  // Special handling for "steak only" and "chicken only"
-  if (!matchedToken) {
-    if (/\bsteak\s+only\b/i.test(normalizedName)) {
-      matchedToken = 'steak only';
-    } else if (/\bchicken\s+only\b/i.test(normalizedName)) {
-      matchedToken = 'chicken only';
-    }
-  }
-  
-  // STRENGTHENED: Single ingredient patterns - exclude if name is extremely short AND category indicates modifier
-  // Examples: "Chicken" (alone), "Steak" (alone), "Shrimp" (alone) - only if category suggests modifier
-  if (!matchedToken && words.length <= 2) {
-    const singleIngredientPatterns = [
-      /^(chicken|steak|beef|pork|turkey|shrimp|fish|salmon|tuna|tofu|tempeh|seitan)$/i,
-      /^(chicken|steak|beef|pork|turkey|shrimp|fish|salmon|tuna|tofu|tempeh|seitan)\s+(only|plain|alone)$/i
-    ];
-    
-    const isSingleIngredient = singleIngredientPatterns.some(pattern => pattern.test(normalizedName));
-    if (isSingleIngredient) {
-      // Only exclude if category indicates modifier/add-on
-      const modifierCategories = ['add-on', 'addon', 'add on', 'modifier', 'extra', 'topping', 'protein-only', 'ingredient'];
-      if (modifierCategories.some(modCat => category.includes(modCat))) {
-        matchedToken = 'single ingredient';
-      }
-    }
-  }
-  
-  // Special handling for "side of" and "cup of" and "serving of"
-  if (!matchedToken) {
-    if (/\bside\s+of\b/i.test(normalizedName)) {
-      matchedToken = 'side of';
-    } else if (/\bcup\s+of\b/i.test(normalizedName)) {
-      matchedToken = 'cup of';
-    } else if (/\bserving\s+of\b/i.test(normalizedName)) {
-      matchedToken = 'serving of';
-    }
-  }
-  
-  // If component blacklist matched, check if dishType can override it
-  if (matchedToken) {
-    // If dishType is provided and name matches dishType keywords, allow it to pass
-    // BUT only if the matched token is not a strict component (e.g., allow "Chicken Burrito" even if it contains "chicken")
-    // However, if the name is clearly just a component (e.g., "Flour Tortilla"), exclude it even with dishType
-    if (dishType && DISH_TAXONOMY[dishType]) {
-      const { keywords } = DISH_TAXONOMY[dishType];
-      const lowerKeywords = keywords.map(k => k.toLowerCase());
-      const nameMatchesDishType = lowerKeywords.some(keyword => {
-        const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const pattern = new RegExp(`\\b${escapedKeyword}\\b`, 'i');
-        return pattern.test(name);
-      });
-      
-      // If name matches dishType AND has meal structure, allow it
-      // But if name is clearly just a component (e.g., "Tortilla", "Shell", "Rice"), exclude it
-      const strictComponentTokens = ['tortilla', 'tortillas', 'shell', 'shells', 'bun', 'buns', 'bread', 'pita', 'rice', 'beans', 'packet', 'add-on', 'addon', 'add on', 'topping', 'scoop', 'utensil', 'utensils'];
-      const isStrictComponent = strictComponentTokens.includes(matchedToken.toLowerCase());
-      
-      if (nameMatchesDishType && !isStrictComponent) {
-        // Name matches dishType and is not a strict component, allow it
-        // Example: "Chicken Burrito" contains "chicken" (blacklist token) but also "burrito" (dishType keyword)
-        return true;
-      }
-    }
-    
-    // Component blacklist matched and dishType doesn't override - exclude it
-    const originalName = menuItem.name || menuItem.item_name || 'unknown';
-    // Log removed to reduce terminal output clutter
-    return false;
-  }
-
-  // PRIORITY: If dishType is provided, check if name matches dishType keywords
+  // PRIORITY: If dishType is provided, check if name matches dishType keywords first
   // This ensures items like "Breakfast Burrito" are included when searching for "burritos"
   // even if category is "breakfast" or another category
   if (dishType && DISH_TAXONOMY[dishType]) {
@@ -362,166 +154,58 @@ function isDishItem(menuItem: any, dishType?: string | null): boolean {
   // COMPONENT BLACKLIST: Check name for component/ingredient terms BEFORE mealCategories allow-list
   // This ensures items like "Flour Tortilla", "Hard Shell", "Side of Rice" are excluded
   // even if category says "entree/entrees"
-  // Must exclude: tortilla, shell, bun, rice, beans, salsa, sauce, dressing, topping, add-on, packet, guacamole, cheese, sour cream, protein scoop, "side of …", "extra …"
-  // Must NOT block real meals like "Chicken Burrito", "Steak Bowl", "Breakfast Burrito", "Smashburger", "Chicken Sandwich"
   const componentBlacklistPatterns = [
     // Tortillas and shells
     /^(flour|corn|wheat|whole\s+wheat)\s+tortilla(s)?$/i,
-    /^tortilla(s)?\s*\(/i,
+    /^tortilla(s)?\s*\(/i,  // "Tortilla (Tacos)"
     /^(hard|soft)\s+shell(s)?$/i,
-    /^shell(s)?\s*\(/i,
+    /^shell(s)?\s*\(/i,     // "Shell (Tacos)"
     
-    // Buns
+    // Buns and bread components
     /^(burger|hamburger|brioche|sesame|whole\s+wheat)\s+bun(s)?$/i,
     /^bun(s)?\s+only$/i,
     
-    // Rice (standalone, not in meal names)
-    /^side\s+of\s+rice$/i,
+    // Patties
+    /^(beef|chicken|turkey|veggie|vegetarian)\s+(patty|patties)$/i,
+    /^(patty|patties)$/i,
+    
+    // Rice and beans (standalone, not in meal names)
+    /^side\s+of\s+(rice|beans)$/i,
     /^(white|brown|wild|jasmine|basmati)\s+rice$/i,
-    /^rice\s+only$/i,
-    /^rice$/i,  // Just "rice" by itself
-    
-    // Beans (standalone, not in meal names)
-    /^side\s+of\s+beans$/i,
     /^(black|pinto|refried|kidney)\s+beans$/i,
+    /^rice\s+only$/i,
     /^beans\s+only$/i,
-    /^beans$/i,  // Just "beans" by itself
     
-    // Salsa (standalone or as component)
-    /^salsa$/i,  // Just "salsa" by itself
-    /^side\s+of\s+salsa$/i,
-    /^(add-on|addon|add\s+on)\s+salsa$/i,
-    /^extra\s+salsa$/i,
-    /^salsa\s+(topping|add-on|addon)$/i,
+    // Protein-only items
+    /^(steak|chicken|beef|pork|turkey|tofu|tempeh)\s+only$/i,
+    /^protein\s+(scoop|only|add-on|addon)$/i,
     
-    // Sauce (standalone or as component)
-    /^sauce$/i,  // Just "sauce" by itself (but not "BBQ Sauce" which is caught by pattern below)
+    // Sauces and dressings (standalone or packets)
     /^(sauce|dressing)\s+packet(s)?$/i,
     /^packet(s)?\s+of\s+(sauce|dressing|ketchup|mustard|mayo|mayonnaise)$/i,
     /^(bbq|hot|chipotle|ranch|caesar|italian|balsamic|honey\s+mustard)\s+(sauce|dressing)$/i,
-    /^side\s+of\s+sauce$/i,
-    /^(add-on|addon|add\s+on)\s+sauce$/i,
-    /^extra\s+sauce$/i,
-    /^sauce\s+(topping|add-on|addon)$/i,
     
-    // Dressing (standalone or as component)
-    /^dressing$/i,  // Just "dressing" by itself
-    /^side\s+of\s+dressing$/i,
-    /^(add-on|addon|add\s+on)\s+dressing$/i,
-    /^extra\s+dressing$/i,
-    /^dressing\s+(topping|add-on|addon)$/i,
+    // Toppings and add-ons
+    /^(add-on|addon|add\s+on)\s+(cheese|guacamole|salsa|sour\s+cream)$/i,
+    /^(extra|additional)\s+(cheese|guacamole|salsa|sour\s+cream|protein|rice|beans)$/i,
+    /^(cheese|guacamole|salsa|sour\s+cream)\s+(topping|add-on|addon)$/i,
     
-    // Topping
-    /^topping$/i,  // Just "topping" by itself
-    /^(add-on|addon|add\s+on)\s+topping$/i,
-    /^extra\s+topping$/i,
+    // Side items
+    /^side\s+of\s+(rice|beans|guacamole|salsa|cheese|sour\s+cream|protein)$/i,
     
-    // Add-on
-    /^add-on$/i,
-    /^addon$/i,
-    /^add\s+on$/i,
-    
-    // Packet
-    /^packet$/i,  // Just "packet" by itself
-    
-    // Guacamole (standalone or as component)
-    /^guacamole$/i,  // Just "guacamole" by itself
-    /^side\s+of\s+guacamole$/i,
-    /^(add-on|addon|add\s+on)\s+guacamole$/i,
-    /^extra\s+guacamole$/i,
-    /^guacamole\s+(topping|add-on|addon)$/i,
-    
-    // Cheese (standalone or as component, but not "Cheese Pizza")
-    /^cheese$/i,  // Just "cheese" by itself
-    /^side\s+of\s+cheese$/i,
-    /^(add-on|addon|add\s+on)\s+cheese$/i,
-    /^extra\s+cheese$/i,
-    /^cheese\s+(topping|add-on|addon)$/i,
-    
-    // Sour cream (standalone or as component)
-    /^sour\s+cream$/i,
-    /^side\s+of\s+sour\s+cream$/i,
-    /^(add-on|addon|add\s+on)\s+sour\s+cream$/i,
-    /^extra\s+sour\s+cream$/i,
-    /^sour\s+cream\s+(topping|add-on|addon)$/i,
-    
-    // Protein scoop
-    /^protein\s+scoop$/i,
-    /^protein\s+(scoop|only|add-on|addon)$/i,
-    
-    // "Side of ..." patterns
-    /^side\s+of\s+(rice|beans|guacamole|salsa|cheese|sour\s+cream|protein|sauce|dressing)$/i,
-    
-    // "Extra ..." patterns
-    /^extra\s+(cheese|guacamole|salsa|sour\s+cream|protein|rice|beans|sauce|dressing|topping)$/i,
-    
-    // Additional component patterns
-    /^(beef|chicken|turkey|veggie|vegetarian)\s+(patty|patties)$/i,
-    /^(patty|patties)$/i,
-    /^(steak|chicken|beef|pork|turkey|tofu|tempeh)\s+only$/i,
+    // Standalone components (but allow if part of meal name like "Chicken Burrito")
+    /^(flour|corn|wheat)\s+tortilla$/i,
+    /^(hard|soft)\s+shell$/i,
   ];
   
   // Check if name matches component blacklist patterns
-  // But be conservative: if name contains meal keywords (burrito, taco, bowl, burger, sandwich, etc.), allow it
-  // This ensures "Chicken Burrito", "Steak Bowl", "Breakfast Burrito", "Smashburger", "Chicken Sandwich" pass through
-  // NOTE: "steak" and "chicken" removed from hasMealKeyword to prevent component blacklist bypass
-  const hasMealKeyword = /(burrito|taco|bowl|burger|sandwich|wrap|salad|pizza|pasta|quesadilla|sub|hoagie|panini|calzone|pita|combo|meal|platter|entree|entrée|main|plate|smashburger|breakfast)/i.test(name);
+  // But be conservative: if name contains meal keywords (burrito, taco, bowl, etc.), allow it
+  const hasMealKeyword = /(burrito|taco|bowl|burger|sandwich|wrap|salad|pizza|pasta|quesadilla|sub|hoagie|panini|calzone|pita|combo|meal|platter|entree|entrée|main|plate)/i.test(name);
   
   if (!hasMealKeyword && componentBlacklistPatterns.some(pattern => pattern.test(name))) {
     return false; // Component blacklist match (and not a meal)
   }
 
-  // HARD GUARD: Prevent ingredient-like items from passing via category allow-list
-  // Check if name is ingredient-like (single word ingredient, common 2-word ingredient, or modifier patterns)
-  // Return false UNLESS the name also contains a real meal term
-  const realMealTerms = /(burrito|taco|bowl|burger|sandwich|wrap|salad|pizza|pasta|quesadilla|sub|hoagie|panini|calzone|pita|combo|meal|platter|entree|entrée|main|plate|smashburger|breakfast)/i;
-  const hasRealMealTerm = realMealTerms.test(normalizedName);
-  
-  // Single-word ingredient check
-  const singleWordIngredientList = [
-    'chicken', 'steak', 'beef', 'pork', 'turkey', 'tofu', 'tempeh', 
-    'rice', 'beans', 'cheese', 'salsa', 'guacamole', 'bacon', 'eggs', 
-    'egg', 'avocado', 'lettuce', 'spinach', 'kale', 'arugula', 'sauce', 
-    'dressing', 'fries', 'bread', 'tortilla', 'tomato', 'tomatoes', 
-    'onion', 'onions', 'pepper', 'peppers', 'mayo', 'mayonnaise',
-    'ketchup', 'mustard', 'ranch', 'protein', 'quinoa', 'couscous'
-  ];
-  
-  // Two-word ingredient combinations
-  const twoWordIngredientList = [
-    'sour cream', 'bbq sauce', 'hot sauce', 'chipotle sauce', 'ranch dressing',
-    'black beans', 'pinto beans', 'white rice', 'brown rice', 'wild rice',
-    'grilled chicken', 'chicken breast', 'ground beef', 'extra protein',
-    'romaine lettuce', 'iceberg lettuce', 'red onion', 'green pepper',
-    'bell pepper', 'jalapeño', 'jalapeno', 'cheddar cheese', 'swiss cheese'
-  ];
-  
-  // Modifier patterns
-  const modifierPatterns = [
-    /^side\s+of\s+/i,
-    /^extra\s+/i,
-    /^add\s+/i,
-    /^cup\s+of\s+/i,
-    /^serving\s+of\s+/i
-  ];
-  
-  const isSingleWordIngredient = words.length === 1 && singleWordIngredientList.includes(normalizedName.trim());
-  const isTwoWordIngredient = words.length === 2 && twoWordIngredientList.includes(normalizedName.trim());
-  const hasModifierPattern = modifierPatterns.some(pattern => pattern.test(normalizedName));
-  
-  if ((isSingleWordIngredient || isTwoWordIngredient || hasModifierPattern) && !hasRealMealTerm) {
-    // Dev-only logging: track first 10 items excluded by hard guard
-    if (process.env.NODE_ENV === 'development' && hardGuardExclusionCount < 10) {
-      const originalName = menuItem.name || menuItem.item_name || 'unknown';
-      const reason = isSingleWordIngredient ? 'single-word ingredient' :
-                     isTwoWordIngredient ? 'two-word ingredient' :
-                     'modifier pattern';
-      console.log(`[isDishItem] Hard guard excluded: "${originalName}" (category: ${category}) — reason: ${reason}`);
-      hardGuardExclusionCount++;
-    }
-    return false;
-  }
-  
   // STRICT: Include only meal categories (allow-list approach)
   const mealCategories = [
     'entree', 'entrée', 'main', 'bowl', 'plate', 'sandwich', 'burger',
@@ -638,7 +322,7 @@ function filterToDishes(items: any[], dishType?: string | null): any[] {
   const beforeCount = items.length;
   const excluded: Array<{ name: string; category: string; reason: string }> = [];
   
-  const filtered = items.filter((item: any): boolean => {
+  const filtered = items.filter((item: any) => {
     const isDish = isDishItem(item, dishType);
     
     if (!isDish) {
@@ -773,15 +457,6 @@ function filterToDishes(items: any[], dishType?: string | null): any[] {
   console.log(`[searchHandler] Dish filter: ${beforeCount} → ${afterCount} items (removed ${removedCount} ingredients/modifiers)`);
   
   if (excluded.length > 0) {
-    // Filter component blacklist exclusions for separate logging
-    const componentBlacklistExclusions = excluded.filter(e => e.reason === 'component blacklist: name contains component/ingredient term');
-    
-    if (componentBlacklistExclusions.length > 0) {
-      console.log(`[searchHandler] Component blacklist exclusions (first ${Math.min(10, componentBlacklistExclusions.length)}):`, 
-        componentBlacklistExclusions.slice(0, 10).map(e => ({ name: e.name, category: e.category, reason: 'component blacklist' }))
-      );
-    }
-    
     console.log(`[searchHandler] Top ${excluded.length} excluded samples:`, excluded.slice(0, 10));
   }
   
@@ -822,40 +497,18 @@ function getDedupeKey(item: any): string {
 
 export interface SearchParams {
   query: string;
-  calorieCap?: number; // Legacy: max calories (use maxCalories instead)
-  minCalories?: number;
-  maxCalories?: number;
+  calorieCap?: number;
   minProtein?: number;
-  maxProtein?: number;
-  minCarbs?: number;
   maxCarbs?: number;
-  minFat?: number; // Legacy: use minFats
-  maxFat?: number; // Legacy: use maxFats
-  minFats?: number;
-  maxFats?: number;
+  maxFat?: number;
   diet?: string;
-  restaurant?: string; // Canonical restaurant name (for backward compatibility)
-  restaurantId?: string; // UUID of restaurant (preferred when available)
-  restaurantVariants?: string[]; // All restaurant_name variants for filtering (e.g., ["CAVA", "Cava"]) - from universal resolver
-  explicitRestaurantQuery?: string; // Raw restaurant query from user (e.g., "cava" from "meals from cava")
-  macroFilters?: {
-    proteinMin?: number;
-    caloriesMax?: number;
-    carbsMax?: number;
-    fatsMax?: number;
-    proteinMax?: number;
-    caloriesMin?: number;
-    carbsMin?: number;
-    fatsMin?: number;
-  } | null;
+  restaurant?: string;
   location?: string;
   userContext?: any;
   offset?: number;
   limit?: number;
   searchKey?: string;
   isPagination?: boolean;
-  isHomepage?: boolean;
-  calorieMode?: "UNDER" | "OVER";
 }
 
 /**
@@ -975,58 +628,6 @@ function normalizeDietaryTag(tag: string): string {
 }
 
 /**
- * Detects meal time from query string (breakfast or dinner)
- * Returns "breakfast" if query contains "breakfast" (whole word)
- * Returns "dinner" if query contains "dinner" (whole word)
- * If both are present, prefers "breakfast" (more restrictive)
- * Returns null if neither is found
- */
-function detectMealTime(query: string): "breakfast" | "dinner" | null {
-  if (!query || typeof query !== 'string') return null;
-  
-  const hasBreakfast = /\bbreakfast\b/i.test(query);
-  const hasDinner = /\bdinner\b/i.test(query);
-  
-  // If both are present, prefer breakfast (more restrictive)
-  if (hasBreakfast) return "breakfast";
-  if (hasDinner) return "dinner";
-  
-  return null;
-}
-
-/**
- * Checks if a name contains "breakfast" (case-insensitive)
- * Safe string coercion - handles undefined, null, and non-string values
- */
-function nameHasBreakfast(name: unknown): boolean {
-  if (name === undefined || name === null) return false;
-  
-  const nameStr = String(name).toLowerCase();
-  return nameStr.includes("breakfast");
-}
-
-/**
- * Checks if an item should be included in breakfast results
- * Returns true if:
- * - Item name contains "breakfast", OR
- * - Item is from Starbucks (Starbucks items are considered breakfast items)
- */
-function isBreakfastItem(item: any): boolean {
-  // Check if name contains "breakfast"
-  if (nameHasBreakfast(item.name)) {
-    return true;
-  }
-  
-  // Also include Starbucks items (case-insensitive comparison)
-  const restaurantName = (item.restaurant_name || '').toLowerCase().trim();
-  if (restaurantName === 'starbucks') {
-    return true;
-  }
-  
-  return false;
-}
-
-/**
  * DIET LOGIC REMOVED - All diet/dietary tag filtering is disabled
  * This function is kept for compatibility but returns empty arrays
  */
@@ -1067,23 +668,10 @@ function normalizeMeal(item: any): any | null {
 
   // Extract macros with strict validation
   // Support keys: calories, protein, carbs, fat (numbers only)
-  // DB canonical: fat (singular), but support fallback from fats (plural)
   const calories = typeof macrosJson.calories === 'number' ? macrosJson.calories : null;
   const protein = typeof macrosJson.protein === 'number' ? macrosJson.protein : null;
   const carbs = typeof macrosJson.carbs === 'number' ? macrosJson.carbs : null;
-  
-  // Normalize fat: prefer fat (singular) from DB, fallback to fats (plural)
-  // Meal object uses fats (plural) to match Meal type
-  const fatValue = typeof macrosJson.fat === 'number' ? macrosJson.fat : 
-                   (typeof macrosJson.fats === 'number' ? macrosJson.fats : null);
-  
-  // Defensive logging: detect rows with both fat and fats with different values
-  if (typeof macrosJson.fat === 'number' && typeof macrosJson.fats === 'number' && 
-      macrosJson.fat !== macrosJson.fats) {
-    console.warn(`[normalizeMeal] Macro mismatch detected for item ${item.id || item.name}: fat=${macrosJson.fat}, fats=${macrosJson.fats}. Using fat (singular) value.`);
-  }
-  
-  const fats = fatValue;
+  const fat = typeof macrosJson.fat === 'number' ? macrosJson.fat : null;
 
   // STRICT: Discard if calories missing or not numeric or 0
   if (calories === null || calories === 0 || isNaN(calories)) {
@@ -1091,10 +679,10 @@ function normalizeMeal(item: any): any | null {
   }
 
   // STRICT: Discard if other macros missing or not numeric (all must be present and valid)
-  // Allow 0 values for protein/carbs/fats, but not null/NaN
+  // Allow 0 values for protein/carbs/fat, but not null/NaN
   if (protein === null || isNaN(protein) || 
       carbs === null || isNaN(carbs) || 
-      fats === null || isNaN(fats)) {
+      fat === null || isNaN(fat)) {
     return null; // Discard - incomplete macros
   }
 
@@ -1113,13 +701,13 @@ function normalizeMeal(item: any): any | null {
     calories: calories,
     protein: protein,
     carbs: carbs,
-    fats: fats, // Use "fats" (plural) as primary field to match Meal type
-    // Include aliases for UI compatibility (database may use different field names)
+    fat: fat,
+    // Include aliases for UI compatibility
     protein_g: protein,
     carbs_g: carbs,
-    fats_g: fats,
-    fat: fats, // Legacy alias for database compatibility
-    fat_g: fats, // Legacy alias for database compatibility
+    fats_g: fat,
+    fats: fat,
+    fat_g: fat,
     price: priceEstimate,
     // Preserve original for reference
     restaurant: restaurantName,
@@ -1312,21 +900,12 @@ function applyRestaurantFilter(items: any[], restaurantFilter?: string): any[] {
  */
 function decodeSearchKey(searchKey: string): {
   q: string;
-  calMin?: number;
-  calMax?: number;
-  proMin?: number;
-  proMax?: number;
-  carbMin?: number;
-  carbMax?: number;
-  fatMin?: number;
-  fatMax?: number;
-  rest?: string;
-  dishType?: string | null;
-  // Legacy support
   cal?: number;
   pro?: number;
   carb?: number;
   fat?: number;
+  rest?: string;
+  dishType?: string | null;
 } | null {
   try {
     const decoded = Buffer.from(searchKey, 'base64').toString('utf-8');
@@ -1354,42 +933,28 @@ export async function searchHandler(params: SearchParams) {
   // searchKey is the single source of truth for pagination
   let reconstructedParams: {
     query?: string;
-    minCalories?: number;
-    maxCalories?: number;
+    calorieCap?: number;
     minProtein?: number;
-    maxProtein?: number;
-    minCarbs?: number;
     maxCarbs?: number;
-    minFats?: number;
-    maxFats?: number;
+    maxFat?: number;
     restaurant?: string;
     dishType?: string | null;
-    // Legacy support
-    calorieCap?: number;
-    minFat?: number;
-    maxFat?: number;
   } = {};
   
   let currentSearchKey: string;
   let reconstructedQuery: string | undefined;
   let reconstructedDishType: string | null | undefined;
   
-  if (params.searchKey && params.isPagination) {
-    // Only use searchKey for pagination requests (isPagination=true)
-    // For new searches, params override searchKey to prevent stale constraints
+  if (params.searchKey) {
+    // Decode searchKey to reconstruct original parameters
     const decoded = decodeSearchKey(params.searchKey);
     if (decoded) {
       reconstructedParams = {
         query: decoded.q || '',
-        // New format: min/max for each macro
-        minCalories: decoded.calMin,
-        maxCalories: decoded.calMax ?? decoded.cal, // Legacy support
-        minProtein: decoded.proMin,
-        maxProtein: decoded.proMax,
-        minCarbs: decoded.carbMin,
-        maxCarbs: decoded.carbMax ?? decoded.carb, // Legacy support
-        minFats: decoded.fatMin,
-        maxFats: decoded.fatMax ?? decoded.fat, // Legacy support
+        calorieCap: decoded.cal,
+        minProtein: decoded.pro,
+        maxCarbs: decoded.carb,
+        maxFat: decoded.fat,
         restaurant: decoded.rest,
         dishType: decoded.dishType || null
       };
@@ -1402,14 +967,10 @@ export async function searchHandler(params: SearchParams) {
         reconstructedQuery,
         reconstructedDishType,
         reconstructedConstraints: {
-          minCalories: reconstructedParams.minCalories,
-          maxCalories: reconstructedParams.maxCalories,
+          calorieCap: reconstructedParams.calorieCap,
           minProtein: reconstructedParams.minProtein,
-          maxProtein: reconstructedParams.maxProtein,
-          minCarbs: reconstructedParams.minCarbs,
           maxCarbs: reconstructedParams.maxCarbs,
-          minFats: reconstructedParams.minFats,
-          maxFats: reconstructedParams.maxFats,
+          maxFat: reconstructedParams.maxFat,
           restaurant: reconstructedParams.restaurant
         }
       });
@@ -1419,11 +980,7 @@ export async function searchHandler(params: SearchParams) {
       currentSearchKey = '';
     }
   } else {
-    // No searchKey provided OR isPagination=false (new search with changed filters)
-    // Use params as-is, ignore any searchKey
-    if (params.searchKey && !params.isPagination) {
-      console.log('[searchHandler] New search detected (isPagination=false) - ignoring searchKey, using params');
-    }
+    // No searchKey provided, use params as-is
     reconstructedQuery = undefined;
     reconstructedDishType = undefined;
     currentSearchKey = '';
@@ -1434,332 +991,63 @@ export async function searchHandler(params: SearchParams) {
   const effectiveQuery = reconstructedParams.query !== undefined 
     ? reconstructedParams.query 
     : (params.query?.trim() || '');
-  
-  // Normalize constraints to numbers (handle string inputs)
-  // For min constraints, allow 0; for max constraints, must be > 0
-  const normalizeNumeric = (value: number | string | undefined | null, allowZero = false): number | undefined => {
-    if (value === undefined || value === null) return undefined;
-    const num = typeof value === 'string' ? parseFloat(value) : value;
-    if (isNaN(num)) return undefined;
-    return (allowZero ? num >= 0 : num > 0) ? num : undefined;
-  };
-  
-  // Calories: support both min and max (legacy calorieCap = maxCalories)
-  const effectiveMinCalories = normalizeNumeric(
-    reconstructedParams.minCalories !== undefined 
-      ? reconstructedParams.minCalories 
-      : params.minCalories,
-    true // Allow 0 for min
-  );
-  const effectiveMaxCalories = normalizeNumeric(
-    reconstructedParams.maxCalories !== undefined 
-      ? reconstructedParams.maxCalories 
-      : (reconstructedParams.calorieCap !== undefined 
-          ? reconstructedParams.calorieCap 
-          : (params.maxCalories ?? params.calorieCap))
-  );
-  
-  // Protein: support both min and max
-  const effectiveMinProtein = normalizeNumeric(
-    reconstructedParams.minProtein !== undefined 
-      ? reconstructedParams.minProtein 
-      : params.minProtein,
-    true // Allow 0 for min
-  );
-  const effectiveMaxProtein = normalizeNumeric(
-    reconstructedParams.maxProtein !== undefined 
-      ? reconstructedParams.maxProtein 
-      : params.maxProtein,
-    true // Allow 0 for max (though unusual)
-  );
-  
-  // Carbs: support both min and max
-  const effectiveMinCarbs = normalizeNumeric(
-    reconstructedParams.minCarbs !== undefined 
-      ? reconstructedParams.minCarbs 
-      : params.minCarbs,
-    true // Allow 0 for min
-  );
-  const effectiveMaxCarbs = normalizeNumeric(
-    reconstructedParams.maxCarbs !== undefined 
-      ? reconstructedParams.maxCarbs 
-      : params.maxCarbs,
-    true // Allow 0 for max (though unusual)
-  );
-  
-  // Fats: support both min and max (prefer fats plural, fallback to fat singular)
-  const effectiveMinFats = normalizeNumeric(
-    reconstructedParams.minFats !== undefined 
-      ? reconstructedParams.minFats 
-      : (reconstructedParams.minFat !== undefined 
-          ? reconstructedParams.minFat 
-          : (params.minFats ?? params.minFat)),
-    true // Allow 0 for min
-  );
-  const effectiveMaxFats = normalizeNumeric(
-    reconstructedParams.maxFats !== undefined 
-      ? reconstructedParams.maxFats 
-      : (reconstructedParams.maxFat !== undefined 
-          ? reconstructedParams.maxFat 
-          : (params.maxFats ?? params.maxFat)),
-    true // Allow 0 for max (though unusual)
-  );
-  
-  // HARD GUARDRAIL: Check for explicit restaurant constraint
-  // Get restaurant from searchKey (pagination) or from explicitRestaurantQuery (new search)
-  const restaurantNameFromSearchKey = reconstructedParams.restaurant;
-  const explicitRestaurantQuery = params.explicitRestaurantQuery;
-  const macroFiltersDetected = params.macroFilters !== null && params.macroFilters !== undefined;
-  
-  // Log intent detection results
-  console.log('[searchHandler] Intent detection:', {
-    explicitRestaurantQuery: explicitRestaurantQuery || undefined,
-    restaurantNameFromSearchKey: restaurantNameFromSearchKey || undefined,
-    macroFiltersDetected,
-    macroFilters: macroFiltersDetected ? params.macroFilters : undefined
-  });
-  
-  // HARD GUARD: Only resolve restaurant if explicitRestaurantQuery exists OR restaurantNameFromSearchKey exists
-  // DO NOT call restaurant trigram candidates/resolver otherwise
-  if (!explicitRestaurantQuery && !restaurantNameFromSearchKey) {
-    console.log('[searchHandler] SKIP restaurant resolver (no explicit restaurant constraint)');
-  }
-  
-  const effectiveRestaurant = restaurantNameFromSearchKey !== undefined 
-    ? restaurantNameFromSearchKey 
+  const effectiveCalorieCap = reconstructedParams.calorieCap !== undefined 
+    ? reconstructedParams.calorieCap 
+    : params.calorieCap;
+  const effectiveMinProtein = reconstructedParams.minProtein !== undefined 
+    ? reconstructedParams.minProtein 
+    : params.minProtein;
+  const effectiveMaxCarbs = reconstructedParams.maxCarbs !== undefined 
+    ? reconstructedParams.maxCarbs 
+    : params.maxCarbs;
+  const effectiveMaxFat = reconstructedParams.maxFat !== undefined 
+    ? reconstructedParams.maxFat 
+    : params.maxFat;
+  const effectiveRestaurant = reconstructedParams.restaurant !== undefined 
+    ? reconstructedParams.restaurant 
     : params.restaurant;
-  
-  // Get restaurant_id if available (preferred over restaurant name)
-  const effectiveRestaurantId = params.restaurantId;
-  
-  // Get restaurant variants for filtering (from universal resolver)
-  const restaurantVariants = params.restaurantVariants;
-  
-  // Log effective constraints (what will actually be used for filtering)
-  const effectiveConstraintsForLog = {
-    minCalories: effectiveMinCalories,
-    maxCalories: effectiveMaxCalories,
-    minProtein: effectiveMinProtein,
-    maxProtein: effectiveMaxProtein,
-    minCarbs: effectiveMinCarbs,
-    maxCarbs: effectiveMaxCarbs,
-    minFats: effectiveMinFats,
-    maxFats: effectiveMaxFats,
-    restaurant: effectiveRestaurant,
-  };
-  console.log('[searchHandler] Effective constraints (will be enforced):', {
-    calories: effectiveMinCalories !== undefined || effectiveMaxCalories !== undefined 
-      ? `${effectiveMinCalories ?? 'min'} - ${effectiveMaxCalories ?? 'max'}`
-      : 'none',
-    protein: effectiveMinProtein !== undefined || effectiveMaxProtein !== undefined
-      ? `${effectiveMinProtein ?? 'min'} - ${effectiveMaxProtein ?? 'max'}`
-      : 'none',
-    carbs: effectiveMinCarbs !== undefined || effectiveMaxCarbs !== undefined
-      ? `${effectiveMinCarbs ?? 'min'} - ${effectiveMaxCarbs ?? 'max'}`
-      : 'none',
-    fats: effectiveMinFats !== undefined || effectiveMaxFats !== undefined
-      ? `${effectiveMinFats ?? 'min'} - ${effectiveMaxFats ?? 'max'}`
-      : 'none',
-    restaurant: effectiveRestaurant || 'none',
-    fullConstraints: effectiveConstraintsForLog
-  });
 
   // Extract dish type: use reconstructed if available, otherwise extract from query
   const dishType = reconstructedDishType !== undefined
     ? reconstructedDishType
     : (effectiveQuery ? extractDishType(effectiveQuery) : null);
 
-  // Extract restaurant name/ID - ONLY resolve if explicitRestaurantQuery exists
+  // Extract restaurant name (fuzzy normalized) if present
   let restaurantName: string | undefined = undefined;
-  let restaurantId: string | undefined = undefined;
-  
-  // If we have explicitRestaurantQuery, resolve it against database
-  if (explicitRestaurantQuery && !restaurantNameFromSearchKey) {
-    // Resolve explicit restaurant query against menu_items distinct restaurant_name FIRST
-    const queryLength = explicitRestaurantQuery.trim().length;
-    
-    if (queryLength <= 4) {
-      // For short queries (<=4 chars), use exact/prefix/contains match on menu_items
-      console.log('[searchHandler] Resolving short restaurant query:', explicitRestaurantQuery);
-      
-      const { data: restaurantMatches, error: restaurantError } = await supabase
-        .from('menu_items')
-        .select('restaurant_name')
-        .ilike('restaurant_name', `%${explicitRestaurantQuery}%`)
-        .limit(10);
-      
-      if (!restaurantError && restaurantMatches && restaurantMatches.length > 0) {
-        // Check for exact match first
-        const exactMatch = restaurantMatches.find((r: any) => 
-          r.restaurant_name.toLowerCase().trim() === explicitRestaurantQuery.toLowerCase().trim()
-        );
-        
-        if (exactMatch) {
-          restaurantName = exactMatch.restaurant_name;
-          console.log('[searchHandler] Restaurant resolved (exact match):', restaurantName);
-        } else if (restaurantMatches.length === 1) {
-          // Single match - use it
-          restaurantName = restaurantMatches[0].restaurant_name;
-          console.log('[searchHandler] Restaurant resolved (single match):', restaurantName);
-        } else {
-          // Multiple matches - return NOT_FOUND (don't show ambiguous options for short queries)
-          console.log('[searchHandler] Restaurant NOT_FOUND: multiple matches for short query');
-          return {
-            meals: [],
-            hasMore: false,
-            nextOffset: 0,
-            searchKey: currentSearchKey || '',
-            message: `We don't have ${explicitRestaurantQuery} in our database yet.`
-          };
-        }
-      } else {
-        // No matches found
-        console.log('[searchHandler] Restaurant NOT_FOUND: no matches');
-        return {
-          meals: [],
-          hasMore: false,
-          nextOffset: 0,
-          searchKey: currentSearchKey || '',
-          message: `We don't have ${explicitRestaurantQuery} in our database yet.`
-        };
-      }
-    } else {
-      // For longer queries (>=5 chars), use trigram with strict threshold
-      console.log('[searchHandler] Resolving longer restaurant query with trigram:', explicitRestaurantQuery);
-      
-      try {
-        const { data: candidates } = await supabase.rpc('search_restaurants_trgm', {
-          query_text: explicitRestaurantQuery
-        });
-        
-        if (candidates && candidates.length > 0) {
-          const topCandidate = candidates[0];
-          const topScore = topCandidate.similarity ?? 0;
-          const topMatchType = topCandidate.match_type || 'fuzzy';
-          
-          // Only accept if exact/contains match OR fuzzy with high similarity (>= 0.6)
-          if (topMatchType === 'exact' || topMatchType === 'contains' || topScore >= 0.6) {
-            restaurantName = topCandidate.name;
-            restaurantId = topCandidate.id;
-            console.log('[searchHandler] Restaurant resolved (trigram):', restaurantName, {
-              match_type: topMatchType,
-              similarity: topScore
-            });
-          } else {
-            // Low similarity - treat as NOT_FOUND
-            console.log('[searchHandler] Restaurant NOT_FOUND: low similarity', {
-              top_score: topScore,
-              threshold: 0.6
-            });
-            return {
-              meals: [],
-              hasMore: false,
-              nextOffset: 0,
-              searchKey: currentSearchKey || '',
-              message: `We don't have ${explicitRestaurantQuery} in our database yet.`
-            };
-          }
-        } else {
-          // No candidates
-          console.log('[searchHandler] Restaurant NOT_FOUND: no trigram candidates');
-          return {
-            meals: [],
-            hasMore: false,
-            nextOffset: 0,
-            searchKey: currentSearchKey || '',
-            message: `We don't have ${explicitRestaurantQuery} in our database yet.`
-          };
-        }
-      } catch (rpcError) {
-        console.warn('[searchHandler] Restaurant RPC failed:', rpcError);
-        return {
-          meals: [],
-          hasMore: false,
-          nextOffset: 0,
-          searchKey: currentSearchKey || '',
-          message: `We don't have ${explicitRestaurantQuery} in our database yet.`
-        };
-      }
-    }
-  } else if (effectiveRestaurantId) {
-    // Use restaurant_id when available (preferred)
-    restaurantId = effectiveRestaurantId;
-    // Also get canonical name for logging/searchKey
-    try {
-      const { data: restaurant, error: restaurantError } = await supabase
-        .from('restaurants')
-        .select('name')
-        .eq('id', restaurantId)
-        .single();
-      
-      if (restaurantError) {
-        // If restaurants table doesn't exist or restaurant not found, fallback to restaurant_name
-        console.warn('[searchHandler] Failed to fetch restaurant name for restaurant_id, falling back to restaurant_name:', restaurantId);
-        restaurantId = undefined; // Clear restaurantId, will use restaurant_name instead
-      } else if (restaurant) {
-        restaurantName = restaurant.name;
-        console.log(`[searchHandler] Using restaurant_id: ${restaurantId} (${restaurantName})`);
-      }
-    } catch (err) {
-      console.warn('[searchHandler] Error fetching restaurant name for restaurant_id, falling back to restaurant_name:', restaurantId, err);
-      restaurantId = undefined; // Clear restaurantId, will use restaurant_name instead
-    }
-  }
-  
-  // If restaurantId is still undefined, use restaurant name (for backward compatibility)
-  if (!restaurantId && (effectiveRestaurant || restaurantNameFromSearchKey)) {
-    restaurantName = (effectiveRestaurant || restaurantNameFromSearchKey)?.trim();
-    console.log(`[searchHandler] Using restaurant name: ${restaurantName} (from searchKey or params, no restaurant_id)`);
-  }
-  
-  // STRICT: Do NOT infer restaurant from query - only use explicit constraints
-  // This prevents "find me" from mapping to random restaurants
-  if (!restaurantId && !restaurantName) {
-    console.log('[searchHandler] No restaurant constraint - searching across all restaurants');
+  if (effectiveRestaurant) {
+    restaurantName = effectiveRestaurant.trim();
   }
 
   // 1. GENERATE SEARCH KEY (Deterministic from normalized query + constraints + dish type + restaurant)
   // Must be deterministic so pagination uses same result set
   // Diet logic removed - no dietary tags in cache key
   // If searchKey was provided, use it; otherwise generate new one
-  // STRICT: Only include rest in searchKey if restaurantName exists (canonical restaurant)
   if (!currentSearchKey) {
-    const searchKeyData: any = {
+    currentSearchKey = Buffer.from(JSON.stringify({
       q: effectiveQuery.toLowerCase() || '',
-      calMin: effectiveMinCalories,
-      calMax: effectiveMaxCalories,
-      proMin: effectiveMinProtein,
-      proMax: effectiveMaxProtein,
-      carbMin: effectiveMinCarbs,
-      carbMax: effectiveMaxCarbs,
-      fatMin: effectiveMinFats,
-      fatMax: effectiveMaxFats,
+      cal: effectiveCalorieCap,
+      pro: effectiveMinProtein,
+      carb: effectiveMaxCarbs,
+      fat: effectiveMaxFat,
+      rest: restaurantName,
       dishType: dishType || null
-    };
-    // Only include rest if restaurantName exists (canonical restaurant)
-    if (restaurantName) {
-      searchKeyData.rest = restaurantName;
-    }
-    currentSearchKey = Buffer.from(JSON.stringify(searchKeyData)).toString('base64');
+    })).toString('base64');
   }
 
-  // 2. PREPARE RESTAURANT FILTER
-  // Use restaurant_id when available, fallback to restaurant name
-  // Only set filter if explicit constraint exists (no inference)
+  // 2. PREPARE RESTAURANT FILTER (fuzzy normalized)
   let restaurantFilter: string | undefined = undefined;
-  if (restaurantId) {
-    // Prefer restaurant_id - filter will use restaurant_id in queries
-    restaurantFilter = restaurantName || restaurantId; // Use name for logging, ID for filtering
-    console.log(`[searchHandler] Restaurant filter: ${restaurantName} (restaurant_id: ${restaurantId})`);
-  } else if (restaurantName) {
-    // Use variants if available, otherwise fallback to single name
-    if (restaurantVariants && restaurantVariants.length > 0) {
-      restaurantFilter = restaurantName; // Keep for logging
-      console.log(`[searchHandler] Restaurant filter: ${restaurantName} with ${restaurantVariants.length} variants`);
-    } else {
-      // Fallback to restaurant name (for backward compatibility)
-      restaurantFilter = restaurantName;
-      console.log(`[searchHandler] Restaurant filter: ${restaurantFilter} (using name, no restaurant_id, no variants)`);
+  if (restaurantName) {
+    try {
+      const { data: restMatches } = await supabase.rpc('search_restaurants_trgm', {
+        query_text: restaurantName
+      });
+      if (restMatches && restMatches.length > 0) {
+        restaurantFilter = restMatches[0].name;
+        console.log(`[searchHandler] Restaurant filter: ${restaurantFilter}`);
+      }
+    } catch (rpcError) {
+      console.warn('[searchHandler] Restaurant RPC failed, continuing without restaurant filter:', rpcError);
+      restaurantFilter = undefined;
     }
   }
 
@@ -1789,211 +1077,20 @@ export async function searchHandler(params: SearchParams) {
     });
   }
 
-  /**
-   * Normalizes restaurant name for comparison (same as restaurant-resolver)
-   */
-  function normalizeRestaurantNameForComparison(name: string): string {
-    if (!name || typeof name !== 'string') return '';
-    return name
-      .toLowerCase()
-      .trim()
-      .replace(/&/g, 'and')
-      .replace(/['.,\-]/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
-
-  /**
-   * Determines if query is restaurant-only browse query (should bypass vector search)
-   * Returns true if:
-   * - Must have restaurant set
-   * - effectiveQuery trimmed length <= 40
-   * - effectiveQuery normalized is very similar to restaurant normalized OR
-   *   effectiveQuery is short and contains no dish keywords and no macro keywords
-   * - Also treat effectiveQuery in ["find meals","meals","menu","items","popular"] as browse query
-   */
-  function isRestaurantOnlyBrowseQuery(effectiveQuery: string, restaurant?: string): boolean {
-    if (!restaurant) return false;
-    if (!effectiveQuery || typeof effectiveQuery !== 'string') return false;
-    
-    const trimmed = effectiveQuery.trim();
-    if (trimmed.length > 40) return false;
-    
-    const lowerQuery = trimmed.toLowerCase();
-    
-    // Check for explicit browse phrases
-    const browsePhrases = ['find meals', 'meals', 'menu', 'items', 'popular'];
-    if (browsePhrases.includes(lowerQuery)) {
-      return true;
-    }
-    
-    // Check for dish keywords (guard - if present, not restaurant-only browse)
-    const dishKeywords = [
-      'burger', 'burgers', 'burrito', 'burritos', 'pizza', 'pizzas', 'taco', 'tacos',
-      'salad', 'salads', 'sandwich', 'sandwiches', 'sub', 'subs',
-      'bowl', 'bowls', 'wrap', 'wraps', 'fries', 'chicken', 'wings',
-      'quesadilla', 'nachos', 'soup', 'soups', 'pasta', 'noodles',
-      'breakfast', 'lunch', 'dinner', 'snack', 'sushi', 'poke', 'ramen'
-    ];
-    
-    for (const keyword of dishKeywords) {
-      const pattern = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-      if (pattern.test(lowerQuery)) {
-        return false; // Contains dish keyword, not restaurant-only browse
-      }
-    }
-    
-    // Check for macro keywords (guard - if present, not restaurant-only browse)
-    const macroKeywords = [
-      'calorie', 'calories', 'cal', 'protein', 'carbs', 'carb', 'carbohydrates',
-      'fat', 'fats', 'macros', 'macro', 'grams', 'gram', 'g',
-      'under', 'over', 'above', 'below', 'at least', 'at most', 'minimum', 'maximum'
-    ];
-    
-    for (const keyword of macroKeywords) {
-      const pattern = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-      if (pattern.test(lowerQuery)) {
-        return false; // Contains macro keyword, not restaurant-only browse
-      }
-    }
-    
-    // Check if normalized query is very similar to normalized restaurant name
-    const normalizedQuery = normalizeRestaurantNameForComparison(trimmed);
-    const normalizedRestaurant = normalizeRestaurantNameForComparison(restaurant);
-    
-    // Check if query is contained in restaurant or restaurant is contained in query
-    if (normalizedRestaurant.includes(normalizedQuery) || normalizedQuery.includes(normalizedRestaurant)) {
-      if (Math.min(normalizedRestaurant.length, normalizedQuery.length) >= 3) {
-        return true; // Similar enough, treat as restaurant-only browse
-      }
-    }
-    
-    // If query is short (<=28 chars) and has no dish/macro keywords, treat as browse
-    if (trimmed.length <= 28) {
-      return true;
-    }
-    
-    return false;
-  }
-
   // 3. RETRIEVAL STRATEGY: Explicit modes
-  // A) DB_FILTERED: dishType or restaurant present OR numeric macro constraints present
-  // B) DB_GENERIC: generic meal discovery (no OpenAI) OR numeric constraints without dish/restaurant
-  // C) VECTOR: specific query (requires OpenAI) - only if no numeric constraints AND no dish/restaurant
+  // A) DB_FILTERED: dishType or restaurant present
+  // B) DB_GENERIC: generic meal discovery (no OpenAI)
+  // C) VECTOR: specific query (requires OpenAI)
   // D) VECTOR_FALLBACK: vector returned 0, fallback to DB_GENERIC
   
-  // Check if user provided ANY numeric macro constraint
-  const hasNumericConstraints = effectiveMinCalories !== undefined || 
-                                 effectiveMaxCalories !== undefined ||
-                                 effectiveMinProtein !== undefined || 
-                                 effectiveMaxProtein !== undefined ||
-                                 effectiveMinCarbs !== undefined ||
-                                 effectiveMaxCarbs !== undefined || 
-                                 effectiveMinFats !== undefined ||
-                                 effectiveMaxFats !== undefined;
-  
   let allItems: any[] = [];
-  let retrievalStrategy: 'RESTAURANT_BROWSE' | 'DB_FILTERED' | 'DB_GENERIC' | 'VECTOR' | 'VECTOR_FALLBACK' = 'DB_GENERIC';
-  let retrievalReason = '';
+  let retrievalStrategy: 'DB_FILTERED' | 'DB_GENERIC' | 'VECTOR' | 'VECTOR_FALLBACK' = 'DB_GENERIC';
   const candidatesBeforeFiltering = 0; // Will be set after retrieval
   
-  // Check for RESTAURANT_BROWSE strategy first (before DB_FILTERED)
-  if (restaurantFilter && isRestaurantOnlyBrowseQuery(effectiveQuery, restaurantFilter)) {
-    retrievalStrategy = 'RESTAURANT_BROWSE';
-    retrievalReason = `restaurant-only browse query: "${effectiveQuery}" for restaurant "${restaurantFilter}"`;
-    console.log(`[searchHandler] Retrieval strategy: RESTAURANT_BROWSE because ${retrievalReason}`);
-    
-    try {
-      // Direct DB query - use restaurant_id when available, fallback to restaurant_name
-      let query = supabase
-        .from('menu_items')
-        .select(`
-          id,
-          restaurant_name,
-          name,
-          category,
-          image_url,
-          price_estimate,
-          macros
-        `);
-      
-      // Prefer restaurant_id when available (more reliable)
-      // Defensive: Try restaurant_id first, fallback to restaurant_name variants on error
-      if (restaurantId) {
-        query = query.eq('restaurant_id', restaurantId);
-        console.log(`[searchHandler] RESTAURANT_BROWSE filtering by restaurant_id: ${restaurantId}`);
-      } else if (restaurantVariants && restaurantVariants.length > 0) {
-        query = query.in('restaurant_name', restaurantVariants);
-        console.log(`[searchHandler] RESTAURANT_BROWSE filtering by restaurant_name variants: ${restaurantVariants.length} variants`);
-      } else if (restaurantFilter) {
-        // Fallback: use single filter (should not happen for explicit restaurant queries)
-        query = query.eq('restaurant_name', restaurantFilter);
-        console.log(`[searchHandler] RESTAURANT_BROWSE filtering by restaurant_name (fallback, no variants): ${restaurantFilter}`);
-      }
-      
-      const { data: dbItems, error: dbError } = await query.limit(2000); // Fetch large pool to ensure we get all items
-      
-      // If restaurant_id query failed (column doesn't exist), retry with restaurant_name
-      if (dbError && restaurantId && restaurantFilter) {
-        console.warn('[searchHandler] restaurant_id query failed, falling back to restaurant_name:', dbError.message);
-        const fallbackQuery = supabase
-          .from('menu_items')
-          .select(`
-            id,
-            restaurant_name,
-            name,
-            category,
-            image_url,
-            price_estimate,
-            macros
-          `)
-          .in('restaurant_name', restaurantVariants && restaurantVariants.length > 0 ? restaurantVariants : [restaurantFilter])
-          .limit(2000);
-        
-        const { data: fallbackItems, error: fallbackError } = await fallbackQuery;
-        if (fallbackError) {
-          console.error('[searchHandler] RESTAURANT_BROWSE fallback query error:', fallbackError);
-          allItems = [];
-        } else {
-          allItems = fallbackItems || [];
-        }
-      } else if (dbError) {
-        console.error('[searchHandler] RESTAURANT_BROWSE query error:', dbError);
-        allItems = [];
-      } else if (dbItems && dbItems.length > 0) {
-        allItems = dbItems;
-        console.log(`[searchHandler] RESTAURANT_BROWSE returned ${allItems.length} candidates`);
-      } else {
-        console.log('[searchHandler] RESTAURANT_BROWSE returned 0 items');
-        return {
-          meals: [],
-          hasMore: false,
-          nextOffset: 0,
-          searchKey: currentSearchKey,
-          message: `We don't have ${restaurantFilter} in our database yet.`
-        };
-      }
-    } catch (dbError) {
-      console.error('[searchHandler] RESTAURANT_BROWSE query exception:', dbError);
-      return {
-        meals: [],
-        hasMore: false,
-        nextOffset: 0,
-        searchKey: currentSearchKey,
-        message: `We don't have ${restaurantFilter} in our database yet.`
-      };
-    }
-  } else if (dishType || restaurantFilter) {
+  if (dishType || restaurantFilter) {
     // STRATEGY A: DB_FILTERED - dishType or restaurant present
     retrievalStrategy = 'DB_FILTERED';
-    if (dishType && restaurantFilter) {
-      retrievalReason = `dishType (${dishType}) and restaurant (${restaurantFilter}) present`;
-    } else if (dishType) {
-      retrievalReason = `dishType (${dishType}) present`;
-    } else {
-      retrievalReason = `restaurant (${restaurantFilter}) present`;
-    }
-    console.log(`[searchHandler] Retrieval strategy: DB_FILTERED because ${retrievalReason}`);
+    console.log(`[searchHandler] Retrieval strategy: DB_FILTERED (dishType: ${dishType || 'none'}, restaurant: ${restaurantFilter || 'none'})`);
     
     try {
       let query = supabase
@@ -2008,57 +1105,15 @@ export async function searchHandler(params: SearchParams) {
           macros
         `);
       
-      // Apply restaurant filter if present - prefer restaurant_id when available
-      // Defensive: Try restaurant_id first, fallback to restaurant_name variants on error
-      if (restaurantId) {
-        query = query.eq('restaurant_id', restaurantId);
-        console.log(`[searchHandler] DB_FILTERED filtering by restaurant_id: ${restaurantId}`);
-      } else if (restaurantVariants && restaurantVariants.length > 0) {
-        query = query.in('restaurant_name', restaurantVariants);
-        console.log(`[searchHandler] DB_FILTERED filtering by restaurant_name variants: ${restaurantVariants.length} variants`);
-      } else if (restaurantFilter) {
-        // Fallback: use single filter (should not happen for explicit restaurant queries)
-        query = query.eq('restaurant_name', restaurantFilter);
-        console.log(`[searchHandler] DB_FILTERED filtering by restaurant_name (fallback, no variants): ${restaurantFilter}`);
+      // Apply restaurant filter if present
+      if (restaurantFilter) {
+        query = query.ilike('restaurant_name', `%${restaurantFilter}%`);
       }
       
       // Fetch large candidate pool (500-1000 items) to cover whole DB
       const { data: dbItems, error: dbError } = await query.limit(1000);
       
-      // If restaurant_id query failed (column doesn't exist), retry with restaurant_name
-      if (dbError && restaurantId && restaurantFilter) {
-        console.warn('[searchHandler] restaurant_id query failed, falling back to restaurant_name:', dbError.message);
-        const fallbackQuery = supabase
-          .from('menu_items')
-          .select(`
-            id,
-            restaurant_name,
-            name,
-            category,
-            image_url,
-            price_estimate,
-            macros
-          `);
-        
-        if (dishType) {
-          // Re-apply dish type filter if present
-          // (dish type filtering happens later, but we need to preserve the query structure)
-        }
-        
-        if (restaurantVariants && restaurantVariants.length > 0) {
-          fallbackQuery.in('restaurant_name', restaurantVariants);
-        } else if (restaurantFilter) {
-          fallbackQuery.eq('restaurant_name', restaurantFilter);
-        }
-        
-        const { data: fallbackItems, error: fallbackError } = await fallbackQuery.limit(1000);
-        if (fallbackError) {
-          console.error('[searchHandler] DB_FILTERED fallback query error:', fallbackError);
-          allItems = [];
-        } else {
-          allItems = fallbackItems || [];
-        }
-      } else if (dbError) {
+      if (dbError) {
         console.error('[searchHandler] DB query error:', dbError);
         allItems = [];
       } else if (dbItems && dbItems.length > 0) {
@@ -2072,51 +1127,10 @@ export async function searchHandler(params: SearchParams) {
       console.error('[searchHandler] DB query exception:', dbError);
       allItems = [];
     }
-  } else if (hasNumericConstraints) {
-    // STRATEGY B (updated): DB_GENERIC - numeric macro constraints present, use DB-first
-    // This is cheaper and more accurate for macro-filtered searches
-    retrievalStrategy = 'DB_GENERIC';
-    retrievalReason = `numeric macro constraints present (calories: ${effectiveMinCalories ?? 'min'} - ${effectiveMaxCalories ?? 'max'}, protein: ${effectiveMinProtein ?? 'min'} - ${effectiveMaxProtein ?? 'max'}, carbs: ${effectiveMinCarbs ?? 'min'} - ${effectiveMaxCarbs ?? 'max'}, fats: ${effectiveMinFats ?? 'min'} - ${effectiveMaxFats ?? 'max'})`;
-    console.log(`[searchHandler] Retrieval strategy: DB_GENERIC because ${retrievalReason}`);
-    
-    try {
-      // Build query - we'll filter macros in code after fetching for reliability
-      // (Supabase PostgREST JSONB filtering syntax is complex and may vary by version)
-      // Fetch a larger pool, then filter in code (still more efficient than fetching everything)
-      const { data: dbItems, error: dbError } = await supabase
-        .from('menu_items')
-        .select(`
-          id,
-          restaurant_name,
-          name,
-          category,
-          image_url,
-          price_estimate,
-          macros
-        `)
-        .not('macros', 'is', null) // Ensure macros exist
-        .order('id', { ascending: true }) // Deterministic ordering
-        .limit(2000); // Fetch larger pool for macro filtering
-      
-      if (dbError) {
-        console.error('[searchHandler] DB_GENERIC query error:', dbError);
-        allItems = [];
-      } else if (dbItems && dbItems.length > 0) {
-        allItems = dbItems;
-        console.log(`[searchHandler] DB_GENERIC returned ${allItems.length} candidates`);
-      } else {
-        console.log('[searchHandler] DB_GENERIC returned 0 items');
-        allItems = [];
-      }
-    } catch (dbError) {
-      console.error('[searchHandler] DB_GENERIC query exception:', dbError);
-      allItems = [];
-    }
   } else if (isGenericMealDiscovery(effectiveQuery)) {
-    // STRATEGY B (legacy): DB_GENERIC - generic meal discovery, skip vector search entirely
+    // STRATEGY B: DB_GENERIC - generic meal discovery, skip vector search entirely
     retrievalStrategy = 'DB_GENERIC';
-    retrievalReason = `generic meal discovery query: "${effectiveQuery}"`;
-    console.log(`[searchHandler] Retrieval strategy: DB_GENERIC because ${retrievalReason}`);
+    console.log(`[searchHandler] Retrieval strategy: DB_GENERIC (generic query: "${effectiveQuery}")`);
     
     try {
       // Deterministic DB query - no OpenAI required
@@ -2150,10 +1164,8 @@ export async function searchHandler(params: SearchParams) {
     }
   } else {
     // STRATEGY C: VECTOR - specific query, use vector search
-    // Only used if no numeric constraints, no dish/restaurant, and not generic query
     retrievalStrategy = 'VECTOR';
-    retrievalReason = `specific query without numeric constraints: "${effectiveQuery}"`;
-    console.log(`[searchHandler] Retrieval strategy: VECTOR because ${retrievalReason}`);
+    console.log(`[searchHandler] Retrieval strategy: VECTOR (specific query: "${effectiveQuery}")`);
     
     if (effectiveQuery && effectiveQuery.trim().length > 0) {
       try {
@@ -2354,169 +1366,28 @@ export async function searchHandler(params: SearchParams) {
   const candidatesAfterNormalization = normalizedItems.length;
   console.log(`[searchHandler] Normalized ${normalizedItems.length} items (discarded ${dishTypeFilteredItems.length - normalizedItems.length} items with missing/invalid macros)`);
 
-  // 6.5. APPLY MEAL TIME FILTER (breakfast/dinner name-based filtering)
-  // Filter based on query containing "breakfast" or "dinner" keywords
-  const mealTime = detectMealTime(params.query);
-  const itemsBeforeMealTimeFilter = normalizedItems.length;
-  let mealTimeFilteredItems = normalizedItems;
-  
-  if (mealTime === "dinner") {
-    // Exclude items whose name contains "breakfast"
-    mealTimeFilteredItems = normalizedItems.filter((item: any) => !nameHasBreakfast(item.name));
-  } else if (mealTime === "breakfast") {
-    // Keep items whose name contains "breakfast" OR items from Starbucks
-    mealTimeFilteredItems = normalizedItems.filter((item: any) => isBreakfastItem(item));
-  }
-  
-  const candidatesAfterMealTimeFilter = mealTimeFilteredItems.length;
-  
-  // Log meal time filtering summary
-  if (mealTime) {
-    console.log(`[searchHandler] Meal time filter (${mealTime}): ${itemsBeforeMealTimeFilter} → ${candidatesAfterMealTimeFilter} items`, {
-      mealTime,
-      before: itemsBeforeMealTimeFilter,
-      after: candidatesAfterMealTimeFilter,
-    });
-  }
-
-  // 6.6. APPLY PROTEIN FILTER (if protein keyword detected in query)
-  // Filter meals to only return those where protein keyword appears in menu name
-  const proteinKeyword = extractProteinKeyword(params.query || '');
-  const itemsBeforeProteinFilter = mealTimeFilteredItems.length;
-  let proteinFilteredItems = mealTimeFilteredItems;
-  let candidatesAfterProteinFilter: number | undefined;
-  
-  if (proteinKeyword) {
-    proteinFilteredItems = applyProteinFilter(mealTimeFilteredItems, proteinKeyword);
-    candidatesAfterProteinFilter = proteinFilteredItems.length;
-    
-    // Log protein filtering summary
-    if (itemsBeforeProteinFilter > candidatesAfterProteinFilter) {
-      console.log(`[searchHandler] Protein filter (${proteinKeyword}): ${itemsBeforeProteinFilter} → ${candidatesAfterProteinFilter} items`);
-    }
-    
-    // If protein filtering results in 0 items, return early with message
-    if (proteinFilteredItems.length === 0) {
-      const proteinDisplay = proteinKeyword.charAt(0).toUpperCase() + proteinKeyword.slice(1);
-      const message = `No meals with ${proteinDisplay} match your request yet.`;
-      
-      return {
-        meals: [],
-        hasMore: false,
-        nextOffset: 0,
-        searchKey: currentSearchKey,
-        message
-      };
-    }
-  }
-
   // 7. APPLY STRICT MACRO FILTERS (from JSONB)
   // All macro filtering uses JSON macros (from normalized object)
   // Macros are in menu_items.macros jsonb: calories, protein, carbs, fat
-  // Use effective parameters (reconstructed from searchKey if available, normalized to numbers)
-  // Support both min (>=) and max (<=) constraints for each macro
-  const itemsBeforeMacroFilter = proteinFilteredItems.length;
-  
-  const macroFilteredItems = proteinFilteredItems.filter((item: any) => {
-    // Ensure item macros are numbers (should already be normalized, but double-check)
-    const itemCalories = typeof item.calories === 'number' ? item.calories : parseFloat(item.calories) || 0;
-    const itemProtein = typeof item.protein === 'number' ? item.protein : parseFloat(item.protein) || 0;
-    const itemCarbs = typeof item.carbs === 'number' ? item.carbs : parseFloat(item.carbs) || 0;
-    // Items are normalized, so they should have fats set, but use defensive fallback
-    // Prefer fats (from normalized object), fallback to fat for safety
-    const itemFats = typeof item.fats === 'number' ? item.fats : 
-                     (typeof item.fat === 'number' ? item.fat : 0);
+  // Use effective parameters (reconstructed from searchKey if available)
+  const macroFilteredItems = normalizedItems.filter((item: any) => {
+    // Calorie cap filter (from macros jsonb)
+    if (effectiveCalorieCap && item.calories > effectiveCalorieCap) return false;
     
-    // Calories constraints: min (>=) and max (<=)
-    if (effectiveMinCalories !== undefined && itemCalories < effectiveMinCalories) return false;
-    if (effectiveMaxCalories !== undefined && itemCalories > effectiveMaxCalories) return false;
+    // Protein minimum filter (from macros jsonb)
+    if (effectiveMinProtein && item.protein < effectiveMinProtein) return false;
     
-    // Protein constraints: min (>=) and max (<=)
-    if (effectiveMinProtein !== undefined && itemProtein < effectiveMinProtein) return false;
-    if (effectiveMaxProtein !== undefined && itemProtein > effectiveMaxProtein) return false;
+    // Carbs maximum filter (from macros jsonb)
+    if (effectiveMaxCarbs && item.carbs > effectiveMaxCarbs) return false;
     
-    // Carbs constraints: min (>=) and max (<=)
-    if (effectiveMinCarbs !== undefined && itemCarbs < effectiveMinCarbs) return false;
-    if (effectiveMaxCarbs !== undefined && itemCarbs > effectiveMaxCarbs) return false;
-    
-    // Fats constraints: min (>=) and max (<=)
-    if (effectiveMinFats !== undefined && itemFats < effectiveMinFats) return false;
-    if (effectiveMaxFats !== undefined && itemFats > effectiveMaxFats) return false;
+    // Fat maximum filter (from macros jsonb)
+    if (effectiveMaxFat && item.fat > effectiveMaxFat) return false;
     
     return true;
   });
   
   const candidatesAfterMacroFilter = macroFilteredItems.length;
-  console.log(`[searchHandler] Macro filter step: ${itemsBeforeMacroFilter} → ${candidatesAfterMacroFilter} items`, {
-    before: itemsBeforeMacroFilter,
-    after: candidatesAfterMacroFilter,
-    effectiveConstraints: {
-      minCalories: effectiveMinCalories,
-      maxCalories: effectiveMaxCalories,
-      minProtein: effectiveMinProtein,
-      maxProtein: effectiveMaxProtein,
-      minCarbs: effectiveMinCarbs,
-      maxCarbs: effectiveMaxCarbs,
-      minFats: effectiveMinFats,
-      maxFats: effectiveMaxFats,
-    }
-  });
-
-  // HOMEPAGE STRICT FILTERING (no fallback - filters must ALWAYS be satisfied)
-  // Ensure dish-only filtering is applied for homepage requests
-  let finalMacroFilteredItems: any[] = macroFilteredItems;
-  
-  // For homepage: ensure dish-only filtering (items should already be dish-only, but double-check for strictness)
-  if (params.isHomepage && !params.isPagination) {
-    // Apply dish-only filter (items should already be filtered, but ensure strictness)
-    const afterMacroFilter = finalMacroFilteredItems.length;
-    finalMacroFilteredItems = finalMacroFilteredItems.filter((item: any) => isDishItem(item, dishType));
-    const afterDishFilter = finalMacroFilteredItems.length;
-    
-    // Log filters applied and counts
-    console.log('[HOME_FILTERS_APPLIED]', {
-      caloriesMin: effectiveMinCalories,
-      caloriesMax: effectiveMaxCalories,
-      proteinMin: effectiveMinProtein,
-      carbsMin: effectiveMinCarbs,
-      fatsMin: effectiveMinFats,
-    });
-    
-    console.log('[HOME_COUNTS]', {
-      dbRows: candidatesAfterNormalization,
-      afterDishFilter: afterDishFilter,
-      afterMacroFilter: afterMacroFilter,
-      returned: finalMacroFilteredItems.length,
-    });
-  }
-  
-  // Runtime assertion in development: ensure all filtered items satisfy constraints
-  if (process.env.NODE_ENV === 'development' && macroFilteredItems.length > 0) {
-    try {
-      const { assertMealsSatisfyConstraints } = await import('@/lib/macro-utils');
-      const mealsWithMacros = macroFilteredItems.map((item: any) => ({
-        macros: {
-          calories: item.calories,
-          protein: item.protein,
-          carbs: item.carbs,
-          fats: item.fats ?? item.fat ?? 0,
-        }
-      }));
-      assertMealsSatisfyConstraints(mealsWithMacros, {
-        minCalories: effectiveMinCalories,
-        maxCalories: effectiveMaxCalories,
-        minProtein: effectiveMinProtein,
-        maxProtein: effectiveMaxProtein,
-        minCarbs: effectiveMinCarbs,
-        maxCarbs: effectiveMaxCarbs,
-        minFats: effectiveMinFats,
-        maxFats: effectiveMaxFats,
-      }, 'searchHandler macro filter');
-    } catch (error) {
-      // Don't fail the request if assertion fails, just log
-      console.error('[searchHandler] Macro constraint assertion failed:', error);
-    }
-  }
+  console.log(`[searchHandler] Macro filters: ${normalizedItems.length} → ${macroFilteredItems.length} items`);
   
   // Log filtering summary with candidate counts before/after filtering
   console.log('[searchHandler] Filtering summary:', {
@@ -2524,13 +1395,11 @@ export async function searchHandler(params: SearchParams) {
     candidatesAfterRetrieval,
     candidatesAfterDishFilter,
     candidatesAfterNormalization,
-    candidatesAfterMealTimeFilter: mealTime ? candidatesAfterMealTimeFilter : undefined,
-    candidatesAfterProteinFilter: proteinKeyword ? candidatesAfterProteinFilter : undefined,
     candidatesAfterMacroFilter
   });
   
-  // Diet filtering removed - use final macro filtered items (homepage may have applied fallback)
-  const itemsForRemainingFilters = finalMacroFilteredItems;
+  // Diet filtering removed - use macroFilteredItems directly
+  const itemsForRemainingFilters = macroFilteredItems;
 
   // 8. APPLY RESTAURANT FILTER (if restaurant filter exists)
   const filteredItems = restaurantFilter 
@@ -2557,31 +1426,13 @@ export async function searchHandler(params: SearchParams) {
     calories: item.calories,
     protein: item.protein,
     carbs: item.carbs,
-    fats: item.fats || item.fat || 0, // Use "fats" (plural) as primary, fallback to "fat" for backward compatibility
+    fats: item.fat, // Use fat from macros jsonb
     image: item.image_url || '/placeholder-food.jpg',
     description: '', // Not in schema, leave empty
     category: item.category || '',
     dietary_tags: item.normalized_tags || [], // Use normalized dietary tags
     price: item.price_estimate || null,
   }));
-  
-  // STRICT RESTAURANT ENFORCEMENT: Dev assertion
-  // If restaurant filter is active, ensure ALL returned meals are from that restaurant
-  if (process.env.NODE_ENV === 'development' && restaurantFilter) {
-    const violations = finalMeals.filter((meal: any) => {
-      const mealRestaurant = meal.restaurant_name || meal.restaurant;
-      return mealRestaurant !== restaurantFilter;
-    });
-    
-    if (violations.length > 0) {
-      const errorMsg = `[searchHandler] CRITICAL: ${violations.length} meal(s) violate restaurant constraint! ` +
-        `Expected: ${restaurantFilter}, but found: ${violations.slice(0, 3).map((v: any) => `${v.name} (${v.restaurant_name || v.restaurant})`).join(', ')}`;
-      console.error(errorMsg);
-      throw new Error(errorMsg);
-    }
-    
-    console.log('[searchHandler] Restaurant constraint verified: all meals from', restaurantFilter);
-  }
 
   // 11. DEDUPLICATE RESULTS (before pagination)
   // Use stable dedupe key: restaurant_name + name (case-insensitive)
@@ -2627,14 +1478,10 @@ export async function searchHandler(params: SearchParams) {
     // Summary with dish type: "Found 5 burgers under 700 calories."
     const dishTypeDisplay = dishType.charAt(0).toUpperCase() + dishType.slice(1) + (mealCount !== 1 ? 's' : '');
     const constraints: string[] = [];
-    if (effectiveMinCalories) constraints.push(`at least ${effectiveMinCalories} calories`);
-    if (effectiveMaxCalories) constraints.push(`under ${effectiveMaxCalories} calories`);
-    if (effectiveMinProtein) constraints.push(`at least ${effectiveMinProtein}g protein`);
-    if (effectiveMaxProtein) constraints.push(`under ${effectiveMaxProtein}g protein`);
-    if (effectiveMinCarbs) constraints.push(`at least ${effectiveMinCarbs}g carbs`);
+    if (effectiveCalorieCap) constraints.push(`under ${effectiveCalorieCap} calories`);
+    if (effectiveMinProtein) constraints.push(`with at least ${effectiveMinProtein}g protein`);
     if (effectiveMaxCarbs) constraints.push(`under ${effectiveMaxCarbs}g carbs`);
-    if (effectiveMinFats) constraints.push(`at least ${effectiveMinFats}g fat`);
-    if (effectiveMaxFats) constraints.push(`under ${effectiveMaxFats}g fat`);
+    if (effectiveMaxFat) constraints.push(`under ${effectiveMaxFat}g fat`);
     
     if (mealCount === 0) {
       summary = `Found 0 ${dishTypeDisplay.toLowerCase()}`;
@@ -2648,14 +1495,10 @@ export async function searchHandler(params: SearchParams) {
   } else if (mealCount > 0) {
     // Generic summary when no dish type
     const constraints: string[] = [];
-    if (effectiveMinCalories) constraints.push(`at least ${effectiveMinCalories} calories`);
-    if (effectiveMaxCalories) constraints.push(`under ${effectiveMaxCalories} calories`);
-    if (effectiveMinProtein) constraints.push(`at least ${effectiveMinProtein}g protein`);
-    if (effectiveMaxProtein) constraints.push(`under ${effectiveMaxProtein}g protein`);
-    if (effectiveMinCarbs) constraints.push(`at least ${effectiveMinCarbs}g carbs`);
+    if (effectiveCalorieCap) constraints.push(`under ${effectiveCalorieCap} calories`);
+    if (effectiveMinProtein) constraints.push(`with at least ${effectiveMinProtein}g protein`);
     if (effectiveMaxCarbs) constraints.push(`under ${effectiveMaxCarbs}g carbs`);
-    if (effectiveMinFats) constraints.push(`at least ${effectiveMinFats}g fat`);
-    if (effectiveMaxFats) constraints.push(`under ${effectiveMaxFats}g fat`);
+    if (effectiveMaxFat) constraints.push(`under ${effectiveMaxFat}g fat`);
     
     if (constraints.length > 0) {
       summary = `Found ${mealCount} meal${mealCount !== 1 ? 's' : ''} ${constraints.join(', ')}.`;
@@ -2680,17 +1523,13 @@ export async function searchHandler(params: SearchParams) {
     returnedCount: slicedItems.length,
     hasMore,
     totalAvailable: deduplicatedMeals.length,
-      effectiveConstraints: {
-        minCalories: effectiveMinCalories,
-        maxCalories: effectiveMaxCalories,
-        minProtein: effectiveMinProtein,
-        maxProtein: effectiveMaxProtein,
-        minCarbs: effectiveMinCarbs,
-        maxCarbs: effectiveMaxCarbs,
-        minFats: effectiveMinFats,
-        maxFats: effectiveMaxFats,
-        restaurant: effectiveRestaurant || '(none)'
-      }
+    effectiveConstraints: {
+      calorieCap: effectiveCalorieCap,
+      minProtein: effectiveMinProtein,
+      maxCarbs: effectiveMaxCarbs,
+      maxFat: effectiveMaxFat,
+      restaurant: effectiveRestaurant || '(none)'
+    }
   });
   
   return {

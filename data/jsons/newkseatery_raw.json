@@ -1,0 +1,846 @@
+
+{
+    "restaurant_name": "Newk's Eatery",
+    "items": [
+    {
+    "name": "Asian Chicken Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 720,
+    "protein": 45,
+    "carbs": 49,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Caesar Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 230,
+    "protein": 7,
+    "carbs": 19,
+    "fat": 13
+    }
+    },
+    {
+    "name": "Cobb Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 910,
+    "protein": 55,
+    "carbs": 44,
+    "fat": 54
+    }
+    },
+    {
+    "name": "Garden Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 310,
+    "protein": 10,
+    "carbs": 25,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Greek Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 200,
+    "protein": 7,
+    "carbs": 14,
+    "fat": 11
+    }
+    },
+    {
+    "name": "Newk's Favorite Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 740,
+    "protein": 43,
+    "carbs": 62,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Pesto Pasta Chicken Caesar Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1020,
+    "protein": 48,
+    "carbs": 48,
+    "fat": 69
+    }
+    },
+    {
+    "name": "Salmon Caesar Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 770,
+    "protein": 37,
+    "carbs": 32,
+    "fat": 53
+    }
+    },
+    {
+    "name": "Shrimp & Avocado Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 380,
+    "protein": 25,
+    "carbs": 12,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Southern Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 560,
+    "protein": 27,
+    "carbs": 22,
+    "fat": 41
+    }
+    },
+    {
+    "name": "The Trio",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 60,
+    "protein": 3,
+    "carbs": 12,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Ultimate Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 660,
+    "protein": 64,
+    "carbs": 23,
+    "fat": 32
+    }
+    },
+    {
+    "name": "Add All-Natural Chicken",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 170,
+    "protein": 32,
+    "carbs": 0,
+    "fat": 4
+    }
+    },
+    {
+    "name": "Add Atlantic Salmon",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 480,
+    "protein": 33,
+    "carbs": 0,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Add Chicken Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 230,
+    "protein": 14,
+    "carbs": 2,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Add Seasoned Shrimp",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 110,
+    "protein": 18,
+    "carbs": 0,
+    "fat": 4
+    }
+    },
+    {
+    "name": "Add Steak",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 70,
+    "protein": 5,
+    "carbs": 0,
+    "fat": 4
+    }
+    },
+    {
+    "name": "Balsamic Vinaigrette",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 350,
+    "protein": 0,
+    "carbs": 4,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Bleu Cheese Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 350,
+    "protein": 2,
+    "carbs": 2,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Caesar Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 330,
+    "protein": 1,
+    "carbs": 2,
+    "fat": 35
+    }
+    },
+    {
+    "name": "Greek Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 450,
+    "protein": 0,
+    "carbs": 1,
+    "fat": 48
+    }
+    },
+    {
+    "name": "Honey Mustard Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 330,
+    "protein": 0,
+    "carbs": 30,
+    "fat": 23
+    }
+    },
+    {
+    "name": "Lemon Basil Vinaigrette",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 280,
+    "protein": 0,
+    "carbs": 6,
+    "fat": 31
+    }
+    },
+    {
+    "name": "Ranch Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 250,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 21
+    }
+    },
+    {
+    "name": "Sherry Vinaigrette",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 270,
+    "protein": 0,
+    "carbs": 20,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Chicken Bacon Club Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1010,
+    "protein": 56,
+    "carbs": 88,
+    "fat": 45
+    }
+    },
+    {
+    "name": "Chicken Salad Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 940,
+    "protein": 43,
+    "carbs": 75,
+    "fat": 51
+    }
+    },
+    {
+    "name": "French Dip Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 810,
+    "protein": 42,
+    "carbs": 79,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Ham & Swiss Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 710,
+    "protein": 38,
+    "carbs": 75,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Newk's Club Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 880,
+    "protein": 46,
+    "carbs": 88,
+    "fat": 35
+    }
+    },
+    {
+    "name": "Newk's Double Club Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1160,
+    "protein": 70,
+    "carbs": 88,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Pesto Chicken Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 830,
+    "protein": 56,
+    "carbs": 77,
+    "fat": 31
+    }
+    },
+    {
+    "name": "Pimiento Cheese Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 960,
+    "protein": 33,
+    "carbs": 78,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Portabella Veggie Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 690,
+    "protein": 24,
+    "carbs": 81,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Roast Beef Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 680,
+    "protein": 40,
+    "carbs": 74,
+    "fat": 21
+    }
+    },
+    {
+    "name": "Shrimp Po'Boy Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 670,
+    "protein": 31,
+    "carbs": 83,
+    "fat": 21
+    }
+    },
+    {
+    "name": "The Italian Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1170,
+    "protein": 38,
+    "carbs": 76,
+    "fat": 70
+    }
+    },
+    {
+    "name": "Tuna Salad Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1000,
+    "protein": 50,
+    "carbs": 79,
+    "fat": 53
+    }
+    },
+    {
+    "name": "Turkey & Swiss Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 700,
+    "protein": 43,
+    "carbs": 76,
+    "fat": 21
+    }
+    },
+    {
+    "name": "Turkey Avocado Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 790,
+    "protein": 44,
+    "carbs": 84,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Chicken Caesar Wrap",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 820,
+    "protein": 30,
+    "carbs": 52,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Chicken Salad Wrap",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 610,
+    "protein": 26,
+    "carbs": 52,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Chipotle Shrimp Caesar Wrap",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 900,
+    "protein": 27,
+    "carbs": 63,
+    "fat": 60
+    }
+    },
+    {
+    "name": "Newk's Q Wrap",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 970,
+    "protein": 35,
+    "carbs": 55,
+    "fat": 65
+    }
+    },
+    {
+    "name": "Newk's Club Wrap",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 820,
+    "protein": 36,
+    "carbs": 70,
+    "fat": 42
+    }
+    },
+    {
+    "name": "BBQ Chicken Pizza",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 770,
+    "protein": 49,
+    "carbs": 86,
+    "fat": 24
+    }
+    },
+    {
+    "name": "Margherita Pizza",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 510,
+    "protein": 25,
+    "carbs": 52,
+    "fat": 21
+    }
+    },
+    {
+    "name": "Mediterranean Pizza",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 740,
+    "protein": 53,
+    "carbs": 54,
+    "fat": 32
+    }
+    },
+    {
+    "name": "Newk's Q Pizza",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1110,
+    "protein": 55,
+    "carbs": 52,
+    "fat": 72
+    }
+    },
+    {
+    "name": "Pepperoni Pizza",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 730,
+    "protein": 36,
+    "carbs": 50,
+    "fat": 39
+    }
+    },
+    {
+    "name": "Portabella Veggie Pizza",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 830,
+    "protein": 31,
+    "carbs": 57,
+    "fat": 51
+    }
+    },
+    {
+    "name": "Sausage & Pepperoni Pizza",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 880,
+    "protein": 43,
+    "carbs": 52,
+    "fat": 51
+    }
+    },
+    {
+    "name": "Spicy Shrimp Pizza",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 770,
+    "protein": 47,
+    "carbs": 53,
+    "fat": 39
+    }
+    },
+    {
+    "name": "Supreme Pizza",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 810,
+    "protein": 36,
+    "carbs": 57,
+    "fat": 45
+    }
+    },
+    {
+    "name": "Five Cheese Mac & Cheese - Full",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 790,
+    "protein": 28,
+    "carbs": 55,
+    "fat": 49
+    }
+    },
+    {
+    "name": "Six Cheese Pimiento Mac & Cheese with Bacon - Full",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1090,
+    "protein": 39,
+    "carbs": 43,
+    "fat": 82
+    }
+    },
+    {
+    "name": "Chicken Tortilla Soup - Bowl",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 290,
+    "protein": 17,
+    "carbs": 30,
+    "fat": 8
+    }
+    },
+    {
+    "name": "Loaded Potato Soup - Bowl",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 650,
+    "protein": 13,
+    "carbs": 34,
+    "fat": 51
+    }
+    },
+    {
+    "name": "Lobster Bisque Soup - Bowl",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 730,
+    "protein": 10,
+    "carbs": 47,
+    "fat": 57
+    }
+    },
+    {
+    "name": "Pepperjack and Crawfish Soup - Bowl",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 640,
+    "protein": 28,
+    "carbs": 22,
+    "fat": 50
+    }
+    },
+    {
+    "name": "Tomato Basil Soup - Bowl",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 580,
+    "protein": 8,
+    "carbs": 40,
+    "fat": 43
+    }
+    },
+    {
+    "name": "Chicken Salad on Croissant",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 830,
+    "protein": 37,
+    "carbs": 44,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Chicken Salad on Wheatberry",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 900,
+    "protein": 45,
+    "carbs": 76,
+    "fat": 47
+    }
+    },
+    {
+    "name": "Ham on Croissant",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 560,
+    "protein": 30,
+    "carbs": 42,
+    "fat": 30
+    }
+    },
+    {
+    "name": "Ham on Wheatberry",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 620,
+    "protein": 40,
+    "carbs": 74,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Pimiento Cheese on Wheatberry",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 990,
+    "protein": 35,
+    "carbs": 78,
+    "fat": 61
+    }
+    },
+    {
+    "name": "Roast Beef on Croissant",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 530,
+    "protein": 33,
+    "carbs": 41,
+    "fat": 24
+    }
+    },
+    {
+    "name": "Roast Beef on Wheatberry",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 600,
+    "protein": 41,
+    "carbs": 73,
+    "fat": 16
+    }
+    },
+    {
+    "name": "Turkey Breast on Croissant",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 560,
+    "protein": 34,
+    "carbs": 44,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Turkey Breast on Wheatberry",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 620,
+    "protein": 44,
+    "carbs": 76,
+    "fat": 15
+    }
+    }
+    ]
+    }

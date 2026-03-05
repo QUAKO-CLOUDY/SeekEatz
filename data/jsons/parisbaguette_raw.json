@@ -1,0 +1,366 @@
+
+{
+    "restaurant_name": "Tous les Jours",
+    "items": [
+    {
+    "name": "4-Cheese Quiche",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 370,
+    "protein": 12,
+    "carbs": 23,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Crab Meat Croquette",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 300,
+    "protein": 7,
+    "carbs": 35,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Curry Croquette",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 240,
+    "protein": 6,
+    "carbs": 34,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Ham & Cheese Pastry",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 380,
+    "protein": 13,
+    "carbs": 30,
+    "fat": 23
+    }
+    },
+    {
+    "name": "Hash Brown Bread",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 420,
+    "protein": 12,
+    "carbs": 44,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Pastry Frank",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 400,
+    "protein": 11,
+    "carbs": 24,
+    "fat": 29
+    }
+    },
+    {
+    "name": "Pepperoni Pizzetta",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 360,
+    "protein": 14,
+    "carbs": 21,
+    "fat": 24
+    }
+    },
+    {
+    "name": "Salted Butter Twist Roll",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 250,
+    "protein": 5,
+    "carbs": 27,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Smoked Sausage Bread",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 430,
+    "protein": 14,
+    "carbs": 32,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Quiche Lorraine",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 390,
+    "protein": 12,
+    "carbs": 21,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Cheddar Cheese Twist",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 270,
+    "protein": 7,
+    "carbs": 26,
+    "fat": 15
+    }
+    },
+    {
+    "name": "Bacon, Egg & Cheddar Croissant",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 510,
+    "protein": 20,
+    "carbs": 24,
+    "fat": 36
+    }
+    },
+    {
+    "name": "Egg & Cheddar Twist Roll",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 420,
+    "protein": 16,
+    "carbs": 29,
+    "fat": 27
+    }
+    },
+    {
+    "name": "Ham, Egg & Swiss Twist Roll",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 470,
+    "protein": 22,
+    "carbs": 30,
+    "fat": 29
+    }
+    },
+    {
+    "name": "Sourdough Supreme Breakfast Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 740,
+    "protein": 38,
+    "carbs": 76,
+    "fat": 30
+    }
+    },
+    {
+    "name": "Grilled Cheese",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 820,
+    "protein": 38,
+    "carbs": 88,
+    "fat": 36
+    }
+    },
+    {
+    "name": "Sourdough Turkey Melt",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 740,
+    "protein": 41,
+    "carbs": 78,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Caprese Baguette",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 520,
+    "protein": 25,
+    "carbs": 58,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Chicken Caesar Wrap",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 700,
+    "protein": 36,
+    "carbs": 49,
+    "fat": 40
+    }
+    },
+    {
+    "name": "Egg Salad Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 580,
+    "protein": 25,
+    "carbs": 40,
+    "fat": 35
+    }
+    },
+    {
+    "name": "Ham & Cheese Baguette",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 560,
+    "protein": 29,
+    "carbs": 55,
+    "fat": 24
+    }
+    },
+    {
+    "name": "Harvest Chicken Salad Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 600,
+    "protein": 23,
+    "carbs": 48,
+    "fat": 35
+    }
+    },
+    {
+    "name": "Tuna Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 650,
+    "protein": 23,
+    "carbs": 43,
+    "fat": 43
+    }
+    },
+    {
+    "name": "Turkey Avocado Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 390,
+    "protein": 20,
+    "carbs": 44,
+    "fat": 15
+    }
+    },
+    {
+    "name": "Tuna Melt Sourdough Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 800,
+    "protein": 37,
+    "carbs": 85,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Ham & Swiss Twist Roll",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 360,
+    "protein": 15,
+    "carbs": 29,
+    "fat": 21
+    }
+    },
+    {
+    "name": "Turkey & Cheddar Twist Roll",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 370,
+    "protein": 17,
+    "carbs": 29,
+    "fat": 21
+    }
+    },
+    {
+    "name": "Strawberry Smoothie (16 oz)",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 400,
+    "protein": 0,
+    "carbs": 102,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Mango Smoothie (16 oz)",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 320,
+    "protein": 0,
+    "carbs": 81,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Strawberry Banana Smoothie (16 oz)",
+    "category": "Smoothie",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 280,
+    "protein": 1,
+    "carbs": 67,
+    "fat": 0
+    }
+    }
+    ]
+    }

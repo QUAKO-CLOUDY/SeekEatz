@@ -1,0 +1,690 @@
+
+{
+    "restaurant_name": "Sweetfin",
+    "items": [
+    {
+    "name": "Sweetbox",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 680,
+    "protein": 29,
+    "carbs": 51,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Brain Booster Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 880,
+    "protein": 29,
+    "carbs": 46,
+    "fat": 70
+    }
+    },
+    {
+    "name": "Brain Booster Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 530,
+    "protein": 19,
+    "carbs": 27,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Classic Tuna Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 520,
+    "protein": 33,
+    "carbs": 23,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Classic Tuna Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 420,
+    "protein": 22,
+    "carbs": 20,
+    "fat": 29
+    }
+    },
+    {
+    "name": "Gochujang Salmon Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 440,
+    "protein": 27,
+    "carbs": 38,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Gochujang Salmon Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 310,
+    "protein": 18,
+    "carbs": 26,
+    "fat": 16
+    }
+    },
+    {
+    "name": "Grasshopper",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 110,
+    "protein": 5,
+    "carbs": 11,
+    "fat": 5
+    }
+    },
+    {
+    "name": "Immunity Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 720,
+    "protein": 38,
+    "carbs": 97,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Immunity Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 460,
+    "protein": 24,
+    "carbs": 65,
+    "fat": 11
+    }
+    },
+    {
+    "name": "Keto Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 750,
+    "protein": 33,
+    "carbs": 22,
+    "fat": 62
+    }
+    },
+    {
+    "name": "Keto Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 430,
+    "protein": 20,
+    "carbs": 13,
+    "fat": 35
+    }
+    },
+    {
+    "name": "Mango Albacore Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 450,
+    "protein": 35,
+    "carbs": 26,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Mango Albacore Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 300,
+    "protein": 23,
+    "carbs": 17,
+    "fat": 15
+    }
+    },
+    {
+    "name": "Miso Eggplant & Mushroom Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 430,
+    "protein": 8,
+    "carbs": 33,
+    "fat": 32
+    }
+    },
+    {
+    "name": "Miso Eggplant & Mushroom Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 300,
+    "protein": 6,
+    "carbs": 22,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Plant Protein Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 710,
+    "protein": 20,
+    "carbs": 113,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Plant Protein Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 420,
+    "protein": 12,
+    "carbs": 69,
+    "fat": 12
+    }
+    },
+    {
+    "name": "Protein Power Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 900,
+    "protein": 42,
+    "carbs": 106,
+    "fat": 40
+    }
+    },
+    {
+    "name": "Protein Power Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 630,
+    "protein": 31,
+    "carbs": 75,
+    "fat": 27
+    }
+    },
+    {
+    "name": "Shiitake Chile Tofu Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 470,
+    "protein": 15,
+    "carbs": 15,
+    "fat": 39
+    }
+    },
+    {
+    "name": "Shiitake Chile Tofu Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 310,
+    "protein": 10,
+    "carbs": 11,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Spicy Tuna Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 600,
+    "protein": 37,
+    "carbs": 22,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Spicy Tuna Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 490,
+    "protein": 25,
+    "carbs": 20,
+    "fat": 35
+    }
+    },
+    {
+    "name": "Sriracha Tuna Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 700,
+    "protein": 38,
+    "carbs": 43,
+    "fat": 46
+    }
+    },
+    {
+    "name": "Sriracha Tuna Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 430,
+    "protein": 25,
+    "carbs": 28,
+    "fat": 27
+    }
+    },
+    {
+    "name": "Superfood Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 740,
+    "protein": 38,
+    "carbs": 86,
+    "fat": 27
+    }
+    },
+    {
+    "name": "Superfood Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 470,
+    "protein": 24,
+    "carbs": 54,
+    "fat": 18
+    }
+    },
+    {
+    "name": "Sweet Potato Ponzu Lime Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 360,
+    "protein": 9,
+    "carbs": 40,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Sweet Potato Ponzu Lime Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 320,
+    "protein": 8,
+    "carbs": 30,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Truffled Yuzu Albacore Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 590,
+    "protein": 33,
+    "carbs": 19,
+    "fat": 45
+    }
+    },
+    {
+    "name": "Truffled Yuzu Albacore Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 450,
+    "protein": 23,
+    "carbs": 17,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Yuzu Salmon Bowl, Large",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 570,
+    "protein": 31,
+    "carbs": 21,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Yuzu Salmon Bowl, Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 450,
+    "protein": 21,
+    "carbs": 18,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Sesame Crunch Chicken Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 790,
+    "protein": 35,
+    "carbs": 41,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Cilantro Chopped Chicken Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 520,
+    "protein": 30,
+    "carbs": 18,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Spicy Chicken Rice Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 740,
+    "protein": 43,
+    "carbs": 101,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Black Garlic Gochujang, Large",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 150,
+    "protein": 1,
+    "carbs": 7,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Black Garlic Gochujang, Small",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 80,
+    "protein": 0,
+    "carbs": 3,
+    "fat": 7
+    }
+    },
+    {
+    "name": "Spicy Mayo, Large",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 130,
+    "protein": 1,
+    "carbs": 2,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Spicy Mayo, Small",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 70,
+    "protein": 1,
+    "carbs": 1,
+    "fat": 7
+    }
+    },
+    {
+    "name": "Miso Sesame Shoyu, Large",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 100,
+    "protein": 0,
+    "carbs": 3,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Miso Sesame Shoyu, Small",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 50,
+    "protein": 0,
+    "carbs": 2,
+    "fat": 5
+    }
+    },
+    {
+    "name": "Ponzu Lime, Large",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 35,
+    "protein": 0,
+    "carbs": 6,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Ponzu Lime, Small",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 15,
+    "protein": 0,
+    "carbs": 3,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Sriracha Ponzu, Large",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 60,
+    "protein": 1,
+    "carbs": 4,
+    "fat": 4
+    }
+    },
+    {
+    "name": "Sriracha Ponzu, Small",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 30,
+    "protein": 0,
+    "carbs": 2,
+    "fat": 2
+    }
+    },
+    {
+    "name": "Yuzu Kosho, Large",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 60,
+    "protein": 1,
+    "carbs": 2,
+    "fat": 5
+    }
+    },
+    {
+    "name": "Yuzu Kosho, Small",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 30,
+    "protein": 0,
+    "carbs": 1,
+    "fat": 3
+    }
+    },
+    {
+    "name": "Cilantro Lime Jalapeno Vinaigrette",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 130,
+    "protein": 0,
+    "carbs": 2,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Sesame Mayo",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 150,
+    "protein": 0,
+    "carbs": 1,
+    "fat": 15
+    }
+    },
+    {
+    "name": "Garlic Lemongrass Ponzu",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 40,
+    "protein": 0,
+    "carbs": 7,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Poke Burrito (High Range)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 990,
+    "protein": 27,
+    "carbs": 80,
+    "fat": 73
+    }
+    },
+    {
+    "name": "Poke Burrito (Low Range)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 850,
+    "protein": 18,
+    "carbs": 65,
+    "fat": 68
+    }
+    },
+    {
+    "name": "Poke Burrito (Signature)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 910,
+    "protein": 29,
+    "carbs": 78,
+    "fat": 63
+    }
+    },
+    {
+    "name": "Sweetbox, Plant-based",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 530,
+    "protein": 11,
+    "carbs": 76,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Sweetbox, Low Range",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 440,
+    "protein": 8,
+    "carbs": 46,
+    "fat": 25
+    }
+    }
+    ]
+    }

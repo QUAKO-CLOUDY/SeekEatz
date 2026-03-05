@@ -1,0 +1,678 @@
+{
+    "restaurant_name": "Magoo's Chicken & Tenders",
+    "items": [
+    {
+    "name": "Plain Hand-Breaded Tender",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 110,
+    "protein": 10,
+    "carbs": 4,
+    "fat": 6
+    }
+    },
+    {
+    "name": "Buffalo Hand-Breaded Tender",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 120,
+    "protein": 10,
+    "carbs": 5,
+    "fat": 7
+    }
+    },
+    {
+    "name": "Lemon Pepper Hand-Breaded Tender",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 200,
+    "protein": 10,
+    "carbs": 4,
+    "fat": 16
+    }
+    },
+    {
+    "name": "Garlic Parmesan Hand-Breaded Tender",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 170,
+    "protein": 11,
+    "carbs": 6,
+    "fat": 11
+    }
+    },
+    {
+    "name": "Sweet Red Chili Hand-Breaded Tender",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 170,
+    "protein": 10,
+    "carbs": 19,
+    "fat": 6
+    }
+    },
+    {
+    "name": "Plain Hand-Breaded Tender Bite",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 60,
+    "protein": 5,
+    "carbs": 2,
+    "fat": 3
+    }
+    },
+    {
+    "name": "Buffalo Hand-Breaded Tender Bite",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 60,
+    "protein": 5,
+    "carbs": 2,
+    "fat": 3
+    }
+    },
+    {
+    "name": "Lemon Pepper Hand-Breaded Tender Bite",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 100,
+    "protein": 5,
+    "carbs": 2,
+    "fat": 8
+    }
+    },
+    {
+    "name": "Garlic Parmesan Hand-Breaded Tender Bite",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 80,
+    "protein": 5,
+    "carbs": 3,
+    "fat": 5
+    }
+    },
+    {
+    "name": "Sweet Red Chili Hand-Breaded Tender Bite",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 80,
+    "protein": 5,
+    "carbs": 10,
+    "fat": 3
+    }
+    },
+    {
+    "name": "Plain Grilled Tender",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 60,
+    "protein": 12,
+    "carbs": 0,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Buffalo Grilled Tender",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 70,
+    "protein": 12,
+    "carbs": 1,
+    "fat": 2
+    }
+    },
+    {
+    "name": "Lemon Pepper Grilled Tender",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 150,
+    "protein": 12,
+    "carbs": 0,
+    "fat": 11
+    }
+    },
+    {
+    "name": "Garlic Parmesan Grilled Tender",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 120,
+    "protein": 12,
+    "carbs": 2,
+    "fat": 7
+    }
+    },
+    {
+    "name": "Sweet Red Chili Grilled Tender",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 120,
+    "protein": 12,
+    "carbs": 15,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Plain Grilled Tender Bite",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 30,
+    "protein": 6,
+    "carbs": 0,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Buffalo Grilled Tender Bite",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 30,
+    "protein": 6,
+    "carbs": 0,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Lemon Pepper Grilled Tender Bite",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 70,
+    "protein": 6,
+    "carbs": 0,
+    "fat": 5
+    }
+    },
+    {
+    "name": "Garlic Parmesan Grilled Tender Bite",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 50,
+    "protein": 6,
+    "carbs": 1,
+    "fat": 3
+    }
+    },
+    {
+    "name": "Sweet Red Chili Grilled Tender Bite",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 60,
+    "protein": 6,
+    "carbs": 8,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Magoo's Sandwich (Hand-Breaded Tenders)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 780,
+    "protein": 38,
+    "carbs": 46,
+    "fat": 49
+    }
+    },
+    {
+    "name": "Buffalo Sandwich (Hand-Breaded Tenders)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 690,
+    "protein": 34,
+    "carbs": 48,
+    "fat": 40
+    }
+    },
+    {
+    "name": "Magoo's Sandwich (Grilled Tenders)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 620,
+    "protein": 43,
+    "carbs": 33,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Buffalo Sandwich (Grilled Tenders)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 550,
+    "protein": 39,
+    "carbs": 37,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Magoo's Wrap (Hand-Breaded Tenders)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 860,
+    "protein": 45,
+    "carbs": 56,
+    "fat": 50
+    }
+    },
+    {
+    "name": "Buffalo Wrap (Hand-Breaded Tenders)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 730,
+    "protein": 40,
+    "carbs": 56,
+    "fat": 39
+    }
+    },
+    {
+    "name": "Magoo's Wrap (Grilled Tenders)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 690,
+    "protein": 50,
+    "carbs": 43,
+    "fat": 36
+    }
+    },
+    {
+    "name": "Buffalo Wrap (Grilled Tenders)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 600,
+    "protein": 49,
+    "carbs": 42,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Magoo's Favorite Salad with Raspberry Walnut Vinaigrette (Hand-Breaded Bites)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1130,
+    "protein": 44,
+    "carbs": 66,
+    "fat": 78
+    }
+    },
+    {
+    "name": "Buffalo Salad with Ranch (Hand-Breaded Bites)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 850,
+    "protein": 43,
+    "carbs": 27,
+    "fat": 65
+    }
+    },
+    {
+    "name": "Farm Fresh Salad with Honey Mustard (Hand-Breaded Bites)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 940,
+    "protein": 49,
+    "carbs": 59,
+    "fat": 59
+    }
+    },
+    {
+    "name": "Magoo's Favorite Salad with Raspberry Walnut Vinaigrette (Hand-Breaded Tenders)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1160,
+    "protein": 47,
+    "carbs": 67,
+    "fat": 80
+    }
+    },
+    {
+    "name": "Buffalo Salad with Ranch (Hand-Breaded Tenders)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 900,
+    "protein": 46,
+    "carbs": 30,
+    "fat": 68
+    }
+    },
+    {
+    "name": "Farm Fresh Salad with Honey Mustard (Hand-Breaded Tenders)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 970,
+    "protein": 52,
+    "carbs": 60,
+    "fat": 61
+    }
+    },
+    {
+    "name": "Magoo's Favorite Salad with Raspberry Walnut Vinaigrette (Grilled Bites)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 930,
+    "protein": 50,
+    "carbs": 51,
+    "fat": 61
+    }
+    },
+    {
+    "name": "Buffalo Salad with Ranch (Grilled Bites)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 680,
+    "protein": 48,
+    "carbs": 13,
+    "fat": 50
+    }
+    },
+    {
+    "name": "Farm Fresh Salad with Honey Mustard (Grilled Bites)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 750,
+    "protein": 55,
+    "carbs": 43,
+    "fat": 42
+    }
+    },
+    {
+    "name": "Magoo's Favorite Salad with Raspberry Walnut Vinaigrette (Grilled Tenders)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 950,
+    "protein": 53,
+    "carbs": 51,
+    "fat": 62
+    }
+    },
+    {
+    "name": "Buffalo Salad with Ranch (Grilled Tenders)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 720,
+    "protein": 52,
+    "carbs": 15,
+    "fat": 52
+    }
+    },
+    {
+    "name": "Farm Fresh Salad with Honey Mustard (Grilled Tenders)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 760,
+    "protein": 58,
+    "carbs": 43,
+    "fat": 43
+    }
+    },
+    {
+    "name": "Magoo's Dip",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 300,
+    "protein": 0,
+    "carbs": 2,
+    "fat": 32
+    }
+    },
+    {
+    "name": "Spicy Magoo's Dip",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 210,
+    "protein": 0,
+    "carbs": 2,
+    "fat": 23
+    }
+    },
+    {
+    "name": "Ranch Dip",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 170,
+    "protein": 1,
+    "carbs": 1,
+    "fat": 18
+    }
+    },
+    {
+    "name": "Buffalo Dip",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 30,
+    "protein": 0,
+    "carbs": 3,
+    "fat": 3
+    }
+    },
+    {
+    "name": "Barbeque Dip",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 110,
+    "protein": 0,
+    "carbs": 29,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Sweet Red Chili Dip",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 100,
+    "protein": 0,
+    "carbs": 26,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Garlic Parmesan Dip",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 130,
+    "protein": 0,
+    "carbs": 3,
+    "fat": 13
+    }
+    },
+    {
+    "name": "Honey Mustard Dip",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 170,
+    "protein": 0,
+    "carbs": 13,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Blue Cheese Dip",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 230,
+    "protein": 2,
+    "carbs": 2,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Lemon Pepper Dip",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 450,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 49
+    }
+    },
+    {
+    "name": "Lite Tuscan Italian Dressing",
+    "category": "Dressing",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 25,
+    "protein": 0,
+    "carbs": 5,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Lite Balsamic Vinaigrette Dressing",
+    "category": "Dressing",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 110,
+    "protein": 0,
+    "carbs": 6,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Ranch Dressing",
+    "category": "Dressing",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 170,
+    "protein": 1,
+    "carbs": 1,
+    "fat": 18
+    }
+    },
+    {
+    "name": "Honey Mustard Dressing",
+    "category": "Dressing",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 170,
+    "protein": 0,
+    "carbs": 13,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Blue Cheese Dressing",
+    "category": "Dressing",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 230,
+    "protein": 2,
+    "carbs": 2,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Raspberry Walnut Vinaigrette Dressing",
+    "category": "Dressing",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 210,
+    "protein": 0,
+    "carbs": 8,
+    "fat": 19
+    }
+    }
+    ]
+    }
+    

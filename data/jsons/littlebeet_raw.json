@@ -1,0 +1,462 @@
+
+{
+    "restaurant_name": "Little Beet",
+    "items": [
+    {
+    "name": "Beet Falafel Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 840,
+    "protein": 26,
+    "carbs": 118,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Brussel Hustle Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 980,
+    "protein": 48,
+    "carbs": 58,
+    "fat": 65
+    }
+    },
+    {
+    "name": "Chicken Esquites Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 810,
+    "protein": 40,
+    "carbs": 69,
+    "fat": 44
+    }
+    },
+    {
+    "name": "Fall Miso Tofu Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 570,
+    "protein": 22,
+    "carbs": 36,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Harvest Turkey Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 750,
+    "protein": 13,
+    "carbs": 129,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Low FODMAP Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 840,
+    "protein": 49,
+    "carbs": 110,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Paleo Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 900,
+    "protein": 34,
+    "carbs": 66,
+    "fat": 58
+    }
+    },
+    {
+    "name": "Pork Apple Fennel Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 720,
+    "protein": 51,
+    "carbs": 56,
+    "fat": 32
+    }
+    },
+    {
+    "name": "Salmon Apple Fennel Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 560,
+    "protein": 34,
+    "carbs": 52,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Seasonal Steak Plate",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 920,
+    "protein": 54,
+    "carbs": 70,
+    "fat": 50
+    }
+    },
+    {
+    "name": "Seasonal Turkey Plate",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 660,
+    "protein": 21,
+    "carbs": 73,
+    "fat": 36
+    }
+    },
+    {
+    "name": "Shawarma Chicken Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 870,
+    "protein": 49,
+    "carbs": 49,
+    "fat": 56
+    }
+    },
+    {
+    "name": "Shrimp Esquites Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 710,
+    "protein": 33,
+    "carbs": 66,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Spicy Chicken Apple Fennel Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 590,
+    "protein": 38,
+    "carbs": 56,
+    "fat": 23
+    }
+    },
+    {
+    "name": "Steak & Brussels Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 920,
+    "protein": 47,
+    "carbs": 93,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Steak Esquites Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 890,
+    "protein": 42,
+    "carbs": 66,
+    "fat": 54
+    }
+    },
+    {
+    "name": "Whole30 Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 730,
+    "protein": 49,
+    "carbs": 67,
+    "fat": 31
+    }
+    },
+    {
+    "name": "Yuzu Poké Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 615,
+    "protein": 29,
+    "carbs": 25,
+    "fat": 47
+    }
+    },
+    {
+    "name": "Baked Beet Falafel",
+    "category": "Protein",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 190,
+    "protein": 6,
+    "carbs": 24,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Braised Pork",
+    "category": "Protein",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 360,
+    "protein": 44,
+    "carbs": 4,
+    "fat": 17
+    }
+    },
+    {
+    "name": "Grilled Steak",
+    "category": "Protein",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 320,
+    "protein": 34,
+    "carbs": 0,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Herb-Roasted Turkey",
+    "category": "Protein",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 60,
+    "protein": 0,
+    "carbs": 4,
+    "fat": 5
+    }
+    },
+    {
+    "name": "Miso Tofu",
+    "category": "Protein",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 150,
+    "protein": 12,
+    "carbs": 7,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Oven-Roasted Salmon",
+    "category": "Protein",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 210,
+    "protein": 28,
+    "carbs": 0,
+    "fat": 11
+    }
+    },
+    {
+    "name": "Roasted Chicken",
+    "category": "Protein",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 270,
+    "protein": 38,
+    "carbs": 1,
+    "fat": 12
+    }
+    },
+    {
+    "name": "Roasted Shrimp",
+    "category": "Protein",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 140,
+    "protein": 25,
+    "carbs": 0,
+    "fat": 4
+    }
+    },
+    {
+    "name": "Salmon Poké",
+    "category": "Protein",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 140,
+    "protein": 22,
+    "carbs": 2,
+    "fat": 5
+    }
+    },
+    {
+    "name": "Spicy Plancha Chicken",
+    "category": "Protein",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 235,
+    "protein": 31,
+    "carbs": 4,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Beet Hummus",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 45,
+    "protein": 2,
+    "carbs": 4,
+    "fat": 3
+    }
+    },
+    {
+    "name": "Chimichurri",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 130,
+    "protein": 0,
+    "carbs": 1,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Chipotle Aioli",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 140,
+    "protein": 0,
+    "carbs": 3,
+    "fat": 15
+    }
+    },
+    {
+    "name": "Cranberry Harissa",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 50,
+    "protein": 0,
+    "carbs": 13,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Guacamole",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 40,
+    "protein": 1,
+    "carbs": 3,
+    "fat": 4
+    }
+    },
+    {
+    "name": "Lemon Tahini",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 100,
+    "protein": 3,
+    "carbs": 4,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Miso Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 70,
+    "protein": 1,
+    "carbs": 7,
+    "fat": 4
+    }
+    },
+    {
+    "name": "Scallion Yogurt Dip",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 20,
+    "protein": 1,
+    "carbs": 2,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Sweet Chili Garlic",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 40,
+    "protein": 0,
+    "carbs": 3,
+    "fat": 3
+    }
+    },
+    {
+    "name": "Turmeric Tahini",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 70,
+    "protein": 2,
+    "carbs": 3,
+    "fat": 6
+    }
+    }
+    ]
+    }

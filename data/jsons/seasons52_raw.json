@@ -1,0 +1,737 @@
+{
+    "restaurant_name": "Seasons 52",
+    "items": [
+      {
+        "name": "Pesto Chicken and Fresh Mozzarella",
+        "category": "FLATBREADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 35,
+          "carbs": 42,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Roasted Mushroom",
+        "category": "FLATBREADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 560,
+          "protein": 23,
+          "carbs": 47,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Roasted Tomato",
+        "category": "FLATBREADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 450,
+          "protein": 20,
+          "carbs": 49,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Philly Cheesesteak",
+        "category": "FLATBREADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 540,
+          "protein": 41,
+          "carbs": 43,
+          "fat": 23
+        }
+      },
+      {
+        "name": "All-Natural Pepperoni",
+        "category": "FLATBREADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 580,
+          "protein": 28,
+          "carbs": 50,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Chipotle BBQ Shrimp",
+        "category": "FLATBREADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 500,
+          "protein": 33,
+          "carbs": 47,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Charcuterie Board",
+        "category": "STARTERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 590,
+          "protein": 31,
+          "carbs": 45,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Lump Crab Cake",
+        "category": "STARTERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 300,
+          "protein": 18,
+          "carbs": 8,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Slow-Roasted Meatballs",
+        "category": "STARTERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 580,
+          "protein": 34,
+          "carbs": 58,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Grilled Artichokes with Preserved Lemon Hummus",
+        "category": "STARTERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 580,
+          "protein": 16,
+          "carbs": 50,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Avocado Toast",
+        "category": "STARTERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 370,
+          "protein": 8,
+          "carbs": 42,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Lump Crab and Shrimp-Stuffed Mushrooms",
+        "category": "STARTERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 240,
+          "protein": 25,
+          "carbs": 17,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Ahi Tuna Tartare",
+        "category": "STARTERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 470,
+          "protein": 37,
+          "carbs": 51,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Farmhouse Chicken - Cup",
+        "category": "SOUPS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 200,
+          "protein": 13,
+          "carbs": 19,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Farmhouse Chicken - Bowl",
+        "category": "SOUPS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 280,
+          "protein": 17,
+          "carbs": 30,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Porcini Mushroom Bisque - Cup",
+        "category": "SOUPS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 330,
+          "protein": 4,
+          "carbs": 21,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Porcini Mushroom Bisque - Bowl",
+        "category": "SOUPS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 440,
+          "protein": 6,
+          "carbs": 32,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Lobster Bisque - Cup",
+        "category": "SOUPS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 200,
+          "protein": 5,
+          "carbs": 15,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Lobster Bisque - Bowl",
+        "category": "SOUPS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 250,
+          "protein": 5,
+          "carbs": 18,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Golden Beet",
+        "category": "SMALL SALADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 340,
+          "protein": 9,
+          "carbs": 41,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Romaine Caesar",
+        "category": "SMALL SALADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 370,
+          "protein": 16,
+          "carbs": 24,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Field Greens",
+        "category": "SMALL SALADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 210,
+          "protein": 5,
+          "carbs": 19,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Mediterranean Wood-Grilled Chicken",
+        "category": "ENTRÉE SALADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 590,
+          "protein": 41,
+          "carbs": 28,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Wood-Grilled Tenderloin",
+        "category": "ENTRÉE SALADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 470,
+          "protein": 45,
+          "carbs": 27,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Sesame-Grilled Salmon",
+        "category": "ENTRÉE SALADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 50,
+          "carbs": 32,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Maui Tuna Crunch",
+        "category": "ENTRÉE SALADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 360,
+          "protein": 27,
+          "carbs": 39,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Wood-Grilled Dry-Rubbed Pork Chop",
+        "category": "ENTRÉES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 540,
+          "protein": 35,
+          "carbs": 55,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Rotisserie Half Chicken",
+        "category": "ENTRÉES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 590,
+          "protein": 66,
+          "carbs": 59,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Wood-Grilled Shrimp and Grits",
+        "category": "ENTRÉES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 590,
+          "protein": 47,
+          "carbs": 19,
+          "fat": 37
+        }
+      },
+      {
+        "name": "Brick-Oven Gnocchi",
+        "category": "ENTRÉES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 590,
+          "protein": 16,
+          "carbs": 73,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Wood-Grilled Rainbow Trout",
+        "category": "ENTRÉES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 470,
+          "protein": 44,
+          "carbs": 23,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Black Lentil Bolognese",
+        "category": "ENTRÉES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 550,
+          "protein": 19,
+          "carbs": 78,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Wood-Grilled Filet Mignon - 6 oz.",
+        "category": "ENTRÉES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 530,
+          "protein": 45,
+          "carbs": 26,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Wood-Grilled Filet Mignon - 8 oz.",
+        "category": "ENTRÉES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 590,
+          "protein": 56,
+          "carbs": 26,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Vineyard Chicken",
+        "category": "ENTRÉES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 590,
+          "protein": 45,
+          "carbs": 42,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Wild Alaska \"Butterfish\"",
+        "category": "MAY WE SUGGEST",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 570,
+          "protein": 45,
+          "carbs": 40,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Caramelized Grilled Sea Scallops Entrée",
+        "category": "MAY WE SUGGEST",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 470,
+          "protein": 38,
+          "carbs": 41,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Brick Oven-Roasted Chilean Sea Bass",
+        "category": "MAY WE SUGGEST",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 520,
+          "protein": 46,
+          "carbs": 46,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Cedar Plank-Roasted Salmon",
+        "category": "MAY WE SUGGEST",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 550,
+          "protein": 50,
+          "carbs": 24,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Wood-Grilled Kona Crusted Lamb Loin",
+        "category": "MAY WE SUGGEST",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 590,
+          "protein": 42,
+          "carbs": 22,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Filet Mignon and Maine Lobster Tail",
+        "category": "MAY WE SUGGEST",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 570,
+          "protein": 57,
+          "carbs": 23,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Mac 'N' Cheese",
+        "category": "FOR THE TABLE",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 590,
+          "protein": 20,
+          "carbs": 62,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Caramelized Brussels Sprouts",
+        "category": "FOR THE TABLE",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 270,
+          "protein": 10,
+          "carbs": 17,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Loaded Potato Skillet",
+        "category": "FOR THE TABLE",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 520,
+          "protein": 18,
+          "carbs": 46,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Sweet Potato Skillet",
+        "category": "FOR THE TABLE",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 580,
+          "protein": 9,
+          "carbs": 83,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Truffled Risotto",
+        "category": "FOR THE TABLE",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 12,
+          "carbs": 54,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Cauliflower Au Gratin",
+        "category": "FOR THE TABLE",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 480,
+          "protein": 21,
+          "carbs": 23,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Pesto Chicken and Fresh Mozzarella - Half",
+        "category": "FLATBREAD PAIRINGS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 260,
+          "protein": 17,
+          "carbs": 21,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Roasted Mushroom - Half",
+        "category": "FLATBREAD PAIRINGS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 280,
+          "protein": 12,
+          "carbs": 24,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Roasted Tomato - Half",
+        "category": "FLATBREAD PAIRINGS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 220,
+          "protein": 10,
+          "carbs": 24,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Philly Cheesesteak - Half",
+        "category": "FLATBREAD PAIRINGS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 270,
+          "protein": 21,
+          "carbs": 22,
+          "fat": 11
+        }
+      },
+      {
+        "name": "All-Natural Pepperoni - Half",
+        "category": "FLATBREAD PAIRINGS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 290,
+          "protein": 14,
+          "carbs": 25,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Chipotle BBQ Shrimp - Half",
+        "category": "FLATBREAD PAIRINGS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 250,
+          "protein": 17,
+          "carbs": 23,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Mahi Mahi Tacos with Southwest Salad",
+        "category": "LUNCH FEATURES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 530,
+          "protein": 38,
+          "carbs": 48,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Wood-Grilled Steak Tacos with Southwest Salad",
+        "category": "LUNCH FEATURES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 500,
+          "protein": 31,
+          "carbs": 48,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Naked Cheeseburger",
+        "category": "LUNCH FEATURES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 480,
+          "protein": 43,
+          "carbs": 6,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Grilled Chicken Caprese Sandwich",
+        "category": "LUNCH FEATURES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 590,
+          "protein": 48,
+          "carbs": 54,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Lump Crab Cake Sandwich",
+        "category": "LUNCH FEATURES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 560,
+          "protein": 28,
+          "carbs": 55,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Wood-Grilled Kona-Crusted Lamb",
+        "category": "HAPPY HOUR SMALL PLATES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 120,
+          "protein": 14,
+          "carbs": 1,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Seared Handline Caught Ahi Tuna",
+        "category": "HAPPY HOUR SMALL PLATES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 70,
+          "protein": 11,
+          "carbs": 3,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Warm Goat Cheese Spread",
+        "category": "HAPPY HOUR SMALL PLATES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 420,
+          "protein": 15,
+          "carbs": 33,
+          "fat": 27
+        }
+      }
+    ]
+}

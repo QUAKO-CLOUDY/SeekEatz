@@ -1,0 +1,449 @@
+{
+    "restaurant_name": "The Capital Grille",
+    "items": [
+    {
+    "name": "Pan Fried Calamari with Hot Cherry Peppers",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1160,
+    "protein": 47,
+    "carbs": 61,
+    "fat": 80
+    }
+    },
+    {
+    "name": "Shrimp Cocktail",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 190,
+    "protein": 38,
+    "carbs": 7,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Jumbo Lump Crab Cocktail",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 200,
+    "protein": 36,
+    "carbs": 8,
+    "fat": 2
+    }
+    },
+    {
+    "name": "Prosciutto Wrapped Mozzarella",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 470,
+    "protein": 30,
+    "carbs": 12,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Lobster and Crab Cakes",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 640,
+    "protein": 36,
+    "carbs": 31,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Tuna Tartare",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 440,
+    "protein": 28,
+    "carbs": 21,
+    "fat": 28
+    }
+    },
+    {
+    "name": "New England Clam Chowder Cup",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 350,
+    "protein": 18,
+    "carbs": 19,
+    "fat": 23
+    }
+    },
+    {
+    "name": "New England Clam Chowder Bowl",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 510,
+    "protein": 26,
+    "carbs": 28,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Maine Lobster Bisque Cup",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 350,
+    "protein": 12,
+    "carbs": 16,
+    "fat": 27
+    }
+    },
+    {
+    "name": "Maine Lobster Bisque Bowl",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 510,
+    "protein": 17,
+    "carbs": 23,
+    "fat": 39
+    }
+    },
+    {
+    "name": "Caramelized French Onion Soup",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 540,
+    "protein": 33,
+    "carbs": 31,
+    "fat": 31
+    }
+    },
+    {
+    "name": "Field Greens Salad with Parmesan Vinaigrette",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 250,
+    "protein": 4,
+    "carbs": 11,
+    "fat": 21
+    }
+    },
+    {
+    "name": "The Capital Grille Chopped Salad",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 510,
+    "protein": 22,
+    "carbs": 14,
+    "fat": 42
+    }
+    },
+    {
+    "name": "Caesar Salad",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 490,
+    "protein": 10,
+    "carbs": 13,
+    "fat": 46
+    }
+    },
+    {
+    "name": "Wedge Salad with Bleu Cheese and Bacon",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 620,
+    "protein": 20,
+    "carbs": 11,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Seared Tenderloin with Butter Poached Lobster Tails",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 930,
+    "protein": 74,
+    "carbs": 8,
+    "fat": 66
+    }
+    },
+    {
+    "name": "Porcini Rubbed Bone-In Ribeye",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1250,
+    "protein": 100,
+    "carbs": 15,
+    "fat": 90
+    }
+    },
+    {
+    "name": "Bone-In Kona Crusted Dry Aged NY Strip",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1040,
+    "protein": 88,
+    "carbs": 27,
+    "fat": 64
+    }
+    },
+    {
+    "name": "Sliced Filet Mignon with Pearl Onions",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 890,
+    "protein": 70,
+    "carbs": 20,
+    "fat": 60
+    }
+    },
+    {
+    "name": "Filet Mignon 8 oz",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 420,
+    "protein": 45,
+    "carbs": 0,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Filet Mignon 10 oz",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 480,
+    "protein": 56,
+    "carbs": 0,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Bone-In Ribeye 22 oz",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1100,
+    "protein": 126,
+    "carbs": 0,
+    "fat": 66
+    }
+    },
+    {
+    "name": "Dry Aged NY Strip 14 oz",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 810,
+    "protein": 83,
+    "carbs": 0,
+    "fat": 53
+    }
+    },
+    {
+    "name": "Roasted Chicken Breast with Sherry Jus",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 530,
+    "protein": 56,
+    "carbs": 1,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Double Cut Lamb Chops",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 860,
+    "protein": 90,
+    "carbs": 4,
+    "fat": 53
+    }
+    },
+    {
+    "name": "Seared Citrus Glazed Salmon",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 610,
+    "protein": 55,
+    "carbs": 23,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Pan-Seared Sea Scallops",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 500,
+    "protein": 35,
+    "carbs": 12,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Fresh Whole Maine Lobster",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 590,
+    "protein": 58,
+    "carbs": 0,
+    "fat": 38
+    }
+    },
+    {
+    "name": "The Capital Grille Cheeseburger",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1040,
+    "protein": 63,
+    "carbs": 39,
+    "fat": 69
+    }
+    },
+    {
+    "name": "Ribeye Steak Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1170,
+    "protein": 71,
+    "carbs": 47,
+    "fat": 78
+    }
+    },
+    {
+    "name": "Lobster Roll",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 660,
+    "protein": 36,
+    "carbs": 44,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Sliced Tenderloin Salad",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 820,
+    "protein": 52,
+    "carbs": 17,
+    "fat": 61
+    }
+    },
+    {
+    "name": "Grilled Chicken Caesar Salad",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 780,
+    "protein": 59,
+    "carbs": 28,
+    "fat": 48
+    }
+    },
+    {
+    "name": "Seared Salmon Salad",
+    "category": "Salad",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 540,
+    "protein": 51,
+    "carbs": 13,
+    "fat": 32
+    }
+    },
+    {
+    "name": "Béarnaise Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 490,
+    "protein": 3,
+    "carbs": 2,
+    "fat": 53
+    }
+    },
+    {
+    "name": "Black Truffle Butter",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 310,
+    "protein": 1,
+    "carbs": 1,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Blue Cheese Butter",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 200,
+    "protein": 2,
+    "carbs": 1,
+    "fat": 20
+    }
+    }
+    ]
+    }

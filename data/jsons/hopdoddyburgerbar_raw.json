@@ -1,0 +1,702 @@
+
+{
+    "restaurant_name": "Hopdoddy Burger Bar",
+    "items": [
+    {
+    "name": "The Classic",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 660,
+    "protein": 38,
+    "carbs": 38,
+    "fat": 38
+    }
+    },
+    {
+    "name": "The Classic Cheeseburger",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 770,
+    "protein": 45,
+    "carbs": 39,
+    "fat": 47
+    }
+    },
+    {
+    "name": "The Classic Bacon Cheeseburger",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 830,
+    "protein": 49,
+    "carbs": 39,
+    "fat": 51
+    }
+    },
+    {
+    "name": "Farmhouse Deluxe",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 940,
+    "protein": 55,
+    "carbs": 43,
+    "fat": 59
+    }
+    },
+    {
+    "name": "Goodnight / Good Cause",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 770,
+    "protein": 46,
+    "carbs": 48,
+    "fat": 44
+    }
+    },
+    {
+    "name": "Magic Shroom",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 800,
+    "protein": 44,
+    "carbs": 40,
+    "fat": 51
+    }
+    },
+    {
+    "name": "El Diablo",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 810,
+    "protein": 46,
+    "carbs": 48,
+    "fat": 48
+    }
+    },
+    {
+    "name": "Double Bacon Jam",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1160,
+    "protein": 63,
+    "carbs": 50,
+    "fat": 73
+    }
+    },
+    {
+    "name": "Wagyu Smash",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1070,
+    "protein": 33,
+    "carbs": 55,
+    "fat": 80
+    }
+    },
+    {
+    "name": "Cadillac Wagyu",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1140,
+    "protein": 48,
+    "carbs": 47,
+    "fat": 83
+    }
+    },
+    {
+    "name": "Doddy Melt",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1310,
+    "protein": 62,
+    "carbs": 59,
+    "fat": 91
+    }
+    },
+    {
+    "name": "Buffalo Bill",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 710,
+    "protein": 46,
+    "carbs": 41,
+    "fat": 39
+    }
+    },
+    {
+    "name": "Ahi Tuna",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 600,
+    "protein": 35,
+    "carbs": 50,
+    "fat": 27
+    }
+    },
+    {
+    "name": "El Bandito (Veggie Burger)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 740,
+    "protein": 24,
+    "carbs": 90,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Sliders",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 720,
+    "protein": 30,
+    "carbs": 47,
+    "fat": 46
+    }
+    },
+    {
+    "name": "Thunderbird",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 760,
+    "protein": 51,
+    "carbs": 58,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Chicken Bacon Ranch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 890,
+    "protein": 44,
+    "carbs": 51,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Crispy Chicken Bacon Ranch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1090,
+    "protein": 47,
+    "carbs": 70,
+    "fat": 68
+    }
+    },
+    {
+    "name": "Nashville Hot Chicken Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 960,
+    "protein": 41,
+    "carbs": 66,
+    "fat": 59
+    }
+    },
+    {
+    "name": "Crispy Tenders – Not Hot",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 930,
+    "protein": 59,
+    "carbs": 41,
+    "fat": 57
+    }
+    },
+    {
+    "name": "Crispy Tenders – Nashville Hot",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 980,
+    "protein": 59,
+    "carbs": 42,
+    "fat": 63
+    }
+    },
+    {
+    "name": "Crispy Tenders – BBQ",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1000,
+    "protein": 60,
+    "carbs": 60,
+    "fat": 57
+    }
+    },
+    {
+    "name": "Crispy Tenders – Buffalo",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 950,
+    "protein": 59,
+    "carbs": 45,
+    "fat": 57
+    }
+    },
+    {
+    "name": "Crispy Tenders – Hot Honey",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1220,
+    "protein": 59,
+    "carbs": 104,
+    "fat": 66
+    }
+    },
+    {
+    "name": "Kale Caesar",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 680,
+    "protein": 21,
+    "carbs": 53,
+    "fat": 44
+    }
+    },
+    {
+    "name": "Thunderbird Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 750,
+    "protein": 48,
+    "carbs": 33,
+    "fat": 49
+    }
+    },
+    {
+    "name": "El Diablo Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 830,
+    "protein": 44,
+    "carbs": 27,
+    "fat": 62
+    }
+    },
+    {
+    "name": "Ahi Tuna Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 500,
+    "protein": 35,
+    "carbs": 27,
+    "fat": 29
+    }
+    },
+    {
+    "name": "Magic Shroom Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 730,
+    "protein": 42,
+    "carbs": 14,
+    "fat": 57
+    }
+    },
+    {
+    "name": "The Classic Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 630,
+    "protein": 35,
+    "carbs": 12,
+    "fat": 50
+    }
+    },
+    {
+    "name": "Goodnight / Good Cause Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 780,
+    "protein": 43,
+    "carbs": 29,
+    "fat": 56
+    }
+    },
+    {
+    "name": "Double Bacon Jam Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 860,
+    "protein": 43,
+    "carbs": 28,
+    "fat": 61
+    }
+    },
+    {
+    "name": "Chicken Bacon Ranch Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 760,
+    "protein": 41,
+    "carbs": 27,
+    "fat": 54
+    }
+    },
+    {
+    "name": "Cadillac Wagyu Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1030,
+    "protein": 44,
+    "carbs": 20,
+    "fat": 85
+    }
+    },
+    {
+    "name": "Buffalo Bill Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 680,
+    "protein": 44,
+    "carbs": 15,
+    "fat": 50
+    }
+    },
+    {
+    "name": "El Bandito Bowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 680,
+    "protein": 20,
+    "carbs": 57,
+    "fat": 44
+    }
+    },
+    {
+    "name": "Parmesan Truffle Fries",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1240,
+    "protein": 17,
+    "carbs": 91,
+    "fat": 90
+    }
+    },
+    {
+    "name": "Traditional Hand-Cut Fries",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 830,
+    "protein": 9,
+    "carbs": 85,
+    "fat": 52
+    }
+    },
+    {
+    "name": "Green Chili Queso Fries",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1190,
+    "protein": 26,
+    "carbs": 91,
+    "fat": 82
+    }
+    },
+    {
+    "name": "Sweet Potato Fries",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1170,
+    "protein": 8,
+    "carbs": 96,
+    "fat": 85
+    }
+    },
+    {
+    "name": "Hot Honey & Sage Sweet Potato Fries",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1090,
+    "protein": 9,
+    "carbs": 141,
+    "fat": 57
+    }
+    },
+    {
+    "name": "Parmesan Brussels Sprout Leaves",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 840,
+    "protein": 14,
+    "carbs": 23,
+    "fat": 79
+    }
+    },
+    {
+    "name": "Hot Honey Brussels Sprout Leaves",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 640,
+    "protein": 7,
+    "carbs": 70,
+    "fat": 42
+    }
+    },
+    {
+    "name": "Alabama Comeback Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 140,
+    "protein": 0,
+    "carbs": 1,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Basil Pesto",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 90,
+    "protein": 2,
+    "carbs": 0,
+    "fat": 9
+    }
+    },
+    {
+    "name": "Buffalo Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 10,
+    "protein": 0,
+    "carbs": 2,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Caesar Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 230,
+    "protein": 2,
+    "carbs": 3,
+    "fat": 23
+    }
+    },
+    {
+    "name": "Caffeinated BBQ Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 60,
+    "protein": 1,
+    "carbs": 17,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Chipotle Aioli",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 160,
+    "protein": 0,
+    "carbs": 4,
+    "fat": 18
+    }
+    },
+    {
+    "name": "Cucumber Wasabi",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 140,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 16
+    }
+    },
+    {
+    "name": "Doddy Mayo",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 180,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Green Chili Queso",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 360,
+    "protein": 17,
+    "carbs": 6,
+    "fat": 30
+    }
+    },
+    {
+    "name": "HD1 Steak Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 20,
+    "protein": 0,
+    "carbs": 3,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Hot Honey",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 200,
+    "protein": 1,
+    "carbs": 52,
+    "fat": 1
+    }
+    },
+    {
+    "name": "Salsa Verde",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 60,
+    "protein": 0,
+    "carbs": 4,
+    "fat": 5
+    }
+    },
+    {
+    "name": "Secret Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 140,
+    "protein": 0,
+    "carbs": 4,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Teriyaki Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 40,
+    "protein": 2,
+    "carbs": 10,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Truffle Aioli",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 180,
+    "protein": 0,
+    "carbs": 1,
+    "fat": 19
+    }
+    }
+    ]
+    }

@@ -1,0 +1,582 @@
+
+{
+    "restaurant_name": "Capriotti's Sandwich Shop",
+    "items": [
+    {
+    "name": "Cap's The Scrambler",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 790,
+    "protein": 20,
+    "carbs": 32,
+    "fat": 65
+    }
+    },
+    {
+    "name": "Cap's The General",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 940,
+    "protein": 30,
+    "carbs": 35,
+    "fat": 75
+    }
+    },
+    {
+    "name": "Cap's The Strami",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 760,
+    "protein": 25,
+    "carbs": 20,
+    "fat": 65
+    }
+    },
+    {
+    "name": "Cap's The Steakenator",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 860,
+    "protein": 29,
+    "carbs": 32,
+    "fat": 69
+    }
+    },
+    {
+    "name": "Cap's Ole Reliable",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 830,
+    "protein": 22,
+    "carbs": 20,
+    "fat": 75
+    }
+    },
+    {
+    "name": "Cheese Steak 5 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 510,
+    "protein": 35,
+    "carbs": 27,
+    "fat": 30
+    }
+    },
+    {
+    "name": "Cheese Steak 8 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 810,
+    "protein": 52,
+    "carbs": 43,
+    "fat": 49
+    }
+    },
+    {
+    "name": "Cheese Steak 10 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1060,
+    "protein": 69,
+    "carbs": 54,
+    "fat": 67
+    }
+    },
+    {
+    "name": "Cheese Steak 18 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1910,
+    "protein": 121,
+    "carbs": 106,
+    "fat": 115
+    }
+    },
+    {
+    "name": "Chicken Cheese Steak 5 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 460,
+    "protein": 28,
+    "carbs": 29,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Chicken Cheese Steak 8 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 730,
+    "protein": 44,
+    "carbs": 45,
+    "fat": 43
+    }
+    },
+    {
+    "name": "Chicken Cheese Steak 10 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1000,
+    "protein": 60,
+    "carbs": 57,
+    "fat": 62
+    }
+    },
+    {
+    "name": "Chicken Cheese Steak 18 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1790,
+    "protein": 106,
+    "carbs": 112,
+    "fat": 104
+    }
+    },
+    {
+    "name": "BBQ Chicken Cheese Steak 5 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 650,
+    "protein": 28,
+    "carbs": 44,
+    "fat": 41
+    }
+    },
+    {
+    "name": "BBQ Chicken Cheese Steak 8 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1160,
+    "protein": 44,
+    "carbs": 72,
+    "fat": 77
+    }
+    },
+    {
+    "name": "BBQ Chicken Cheese Steak 10 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1550,
+    "protein": 59,
+    "carbs": 95,
+    "fat": 105
+    }
+    },
+    {
+    "name": "BBQ Chicken Cheese Steak 18 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 2720,
+    "protein": 105,
+    "carbs": 184,
+    "fat": 172
+    }
+    },
+    {
+    "name": "The Bobbie 5 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 650,
+    "protein": 17,
+    "carbs": 60,
+    "fat": 38
+    }
+    },
+    {
+    "name": "The Bobbie 8 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1010,
+    "protein": 28,
+    "carbs": 97,
+    "fat": 56
+    }
+    },
+    {
+    "name": "The Bobbie 10 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1320,
+    "protein": 37,
+    "carbs": 121,
+    "fat": 77
+    }
+    },
+    {
+    "name": "The Bobbie 18 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 2330,
+    "protein": 66,
+    "carbs": 211,
+    "fat": 135
+    }
+    },
+    {
+    "name": "Capastrami 5 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 800,
+    "protein": 51,
+    "carbs": 33,
+    "fat": 58
+    }
+    },
+    {
+    "name": "Capastrami 8 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1150,
+    "protein": 69,
+    "carbs": 53,
+    "fat": 81
+    }
+    },
+    {
+    "name": "Capastrami 10 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1580,
+    "protein": 102,
+    "carbs": 67,
+    "fat": 113
+    }
+    },
+    {
+    "name": "Capastrami 18 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 2810,
+    "protein": 173,
+    "carbs": 128,
+    "fat": 197
+    }
+    },
+    {
+    "name": "American Wagyu Cheese Steak 5 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 450,
+    "protein": 22,
+    "carbs": 28,
+    "fat": 29
+    }
+    },
+    {
+    "name": "American Wagyu Cheese Steak 8 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 730,
+    "protein": 35,
+    "carbs": 46,
+    "fat": 47
+    }
+    },
+    {
+    "name": "American Wagyu Slaw Be Jo 5 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 510,
+    "protein": 20,
+    "carbs": 32,
+    "fat": 34
+    }
+    },
+    {
+    "name": "American Wagyu Slaw Be Jo 8 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 840,
+    "protein": 35,
+    "carbs": 51,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Impossible Cheese Steak 5 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 540,
+    "protein": 23,
+    "carbs": 33,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Impossible Cheese Steak 8 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 840,
+    "protein": 34,
+    "carbs": 52,
+    "fat": 57
+    }
+    },
+    {
+    "name": "Veggie Turkey 5 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 640,
+    "protein": 18,
+    "carbs": 34,
+    "fat": 48
+    }
+    },
+    {
+    "name": "Veggie Turkey 8 inch",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1010,
+    "protein": 30,
+    "carbs": 55,
+    "fat": 75
+    }
+    },
+    {
+    "name": "Chopped Italian Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 300,
+    "protein": 20,
+    "carbs": 19,
+    "fat": 16
+    }
+    },
+    {
+    "name": "Wagyu & Bleu Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 310,
+    "protein": 30,
+    "carbs": 20,
+    "fat": 13
+    }
+    },
+    {
+    "name": "Balsamic Chicken Salad Regular",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 510,
+    "protein": 31,
+    "carbs": 37,
+    "fat": 27
+    }
+    },
+    {
+    "name": "Kid's The Bobbie Entire Meal",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 724,
+    "protein": 17,
+    "carbs": 109,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Kid's Capastrami Entire Meal",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 924,
+    "protein": 51,
+    "carbs": 82,
+    "fat": 65
+    }
+    },
+    {
+    "name": "Kid's Cheese Steak Entire Meal",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 584,
+    "protein": 35,
+    "carbs": 76,
+    "fat": 30
+    }
+    },
+    {
+    "name": "Kid's Grilled Italian Entire Meal",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 414,
+    "protein": 19,
+    "carbs": 78,
+    "fat": 17
+    }
+    },
+    {
+    "name": "Kid's Tuna Entire Meal",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 364,
+    "protein": 36,
+    "carbs": 76,
+    "fat": 5
+    }
+    },
+    {
+    "name": "Chicken Noodle Soup",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 100,
+    "protein": 10,
+    "carbs": 10,
+    "fat": 2
+    }
+    },
+    {
+    "name": "New England Clam Chowder",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 350,
+    "protein": 11,
+    "carbs": 24,
+    "fat": 23
+    }
+    },
+    {
+    "name": "Tomato Bisque",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 200,
+    "protein": 5,
+    "carbs": 17,
+    "fat": 13
+    }
+    },
+    {
+    "name": "Russian Dressing",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 140,
+    "protein": 0,
+    "carbs": 5,
+    "fat": 13
+    }
+    },
+    {
+    "name": "Balsamic Vinaigrette",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 60,
+    "protein": 0,
+    "carbs": 4,
+    "fat": 5
+    }
+    },
+    {
+    "name": "Chipotle Ranch",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 140,
+    "protein": 0,
+    "carbs": 4,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Gorgonzola Vinaigrette",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 90,
+    "protein": 1,
+    "carbs": 3,
+    "fat": 8
+    }
+    }
+    ]
+    }

@@ -1,0 +1,545 @@
+{
+    "restaurant_name": "Jimmy Buffett's Margaritaville Orlando",
+    "items": [
+      {
+        "name": "Peel and Eat Shrimp",
+        "category": "APPETIZERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 470,
+          "protein": 21,
+          "carbs": 21,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Conch Fritters",
+        "category": "APPETIZERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1200,
+          "protein": 38,
+          "carbs": 88,
+          "fat": 75
+        }
+      },
+      {
+        "name": "Garlic Buffalo Bone-In Hemisphere Wings",
+        "category": "APPETIZERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1460,
+          "protein": 68,
+          "carbs": 25,
+          "fat": 118
+        }
+      },
+      {
+        "name": "Spicy Mango Jerk Bone-In Hemisphere Wings",
+        "category": "APPETIZERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1440,
+          "protein": 68,
+          "carbs": 47,
+          "fat": 109
+        }
+      },
+      {
+        "name": "Garlic Buffalo Boneless Hemisphere Wings",
+        "category": "APPETIZERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1260,
+          "protein": 38,
+          "carbs": 57,
+          "fat": 100
+        }
+      },
+      {
+        "name": "Spicy Mango Jerk Boneless Hemisphere Wings",
+        "category": "APPETIZERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1180,
+          "protein": 36,
+          "carbs": 86,
+          "fat": 79
+        }
+      },
+      {
+        "name": "Chips & House-Made Guacamole",
+        "category": "APPETIZERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 910,
+          "protein": 10,
+          "carbs": 100,
+          "fat": 55
+        }
+      },
+      {
+        "name": "Key West Chicken Quesadilla",
+        "category": "APPETIZERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1530,
+          "protein": 74,
+          "carbs": 102,
+          "fat": 95
+        }
+      },
+      {
+        "name": "Pretzel Sticks with Dijonaise and Cheese Sauce",
+        "category": "APPETIZERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 940,
+          "protein": 26,
+          "carbs": 133,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Asiago Crab & Artichoke Dip",
+        "category": "APPETIZERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1670,
+          "protein": 38,
+          "carbs": 110,
+          "fat": 122
+        }
+      },
+      {
+        "name": "Volcano Nachos",
+        "category": "APPETIZERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 3710,
+          "protein": 109,
+          "carbs": 345,
+          "fat": 213
+        }
+      },
+      {
+        "name": "White Cheddar Cheese Curds",
+        "category": "APPETIZERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1210,
+          "protein": 39,
+          "carbs": 58,
+          "fat": 91
+        }
+      },
+      {
+        "name": "Lava Lava Shrimp",
+        "category": "APPETIZERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 960,
+          "protein": 45,
+          "carbs": 72,
+          "fat": 55
+        }
+      },
+      {
+        "name": "Tequila Spiked Shrimp Ceviche",
+        "category": "APPETIZERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 850,
+          "protein": 25,
+          "carbs": 70,
+          "fat": 55
+        }
+      },
+      {
+        "name": "Chicken Caesar Salad",
+        "category": "SALADS & SOUPS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1220,
+          "protein": 46,
+          "carbs": 27,
+          "fat": 104
+        }
+      },
+      {
+        "name": "Taco Salad",
+        "category": "SALADS & SOUPS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1180,
+          "protein": 38,
+          "carbs": 96,
+          "fat": 74
+        }
+      },
+      {
+        "name": "Caribbean Salmon Salad",
+        "category": "SALADS & SOUPS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1450,
+          "protein": 51,
+          "carbs": 125,
+          "fat": 76
+        }
+      },
+      {
+        "name": "Loaded Baked Potato Soup",
+        "category": "SALADS & SOUPS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 660,
+          "protein": 17,
+          "carbs": 54,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Fish Tacos",
+        "category": "ENTREES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 800,
+          "protein": 18,
+          "carbs": 112,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Crispy Coconut Shrimp w/Fries and Slaw",
+        "category": "ENTREES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1550,
+          "protein": 29,
+          "carbs": 163,
+          "fat": 88
+        }
+      },
+      {
+        "name": "Huli Huli Chicken & Shrimp Bowl",
+        "category": "ENTREES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 830,
+          "protein": 42,
+          "carbs": 84,
+          "fat": 37
+        }
+      },
+      {
+        "name": "Blackened Salmon",
+        "category": "ENTREES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 750,
+          "protein": 43,
+          "carbs": 55,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Jimmy's Jammin' Jambalaya w/Rice",
+        "category": "ENTREES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 990,
+          "protein": 44,
+          "carbs": 70,
+          "fat": 58
+        }
+      },
+      {
+        "name": "Shrimp Mac & Cheese",
+        "category": "ENTREES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1680,
+          "protein": 64,
+          "carbs": 138,
+          "fat": 97
+        }
+      },
+      {
+        "name": "Jerk Chicken Pasta",
+        "category": "ENTREES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1210,
+          "protein": 46,
+          "carbs": 138,
+          "fat": 52
+        }
+      },
+      {
+        "name": "Landshark Lager Fish & Chips w/ Fries and Slaw",
+        "category": "ENTREES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 2330,
+          "protein": 72,
+          "carbs": 188,
+          "fat": 135
+        }
+      },
+      {
+        "name": "Caribbean NY Strip",
+        "category": "ENTREES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1580,
+          "protein": 82,
+          "carbs": 38,
+          "fat": 121
+        }
+      },
+      {
+        "name": "Shrimp & Grits",
+        "category": "ENTREES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1320,
+          "protein": 63,
+          "carbs": 41,
+          "fat": 99
+        }
+      },
+      {
+        "name": "Pineapple Chimmichuri Grilled Chicken",
+        "category": "ENTREES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 950,
+          "protein": 58,
+          "carbs": 65,
+          "fat": 54
+        }
+      },
+      {
+        "name": "Adult Chicken Strips Platter w/ Fries",
+        "category": "ENTREES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 2060,
+          "protein": 102,
+          "carbs": 113,
+          "fat": 136
+        }
+      },
+      {
+        "name": "Cheeseburger In Paradise (No Side/No Fries)",
+        "category": "BURGERS IN PARADISE",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1340,
+          "protein": 56,
+          "carbs": 68,
+          "fat": 93
+        }
+      },
+      {
+        "name": "Cheeseburger Beyond Paradise",
+        "category": "BURGERS IN PARADISE",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 890,
+          "protein": 36,
+          "carbs": 63,
+          "fat": 55
+        }
+      },
+      {
+        "name": "Southern Burger Stack (No Side/No Fries)",
+        "category": "BURGERS IN PARADISE",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1430,
+          "protein": 66,
+          "carbs": 90,
+          "fat": 96
+        }
+      },
+      {
+        "name": "Rancho Deluxe Burger (No Side/No Fries)",
+        "category": "BURGERS IN PARADISE",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1440,
+          "protein": 73,
+          "carbs": 63,
+          "fat": 100
+        }
+      },
+      {
+        "name": "Bacon Jam-Boree Burger (No Side/No Fries)",
+        "category": "BURGERS IN PARADISE",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1290,
+          "protein": 81,
+          "carbs": 57,
+          "fat": 91
+        }
+      },
+      {
+        "name": "\"Trip Around the Sun \" Burger",
+        "category": "BURGERS IN PARADISE",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1090,
+          "protein": 58,
+          "carbs": 74,
+          "fat": 63
+        }
+      },
+      {
+        "name": "Turkey Burger Patty",
+        "category": "BURGERS IN PARADISE",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 410,
+          "protein": 33,
+          "carbs": 25,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Veggie/Edamame Patty",
+        "category": "BURGERS IN PARADISE",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 240,
+          "protein": 19,
+          "carbs": 30,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Grilled Chicken Sandwich",
+        "category": "SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1170,
+          "protein": 58,
+          "carbs": 62,
+          "fat": 70
+        }
+      },
+      {
+        "name": "Crab Cake Sandwich",
+        "category": "SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 930,
+          "protein": 24,
+          "carbs": 82,
+          "fat": 60
+        }
+      },
+      {
+        "name": "Cuban Meatloaf Sandwich w/ Fries",
+        "category": "SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1360,
+          "protein": 64,
+          "carbs": 96,
+          "fat": 81
+        }
+      },
+      {
+        "name": "Beach Club",
+        "category": "SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1070,
+          "protein": 70,
+          "carbs": 87,
+          "fat": 46
+        }
+      },
+      {
+        "name": "Fries (No Ketchup)",
+        "category": "SIDES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 520,
+          "protein": 5,
+          "carbs": 54,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Sweet Potato Fries (No Ketchup)",
+        "category": "SIDES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 460,
+          "protein": 4,
+          "carbs": 47,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Salad, Side House (No Dressing)",
+        "category": "SIDES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 25,
+          "protein": 2,
+          "carbs": 5,
+          "fat": 0
+        }
+      }
+    ]
+}

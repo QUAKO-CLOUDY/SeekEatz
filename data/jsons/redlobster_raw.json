@@ -1,0 +1,941 @@
+{
+    "restaurant_name": "Red Lobster",
+    "items": [
+      {
+        "name": "Crispy Dragon Teriyaki Lobster",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 360,
+          "protein": 16,
+          "carbs": 32,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Lobster Pasta au Gratin",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 670,
+          "protein": 34,
+          "carbs": 45,
+          "fat": 39
+        }
+      },
+      {
+        "name": "Lobster & Shrimp Linguini Alfredo",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 970,
+          "protein": 43,
+          "carbs": 64,
+          "fat": 62
+        }
+      },
+      {
+        "name": "Maine Lobster Tail",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 420,
+          "protein": 13,
+          "carbs": 1,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Rock Lobster Tail",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 480,
+          "protein": 27,
+          "carbs": 2,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Grilled Lobster, Shrimp & Salmon",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1180,
+          "protein": 76,
+          "carbs": 47,
+          "fat": 76
+        }
+      },
+      {
+        "name": "Live Maine Lobster",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 440,
+          "protein": 33,
+          "carbs": 1,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Lobster Dip",
+        "category": "Appetizer",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 890,
+          "protein": 30,
+          "carbs": 82,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Lobster Flatbread",
+        "category": "Appetizer",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 800,
+          "protein": 39,
+          "carbs": 77,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Lobster & Shrimp Linguini",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1240,
+          "protein": 63,
+          "carbs": 85,
+          "fat": 74
+        }
+      },
+      {
+        "name": "Lobsterfest Duo with LobsterChops",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 610,
+          "protein": 32,
+          "carbs": 2,
+          "fat": 53
+        }
+      },
+      {
+        "name": "Lobster-Topped Baked Potato",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 450,
+          "protein": 18,
+          "carbs": 59,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Lobsterfest Seafood Boil",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 700,
+          "protein": 82,
+          "carbs": 83,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Surf & Turf - Maine Lobster Tail & 6 Oz. Filet Mignon",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 680,
+          "protein": 47,
+          "carbs": 2,
+          "fat": 54
+        }
+      },
+      {
+        "name": "Surf & Turf - Maine Lobster Tail & 7 Oz. Sirloin",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 740,
+          "protein": 59,
+          "carbs": 1,
+          "fat": 56
+        }
+      },
+      {
+        "name": "Bacon Wrapped Sea Scallops",
+        "category": "Appetizer",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 450,
+          "protein": 23,
+          "carbs": 9,
+          "fat": 37
+        }
+      },
+      {
+        "name": "Calamari, Hand-Breaded",
+        "category": "Appetizer",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1000,
+          "protein": 47,
+          "carbs": 44,
+          "fat": 70
+        }
+      },
+      {
+        "name": "Crab Queso",
+        "category": "Appetizer",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 930,
+          "protein": 31,
+          "carbs": 76,
+          "fat": 56
+        }
+      },
+      {
+        "name": "Crispy Dragon Shrimp",
+        "category": "Appetizer",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1010,
+          "protein": 25,
+          "carbs": 67,
+          "fat": 72
+        }
+      },
+      {
+        "name": "Lobster Bisque (Cup)",
+        "category": "Soup",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 340,
+          "protein": 6,
+          "carbs": 17,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Lobster Bisque (Bowl)",
+        "category": "Soup",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 630,
+          "protein": 11,
+          "carbs": 27,
+          "fat": 52
+        }
+      },
+      {
+        "name": "Mozzarella Cheesesticks",
+        "category": "Appetizer",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 730,
+          "protein": 31,
+          "carbs": 58,
+          "fat": 41
+        }
+      },
+      {
+        "name": "New England Clam Chowder (Cup)",
+        "category": "Soup",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 240,
+          "protein": 7,
+          "carbs": 11,
+          "fat": 15
+        }
+      },
+      {
+        "name": "New England Clam Chowder (Bowl)",
+        "category": "Soup",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 470,
+          "protein": 15,
+          "carbs": 22,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Parrot Isle Coconut Shrimp",
+        "category": "Appetizer",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 660,
+          "protein": 20,
+          "carbs": 55,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Popcorn Shrimp",
+        "category": "Appetizer",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 820,
+          "protein": 33,
+          "carbs": 55,
+          "fat": 51
+        }
+      },
+      {
+        "name": "Seafood Stuffed Mushrooms",
+        "category": "Appetizer",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 360,
+          "protein": 24,
+          "carbs": 17,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Seafood-Stuffed Mushrooms with Crab Topping",
+        "category": "Appetizer",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 530,
+          "protein": 33,
+          "carbs": 24,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Shrimp Cocktail",
+        "category": "Appetizer",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 180,
+          "protein": 23,
+          "carbs": 10,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Admiral's Feast",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1670,
+          "protein": 57,
+          "carbs": 131,
+          "fat": 99
+        }
+      },
+      {
+        "name": "Bacon Cheeseburger",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 940,
+          "protein": 62,
+          "carbs": 43,
+          "fat": 57
+        }
+      },
+      {
+        "name": "Cajun Chicken Linguini Alfredo",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1190,
+          "protein": 66,
+          "carbs": 86,
+          "fat": 64
+        }
+      },
+      {
+        "name": "Crab Carbonara",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1730,
+          "protein": 72,
+          "carbs": 84,
+          "fat": 126
+        }
+      },
+      {
+        "name": "Crab Your Way - Snow Crab Two Clusters with Crispy Potatoes",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 610,
+          "protein": 42,
+          "carbs": 55,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Crunch-Fried Flounder Sandwich with Fries & Hush Puppies",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1690,
+          "protein": 40,
+          "carbs": 190,
+          "fat": 85
+        }
+      },
+      {
+        "name": "Fish & Chips with Fries, Coleslaw, Hush Puppies",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1660,
+          "protein": 39,
+          "carbs": 148,
+          "fat": 100
+        }
+      },
+      {
+        "name": "Lobster Lover's Duo",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 600,
+          "protein": 25,
+          "carbs": 1,
+          "fat": 51
+        }
+      },
+      {
+        "name": "Parmesan-Crusted Chicken",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 650,
+          "protein": 47,
+          "carbs": 34,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Salmon, Grilled",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 47,
+          "carbs": 1,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Salmon New Orleans",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1160,
+          "protein": 102,
+          "carbs": 9,
+          "fat": 77
+        }
+      },
+      {
+        "name": "Lobsterfest Seafood Boil",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 700,
+          "protein": 82,
+          "carbs": 83,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Mariner's Seafood Boil",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 600,
+          "protein": 60,
+          "carbs": 80,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Sailor's Seafood Boil",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1320,
+          "protein": 83,
+          "carbs": 91,
+          "fat": 71
+        }
+      },
+      {
+        "name": "Shrimp Linguini Alfredo",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1010,
+          "protein": 37,
+          "carbs": 78,
+          "fat": 60
+        }
+      },
+      {
+        "name": "Shrimp & Sausage Jambalaya",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1020,
+          "protein": 35,
+          "carbs": 81,
+          "fat": 62
+        }
+      },
+      {
+        "name": "Steak - 6 Oz. Filet Mignon",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 260,
+          "protein": 34,
+          "carbs": 1,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Steak - 7 Oz. Sirloin",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 320,
+          "protein": 46,
+          "carbs": 1,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Ultimate Feast",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1280,
+          "protein": 52,
+          "carbs": 35,
+          "fat": 98
+        }
+      },
+      {
+        "name": "Wild-Caught Crunch-Fried Flounder",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1170,
+          "protein": 44,
+          "carbs": 78,
+          "fat": 74
+        }
+      },
+      {
+        "name": "Caesar Salad with Chicken",
+        "category": "Salad",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 730,
+          "protein": 43,
+          "carbs": 26,
+          "fat": 52
+        }
+      },
+      {
+        "name": "Sesame-Soy Salmon Bowl",
+        "category": "Bowl",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1120,
+          "protein": 62,
+          "carbs": 86,
+          "fat": 58
+        }
+      },
+      {
+        "name": "Southwest Shrimp Bowl",
+        "category": "Bowl",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 700,
+          "protein": 24,
+          "carbs": 53,
+          "fat": 45
+        }
+      },
+      {
+        "name": "Monday Lobster & Shrimp",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 850,
+          "protein": 37,
+          "carbs": 7,
+          "fat": 76
+        }
+      },
+      {
+        "name": "Tuesday Snow Crab Legs Two Clusters with Crispy Potatoes",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 910,
+          "protein": 42,
+          "carbs": 56,
+          "fat": 59
+        }
+      },
+      {
+        "name": "Wednesday Steak & Lobster",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 740,
+          "protein": 59,
+          "carbs": 1,
+          "fat": 56
+        }
+      },
+      {
+        "name": "Thursday Chicken Alfredo",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1190,
+          "protein": 66,
+          "carbs": 86,
+          "fat": 64
+        }
+      },
+      {
+        "name": "Thursday Shrimp Alfredo",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1010,
+          "protein": 37,
+          "carbs": 78,
+          "fat": 60
+        }
+      },
+      {
+        "name": "Friday Fish & Chips with Hush Puppies, Fries, Coleslaw",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1660,
+          "protein": 39,
+          "carbs": 148,
+          "fat": 100
+        }
+      },
+      {
+        "name": "Weekday Shrimp Trio",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1840,
+          "protein": 63,
+          "carbs": 180,
+          "fat": 95
+        }
+      },
+      {
+        "name": "Garlic Shrimp Scampi (Lunch)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 440,
+          "protein": 24,
+          "carbs": 7,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Parrot Isle Coconut Shrimp (Lunch)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 570,
+          "protein": 16,
+          "carbs": 48,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Popcorn Shrimp with Chesapeake Fries (Lunch)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1000,
+          "protein": 24,
+          "carbs": 122,
+          "fat": 46
+        }
+      },
+      {
+        "name": "Sailor's Platter with Chesapeake Fries (Lunch)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1910,
+          "protein": 58,
+          "carbs": 164,
+          "fat": 112
+        }
+      },
+      {
+        "name": "Sesame-Soy Salmon Bowl (Lunch)",
+        "category": "Bowl",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1120,
+          "protein": 62,
+          "carbs": 86,
+          "fat": 58
+        }
+      },
+      {
+        "name": "Southwest Shrimp Bowl (Lunch)",
+        "category": "Bowl",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 700,
+          "protein": 24,
+          "carbs": 53,
+          "fat": 45
+        }
+      },
+      {
+        "name": "Walt's Favorite Shrimp (Lunch)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 380,
+          "protein": 15,
+          "carbs": 43,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Wild-Caught Crunch-Fried Flounder (Lunch)",
+        "category": "Entree",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1170,
+          "protein": 44,
+          "carbs": 78,
+          "fat": 74
+        }
+      },
+      {
+        "name": "Blue cheese Dressing",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 230,
+          "protein": 2,
+          "carbs": 2,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Caesar Dressing",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 300,
+          "protein": 2,
+          "carbs": 0,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Citrus Vinaigrette Dressing",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 70,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Cocktail Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 50,
+          "protein": 1,
+          "carbs": 11,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Honey Mustard Dressing",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 200,
+          "protein": 0,
+          "carbs": 7,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Mango Pineapple Vinaigrette Dressing",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 11,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Marinara Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 25,
+          "protein": 1,
+          "carbs": 4,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Pina Colada Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 90,
+          "protein": 1,
+          "carbs": 12,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Ranch Dressing",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 150,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Tartar Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 230,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Thousand Island Dressing",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 210,
+          "protein": 0,
+          "carbs": 8,
+          "fat": 19
+        }
+      }
+    ]
+  }

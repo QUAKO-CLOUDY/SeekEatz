@@ -1,0 +1,667 @@
+
+{
+  "restaurant_name": "Maggiano's Little Italy",
+  "items": [
+  {
+  "name": "Bruschetta",
+  "category": "Appetizer",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 770,
+  "protein": 15,
+  "carbs": 46,
+  "fat": 59
+  }
+  },
+  {
+  "name": "Calamari Fritte",
+  "category": "Appetizer",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 830,
+  "protein": 36,
+  "carbs": 52,
+  "fat": 54
+  }
+  },
+  {
+  "name": "Calamari Fritte Happy Hour",
+  "category": "Appetizer",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 440,
+  "protein": 19,
+  "carbs": 31,
+  "fat": 28
+  }
+  },
+  {
+  "name": "Crab Cakes",
+  "category": "Appetizer",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 760,
+  "protein": 25,
+  "carbs": 28,
+  "fat": 61
+  }
+  },
+  {
+  "name": "Crispy Mozzarella",
+  "category": "Appetizer",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1620,
+  "protein": 79,
+  "carbs": 85,
+  "fat": 108
+  }
+  },
+  {
+  "name": "Flatbread Italian Sausage",
+  "category": "Appetizer",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1150,
+  "protein": 58,
+  "carbs": 88,
+  "fat": 63
+  }
+  },
+  {
+  "name": "Flatbread Margherita",
+  "category": "Appetizer",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 960,
+  "protein": 48,
+  "carbs": 86,
+  "fat": 48
+  }
+  },
+  {
+  "name": "Garlic Bread",
+  "category": "Appetizer",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 880,
+  "protein": 36,
+  "carbs": 80,
+  "fat": 47
+  }
+  },
+  {
+  "name": "Stuffed Mushrooms",
+  "category": "Appetizer",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 690,
+  "protein": 15,
+  "carbs": 25,
+  "fat": 60
+  }
+  },
+  {
+  "name": "Stuffed Mushrooms Happy Hour",
+  "category": "Appetizer",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 350,
+  "protein": 8,
+  "carbs": 15,
+  "fat": 30
+  }
+  },
+  {
+  "name": "Wagyu Beef Meatballs",
+  "category": "Appetizer",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1860,
+  "protein": 71,
+  "carbs": 98,
+  "fat": 133
+  }
+  },
+  {
+  "name": "Zucchini Fritte",
+  "category": "Appetizer",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1730,
+  "protein": 22,
+  "carbs": 117,
+  "fat": 131
+  }
+  },
+  {
+  "name": "Zucchini Fritte Happy Hour",
+  "category": "Appetizer",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1110,
+  "protein": 12,
+  "carbs": 61,
+  "fat": 93
+  }
+  },
+  {
+  "name": "Chef's Signature Caesar Entree",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 970,
+  "protein": 22,
+  "carbs": 66,
+  "fat": 70
+  }
+  },
+  {
+  "name": "Italian Chopped Salad Entree",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1230,
+  "protein": 32,
+  "carbs": 83,
+  "fat": 87
+  }
+  },
+  {
+  "name": "Maggiano's Salad Entree",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 930,
+  "protein": 23,
+  "carbs": 27,
+  "fat": 84
+  }
+  },
+  {
+  "name": "Fettuccine Alfredo",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 2140,
+  "protein": 32,
+  "carbs": 148,
+  "fat": 175
+  }
+  },
+  {
+  "name": "Fettuccine Alfredo With Chicken",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 2390,
+  "protein": 65,
+  "carbs": 155,
+  "fat": 185
+  }
+  },
+  {
+  "name": "Fettuccine Alfredo With Shrimp",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 2280,
+  "protein": 61,
+  "carbs": 148,
+  "fat": 177
+  }
+  },
+  {
+  "name": "Fettuccine Bolognese",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1170,
+  "protein": 39,
+  "carbs": 120,
+  "fat": 60
+  }
+  },
+  {
+  "name": "Four-Cheese Ravioli",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1270,
+  "protein": 35,
+  "carbs": 68,
+  "fat": 103
+  }
+  },
+  {
+  "name": "Lasagna",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1420,
+  "protein": 64,
+  "carbs": 65,
+  "fat": 101
+  }
+  },
+  {
+  "name": "Linguine Di Mare",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1390,
+  "protein": 90,
+  "carbs": 162,
+  "fat": 45
+  }
+  },
+  {
+  "name": "Linguine Vongole",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1500,
+  "protein": 64,
+  "carbs": 152,
+  "fat": 72
+  }
+  },
+  {
+  "name": "Mushroom Ravioli",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1010,
+  "protein": 21,
+  "carbs": 75,
+  "fat": 71
+  }
+  },
+  {
+  "name": "Our Famous Rigatoni D",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 2060,
+  "protein": 85,
+  "carbs": 161,
+  "fat": 121
+  }
+  },
+  {
+  "name": "Rigatoni Alla Vodka",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1890,
+  "protein": 30,
+  "carbs": 153,
+  "fat": 130
+  }
+  },
+  {
+  "name": "Shrimp Fra Diavolo",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1390,
+  "protein": 58,
+  "carbs": 162,
+  "fat": 63
+  }
+  },
+  {
+  "name": "Spaghetti & Meat Sauce",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1160,
+  "protein": 47,
+  "carbs": 165,
+  "fat": 35
+  }
+  },
+  {
+  "name": "Spaghetti & Meatball With Marinara",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1630,
+  "protein": 50,
+  "carbs": 179,
+  "fat": 82
+  }
+  },
+  {
+  "name": "Spaghetti & Meatball With Meat Sauce",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1490,
+  "protein": 67,
+  "carbs": 178,
+  "fat": 56
+  }
+  },
+  {
+  "name": "Wagyu Beef Stuffed Shells",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1560,
+  "protein": 54,
+  "carbs": 87,
+  "fat": 119
+  }
+  },
+  {
+  "name": "Chicken Francese",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1440,
+  "protein": 83,
+  "carbs": 62,
+  "fat": 98
+  }
+  },
+  {
+  "name": "Chicken Marsala",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1730,
+  "protein": 88,
+  "carbs": 100,
+  "fat": 107
+  }
+  },
+  {
+  "name": "Chicken Parmesan",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1610,
+  "protein": 95,
+  "carbs": 127,
+  "fat": 81
+  }
+  },
+  {
+  "name": "Chicken Piccata",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1820,
+  "protein": 87,
+  "carbs": 91,
+  "fat": 127
+  }
+  },
+  {
+  "name": "Blackened Salmon With Crispy Calabrian Shrimp",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1420,
+  "protein": 74,
+  "carbs": 40,
+  "fat": 111
+  }
+  },
+  {
+  "name": "Branzino Crab Imperial",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1060,
+  "protein": 63,
+  "carbs": 43,
+  "fat": 72
+  }
+  },
+  {
+  "name": "Lobster Carbonara",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 2050,
+  "protein": 60,
+  "carbs": 159,
+  "fat": 138
+  }
+  },
+  {
+  "name": "Shrimp Scampi",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 2130,
+  "protein": 59,
+  "carbs": 143,
+  "fat": 150
+  }
+  },
+  {
+  "name": "Simply Grilled Salmon",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 810,
+  "protein": 49,
+  "carbs": 6,
+  "fat": 67
+  }
+  },
+  {
+  "name": "Beef Tenderloin Medallions 11 Oz",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1060,
+  "protein": 71,
+  "carbs": 46,
+  "fat": 70
+  }
+  },
+  {
+  "name": "Beef Tenderloin Medallions 5 Oz",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 860,
+  "protein": 40,
+  "carbs": 46,
+  "fat": 62
+  }
+  },
+  {
+  "name": "16 Oz Bone-In Ribeye",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1940,
+  "protein": 67,
+  "carbs": 37,
+  "fat": 173
+  }
+  },
+  {
+  "name": "Center-Cut Filet Mignon",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 670,
+  "protein": 57,
+  "carbs": 31,
+  "fat": 37
+  }
+  },
+  {
+  "name": "New York Strip",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1220,
+  "protein": 67,
+  "carbs": 36,
+  "fat": 93
+  }
+  },
+  {
+  "name": "Surf & Turf",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1250,
+  "protein": 93,
+  "carbs": 15,
+  "fat": 92
+  }
+  },
+  {
+  "name": "Fettuccine Alfredo Chicken Gluten-Free",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 2250,
+  "protein": 53,
+  "carbs": 155,
+  "fat": 172
+  }
+  },
+  {
+  "name": "Fettuccine Alfredo Shrimp Gluten-Free",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 2190,
+  "protein": 46,
+  "carbs": 155,
+  "fat": 168
+  }
+  },
+  {
+  "name": "Rigatoni D Gluten-Free",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1950,
+  "protein": 79,
+  "carbs": 154,
+  "fat": 111
+  }
+  },
+  {
+  "name": "Shrimp Scampi Gluten-Free",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1970,
+  "protein": 52,
+  "carbs": 127,
+  "fat": 140
+  }
+  },
+  {
+  "name": "Rigatoni Alla Vodka Gluten-Free",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1790,
+  "protein": 24,
+  "carbs": 146,
+  "fat": 120
+  }
+  },
+  {
+  "name": "Spaghetti With Marinara Gluten-Free",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1190,
+  "protein": 24,
+  "carbs": 155,
+  "fat": 52
+  }
+  },
+  {
+  "name": "Spaghetti With Meat Sauce Gluten-Free",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1000,
+  "protein": 39,
+  "carbs": 149,
+  "fat": 25
+  }
+  },
+  {
+  "name": "The Grand Chicken Parmesan Gluten-Free",
+  "category": "Entree",
+  "price_estimate": null,
+  "image_url": null,
+  "macros": {
+  "calories": 1360,
+  "protein": 82,
+  "carbs": 147,
+  "fat": 48
+  }
+  }
+  ]
+  }
+  

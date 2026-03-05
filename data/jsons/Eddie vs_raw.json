@@ -1,0 +1,582 @@
+
+{
+    "restaurant_name": "Eddie V's Prime Seafood",
+    "items": [
+    {
+    "name": "East Coast Oysters (6)",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 160,
+    "protein": 6,
+    "carbs": 32,
+    "fat": 2
+    }
+    },
+    {
+    "name": "West Coast Oysters (6)",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 160,
+    "protein": 6,
+    "carbs": 32,
+    "fat": 2
+    }
+    },
+    {
+    "name": "The Shellfish Tower",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 400,
+    "protein": 34,
+    "carbs": 18,
+    "fat": 21
+    }
+    },
+    {
+    "name": "The Big Eddie",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 730,
+    "protein": 76,
+    "carbs": 21,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Jumbo Shrimp Cocktail",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 500,
+    "protein": 22,
+    "carbs": 19,
+    "fat": 39
+    }
+    },
+    {
+    "name": "Caviar, 20g",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 200,
+    "protein": 8,
+    "carbs": 12,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Maine Lobster Bisque, Cup",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 320,
+    "protein": 7,
+    "carbs": 13,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Maine Lobster Bisque, Bowl",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 450,
+    "protein": 9,
+    "carbs": 18,
+    "fat": 35
+    }
+    },
+    {
+    "name": "Burrata and Beet Salad",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 480,
+    "protein": 14,
+    "carbs": 17,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Mixed Greens Salad",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 320,
+    "protein": 6,
+    "carbs": 12,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Jumbo Lump Crab Cake",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 720,
+    "protein": 32,
+    "carbs": 17,
+    "fat": 57
+    }
+    },
+    {
+    "name": "Kung Pao Calamari",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1450,
+    "protein": 34,
+    "carbs": 93,
+    "fat": 106
+    }
+    },
+    {
+    "name": "Filet Mignon Cobb Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 950,
+    "protein": 57,
+    "carbs": 15,
+    "fat": 75
+    }
+    },
+    {
+    "name": "Blackened Chicken Caesar Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 670,
+    "protein": 44,
+    "carbs": 17,
+    "fat": 49
+    }
+    },
+    {
+    "name": "North Atlantic Scallops and Wild Mushroom Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 610,
+    "protein": 23,
+    "carbs": 22,
+    "fat": 48
+    }
+    },
+    {
+    "name": "Butter-Poached Lobster Roll",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 620,
+    "protein": 25,
+    "carbs": 43,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Wagyu Burger",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1040,
+    "protein": 57,
+    "carbs": 65,
+    "fat": 61
+    }
+    },
+    {
+    "name": "Crispy Chicken Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 860,
+    "protein": 45,
+    "carbs": 100,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Maine Lobster Tacos",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 670,
+    "protein": 25,
+    "carbs": 50,
+    "fat": 42
+    }
+    },
+    {
+    "name": "Mini Filet Sandwiches with Fries",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1000,
+    "protein": 34,
+    "carbs": 105,
+    "fat": 49
+    }
+    },
+    {
+    "name": "Roasted Chicken & Mushrooms with Mashed Potatoes",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 840,
+    "protein": 41,
+    "carbs": 41,
+    "fat": 53
+    }
+    },
+    {
+    "name": "Norwegian Salmon",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 580,
+    "protein": 41,
+    "carbs": 32,
+    "fat": 27
+    }
+    },
+    {
+    "name": "Crab Fried Rice",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1300,
+    "protein": 48,
+    "carbs": 155,
+    "fat": 52
+    }
+    },
+    {
+    "name": "Ahi Tuna",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 600,
+    "protein": 57,
+    "carbs": 48,
+    "fat": 5
+    }
+    },
+    {
+    "name": "Crab-Stuffed Shrimp",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 470,
+    "protein": 37,
+    "carbs": 14,
+    "fat": 30
+    }
+    },
+    {
+    "name": "8 oz. Filet with Mashed Potatoes",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 730,
+    "protein": 46,
+    "carbs": 24,
+    "fat": 51
+    }
+    },
+    {
+    "name": "Tableside Steak Tartare",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 420,
+    "protein": 30,
+    "carbs": 16,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Wagyu Dumplings",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 410,
+    "protein": 13,
+    "carbs": 57,
+    "fat": 14
+    }
+    },
+    {
+    "name": "Yellowtail Sashimi",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 150,
+    "protein": 20,
+    "carbs": 6,
+    "fat": 4
+    }
+    },
+    {
+    "name": "Ahi Tuna Tartare",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 530,
+    "protein": 31,
+    "carbs": 42,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Spicy Tuna on Crispy Rice",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1040,
+    "protein": 56,
+    "carbs": 102,
+    "fat": 45
+    }
+    },
+    {
+    "name": "Chilean Sea Bass",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 290,
+    "protein": 42,
+    "carbs": 9,
+    "fat": 7
+    }
+    },
+    {
+    "name": "North Atlantic Scallops with Pistachio Sage Pesto",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 370,
+    "protein": 25,
+    "carbs": 11,
+    "fat": 26
+    }
+    },
+    {
+    "name": "Parmesan Sole",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 980,
+    "protein": 47,
+    "carbs": 41,
+    "fat": 71
+    }
+    },
+    {
+    "name": "Texas Redfish",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 570,
+    "protein": 60,
+    "carbs": 5,
+    "fat": 36
+    }
+    },
+    {
+    "name": "Twin Lobster Tails (7-8 oz.)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 390,
+    "protein": 64,
+    "carbs": 8,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Twin Lobster Tails (8-10 oz.)",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 470,
+    "protein": 77,
+    "carbs": 9,
+    "fat": 12
+    }
+    },
+    {
+    "name": "10 oz. Filet Mignon",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 490,
+    "protein": 54,
+    "carbs": 3,
+    "fat": 29
+    }
+    },
+    {
+    "name": "18 oz. Prime Bone-In NY Strip",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 860,
+    "protein": 88,
+    "carbs": 0,
+    "fat": 53
+    }
+    },
+    {
+    "name": "22 oz. Prime Bone-In Ribeye",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 990,
+    "protein": 80,
+    "carbs": 4,
+    "fat": 73
+    }
+    },
+    {
+    "name": "Filet Medallions Oscar Style",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 880,
+    "protein": 64,
+    "carbs": 5,
+    "fat": 67
+    }
+    },
+    {
+    "name": "10 oz. Filet Mignon, Lobster, Beurre Blanc",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 800,
+    "protein": 76,
+    "carbs": 7,
+    "fat": 51
+    }
+    },
+    {
+    "name": "Morel-Crusted Lamb Chops",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 690,
+    "protein": 57,
+    "carbs": 8,
+    "fat": 48
+    }
+    },
+    {
+    "name": "12 oz. Gold Grade Wagyu Strip",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 870,
+    "protein": 50,
+    "carbs": 0,
+    "fat": 74
+    }
+    },
+    {
+    "name": "Drawn Butter (1 fl. oz.)",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 250,
+    "protein": 0,
+    "carbs": 0,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Parmesan and Horseradish Crust",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 220,
+    "protein": 3,
+    "carbs": 8,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Cognac Peppercorn Crème",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 230,
+    "protein": 3,
+    "carbs": 5,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Cave-Aged Blue Cheese Crust",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 370,
+    "protein": 6,
+    "carbs": 7,
+    "fat": 36
+    }
+    }
+    ]
+    }

@@ -1,0 +1,709 @@
+{
+    "restaurant_name": "Bareburger",
+    "items": [
+    {
+    "name": "Spicy Cilantro Black Bean Burger",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 480,
+    "protein": 10,
+    "carbs": 47,
+    "fat": 31
+    }
+    },
+    {
+    "name": "The Great Beyond",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 740,
+    "protein": 29,
+    "carbs": 80,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Beyond Smash Burger",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 650,
+    "protein": 33,
+    "carbs": 44,
+    "fat": 36
+    }
+    },
+    {
+    "name": "Impossible Chopped Cheese",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 940,
+    "protein": 34,
+    "carbs": 103,
+    "fat": 47
+    }
+    },
+    {
+    "name": "Impossible Standard",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 470,
+    "protein": 21,
+    "carbs": 21,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Falafelraptor",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 550,
+    "protein": 15,
+    "carbs": 67,
+    "fat": 27
+    }
+    },
+    {
+    "name": "Cilantro Black Bean",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 440,
+    "protein": 9,
+    "carbs": 42,
+    "fat": 29
+    }
+    },
+    {
+    "name": "My Sunshine",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 430,
+    "protein": 8,
+    "carbs": 41,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Beyond Chicken Nuggets",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 570,
+    "protein": 24,
+    "carbs": 4,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Build Your Own Burger",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 470,
+    "protein": 21,
+    "carbs": 19,
+    "fat": 33
+    }
+    },
+    {
+    "name": "Classic Double Smash",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1120,
+    "protein": 70,
+    "carbs": 56,
+    "fat": 69
+    }
+    },
+    {
+    "name": "Standard",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 710,
+    "protein": 47,
+    "carbs": 8,
+    "fat": 53
+    }
+    },
+    {
+    "name": "The National",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 960,
+    "protein": 60,
+    "carbs": 8,
+    "fat": 68
+    }
+    },
+    {
+    "name": "Supreme",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1130,
+    "protein": 62,
+    "carbs": 21,
+    "fat": 81
+    }
+    },
+    {
+    "name": "Americana",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 600,
+    "protein": 48,
+    "carbs": 13,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Sweet Bison Blues",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 860,
+    "protein": 56,
+    "carbs": 10,
+    "fat": 59
+    }
+    },
+    {
+    "name": "Spicy Paul Bunyon",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 610,
+    "protein": 38,
+    "carbs": 12,
+    "fat": 45
+    }
+    },
+    {
+    "name": "Elkasaurus",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 740,
+    "protein": 56,
+    "carbs": 18,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Truffle Elk",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 580,
+    "protein": 45,
+    "carbs": 12,
+    "fat": 40
+    }
+    },
+    {
+    "name": "Classic Chix",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 170,
+    "protein": 0,
+    "carbs": 1,
+    "fat": 17
+    }
+    },
+    {
+    "name": "Buffalo Chix",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 840,
+    "protein": 20,
+    "carbs": 99,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Southern Chix",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 220,
+    "protein": 0,
+    "carbs": 5,
+    "fat": 20
+    }
+    },
+    {
+    "name": "Spicy Bacon Chix",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 480,
+    "protein": 21,
+    "carbs": 5,
+    "fat": 35
+    }
+    },
+    {
+    "name": "Avocado Chicken BLT",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 400,
+    "protein": 6,
+    "carbs": 10,
+    "fat": 36
+    }
+    },
+    {
+    "name": "Hot Honey Chix",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 310,
+    "protein": 5,
+    "carbs": 18,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Impossible Classic Chix",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 350,
+    "protein": 1,
+    "carbs": 23,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Chipotle Chicken Caesar",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 220,
+    "protein": 11,
+    "carbs": 6,
+    "fat": 17
+    }
+    },
+    {
+    "name": "Green Goddess Turkey",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 630,
+    "protein": 47,
+    "carbs": 14,
+    "fat": 45
+    }
+    },
+    {
+    "name": "Popcorn Chicken",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "macros": {
+    "calories": 970,
+    "protein": 55,
+    "carbs": 40,
+    "fat": 62
+    }
+    },
+    {
+    "name": "The Naked Bird Tenders",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 790,
+    "protein": 38,
+    "carbs": 52,
+    "fat": 45
+    }
+    },
+    {
+    "name": "The Naked Bird Tenders Combo Box",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1520,
+    "protein": 50,
+    "carbs": 145,
+    "fat": 83
+    }
+    },
+    {
+    "name": "Southwestern Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1430,
+    "protein": 56,
+    "carbs": 108,
+    "fat": 90
+    }
+    },
+    {
+    "name": "Cali Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1230,
+    "protein": 32,
+    "carbs": 97,
+    "fat": 89
+    }
+    },
+    {
+    "name": "Cali Salad Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 770,
+    "protein": 20,
+    "carbs": 63,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Kobb Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1110,
+    "protein": 42,
+    "carbs": 28,
+    "fat": 94
+    }
+    },
+    {
+    "name": "Kobb Salad Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 740,
+    "protein": 33,
+    "carbs": 17,
+    "fat": 61
+    }
+    },
+    {
+    "name": "Caesar Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1220,
+    "protein": 41,
+    "carbs": 75,
+    "fat": 85
+    }
+    },
+    {
+    "name": "Caesar Salad Small",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 610,
+    "protein": 21,
+    "carbs": 37,
+    "fat": 43
+    }
+    },
+    {
+    "name": "House Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 450,
+    "protein": 3,
+    "carbs": 17,
+    "fat": 46
+    }
+    },
+    {
+    "name": "Pickle Chips",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "macros": {
+    "calories": 300,
+    "protein": 1,
+    "carbs": 38,
+    "fat": 16
+    }
+    },
+    {
+    "name": "Honey Brussels",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1340,
+    "protein": 29,
+    "carbs": 53,
+    "fat": 119
+    }
+    },
+    {
+    "name": "Goin Back To Cauli",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "macros": {
+    "calories": 960,
+    "protein": 17,
+    "carbs": 136,
+    "fat": 41
+    }
+    },
+    {
+    "name": "Guacamole",
+    "category": "Sauce",
+    "price_estimate": null,
+    "macros": {
+    "calories": 700,
+    "protein": 14,
+    "carbs": 80,
+    "fat": 39
+    }
+    },
+    {
+    "name": "Spicy Mozz Stix",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1240,
+    "protein": 43,
+    "carbs": 1923,
+    "fat": 97
+    }
+    },
+    {
+    "name": "Amazing Nachos",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1160,
+    "protein": 36,
+    "carbs": 129,
+    "fat": 54
+    }
+    },
+    {
+    "name": "Black Garlic Truffle Style",
+    "category": "Sauce",
+    "price_estimate": null,
+    "macros": {
+    "calories": 360,
+    "protein": 20,
+    "carbs": 6,
+    "fat": 29
+    }
+    },
+    {
+    "name": "Spicy Bacon Ranch Style",
+    "category": "Sauce",
+    "price_estimate": null,
+    "macros": {
+    "calories": 480,
+    "protein": 26,
+    "carbs": 5,
+    "fat": 35
+    }
+    },
+    {
+    "name": "Korean Style Jumbo Wings (4)",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "macros": {
+    "calories": 870,
+    "protein": 56,
+    "carbs": 72,
+    "fat": 42
+    }
+    },
+    {
+    "name": "Korean Style Jumbo Wings (8)",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1740,
+    "protein": 111,
+    "carbs": 144,
+    "fat": 85
+    }
+    },
+    {
+    "name": "Jumbo Wings - Naked (12pc)",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "macros": {
+    "calories": 2490,
+    "protein": 244,
+    "carbs": 0,
+    "fat": 181
+    }
+    },
+    {
+    "name": "Jumbo Wings - Naked (6pc)",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1240,
+    "protein": 122,
+    "carbs": 0,
+    "fat": 90
+    }
+    },
+    {
+    "name": "Pick A Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "macros": {
+    "calories": 190,
+    "protein": 0,
+    "carbs": 12,
+    "fat": 15
+    }
+    },
+    {
+    "name": "Junior Smash Your Way",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 320,
+    "protein": 26,
+    "carbs": 0,
+    "fat": 24
+    }
+    },
+    {
+    "name": "Smash Burger",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 600,
+    "protein": 34,
+    "carbs": 27,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Smash Burger w/ Fries",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 920,
+    "protein": 37,
+    "carbs": 64,
+    "fat": 57
+    }
+    },
+    {
+    "name": "2 Smash Burger w/ Fries",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1510,
+    "protein": 71,
+    "carbs": 91,
+    "fat": 94
+    }
+    },
+    {
+    "name": "4 Smash Burger w/ Fries",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 3020,
+    "protein": 142,
+    "carbs": 183,
+    "fat": 189
+    }
+    },
+    {
+    "name": "Cheesesteak",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1660,
+    "protein": 94,
+    "carbs": 90,
+    "fat": 109
+    }
+    },
+    {
+    "name": "BBQ Pastrami Junior",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 470,
+    "protein": 28,
+    "carbs": 33,
+    "fat": 24
+    }
+    },
+    {
+    "name": "Classic Pastrami",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 790,
+    "protein": 50,
+    "carbs": 2,
+    "fat": 62
+    }
+    },
+    {
+    "name": "Mile High Style",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 890,
+    "protein": 65,
+    "carbs": 10,
+    "fat": 64
+    }
+    },
+    {
+    "name": "Spicy Pastrami Junior",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 440,
+    "protein": 27,
+    "carbs": 25,
+    "fat": 22
+    }
+    },
+    {
+    "name": "Amazing Wagyu Dip",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1640,
+    "protein": 69,
+    "carbs": 99,
+    "fat": 103
+    }
+    },
+    {
+    "name": "Ultimate Wagyu",
+    "category": "Entree",
+    "price_estimate": null,
+    "macros": {
+    "calories": 1540,
+    "protein": 67,
+    "carbs": 63,
+    "fat": 108
+    }
+    }
+    ]
+    }

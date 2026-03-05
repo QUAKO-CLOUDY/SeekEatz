@@ -1,0 +1,810 @@
+
+{
+    "restaurant_name": "Black Bear Diner",
+    "items": [
+    {
+    "name": "California Bacon Benedict",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 850,
+    "protein": 37,
+    "carbs": 36,
+    "fat": 63
+    }
+    },
+    {
+    "name": "Classic Eggs Benedict",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 700,
+    "protein": 31,
+    "carbs": 67,
+    "fat": 37
+    }
+    },
+    {
+    "name": "Chorizo Breakfast Burrito",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1240,
+    "protein": 41,
+    "carbs": 79,
+    "fat": 77
+    }
+    },
+    {
+    "name": "Breakfast Club Melt Low Range",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 980,
+    "protein": 40,
+    "carbs": 60,
+    "fat": 70
+    }
+    },
+    {
+    "name": "Breakfast Club Melt High Range",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1020,
+    "protein": 40,
+    "carbs": 60,
+    "fat": 70
+    }
+    },
+    {
+    "name": "The Original Scrambowl",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1560,
+    "protein": 51,
+    "carbs": 132,
+    "fat": 93
+    }
+    },
+    {
+    "name": "Biscuits And Gravy",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1290,
+    "protein": 24,
+    "carbs": 153,
+    "fat": 65
+    }
+    },
+    {
+    "name": "Bear's Choice - Pancakes With Bacon",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1390,
+    "protein": 40,
+    "carbs": 243,
+    "fat": 30
+    }
+    },
+    {
+    "name": "Bear's Choice - Pancakes With Sausage Links",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1550,
+    "protein": 45,
+    "carbs": 244,
+    "fat": 45
+    }
+    },
+    {
+    "name": "Bear's Choice - Pancakes With Ham",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1610,
+    "protein": 62,
+    "carbs": 257,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Bear's Choice - Waffle With Bacon",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 890,
+    "protein": 26,
+    "carbs": 120,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Bear's Choice - French Toast With Bacon",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 800,
+    "protein": 36,
+    "carbs": 114,
+    "fat": 25
+    }
+    },
+    {
+    "name": "Bear's Choice - Biscuits And Gravy With Bacon",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1430,
+    "protein": 40,
+    "carbs": 151,
+    "fat": 73
+    }
+    },
+    {
+    "name": "Bob's Big Bear Burger",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1290,
+    "protein": 64,
+    "carbs": 77,
+    "fat": 78
+    }
+    },
+    {
+    "name": "Chicken Fried Steak And Eggs",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 750,
+    "protein": 42,
+    "carbs": 50,
+    "fat": 40
+    }
+    },
+    {
+    "name": "Hickory Smoked Ham And Eggs",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 600,
+    "protein": 34,
+    "carbs": 19,
+    "fat": 17
+    }
+    },
+    {
+    "name": "New York Steak And Eggs Low Range",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 212,
+    "protein": 12,
+    "carbs": 5,
+    "fat": 16
+    }
+    },
+    {
+    "name": "Mild Patty Sausage And Eggs",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 750,
+    "protein": 35,
+    "carbs": 8,
+    "fat": 64
+    }
+    },
+    {
+    "name": "Hot Patty Sausage And Eggs",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 760,
+    "protein": 35,
+    "carbs": 10,
+    "fat": 64
+    }
+    },
+    {
+    "name": "Corned Beef Hash",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 400,
+    "protein": 34,
+    "carbs": 7,
+    "fat": 28
+    }
+    },
+    {
+    "name": "Thick-Cut Smoked Bacon And Eggs",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 470,
+    "protein": 34,
+    "carbs": 5,
+    "fat": 34
+    }
+    },
+    {
+    "name": "Classic Diner Cheeseburger Basket Single Patty",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1110,
+    "protein": 40,
+    "carbs": 110,
+    "fat": 60
+    }
+    },
+    {
+    "name": "Classic Diner Cheeseburger Basket Double",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1350,
+    "protein": 60,
+    "carbs": 110,
+    "fat": 80
+    }
+    },
+    {
+    "name": "Fish Fry Friday",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 2560,
+    "protein": 54,
+    "carbs": 280,
+    "fat": 136
+    }
+    },
+    {
+    "name": "Prime Rib",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1460,
+    "protein": 72,
+    "carbs": 45,
+    "fat": 110
+    }
+    },
+    {
+    "name": "Fish N Chips",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1740,
+    "protein": 33,
+    "carbs": 171,
+    "fat": 103
+    }
+    },
+    {
+    "name": "Shrimp N Chips",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1455,
+    "protein": 40,
+    "carbs": 210,
+    "fat": 55
+    }
+    },
+    {
+    "name": "Chicken N Waffle",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1230,
+    "protein": 35,
+    "carbs": 140,
+    "fat": 40
+    }
+    },
+    {
+    "name": "Blackened Pesto Salmon",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 960,
+    "protein": 65,
+    "carbs": 45,
+    "fat": 65
+    }
+    },
+    {
+    "name": "Creamy Alfredo Pasta",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1225,
+    "protein": 40,
+    "carbs": 125,
+    "fat": 65
+    }
+    },
+    {
+    "name": "Surf And Turf",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 480,
+    "protein": 10,
+    "carbs": 60,
+    "fat": 10
+    }
+    },
+    {
+    "name": "BBQ Ribs And Shrimp",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1250,
+    "protein": 65,
+    "carbs": 115,
+    "fat": 60
+    }
+    },
+    {
+    "name": "BBQ Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 140,
+    "protein": 0,
+    "carbs": 36,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Bacon Ranch Dipping Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 334,
+    "protein": 1,
+    "carbs": 1,
+    "fat": 35
+    }
+    },
+    {
+    "name": "Cocktail Sauce",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 76,
+    "protein": 0,
+    "carbs": 19,
+    "fat": 0
+    }
+    },
+    {
+    "name": "Chicken Sausage Scramble",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 590,
+    "protein": 36,
+    "carbs": 51,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Avocado Toast Low Range",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 534,
+    "protein": 17,
+    "carbs": 39,
+    "fat": 38
+    }
+    },
+    {
+    "name": "Steel Cut Oatmeal",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 740,
+    "protein": 13,
+    "carbs": 115,
+    "fat": 29
+    }
+    },
+    {
+    "name": "Bigfoot Chicken Fried Steak Homestyle",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1180,
+    "protein": 46,
+    "carbs": 99,
+    "fat": 67
+    }
+    },
+    {
+    "name": "Roasted Turkey homestyle",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 470,
+    "protein": 62,
+    "carbs": 75,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Housemade Meatloaf Homestyle",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1630,
+    "protein": 110,
+    "carbs": 95,
+    "fat": 90
+    }
+    },
+    {
+    "name": "Slow-Cooked Pot Roast Homestyle",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 330,
+    "protein": 25,
+    "carbs": 35,
+    "fat": 10
+    }
+    },
+    {
+    "name": "Santa Maria Tri-Tip Homestyle",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 400,
+    "protein": 52,
+    "carbs": 4,
+    "fat": 20
+    }
+    },
+    {
+    "name": "BBQ Ribs Homestyle",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1800,
+    "protein": 110,
+    "carbs": 85,
+    "fat": 115
+    }
+    },
+    {
+    "name": "The Grizz",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1720,
+    "protein": 65,
+    "carbs": 197,
+    "fat": 71
+    }
+    },
+    {
+    "name": "Bigfoot Chicken Fried Steak And Eggs Hungry Bear",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1180,
+    "protein": 46,
+    "carbs": 226,
+    "fat": 70
+    }
+    },
+    {
+    "name": "Ham And Cheese Omelette Little Less",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 270,
+    "protein": 23,
+    "carbs": 10,
+    "fat": 16
+    }
+    },
+    {
+    "name": "Bowl Of Chili",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 840,
+    "protein": 34,
+    "carbs": 95,
+    "fat": 36
+    }
+    },
+    {
+    "name": "Half Ham Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 300,
+    "protein": 15,
+    "carbs": 32,
+    "fat": 11
+    }
+    },
+    {
+    "name": "Bear Paw Chicken Fried Steak",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 610,
+    "protein": 30,
+    "carbs": 54,
+    "fat": 31
+    }
+    },
+    {
+    "name": "New England Clam Chowder Bowl",
+    "category": "Appetizer",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 495,
+    "protein": 14,
+    "carbs": 30,
+    "fat": 36
+    }
+    },
+    {
+    "name": "Joe's Hobo Omelette",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 620,
+    "protein": 46,
+    "carbs": 13,
+    "fat": 42
+    }
+    },
+    {
+    "name": "Chicken Fried Steak Omelette",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1170,
+    "protein": 60,
+    "carbs": 60,
+    "fat": 80
+    }
+    },
+    {
+    "name": "Bruce's Meat Lover's Omelette",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 690,
+    "protein": 51,
+    "carbs": 11,
+    "fat": 48
+    }
+    },
+    {
+    "name": "2 Sweet Cream Pancakes",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 990,
+    "protein": 22,
+    "carbs": 193,
+    "fat": 15
+    }
+    },
+    {
+    "name": "Cinnamon Roll French Toast",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1460,
+    "protein": 22,
+    "carbs": 191,
+    "fat": 71
+    }
+    },
+    {
+    "name": "Bacon Ranch Dressing 2 Oz",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 330,
+    "protein": 1,
+    "carbs": 1,
+    "fat": 357
+    }
+    },
+    {
+    "name": "Bleu Cheese Dressing 2 Oz",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 250,
+    "protein": 2,
+    "carbs": 2,
+    "fat": 26
+    }
+    },
+    {
+    "name": "1000 Island Dressing 2 Oz",
+    "category": "Sauce",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 200,
+    "protein": 0,
+    "carbs": 5,
+    "fat": 19
+    }
+    },
+    {
+    "name": "Tri Tip Dip Sandwich",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 490,
+    "protein": 41,
+    "carbs": 44,
+    "fat": 16
+    }
+    },
+    {
+    "name": "The Reuben",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 970,
+    "protein": 55,
+    "carbs": 57,
+    "fat": 60
+    }
+    },
+    {
+    "name": "Chicken Avocado Club",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 900,
+    "protein": 57,
+    "carbs": 75,
+    "fat": 40
+    }
+    },
+    {
+    "name": "Crispy Chicken Bacon Ranch Wrap",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1090,
+    "protein": 32,
+    "carbs": 94,
+    "fat": 67
+    }
+    },
+    {
+    "name": "Western BBQ Burger",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 760,
+    "protein": 31,
+    "carbs": 47,
+    "fat": 50
+    }
+    },
+    {
+    "name": "Bacon Cheeseburger Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 840,
+    "protein": 45,
+    "carbs": 21,
+    "fat": 64
+    }
+    },
+    {
+    "name": "Crispy Chicken Cobb Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 860,
+    "protein": 49,
+    "carbs": 53,
+    "fat": 53
+    }
+    },
+    {
+    "name": "Beef Taco Salad",
+    "category": "Entree",
+    "price_estimate": null,
+    "image_url": null,
+    "macros": {
+    "calories": 1340,
+    "protein": 72,
+    "carbs": 100,
+    "fat": 75
+    }
+    }
+    ]
+    }

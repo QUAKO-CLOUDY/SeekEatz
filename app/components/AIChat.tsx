@@ -60,42 +60,60 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   }, [userId]);
 
   useEffect(() => {
+    // Network change detection: reset stuck loading state when going online/offline
+    const handleOnline = () => {
+      console.log('[AIChat] Network came online - resetting loading state');
+      setIsLoading(false);
+      if (abortControllerRef.current) {
+        try { abortControllerRef.current.abort(); } catch (e) { /* ignore */ }
+        abortControllerRef.current = null;
+      }
+    };
+    const handleOffline = () => {
+      console.log('[AIChat] Network went offline - resetting loading state');
+      setIsLoading(false);
+      if (abortControllerRef.current) {
+        try { abortControllerRef.current.abort(); } catch (e) { /* ignore */ }
+        abortControllerRef.current = null;
+      }
+    };
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
     const checkAuth = async () => {
       try {
         const supabase = createClient();
-        // Retry logic for auth check (helps with timing after signup)
+        // Retry logic for auth check — capped at 2 retries, 100ms delay, with per-call timeout
+        const withAuthTimeout = (promise: Promise<any>, ms: number) =>
+          Promise.race([promise, new Promise<any>(resolve => setTimeout(() => resolve({ data: { user: null }, error: null }), ms))]);
+
         let retries = 0;
         let user = null;
 
-        while (retries < 5 && !user) {
-          const { data: { user: fetchedUser }, error } = await supabase.auth.getUser();
-          // AuthSessionMissingError is expected when signed out - treat as not signed in
+        while (retries < 2 && !user) {
+          const { data: { user: fetchedUser }, error } = await withAuthTimeout(supabase.auth.getUser(), 3000);
           if (error && (error.message?.includes('Auth session missing') || error.name === 'AuthSessionMissingError')) {
             setIsSignedIn(false);
-            setIsLimitReached(false); // Clear limit when no user
+            setIsLimitReached(false);
             break;
           } else if (fetchedUser) {
             user = fetchedUser;
             setIsSignedIn(true);
-            setIsLimitReached(false); // Clear limit when user is authenticated
-            // Remove any gate messages
+            setIsLimitReached(false);
             setMessages(prev => prev.filter(msg => !msg.isGateMessage));
             break;
           }
 
-          // If no user and not a session missing error, retry after a short delay
-          if (!fetchedUser && retries < 4) {
-            await new Promise(resolve => setTimeout(resolve, 300));
+          if (!fetchedUser && retries < 1) {
+            await new Promise(resolve => setTimeout(resolve, 100));
           }
           retries++;
         }
 
-        // If still no user after retries, set to false
         if (!user) {
           setIsSignedIn(false);
         }
       } catch (error: any) {
-        // AuthSessionMissingError is expected when signed out - treat as not signed in
         if (error?.message?.includes('Auth session missing') || error?.name === 'AuthSessionMissingError') {
           setIsSignedIn(false);
         } else {
@@ -147,8 +165,10 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
     return () => {
       subscription.unsubscribe();
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     };
-  }, [currentSessionId, setMessages]);
+  }, [currentSessionId, setMessages, setIsLoading]);
   // Local state - chat state is managed by ChatContext
   const [inputText, setInputText] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -836,9 +856,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     // Touch activity when user sends a message
     touchGuestActivity();
 
-    // Log chat submit event (for authenticated users)
+    // Log chat submit event (fire-and-forget — NEVER block the send flow)
     if (isSignedIn) {
-      await logUsageEvent('chat_submit', { message: trimmedText });
+      logUsageEvent('chat_submit', { message: trimmedText }).catch(() => { });
     }
 
     // Cancel any existing request
@@ -1148,13 +1168,10 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               }
             }
 
-            // Log to Supabase (for authenticated users)
+            // Log to Supabase — fire-and-forget, never block the UI while isLoading=true
             if (isSignedIn) {
-              await logChatMessage('assistant', summaryLine, parsedMeals, mealSearchContext);
-              await logUsageEvent('chat_response', {
-                messageCount: parsedMeals.length,
-                hasMeals: true
-              });
+              logChatMessage('assistant', summaryLine, parsedMeals, mealSearchContext).catch(() => { });
+              logUsageEvent('chat_response', { messageCount: parsedMeals.length, hasMeals: true }).catch(() => { });
             }
 
             return; // Done with meal response
@@ -1197,10 +1214,10 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               }
             }
 
-            // Log to Supabase (for authenticated users)
+            // Log to Supabase — fire-and-forget, never block the UI while isLoading=true
             if (isSignedIn) {
-              await logChatMessage('assistant', textContent);
-              await logUsageEvent('chat_response', { hasMeals: false });
+              logChatMessage('assistant', textContent).catch(() => { });
+              logUsageEvent('chat_response', { hasMeals: false }).catch(() => { });
             }
 
             return;

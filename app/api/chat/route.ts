@@ -1500,9 +1500,12 @@ export async function POST(req: Request) {
           });
         }
 
-        // Call searchHandler and return response directly with consistent shape:
-        // { mode: "meals", meals, hasMore, nextOffset, searchKey, summary?, message? }
-        const result = await searchHandler(searchParams);
+        // Call searchHandler with a hard timeout to prevent API from hanging if DB is slow or network changes
+        const SEARCH_TIMEOUT_MS = 25000;
+        const searchTimeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('SEARCH_TIMEOUT: DB query exceeded 25 seconds')), SEARCH_TIMEOUT_MS)
+        );
+        const result = await Promise.race([searchHandler(searchParams), searchTimeoutPromise]);
 
         // SUPERLATIVE POST-PROCESSING: Sort by the correct macro and take top 1
         const superlativeSort = detectSuperlativeSort(message);

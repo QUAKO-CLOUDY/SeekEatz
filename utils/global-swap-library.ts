@@ -290,11 +290,14 @@ export const GLOBAL_SWAP_LIBRARY: SwapLibraryEntry[] = [
         id: 'side-fruit',
         label: 'Fruit instead of chips',
         category: 'SIDE_REPLACEMENT',
-        applicableDishTypes: ['sub', 'wrap', 'generic'],
+        // Only subs and wraps commonly come with chips/crisps as a default side.
+        // 'generic' intentionally removed to prevent this from appearing on bagels,
+        // bowls, smoothies, pizzas, etc. that would never be served with chips.
+        applicableDishTypes: ['sub', 'wrap'],
         impactLabels: ['Reduce calories', 'Reduce fat'],
         heuristicDelta: { calories: [-150, -80], fats: [-10, -5] },
         conflictsWith: ['side-salad', 'side-grilled-veg', 'portion-skip-side'],
-        details: 'Swap chips for fresh fruit',
+        details: 'Swap the chips side for fresh fruit to cut fat and calories',
     },
 
     // ========== BREAKFAST-SPECIFIC SWAPS ==========

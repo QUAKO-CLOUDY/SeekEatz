@@ -1,14 +1,18 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
-import { generateSwapModifications, type MacroGoals } from '@/utils/swap-rule-engine';
+import { type MacroGoals } from '@/utils/swap-rule-engine';
 import { getModifierCandidates } from '@/utils/modifier-candidates';
+import { normalizeMacros } from '@/lib/macro-utils';
+import { generateHybridSwaps } from '@/utils/hybrid-swap-generator';
 /**
- * Swap endpoint: Returns modification suggestions (PRIMARY) and alternative menu items (SECONDARY)
+ * Swap endpoint v2: Hybrid Swap Engine
+ * Returns modification suggestions (DB-backed + global + LLM fallback) and alternative menu items.
  * 
  * Response format:
  * {
- *   modifications: [...],  // Rule-based modification suggestions
- *   alternatives: [...]     // DB-only alternate menu items (fallback)
+ *   modifications: [...],  // Mixed DB + global + LLM swap suggestions
+ *   alternatives: [...],   // DB-only alternate menu items (fallback)
+ *   source: 'db' | 'global' | 'llm' | 'mixed'
  * }
  */
 export async function POST(req: Request) {
@@ -32,10 +36,10 @@ export async function POST(req: Request) {
 
     const supabase = await createClient();
 
-    // ========== PRIMARY: Generate rule-based modifications ==========
+    // ========== PRIMARY: Hybrid Swap Engine v2 ==========
     // Step 1: Fetch modifier candidates from DB (same restaurant only)
     const modifierCandidates = await getModifierCandidates(supabase, restaurant_name);
-    
+
     // Log in dev
     if (process.env.NODE_ENV === 'development') {
       console.log('[swaps] Modifier candidates:', {
@@ -48,7 +52,7 @@ export async function POST(req: Request) {
     // Convert user_goals and constraints to MacroGoals format
     // Normalize fat: prefer fat (singular) from DB, fallback to fats (plural)
     const mealFat = meal_macros?.fat ?? meal_macros?.fats ?? 0;
-    
+
     const macroGoals: MacroGoals = {
       lowerCalories: calorieCap ? (meal_macros?.calories || 0) > calorieCap : undefined,
       higherProtein: minProtein ? (meal_macros?.protein || 0) < minProtein : undefined,
@@ -60,47 +64,51 @@ export async function POST(req: Request) {
       maxFat,
     };
 
-    // Generate modifications using rule engine (DB-backed, async)
-    const modifications = await generateSwapModifications(
+    // Normalize meal macros for hybrid engine
+    const normalizedMealMacros = normalizeMacros(meal_macros) ?? {
+      calories: meal_macros?.calories || 0,
+      protein: meal_macros?.protein || 0,
+      carbs: meal_macros?.carbs || 0,
+      fats: mealFat,
+    };
+
+    // Generate modifications using Hybrid Swap Engine v2
+    const hybridResult = await generateHybridSwaps(
       meal_name,
-      meal_macros || {},
+      normalizedMealMacros,
       macroGoals,
       restaurant_name,
       modifierCandidates
     );
 
-    // Validate modifications (dev-only assertion)
+    // Extract DB-backed modifications
+    const modifications = hybridResult.modifications;
+
+    // Validate DB-backed modifications (dev-only assertion)
     if (process.env.NODE_ENV === 'development') {
       const validModifications = modifications.filter(mod => {
-        // Must have modifierItemIds
         if (!mod.modifierItemIds || mod.modifierItemIds.length === 0) {
           console.warn('[swaps] Modification missing modifierItemIds:', mod.id);
           return false;
         }
-
-        // All modifierItemIds must exist in candidate list
-        const allIdsValid = mod.modifierItemIds.every(id => 
+        const allIdsValid = mod.modifierItemIds.every(id =>
           modifierCandidates.some(candidate => candidate.id === id)
         );
         if (!allIdsValid) {
           console.warn('[swaps] Modification has invalid modifierItemIds:', mod.id, mod.modifierItemIds);
           return false;
         }
-
-        // DeltaMacros must be all numbers (no NaN)
         const delta = mod.estimatedDelta;
         if (isNaN(delta.calories) || isNaN(delta.protein) || isNaN(delta.carbs) || isNaN(delta.fats)) {
           console.warn('[swaps] Modification has NaN in deltaMacros:', mod.id, delta);
           return false;
         }
-
         return true;
       });
 
       if (validModifications.length !== modifications.length) {
         const invalidCount = modifications.length - validModifications.length;
-        console.error(`[swaps] CRITICAL: ${invalidCount} modification(s) failed validation!`);
-        // In dev, throw to catch regressions early
+        console.error(`[swaps] CRITICAL: ${invalidCount} DB modification(s) failed validation!`);
         throw new Error(`[swaps] ${invalidCount} modification(s) failed validation`);
       }
     }
@@ -110,9 +118,10 @@ export async function POST(req: Request) {
     // Alternatives must be: same restaurant, same dish type, and move toward user's constraints
     const alternatives: any[] = [];
 
-    // Only fetch alternatives if we have NO modifications (true fallback scenario)
-    // Modifications are always preferred over alternatives
-    const shouldFetchAlternatives = modifications.length === 0;
+    // Only fetch alternatives if we have NO modifications AND no global/LLM swaps
+    // Modifications + global swaps are always preferred over alternatives
+    const totalHybridSwaps = modifications.length + hybridResult.globalSwaps.length + hybridResult.llmSwaps.length;
+    const shouldFetchAlternatives = totalHybridSwaps === 0;
 
     // Only fetch alternatives if we have no modifications
     if (shouldFetchAlternatives) {
@@ -135,7 +144,7 @@ export async function POST(req: Request) {
           // Must have valid macros
           const macros = item.macros;
           if (!macros || typeof macros !== 'object') return false;
-          
+
           const calories = typeof macros.calories === 'number' ? macros.calories : null;
           if (calories === null || calories < 150 || isNaN(calories)) return false; // Must be a real meal
 
@@ -145,7 +154,7 @@ export async function POST(req: Request) {
           // Apply constraints if provided (alternatives must move toward user's constraints)
           // Normalize fat: prefer fat (singular) from DB, fallback to fats (plural)
           const itemFat = macros.fat ?? macros.fats ?? 0;
-          
+
           if (calorieCap && calories > calorieCap) return false;
           if (minProtein && (macros.protein || 0) < minProtein) return false;
           if (maxCarbs && (macros.carbs || 0) > maxCarbs) return false;
@@ -172,59 +181,108 @@ export async function POST(req: Request) {
       }
     }
 
-    // Map modifications to response format
-    // All modifications are DB-backed and validated (estimatedDelta is required)
-    const mappedModifications = modifications.map((mod, index) => ({
+    // ========== Map all swap types to unified response format ==========
+
+    // 1. Map DB-backed modifications (existing shape)
+    const mappedDBMods = modifications.map((mod, index) => ({
       id: mod.id || `mod-${index}`,
       label: mod.swapTitle,
       expectedEffect: mod.expectedEffect,
       estimatedDelta: mod.estimatedDelta,
       confidenceLabel: mod.confidenceLabel,
       type: mod.type,
-      swapType: mod.swapType, // Goal-aware type
+      swapType: mod.swapType,
       details: mod.details,
-      modifierItemIds: mod.modifierItemIds, // Required, always present
+      modifierItemIds: mod.modifierItemIds,
+      impactLabels: [] as string[],
+      source: 'db' as const,
       deltaMacros: {
         calories: mod.estimatedDelta.calories,
         protein: mod.estimatedDelta.protein,
         carbs: mod.estimatedDelta.carbs,
-        fats: mod.estimatedDelta.fats, // Use "fats" (plural) to match Meal type
+        fats: mod.estimatedDelta.fats,
       },
     }));
 
-    // Final validation: ensure all modifications are valid (production-safe)
-    const validModifications = mappedModifications.filter(mod => {
-      // modifierItemIds must exist and be non-empty
+    // Final validation for DB mods (production-safe)
+    const validDBMods = mappedDBMods.filter(mod => {
       if (!mod.modifierItemIds || mod.modifierItemIds.length === 0) {
         if (process.env.NODE_ENV === 'development') {
-          console.warn('[swaps] Filtered out modification with no modifierItemIds:', mod.id);
+          console.warn('[swaps] Filtered out DB modification with no modifierItemIds:', mod.id);
         }
         return false;
       }
-
-      // All modifierItemIds must exist in candidate list
-      const allIdsValid = mod.modifierItemIds.every(id => 
+      const allIdsValid = mod.modifierItemIds.every(id =>
         modifierCandidates.some(candidate => candidate.id === id)
       );
       if (!allIdsValid) {
         if (process.env.NODE_ENV === 'development') {
-          console.warn('[swaps] Filtered out modification with invalid modifierItemIds:', mod.id, mod.modifierItemIds);
+          console.warn('[swaps] Filtered out DB modification with invalid modifierItemIds:', mod.id, mod.modifierItemIds);
         }
         return false;
       }
-
       return true;
     });
 
-    // Dev assertion: all returned swaps must be valid
-    if (process.env.NODE_ENV === 'development' && validModifications.length !== mappedModifications.length) {
-      const invalidCount = mappedModifications.length - validModifications.length;
-      console.error(`[swaps] CRITICAL: ${invalidCount} modification(s) filtered out due to invalid modifierItemIds!`);
+    // 2. Map global swaps to same response shape (modifierItemIds = [], heuristic deltas)
+    const mappedGlobalSwaps = hybridResult.globalSwaps.map((gs) => ({
+      id: gs.id,
+      label: gs.label,
+      expectedEffect: gs.impactLabels.join(', '),
+      estimatedDelta: gs.estimatedDelta,
+      confidenceLabel: gs.impactType === 'deterministic' ? 'Likely available' as const : 'Ask if available' as const,
+      type: 'modify' as const,
+      swapType: 'neutral' as const,
+      details: gs.details,
+      modifierItemIds: [] as string[], // Global swaps have no DB modifier IDs
+      impactLabels: gs.impactLabels,
+      source: 'global' as const,
+      deltaMacros: {
+        calories: gs.estimatedDelta.calories,
+        protein: gs.estimatedDelta.protein,
+        carbs: gs.estimatedDelta.carbs,
+        fats: gs.estimatedDelta.fats,
+      },
+    }));
+
+    // 3. Map LLM swaps to same response shape
+    const mappedLLMSwaps = hybridResult.llmSwaps.map((ls) => ({
+      id: ls.id,
+      label: ls.label,
+      expectedEffect: ls.impactLabels.join(', '),
+      estimatedDelta: ls.estimatedDelta || { calories: 0, protein: 0, carbs: 0, fats: 0 },
+      confidenceLabel: 'Ask if available' as const,
+      type: 'modify' as const,
+      swapType: 'neutral' as const,
+      details: ls.details,
+      modifierItemIds: [] as string[],
+      impactLabels: ls.impactLabels,
+      source: 'llm' as const,
+      deltaMacros: ls.estimatedDelta ? {
+        calories: ls.estimatedDelta.calories,
+        protein: ls.estimatedDelta.protein,
+        carbs: ls.estimatedDelta.carbs,
+        fats: ls.estimatedDelta.fats,
+      } : { calories: 0, protein: 0, carbs: 0, fats: 0 },
+    }));
+
+    // Combine all swap types into unified modifications array
+    const allModifications = [...validDBMods, ...mappedGlobalSwaps, ...mappedLLMSwaps];
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[swaps] Final response:', {
+        dbMods: validDBMods.length,
+        globalSwaps: mappedGlobalSwaps.length,
+        llmSwaps: mappedLLMSwaps.length,
+        total: allModifications.length,
+        source: hybridResult.source,
+      });
     }
 
     return NextResponse.json({
-      modifications: validModifications,
+      modifications: allModifications,
       alternatives: alternatives,
+      source: hybridResult.source,
     });
   } catch (error) {
     console.error('[swaps] Error:', error);

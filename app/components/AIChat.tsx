@@ -160,6 +160,15 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const [isAtBottom, setIsAtBottom] = useState(true);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
+  // Safety: Reset isLoading on mount in case a previous in-flight request
+  // was killed by a browser refresh (the finally block never ran).
+  useEffect(() => {
+    setIsLoading(false);
+    // Also abort any lingering request (ref is reset on remount)
+    abortControllerRef.current = null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // User location state (for nearby meal filtering)
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
@@ -860,9 +869,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       content: trimmedText
     };
 
-    // Log user message to Supabase (if authenticated)
+    // Log user message to Supabase (fire-and-forget — never block the send flow)
     if (isSignedIn) {
-      await logChatMessage('user', trimmedText);
+      logChatMessage('user', trimmedText).catch(() => { });
     }
 
     // Add user message optimistically

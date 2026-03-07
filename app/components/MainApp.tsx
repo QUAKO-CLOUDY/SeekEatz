@@ -224,6 +224,18 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         localStorage.getItem('hasCompletedOnboarding') === 'true'
         : false;
 
+      // Fast path for /chat route: skip auth checks entirely.
+      // AIChat.tsx has its own auth listener and handles gating.
+      // This prevents the 200–600ms auth-retry delay on every chat refresh.
+      if (isChatRoute) {
+        if (!isOnboarded) {
+          setAppState('onboarding');
+        } else {
+          setAppState('app');
+        }
+        return;
+      }
+
       // Check Supabase session - retry if not found initially (session might still be propagating)
       // Treat AuthSessionMissingError as "no user" (signed-out preview mode)
       let user = null;
@@ -300,13 +312,6 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           return 'onboarding';
         } else if (!user) {
           // Onboarded but not authenticated
-          // If we're on the /chat route, allow preview access (don't show auth screen)
-          // The AIChat component will handle the free chat limit and redirect to /auth/signin if needed
-          if (isChatRoute) {
-            // Allow chat preview - show app UI, AIChat will handle limit logic
-            return 'app';
-          }
-
           // If onboarding was just completed (recent localStorage flag), give session time to propagate
           // Check if onboardingCompleted flag was set very recently (within last 5 seconds)
           const onboardingTimestamp = typeof window !== 'undefined'
@@ -326,35 +331,22 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
                     setAppState('app');
                   } else {
                     // If error is AuthSessionMissingError, treat as no user (expected for signed-out)
-                    // Only show auth screen if NOT on chat route
-                    if (!isChatRoute && retryError && !retryError.message?.includes('Auth session missing')) {
+                    if (retryError && !retryError.message?.includes('Auth session missing')) {
                       setAppState('auth');
                     } else {
-                      // On chat route or session missing (signed-out preview) - show app
                       setAppState('app');
                     }
                   }
                 } catch (error: any) {
-                  // AuthSessionMissingError is expected when signed out - show app for preview
-                  if (error?.message?.includes('Auth session missing') || error?.name === 'AuthSessionMissingError') {
-                    setAppState('app');
-                  } else {
-                    // Other errors - only show auth if NOT on chat route
-                    if (!isChatRoute) {
-                      setAppState('auth');
-                    } else {
-                      setAppState('app');
-                    }
-                  }
+                  setAppState('auth');
                 }
               }, 1000);
               // Return current state while waiting
               return currentState || 'app';
             }
           }
-          // Onboarded but not authenticated - show auth (unless on chat route)
-          // On chat route, allow preview access
-          return isChatRoute ? 'app' : 'auth';
+          // Onboarded but not authenticated - show auth
+          return 'auth';
         } else {
           // Onboarded and authenticated - show app
           return 'app';

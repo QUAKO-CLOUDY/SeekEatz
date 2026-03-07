@@ -1,3 +1,6 @@
-export async function POST(request: Request) {
-    return Response.json({ status: 'ok' });
+import { NextResponse } from 'next/server';
+
+export async function POST() {
+    // TODO: implement telemetry click tracking
+    return NextResponse.json({ ok: true });
 }

@@ -5,6 +5,11 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import LandingPage from './components/LandingPage';
 
+/**
+ * Root page: checks if the user is already signed in and has completed onboarding.
+ * Returning authenticated users go directly to /chat.
+ * Everyone else sees the landing page.
+ */
 export default function RootPage() {
   const router = useRouter();
   const [showLanding, setShowLanding] = useState(false);

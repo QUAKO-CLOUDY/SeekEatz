@@ -50,12 +50,12 @@ export interface SearchInput {
         userId?: string;
     };
 
-    // Homepage-specific fields
+    // Homepage-specific fields (all macros support above/below + exclude when enabled: false)
     filters?: {
         calories?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
-        protein?: { enabled: boolean; min: number };
-        carbs?: { enabled: boolean; min: number };
-        fats?: { enabled: boolean; min: number };
+        protein?: { enabled: boolean; mode?: "BELOW" | "ABOVE"; value?: number; min?: number };
+        carbs?: { enabled: boolean; mode?: "BELOW" | "ABOVE"; value?: number; min?: number };
+        fats?: { enabled: boolean; mode?: "BELOW" | "ABOVE"; value?: number; min?: number };
     };
     macroFilters?: {
         proteinMin?: number;
@@ -129,35 +129,38 @@ export async function buildSearchParams(input: SearchInput): Promise<SearchParam
         fatsMax?: number;
     } | null = null;
 
-    if (input.isHomepage && input.filters) {
-        // Homepage: use new structured filters with enabled flags
-        // Only set values when enabled is true
+    if (input.isHomepage && (input.filters || input.macroFilters)) {
+        // Homepage: prefer structured filters; fall back to macroFilters for any missing value
+        const p = input.filters?.protein;
+        const c = input.filters?.carbs;
+        const f = input.filters?.fats;
+        const val = (x: typeof p) => (x?.value ?? x?.min);
+        const fromFilters = input.filters
+            ? {
+                caloriesMax: input.filters.calories?.enabled && input.filters.calories.mode === "BELOW"
+                    ? input.filters.calories.value
+                    : undefined,
+                caloriesMin: input.filters.calories?.enabled && input.filters.calories.mode === "ABOVE"
+                    ? input.filters.calories.value
+                    : undefined,
+                proteinMin: p?.enabled && (p.mode === "ABOVE" || !p.mode) ? (val(p) ?? undefined) : undefined,
+                proteinMax: p?.enabled && p.mode === "BELOW" ? (val(p) ?? undefined) : undefined,
+                carbsMin: c?.enabled && (c.mode === "ABOVE" || !c.mode) ? (val(c) ?? undefined) : undefined,
+                carbsMax: c?.enabled && c.mode === "BELOW" ? (val(c) ?? undefined) : undefined,
+                fatsMin: f?.enabled && (f.mode === "ABOVE" || !f.mode) ? (val(f) ?? undefined) : undefined,
+                fatsMax: f?.enabled && f.mode === "BELOW" ? (val(f) ?? undefined) : undefined,
+            }
+            : null;
+        const fallback = input.macroFilters || {};
         mergedMacroFilters = {
-            proteinMin: input.filters.protein?.enabled ? input.filters.protein.min : undefined,
-            carbsMin: input.filters.carbs?.enabled ? input.filters.carbs.min : undefined,
-            fatsMin: input.filters.fats?.enabled ? input.filters.fats.min : undefined,
-            caloriesMax: input.filters.calories?.enabled && input.filters.calories.mode === "BELOW"
-                ? input.filters.calories.value
-                : undefined,
-            caloriesMin: input.filters.calories?.enabled && input.filters.calories.mode === "ABOVE"
-                ? input.filters.calories.value
-                : undefined,
-            // No max values for protein/carbs/fats (they are always minimums on homepage)
-            proteinMax: undefined,
-            carbsMax: undefined,
-            fatsMax: undefined,
-        };
-    } else if (input.isHomepage && input.macroFilters) {
-        // Homepage: fallback to legacy macroFilters format
-        mergedMacroFilters = {
-            proteinMin: input.macroFilters.proteinMin,
-            carbsMin: input.macroFilters.carbsMin,
-            fatsMin: input.macroFilters.fatsMin,
-            caloriesMax: input.macroFilters.caloriesMax,
-            caloriesMin: input.macroFilters.caloriesMin,
-            proteinMax: undefined,
-            carbsMax: undefined,
-            fatsMax: undefined,
+            caloriesMax: fromFilters?.caloriesMax ?? fallback.caloriesMax,
+            caloriesMin: fromFilters?.caloriesMin ?? fallback.caloriesMin,
+            proteinMin: fromFilters?.proteinMin ?? fallback.proteinMin,
+            proteinMax: fromFilters?.proteinMax ?? fallback.proteinMax,
+            carbsMin: fromFilters?.carbsMin ?? fallback.carbsMin,
+            carbsMax: fromFilters?.carbsMax ?? fallback.carbsMax,
+            fatsMin: fromFilters?.fatsMin ?? fallback.fatsMin,
+            fatsMax: fromFilters?.fatsMax ?? fallback.fatsMax,
         };
     } else if (macroFilters) {
         // Non-homepage: merge extracted filters with input params

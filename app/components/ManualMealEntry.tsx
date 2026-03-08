@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -10,34 +10,53 @@ import type { Meal } from "../types";
 type Props = {
   onAddMeal: (meal: Meal) => void;
   onClose: () => void;
+  /** When provided, form is in edit mode and onUpdateMeal is called on submit */
+  editLogId?: string;
+  initialMeal?: Meal;
+  onUpdateMeal?: (logId: string, meal: Meal) => void;
 };
 
-export function ManualMealEntry({ onAddMeal, onClose }: Props) {
+export function ManualMealEntry({ onAddMeal, onClose, editLogId, initialMeal, onUpdateMeal }: Props) {
   const [mealName, setMealName] = useState("");
   const [calories, setCalories] = useState("");
   const [protein, setProtein] = useState("");
   const [carbs, setCarbs] = useState("");
   const [fats, setFats] = useState("");
 
-  const handleSubmit = () => {
-    if (!mealName || !calories || !protein || !carbs || !fats) {
-      return;
+  const isEdit = Boolean(editLogId && initialMeal && onUpdateMeal);
+
+  useEffect(() => {
+    if (initialMeal) {
+      setMealName(initialMeal.name);
+      setCalories(String(initialMeal.calories ?? ""));
+      setProtein(String(initialMeal.protein ?? ""));
+      setCarbs(String(initialMeal.carbs ?? ""));
+      setFats(String(initialMeal.fats ?? ""));
     }
+  }, [initialMeal]);
+
+  const handleSubmit = () => {
+    if (!mealName || !calories || !protein || !carbs || !fats) return;
 
     const meal: Meal = {
-      id: `manual-${Date.now()}`,
+      id: initialMeal?.id ?? `manual-${Date.now()}`,
       name: mealName,
-      restaurant: "Manual Entry",
-      rating: 0,
+      restaurant: initialMeal?.restaurant ?? "Manual Entry",
+      rating: initialMeal?.rating ?? 0,
       category: "restaurant",
-      image: "https://images.unsplash.com/photo-1547592180-85f173990554?w=400",
-      calories: parseInt(calories),
-      protein: parseInt(protein),
-      carbs: parseInt(carbs),
-      fats: parseInt(fats), // Changed 'fats' to 'fat' to match the Type definition
+      image: initialMeal?.image ?? "/logos/default.png",
+      calories: parseInt(calories, 10) || 0,
+      protein: parseInt(protein, 10) || 0,
+      carbs: parseInt(carbs, 10) || 0,
+      fats: parseInt(fats, 10) || 0,
     };
 
-    onAddMeal(meal);
+    if (isEdit && editLogId && onUpdateMeal) {
+      onUpdateMeal(editLogId, meal);
+    } else {
+      onAddMeal(meal);
+    }
+    onClose();
   };
 
   const isValid = mealName && calories && protein && carbs && fats;
@@ -47,7 +66,7 @@ export function ManualMealEntry({ onAddMeal, onClose }: Props) {
       <div className="w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-800 border-t border-gray-700 rounded-t-3xl p-6 animate-slide-up">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-white">Add Meal Manually</h2>
+          <h2 className="text-white">{isEdit ? "Edit meal" : "Add meal manually"}</h2>
           <Button
             variant="ghost"
             size="icon"
@@ -147,7 +166,7 @@ export function ManualMealEntry({ onAddMeal, onClose }: Props) {
             className="flex-1 h-12 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 shadow-lg shadow-cyan-500/30 disabled:opacity-50 disabled:shadow-none"
           >
             <Check className="mr-2 w-5 h-5" />
-            Add Meal
+            {isEdit ? "Save changes" : "Add meal"}
           </Button>
         </div>
       </div>

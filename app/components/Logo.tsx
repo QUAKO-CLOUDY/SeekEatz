@@ -43,92 +43,40 @@ export default function Logo({
           </linearGradient>
           {/* Clip path to show menu lines only inside the magnifying glass */}
           <clipPath id={`menuClip-${gradientId}`}>
-            <circle cx="14" cy="14" r="8" />
+            <circle cx="14" cy="14" r="9.5" />
           </clipPath>
         </defs>
         
-        {/* Menu lines visible through the magnifying glass */}
+        {/* Mini floating menu - centered inside the glass */}
         <g clipPath={`url(#menuClip-${gradientId})`}>
           {/* Background fill for menu area */}
           <circle
             cx="14"
             cy="14"
-            r="8"
+            r="9.5"
             fill="rgba(6, 182, 212, 0.08)"
           />
           
-          {/* Menu item lines - more realistic menu appearance */}
-          {/* Menu item 1 */}
-          <line
-            x1="7"
-            y1="9"
-            x2="17"
-            y2="9"
-            stroke={`url(#${gradientId})`}
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            opacity="0.5"
-          />
-          <circle cx="18" cy="9" r="0.8" fill={`url(#${gradientId})`} opacity="0.4" />
-          
-          {/* Menu item 2 */}
-          <line
-            x1="7"
-            y1="11.5"
-            x2="19"
-            y2="11.5"
-            stroke={`url(#${gradientId})`}
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            opacity="0.5"
-          />
-          <circle cx="20" cy="11.5" r="0.8" fill={`url(#${gradientId})`} opacity="0.4" />
-          
-          {/* Menu item 3 - shorter line */}
-          <line
-            x1="7"
-            y1="14"
-            x2="15"
-            y2="14"
-            stroke={`url(#${gradientId})`}
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            opacity="0.5"
-          />
-          <circle cx="16" cy="14" r="0.8" fill={`url(#${gradientId})`} opacity="0.4" />
-          
-          {/* Menu item 4 */}
-          <line
-            x1="7"
-            y1="16.5"
-            x2="18"
-            y2="16.5"
-            stroke={`url(#${gradientId})`}
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            opacity="0.5"
-          />
-          <circle cx="19" cy="16.5" r="0.8" fill={`url(#${gradientId})`} opacity="0.4" />
-          
-          {/* Menu item 5 */}
-          <line
-            x1="7"
-            y1="19"
-            x2="16"
-            y2="19"
-            stroke={`url(#${gradientId})`}
-            strokeWidth="1.2"
-            strokeLinecap="round"
-            opacity="0.5"
-          />
-          <circle cx="17" cy="19" r="0.8" fill={`url(#${gradientId})`} opacity="0.4" />
+          {/* Compact menu block inside the glass */}
+          <g transform="translate(14, 14)">
+            <line x1="-5" y1="-4" x2="4" y2="-4" stroke={`url(#${gradientId})`} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+            <circle cx="5" cy="-4" r="0.6" fill={`url(#${gradientId})`} opacity="0.5" />
+            <line x1="-5" y1="-2" x2="5" y2="-2" stroke={`url(#${gradientId})`} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+            <circle cx="5.5" cy="-2" r="0.6" fill={`url(#${gradientId})`} opacity="0.5" />
+            <line x1="-5" y1="0" x2="3" y2="0" stroke={`url(#${gradientId})`} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+            <circle cx="4" cy="0" r="0.6" fill={`url(#${gradientId})`} opacity="0.5" />
+            <line x1="-5" y1="2" x2="4" y2="2" stroke={`url(#${gradientId})`} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+            <circle cx="5" cy="2" r="0.6" fill={`url(#${gradientId})`} opacity="0.5" />
+            <line x1="-5" y1="4" x2="3" y2="4" stroke={`url(#${gradientId})`} strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+            <circle cx="4" cy="4" r="0.6" fill={`url(#${gradientId})`} opacity="0.5" />
+          </g>
         </g>
         
-        {/* Magnifying Glass Circle */}
+        {/* Magnifying Glass Circle - slightly bigger */}
         <circle
           cx="14"
           cy="14"
-          r="8"
+          r="9.5"
           stroke={`url(#${gradientId})`}
           strokeWidth="2"
           fill="none"
@@ -137,8 +85,8 @@ export default function Logo({
         
         {/* Magnifying Glass Handle */}
         <line
-          x1="20"
-          y1="20"
+          x1="20.7"
+          y1="20.7"
           x2="26"
           y2="26"
           stroke={`url(#${gradientId})`}

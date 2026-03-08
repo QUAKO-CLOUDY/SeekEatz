@@ -1,6 +1,7 @@
 "use client";
 
-import { Home, Activity, Sparkles, Heart, Settings as SettingsIcon } from "lucide-react";
+import { Home, Activity, Heart, Settings as SettingsIcon } from "lucide-react";
+import Logo from "./Logo";
 
 export type Screen = "home" | "log" | "chat" | "favorites" | "settings" | "search";
 
@@ -100,7 +101,7 @@ export function Navigation({ currentScreen, onNavigate }: Props) {
                 "0 4px 20px rgba(6,182,212,0.5), 0 2px 10px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.3)",
             }}
           >
-            <Sparkles className="w-5 h-5 text-white" strokeWidth={2.5} />
+            <Logo className="[&_svg]:w-5 [&_svg]:h-5 [&_svg]:brightness-0 [&_svg]:invert" size="sm" showText={false} />
 
             {/* Active ring pulse */}
             {isAIChatActive && (

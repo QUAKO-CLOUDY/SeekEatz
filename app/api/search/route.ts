@@ -3,31 +3,31 @@ import { buildSearchParams } from '@/lib/search-utils';
 
 export const dynamic = 'force-dynamic';
 
+const SEARCH_TIMEOUT_MS = 22000; // 22s server timeout (client uses 25s)
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-
-    // This endpoint is purely for executing the search
-    // called by the "Load More" button or internally by the Chat Router
-
-    // Normalize input: searchKey is the single source of truth for pagination
-    // Don't clear query - let searchHandler reconstruct from searchKey if present
     const normalizedInput = {
       ...body,
       query: body.query || body.message || '',
     };
 
-    // Build normalized SearchParams using unified function
     const searchParams = await buildSearchParams(normalizedInput);
 
-    // Check authentication and usage limits
     const { createClient } = await import('@/utils/supabase/server');
-    const { hasRemainingUsage, incrementUsageCount, getUsageCount } = await import('@/lib/usage-cookie');
+    const { hasRemainingUsage, incrementUsageCount } = await import('@/lib/usage-cookie');
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const authPromise = supabase.auth.getUser();
+    const authWithTimeout = Promise.race([
+      authPromise,
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Auth timeout')), 8000)
+      ),
+    ]);
+    const { data: { user } } = await authWithTimeout;
 
-    // If not authenticated, check usage limit
     if (!user) {
       const allowed = await hasRemainingUsage();
       if (!allowed) {
@@ -39,10 +39,13 @@ export async function POST(req: Request) {
       }
     }
 
-    // Call searchHandler with consistent shape
-    const result = await searchHandler(searchParams);
+    const result = await Promise.race([
+      searchHandler(searchParams),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Search timeout')), SEARCH_TIMEOUT_MS)
+      ),
+    ]);
 
-    // Increment usage count for unauthenticated users
     if (!user) {
       await incrementUsageCount();
     }
@@ -50,6 +53,10 @@ export async function POST(req: Request) {
     return Response.json(result);
   } catch (error) {
     console.error('Search Route API Error:', error);
-    return Response.json({ error: 'Internal Server Error' }, { status: 500 });
+    const isTimeout = error instanceof Error && (error.message === 'Auth timeout' || error.message === 'Search timeout');
+    return Response.json(
+      { error: isTimeout ? 'Request timed out' : 'Internal Server Error' },
+      { status: isTimeout ? 504 : 500 }
+    );
   }
 }

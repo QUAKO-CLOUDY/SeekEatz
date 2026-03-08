@@ -126,6 +126,15 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
 
+  /* Landing: anchor targets sit below fixed nav */
+  #hero,
+  #features,
+  #why-seekeatz,
+  #faq,
+  #cta {
+    scroll-margin-top: 5rem;
+  }
+
   .bg-gradient-radial {
     background-image: radial-gradient(var(--tw-gradient-stops));
   }
@@ -147,3 +156,114 @@
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
 }
+
+@keyframes mini-ring-pulse {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+.animate-mini-ring {
+  animation: mini-ring-pulse 2s ease-in-out infinite;
+}
+
+/* Landing: hero-centric animations (ease-out for snappier feel) */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes float-soft {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(2%, -2%) scale(1.02); }
+}
+
+@keyframes blob-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-float-soft {
+  animation: float-soft 8s ease-in-out infinite;
+}
+
+.animate-blob-pulse {
+  animation: blob-pulse 6s ease-in-out infinite;
+}
+
+/* Plate area: animated gradient shift */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes gradient-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Plate background: drifting / floating movement (centered: -50%, -50%) */
+@keyframes plate-float-1 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0) scale(1); }
+  25% { transform: translate(-50%, -50%) translate(12px, -15px) scale(1.05); }
+  50% { transform: translate(-50%, -50%) translate(-8px, -8px) scale(0.95); }
+  75% { transform: translate(-50%, -50%) translate(-15px, 10px) scale(1.02); }
+}
+
+@keyframes plate-float-2 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0) scale(1); }
+  33% { transform: translate(-50%, -50%) translate(-20px, 5px) scale(1.08); }
+  66% { transform: translate(-50%, -50%) translate(10px, 18px) scale(0.92); }
+}
+
+@keyframes plate-float-3 {
+  0%, 100% { transform: translate(-50%, -50%) translate(0, 0) scale(1); }
+  50% { transform: translate(-50%, -50%) translate(15px, 12px) scale(1.06); }
+}
+
+@keyframes plate-orbit {
+  0% { transform: rotate(0deg) translateX(45px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(45px) rotate(-360deg); }
+}
+
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 8s ease-in-out infinite;
+}
+
+.animate-gradient-rotate {
+  animation: gradient-rotate 12s linear infinite;
+}
+
+.animate-plate-float-1 { animation: plate-float-1 6s ease-in-out infinite; }
+.animate-plate-float-2 { animation: plate-float-2 8s ease-in-out infinite; }
+.animate-plate-float-3 { animation: plate-float-3 7s ease-in-out infinite; }
+.animate-plate-orbit { animation: plate-orbit 15s linear infinite; }
+
+/* Stagger delays for hero children */
+.landing-hero-stagger-0 { animation-delay: 0ms; }
+.landing-hero-stagger-1 { animation-delay: 80ms; }
+.landing-hero-stagger-2 { animation-delay: 160ms; }
+.landing-hero-stagger-3 { animation-delay: 240ms; }
+.landing-hero-stagger-4 { animation-delay: 320ms; }
+.landing-hero-stagger-5 { animation-delay: 400ms; }
+.landing-hero-stagger-6 { animation-delay: 520ms; }
+.landing-hero-stagger-7 { animation-delay: 640ms; }

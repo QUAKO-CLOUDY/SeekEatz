@@ -6,8 +6,9 @@ export function AppContainer({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isWaitlist = pathname?.startsWith('/waitlist');
   const isLanding = pathname === '/';
+  const isLanding2 = pathname === '/landing-2';
 
-  if (isWaitlist || isLanding) {
+  if (isWaitlist || isLanding || isLanding2) {
     // Full-width layout for waitlist and landing pages
     return <>{children}</>;
   }

@@ -19,7 +19,9 @@ import {
   UtensilsCrossed,
   Beef,
   Wheat,
-  Droplets
+  Droplets,
+  BottleWine,
+  ArrowRightLeft
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AnimatedNumber } from './AnimatedNumber';
@@ -676,41 +678,56 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
           <div className="px-5 pt-4 space-y-6">
 
             {/* TITLE & INFO: Restaurant bigger/bold, dish name smaller underneath */}
-            <div>
-              <h1 className="text-foreground text-xl font-bold leading-tight">{meal.restaurant_name || meal.restaurant}</h1>
-              <div className="flex items-center gap-2 flex-wrap mt-1">
-                <p className="text-muted-foreground text-base font-medium leading-tight">{meal.name}</p>
-                {proteinDensity.badge && (
-                  <span className={`${proteinDensity.badge.bg} border px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shrink-0`}>
-                    <span>{proteinDensity.badge.emoji}</span>
-                    <span>{proteinDensity.badge.text}</span>
-                  </span>
-                )}
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <h1 className="text-foreground text-2xl font-bold leading-tight">{meal.restaurant_name || meal.restaurant}</h1>
+                <div className="flex items-center gap-2 flex-wrap mt-1">
+                  <p className="text-muted-foreground text-base font-medium leading-tight">{meal.name}</p>
+                  {proteinDensity.badge && (
+                    <span className={`${proteinDensity.badge.bg} border px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shrink-0`}>
+                      <span>{proteinDensity.badge.emoji}</span>
+                      <span>{proteinDensity.badge.text}</span>
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
+                  {distance && (
+                    <>
+                      <div className="flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
+                        {distance} away
+                      </div>
+                    </>
+                  )}
+                  {prepTime && (
+                    <>
+                      <span className="w-1 h-1 rounded-full bg-border"></span>
+                      <div className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {prepTime} pickup
+                      </div>
+                    </>
+                  )}
+                  {locationLabel && (
+                    <>
+                      <span className="w-1 h-1 rounded-full bg-border"></span>
+                      <span>{locationLabel}</span>
+                    </>
+                  )}
+                </div>
               </div>
-              <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
-                {distance && (
-                  <>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
-                      {distance} away
-                    </div>
-                  </>
-                )}
-                {prepTime && (
-                  <>
-                    <span className="w-1 h-1 rounded-full bg-border"></span>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      {prepTime} pickup
-                    </div>
-                  </>
-                )}
-                {locationLabel && (
-                  <>
-                    <span className="w-1 h-1 rounded-full bg-border"></span>
-                    <span>{locationLabel}</span>
-                  </>
-                )}
+
+              {/* Restaurant logo — larger square box to the far right */}
+              <div className="flex-shrink-0 w-20 h-20 rounded-2xl bg-muted/80 border border-border flex items-center justify-center overflow-hidden shadow-sm">
+                <img
+                  src={getLogo(meal.restaurant_name || meal.restaurant || '')}
+                  alt={meal.restaurant_name || meal.restaurant || ''}
+                  className="w-full h-full object-contain p-2"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = '/logos/default.png';
+                  }}
+                />
               </div>
             </div>
 
@@ -863,7 +880,7 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
-                    <UtensilsCrossed className="w-4 h-4 text-white" />
+                    <BottleWine className="w-4 h-4 text-white" />
                   </div>
                   <p className="text-foreground font-medium">Sauces</p>
                 </div>
@@ -879,8 +896,8 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                           key={sauce.id}
                           onClick={() => setSelectedSauceIds((prev) => (prev.includes(sauce.id) ? prev.filter((x) => x !== sauce.id) : [...prev, sauce.id]))}
                           className={`rounded-xl border px-3 py-2 text-left text-sm transition-all ${isSelected
-                              ? 'bg-amber-500/20 border-amber-500/50 text-foreground'
-                              : 'bg-muted/50 border-border text-muted-foreground hover:border-amber-500/30'
+                            ? 'bg-amber-500/20 border-amber-500/50 text-foreground'
+                            : 'bg-muted/50 border-border text-muted-foreground hover:border-amber-500/30'
                             }`}
                         >
                           <span className="font-medium">{sauce.name}</span>
@@ -892,19 +909,19 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                 )}
                 {selectedSauceIds.length > 0 && (
                   <p className="text-amber-600 dark:text-amber-400 text-xs mt-2">
-                    +{sauceMacrosSum.calories} cal from sauces — Log to Tracker reflects updated total.
+                    +{sauceMacrosSum.calories} Calories from sauces. Log to tracker to reflect the updated total.
                   </p>
                 )}
               </div>
             )}
 
-            {/* AI SUGGESTED SWAPS - Uses selectedMealSwaps (same as log modal) */}
+            {/* SUGGESTED SWAPS - Uses selectedMealSwaps (same as log modal) */}
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-lg flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-white" />
+                  <ArrowRightLeft className="w-4 h-4 text-white" />
                 </div>
-                <p className="text-foreground font-medium">AI-Suggested Swaps</p>
+                <p className="text-foreground font-medium">Suggested Swaps</p>
               </div>
               <div className="space-y-2">
                 {isLoadingSwaps ? (
@@ -1145,8 +1162,8 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                       key={swap.id}
                       onClick={() => toggleSwap(swap.id)}
                       className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${isSelected
-                          ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-cyan-500 shadow-lg shadow-cyan-500/20'
-                          : 'bg-muted border-border hover:border-border/80'
+                        ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-cyan-500 shadow-lg shadow-cyan-500/20'
+                        : 'bg-muted border-border hover:border-border/80'
                         }`}
                     >
                       <div className="flex items-center gap-3">

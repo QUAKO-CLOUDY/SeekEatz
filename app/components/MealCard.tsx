@@ -19,10 +19,10 @@ type Props = {
 
 export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact = false, userProfile, loggedMeals = [] }: Props) {
   const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);
-  
+
   // Determine if log data is ready (userProfile must exist)
   const logReady = userProfile !== undefined && userProfile !== null;
-  
+
   // Calculate stable dependency key for today's meals (outside useMemo dependency array)
   const todaysMealsKey = useMemo(() => {
     if (!logReady) return '0-0';
@@ -34,39 +34,39 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
     }, 0);
     return `${count}-${total}`;
   }, [loggedMeals, todayStr, logReady]);
-  
+
   // Compute caloriesRemainingFromLog once (memoized) - base remaining from log data
   const caloriesRemainingFromLog = useMemo(() => {
     if (!logReady || !userProfile) return null;
-    
-    const targetCalories = typeof userProfile.target_calories === 'number' 
-      ? userProfile.target_calories 
+
+    const targetCalories = typeof userProfile.target_calories === 'number'
+      ? userProfile.target_calories
       : parseFloat(userProfile.target_calories as any) || 0;
-    
+
     // Calculate today's consumed calories from log
     const todaysMeals = loggedMeals.filter(loggedMeal => loggedMeal.date === todayStr);
     const todaysConsumedCalories = todaysMeals.reduce((sum, loggedMeal) => {
-      const calories = typeof loggedMeal.meal.calories === 'number' 
-        ? loggedMeal.meal.calories 
+      const calories = typeof loggedMeal.meal.calories === 'number'
+        ? loggedMeal.meal.calories
         : (typeof loggedMeal.meal.calories === 'string' ? parseFloat(loggedMeal.meal.calories) : 0);
       return sum + (isNaN(calories) ? 0 : Math.round(calories));
     }, 0);
-    
+
     // Base remaining: target - consumed
     return Math.round(targetCalories - todaysConsumedCalories);
   }, [logReady, userProfile?.target_calories, todaysMealsKey, todayStr]);
-  
+
   // Per meal card: remainingIfEat = caloriesRemainingFromLog - meal.calories
   const remainingCalories = useMemo(() => {
     if (!logReady || caloriesRemainingFromLog === null) return null;
-    
+
     // Get meal calories (ensure numeric)
     const mealCalories = Number(meal.calories ?? 0);
     const safeMealCalories = isNaN(mealCalories) ? 0 : Math.round(mealCalories);
-    
+
     // Remaining if this meal is eaten
     const remainingIfEat = caloriesRemainingFromLog - safeMealCalories;
-    
+
     // Dev log
     if (process.env.NODE_ENV === 'development' && logReady) {
       console.log('[calories]', {
@@ -76,18 +76,18 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
         mealName: meal.name
       });
     }
-    
+
     return remainingIfEat;
   }, [logReady, caloriesRemainingFromLog, meal.calories, meal.name]);
 
   // Removed useEffect - using derived values only (no state updates based on dependencies)
   // Extract restaurant name (handle both restaurant_name from Supabase and restaurant from Meal type)
   const restaurantName = (meal as any).restaurant_name || meal.restaurant || "Unknown";
-  
+
   // State to track logo source (with fallback to default.png)
   const [logoSrc, setLogoSrc] = useState(getLogo(restaurantName));
   const [logoVersion, setLogoVersion] = useState(Date.now().toString());
-  
+
   // Reset logo src when meal changes and update version to bust cache
   useEffect(() => {
     const newLogoSrc = getLogo(restaurantName);
@@ -106,9 +106,9 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
 
   // Check if it's a grocery/hot bar item
   const category = meal.category as string | undefined;
-  const isGrocery = category === 'grocery' || 
-                  category === 'Grocery' || 
-                  category === 'Hot Bar';
+  const isGrocery = category === 'grocery' ||
+    category === 'Grocery' ||
+    category === 'Hot Bar';
 
   // Compact mode: horizontal layout matching reference image (340px × 75px)
   if (compact) {
@@ -124,8 +124,8 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
         <div className="flex items-center h-full px-2.5 gap-2">
           {/* Left Logo - Restaurant Logo */}
           <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-700">
-            <img 
-              src={logoSrcWithCacheBust} 
+            <img
+              src={logoSrcWithCacheBust}
               alt={restaurantName}
               className="w-full h-full object-contain p-1"
               onError={(e) => {
@@ -164,11 +164,10 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
               {!logReady ? (
                 <p className="text-[7px] leading-tight text-muted-foreground">—</p>
               ) : remainingCalories !== null ? (
-                <p className={`text-[7px] leading-tight ${
-                  remainingCalories >= 0 
-                    ? 'text-green-600 dark:text-green-400' 
-                    : 'text-red-600 dark:text-red-400'
-                }`}>
+                <p className={`text-[7px] leading-tight ${remainingCalories >= 0
+                  ? 'text-green-600 dark:text-green-400'
+                  : 'text-red-600 dark:text-red-400'
+                  }`}>
                   {remainingCalories >= 0 ? '+' : ''}{remainingCalories}
                 </p>
               ) : null}
@@ -215,9 +214,8 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
               className="absolute top-1 right-2 bg-background/80 dark:bg-gray-900/80 backdrop-blur-md rounded-full p-1 border border-border z-10 hover:bg-muted/90 dark:hover:bg-gray-800/90 transition-colors"
             >
               <Heart
-                className={`w-3 h-3 transition-colors ${
-                  isFavorite ? "fill-pink-500 text-pink-500" : "text-muted-foreground"
-                }`}
+                className={`w-3 h-3 transition-colors ${isFavorite ? "fill-pink-500 text-pink-500" : "text-muted-foreground"
+                  }`}
               />
             </button>
           )}
@@ -239,14 +237,13 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
   return (
     <div
       onClick={onClick}
-      className={`bg-gradient-to-br from-card to-muted dark:from-gray-900 dark:to-gray-800 rounded-3xl shadow-xl hover:shadow-2xl transition-all cursor-pointer overflow-hidden hover:border-cyan-500/50 hover:scale-[1.02] group relative w-full ${
-        isGrocery
-          ? 'border-2 border-green-500/30'
-          : 'border border-border'
-      }`}
+      className={`bg-gradient-to-br from-card to-muted dark:from-gray-900 dark:to-gray-800 rounded-3xl shadow-xl hover:shadow-2xl transition-all cursor-pointer overflow-hidden hover:border-cyan-500/50 hover:scale-[1.02] group relative w-full ${isGrocery
+        ? 'border-2 border-green-500/30'
+        : 'border border-border'
+        }`}
     >
       {/* Image Container */}
-      <div 
+      <div
         className="relative w-full overflow-hidden rounded-t-3xl bg-gradient-to-br from-muted to-muted/50"
         style={{
           aspectRatio: '16 / 9',
@@ -255,8 +252,8 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
       >
         {/* Restaurant Logo - Fills entire image area */}
         <div className="w-full h-full flex items-center justify-center">
-          <img 
-            src={logoSrcWithCacheBust} 
+          <img
+            src={logoSrcWithCacheBust}
             alt={restaurantName}
             className="w-full h-full object-contain object-center"
             style={{
@@ -282,7 +279,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
         </div>
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background dark:from-gray-950 via-background/20 dark:via-gray-950/20 to-transparent pointer-events-none" />
-        
+
         {/* Match Badge */}
         {meal.matchScore && (
           <div className="absolute top-3 left-3 z-10">
@@ -300,9 +297,8 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
           className="absolute top-2 right-2 bg-background/80 dark:bg-gray-900/80 backdrop-blur-md rounded-full p-2 border border-border z-10 hover:bg-muted/90 dark:hover:bg-gray-800/90 transition-colors"
         >
           <Heart
-            className={`w-5 h-5 transition-colors ${
-              isFavorite ? "fill-pink-500 text-pink-500" : "text-muted-foreground"
-            }`}
+            className={`w-5 h-5 transition-colors ${isFavorite ? "fill-pink-500 text-pink-500" : "text-muted-foreground"
+              }`}
           />
         </button>
 
@@ -327,13 +323,13 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
       </div>
 
       <div className="p-4">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex-1 min-w-0 pr-2">
+        <div className="flex items-start justify-between mb-3 gap-3">
+          <div className="flex-1 min-w-0">
             <h3 className="text-foreground mb-1 font-semibold line-clamp-2 break-words">{meal.name}</h3>
             <div className="flex items-center gap-1.5 min-w-0">
-              <p className="text-muted-foreground text-sm truncate">{meal.restaurant}</p>
+              <p className="text-muted-foreground text-sm truncate">{restaurantName}</p>
               {hasVariableAvailability && (
-                <div 
+                <div
                   className="group/alert relative flex-shrink-0"
                   title="Availability depends on store location"
                 >
@@ -349,6 +345,19 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
               <p className="text-muted-foreground mt-0.5 text-xs">{meal.distance.toFixed(1)} miles away</p>
             )}
           </div>
+
+          {/* Big restaurant logo on the far right */}
+          <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-muted/80 border border-border flex items-center justify-center overflow-hidden shadow-sm">
+            <img
+              src={getLogo(restaurantName)}
+              alt={restaurantName}
+              className="w-full h-full object-contain p-1.5"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = '/logos/default.png';
+              }}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-4 gap-2 text-xs">
@@ -361,11 +370,10 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             {!logReady ? (
               <p className="text-[9px] mt-0.5 text-muted-foreground">—</p>
             ) : remainingCalories !== null ? (
-              <p className={`text-[9px] mt-0.5 ${
-                remainingCalories >= 0 
-                  ? 'text-green-600 dark:text-green-400' 
-                  : 'text-red-600 dark:text-red-400'
-              }`}>
+              <p className={`text-[9px] mt-0.5 ${remainingCalories >= 0
+                ? 'text-green-600 dark:text-green-400'
+                : 'text-red-600 dark:text-red-400'
+                }`}>
                 {remainingCalories >= 0 ? '+' : ''}{remainingCalories} left
               </p>
             ) : null}
@@ -388,7 +396,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             <div className="flex items-center justify-center mb-1">
               <div className="w-3 h-3 rounded-full bg-amber-400" />
             </div>
-            <p className="text-foreground font-bold">{meal.fats}g</p> 
+            <p className="text-foreground font-bold">{meal.fats}g</p>
             <p className="text-amber-600 dark:text-amber-300/70 text-[10px]">fat</p>
           </div>
         </div>

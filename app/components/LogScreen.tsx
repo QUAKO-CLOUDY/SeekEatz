@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useId } from "react";
 import {
   Calendar,
   Flame,
@@ -11,10 +11,13 @@ import {
   ChevronDown,
   ChevronRight,
   Info,
+  Plus,
+  Pencil,
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { CircularProgress } from "./CircularProgress";
+import { ManualMealEntry } from "./ManualMealEntry";
 import { useTheme } from "../contexts/ThemeContext";
 import type { UserProfile, Meal } from "../types";
 import { useCalorieTracking } from "../hooks/useCalorieTracking";
@@ -30,6 +33,8 @@ type Props = {
   userProfile: UserProfile;
   loggedMeals: LoggedMeal[];
   onRemoveMeal: (id: string) => void;
+  onAddMeal?: (meal: Meal) => void;
+  onUpdateMeal?: (logId: string, meal: Meal) => void;
 };
 
 function formatDate(dateStr: string): string {
@@ -58,15 +63,51 @@ function calculateStreak(loggedDates: string[]): number {
   return streak;
 }
 
+/** Mini animated ring for "track your progress" recommendation – matches log screen ring style */
+function MiniProgressRing() {
+  const id = `mini-ring-${useId().replace(/:/g, "")}`;
+  const size = 32;
+  const stroke = 3;
+  const r = (size - stroke) / 2;
+  const cx = size / 2;
+  const circumference = r * 2 * Math.PI;
+  return (
+    <svg width={size} height={size} className="transform -rotate-90 flex-shrink-0">
+      <defs>
+        <linearGradient id={id} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#f472b6" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#f43f5e" stopOpacity="0.9" />
+        </linearGradient>
+      </defs>
+      <circle
+        cx={cx}
+        cy={cx}
+        r={r}
+        stroke={`url(#${id})`}
+        strokeWidth={stroke}
+        fill="none"
+        strokeDasharray={circumference}
+        strokeDashoffset={circumference * 0.65}
+        strokeLinecap="round"
+        className="animate-mini-ring"
+      />
+    </svg>
+  );
+}
+
 type Recommendation = {
   icon: React.ComponentType<{ className?: string }>;
   color: "purple" | "cyan" | "green" | "amber";
   message: string;
 };
 
-export function LogScreen({ userProfile, loggedMeals, onRemoveMeal }: Props) {
+export function LogScreen({ userProfile, loggedMeals, onRemoveMeal, onAddMeal, onUpdateMeal }: Props) {
   const { resolvedTheme } = useTheme();
   const todayStr = new Date().toISOString().slice(0, 10);
+
+  const [showManualEntry, setShowManualEntry] = useState(false);
+  const [editingLogId, setEditingLogId] = useState<string | null>(null);
+  const editingMeal = editingLogId ? loggedMeals.find((l) => l.id === editingLogId)?.meal : undefined;
 
   const loggedDates = Array.from(
     new Set(loggedMeals.map((log) => log.date))
@@ -168,13 +209,16 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal }: Props) {
       {/* TOP SECTION – RINGS + MACROS */}
       <div className="bg-gradient-to-br from-card via-muted/40 to-card text-foreground p-6 pb-4 relative" style={{ paddingTop: `calc(1.5rem + env(safe-area-inset-top, 0px))` }}>
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <p className="text-muted-foreground mb-1">Daily Tracking</p>
-            <h1 className="text-foreground">Your Progress 📊</h1>
-            <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1">
-              Showing totals for <span className="text-cyan-500 dark:text-cyan-400 font-medium">{selectedLabel}</span>. Rings
-              update based on the day you pick.
-            </p>
+          <div className="flex items-center gap-3">
+            <MiniProgressRing />
+            <div>
+              <p className="text-muted-foreground mb-1">Daily Tracking</p>
+              <h1 className="text-foreground">Your Progress</h1>
+              <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1">
+                Showing totals for <span className="text-cyan-500 dark:text-cyan-400 font-medium">{selectedLabel}</span>. Rings
+                update based on the day you pick.
+              </p>
+            </div>
           </div>
 
           {/* Calendar + Date Picker */}
@@ -350,8 +394,32 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal }: Props) {
         </div>
       </div>
 
-      {/* BOTTOM SECTION – RECOMMENDATIONS, MEALS, HISTORY */}
+      {/* BOTTOM SECTION – MANUAL ENTRY, RECOMMENDATIONS, MEALS, HISTORY */}
       <div className="p-6 pb-32 space-y-6 bg-background" style={{ paddingBottom: `calc(8rem + env(safe-area-inset-bottom, 0px))` }}>
+        {/* Manual food entry – add & edit */}
+        {onAddMeal && (
+          <div className="rounded-2xl border border-border bg-gradient-to-br from-card to-muted/50 overflow-hidden">
+            <div className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 flex items-center justify-center flex-shrink-0">
+                  <Apple className="w-5 h-5 text-cyan-500" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Log your own food</p>
+                  <p className="text-sm text-muted-foreground">Add or edit meals with custom name and macros</p>
+                </div>
+              </div>
+              <Button
+                onClick={() => { setEditingLogId(null); setShowManualEntry(true); }}
+                className="shrink-0 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white rounded-xl shadow-lg shadow-cyan-500/20"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add entry
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* AI Recommendations */}
         {recommendations.length > 0 && (
           <div className="mt-4">
@@ -460,14 +528,26 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal }: Props) {
                             )}
                           </p>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => onRemoveMeal(log.id)}
-                          className="text-muted-foreground hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {onUpdateMeal && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => { setEditingLogId(log.id); setShowManualEntry(true); }}
+                              className="text-muted-foreground hover:text-cyan-500"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => onRemoveMeal(log.id)}
+                            className="text-muted-foreground hover:text-red-400"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
                       <div className="flex flex-wrap gap-2 mt-2">
                         <Badge className="rounded-full bg-pink-500/20 dark:bg-pink-500/20 text-pink-600 dark:text-pink-300 border-pink-500/30">
@@ -587,6 +667,17 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal }: Props) {
       {/* Extra spacer to ensure all content is scrollable above navigation */}
       <div className="h-24" />
       </div>
+
+      {/* Manual entry / edit modal */}
+      {showManualEntry && onAddMeal && (
+        <ManualMealEntry
+          onAddMeal={(meal) => { onAddMeal(meal); setShowManualEntry(false); setEditingLogId(null); }}
+          onClose={() => { setShowManualEntry(false); setEditingLogId(null); }}
+          editLogId={editingLogId ?? undefined}
+          initialMeal={editingMeal}
+          onUpdateMeal={onUpdateMeal ? (id, meal) => { onUpdateMeal(id, meal); setShowManualEntry(false); setEditingLogId(null); } : undefined}
+        />
+      )}
     </div>
   );
 }

@@ -1,23 +1,28 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
-import { 
-  ArrowLeft, 
-  Flame, 
-  Zap, 
-  TrendingUp, 
-  Plus, 
-  Heart, 
-  Share, 
-  ShieldCheck,
+import {
+  ArrowLeft,
+  Flame,
+  Zap,
+  TrendingUp,
+  Plus,
+  Heart,
+  Share,
   Clock,
   MapPin,
   Info,
   ExternalLink,
   Sparkles,
   X,
-  Check
+  Check,
+  UtensilsCrossed,
+  Beef,
+  Wheat,
+  Droplets
 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { AnimatedNumber } from './AnimatedNumber';
 import type { Meal } from '../types';
 import { copyToClipboard } from '@/lib/clipboard-utils';
 import { useTheme } from '../contexts/ThemeContext';
@@ -48,21 +53,18 @@ type SwapOption = {
   };
 };
 
+type SauceItem = {
+  id: string;
+  name: string;
+  macros: { calories: number; protein: number; carbs: number; fat: number };
+};
+
 // --- HELPER LOGIC ---
-function generateWhyText(meal: Meal): string {
-  if (meal.protein > 35 && meal.calories < 600) return "High protein & low calorie cut-friendly option.";
-  if (meal.carbs < 20) return "Low-carb option that fits your macro goals.";
-  if (meal.calories > 800) return "High energy meal for intense training days.";
-  return "Balanced macro profile with clean ingredients.";
-}
-
-// Removed generateSwaps and isSwapAvailable - swaps now come from /api/swaps only
-
 // Helper to calculate protein density
 function getProteinDensity(meal: Meal): { ratio: number; badge: { text: string; bg: string; emoji: string } | null } {
   if (meal.calories === 0) return { ratio: 0, badge: null };
   const ratio = meal.protein / meal.calories;
-  
+
   if (ratio >= 0.15) {
     return {
       ratio,
@@ -78,27 +80,103 @@ function getProteinDensity(meal: Meal): { ratio: number; badge: { text: string; 
   return { ratio, badge: null };
 }
 
+const TAG_STYLES: Record<string, { light: string; dark: string }> = {
+  'high-protein': { light: 'bg-cyan-100 border-cyan-300 text-cyan-700', dark: 'bg-cyan-900/30 border-cyan-700 text-cyan-300' },
+  'low-calorie': { light: 'bg-green-100 border-green-300 text-green-700', dark: 'bg-green-900/30 border-green-700 text-green-300' },
+  'low-carb': { light: 'bg-purple-100 border-purple-300 text-purple-700', dark: 'bg-purple-900/30 border-purple-700 text-purple-300' },
+  'keto': { light: 'bg-purple-100 border-purple-300 text-purple-700', dark: 'bg-purple-900/30 border-purple-700 text-purple-300' },
+  'default': { light: 'bg-gray-100 border-gray-300 text-gray-700', dark: 'bg-gray-800 border-gray-700 text-gray-300' },
+};
+
+function normalizeTagForDisplay(raw: string): string {
+  const t = (raw || '').trim();
+  if (!t) return '';
+  // Title-case and clean common variants
+  const lower = t.toLowerCase();
+  if (lower === 'high protein' || lower === 'high-protein') return 'High Protein';
+  if (lower === 'low calorie' || lower === 'low-calorie' || lower === 'low calories') return 'Low Calorie';
+  if (lower === 'low carb' || lower === 'low-carb' || lower === 'low carbs') return 'Low Carb';
+  if (lower === 'keto-friendly' || lower === 'keto') return 'Keto-Friendly';
+  if (lower === 'italian') return 'Italian';
+  if (lower === 'thai') return 'Thai';
+  if (lower === 'bowl' || lower === 'bowls') return 'Bowl';
+  if (lower === 'pizza' || lower === 'pizzas') return 'Pizza';
+  if (lower === 'sandwich' || lower === 'sandwiches') return 'Sandwich';
+  if (lower === 'salad' || lower === 'salads') return 'Salad';
+  if (lower === 'burger' || lower === 'burgers') return 'Burger';
+  if (lower === 'burrito' || lower === 'burritos') return 'Burrito';
+  if (lower === 'taco' || lower === 'tacos') return 'Tacos';
+  if (lower === 'grocery') return 'Grocery';
+  if (lower === 'restaurant') return 'Restaurant';
+  return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase();
+}
+
+function getTagStyle(key: string, isDark: boolean): string {
+  const style = TAG_STYLES[key] || TAG_STYLES.default;
+  return isDark ? style.dark : style.light;
+}
+
+/** Highlights from meal/restaurant tags + macros + dish type. Max 3. */
 function generateSmartTags(meal: Meal, isDark: boolean = false): Array<{ text: string; bg: string }> {
-  const tags: Array<{ text: string; bg: string }> = [];
-  
-  // Based on macros
-  if (meal.carbs < 15) {
-    tags.push({ text: "Keto-Friendly", bg: isDark ? "bg-purple-900/30 border-purple-700 text-purple-300" : "bg-purple-100 border-purple-300 text-purple-700" });
+  const out: Array<{ text: string; bg: string }> = [];
+  const seen = new Set<string>();
+
+  const add = (text: string, styleKey: string = 'default') => {
+    const key = text.toLowerCase().replace(/\s+/g, '-');
+    if (seen.has(key) || out.length >= 3) return;
+    seen.add(key);
+    out.push({ text, bg: getTagStyle(styleKey, isDark) });
+  };
+
+  // 1) Meal/restaurant tags (dietary_tags, tags)
+  const tagSources = [
+    ...(meal.dietary_tags || []),
+    ...(meal.tags || []),
+  ];
+  for (const raw of tagSources) {
+    const text = normalizeTagForDisplay(raw);
+    if (!text) continue;
+    const lower = text.toLowerCase();
+    let styleKey = 'default';
+    if (lower.includes('protein')) styleKey = 'high-protein';
+    else if (lower.includes('calorie') || lower.includes('calories')) styleKey = 'low-calorie';
+    else if (lower.includes('carb') || lower.includes('keto')) styleKey = 'low-carb';
+    add(text, styleKey);
+    if (out.length >= 3) return out;
   }
-  if (meal.calories < 500) {
-    tags.push({ text: "Low Calorie", bg: isDark ? "bg-green-900/30 border-green-700 text-green-300" : "bg-green-100 border-green-300 text-green-700" });
+
+  // 2) Macro-based (only if we have room and not already covered)
+  if (out.length < 3 && meal.protein > 30 && !seen.has('high-protein')) add('High Protein', 'high-protein');
+  if (out.length < 3 && meal.calories < 500 && !seen.has('low-calorie')) add('Low Calorie', 'low-calorie');
+  if (out.length < 3 && meal.carbs < 15 && !seen.has('low-carb')) add('Low Carb', 'low-carb');
+  if (out.length < 3 && meal.carbs < 20 && !seen.has('keto')) add('Keto-Friendly', 'keto');
+
+  // 3) Infer from dish name (Italian, Thai, Bowl, Pizza, Sandwich, etc.)
+  const name = (meal.name || '').toLowerCase();
+  const dishPatterns: Array<{ pattern: RegExp | string; tag: string }> = [
+    { pattern: /\bitalian\b/, tag: 'Italian' },
+    { pattern: /\bthai\b/, tag: 'Thai' },
+    { pattern: /\bbowl(s)?\b/, tag: 'Bowl' },
+    { pattern: /\bpizza(s)?\b/, tag: 'Pizza' },
+    { pattern: /\bsandwich(es)?\b/, tag: 'Sandwich' },
+    { pattern: /\bsalad(s)?\b/, tag: 'Salad' },
+    { pattern: /\bburger(s)?\b/, tag: 'Burger' },
+    { pattern: /\bburrito(s)?\b/, tag: 'Burrito' },
+    { pattern: /\btaco(s)?\b/, tag: 'Tacos' },
+    { pattern: /\bwrap(s)?\b/, tag: 'Wrap' },
+    { pattern: /\bgrill(ed)?\b/, tag: 'Grilled' },
+  ];
+  for (const { pattern, tag } of dishPatterns) {
+    if (out.length >= 3) break;
+    const match = typeof pattern === 'string' ? name.includes(pattern) : pattern.test(name);
+    if (match && !seen.has(tag.toLowerCase())) add(tag, 'default');
   }
-  if (meal.protein > 30) {
-    tags.push({ text: "High Protein", bg: isDark ? "bg-cyan-900/30 border-cyan-700 text-cyan-300" : "bg-cyan-100 border-cyan-300 text-cyan-700" });
-  }
-  
-  // Always include category if available
-  if (meal.category) {
-    const categoryText = meal.category === 'grocery' ? 'Grocery' : 'Restaurant';
-    tags.push({ text: categoryText, bg: isDark ? "bg-gray-800 border-gray-700 text-gray-300" : "bg-gray-100 border-gray-300 text-gray-700" });
-  }
-  
-  return tags;
+
+  // 4) Category as fallback (only if still under 3)
+  if (out.length < 3 && meal.category === 'grocery' && !seen.has('grocery')) add('Grocery', 'default');
+  if (out.length < 3 && meal.category === 'restaurant' && out.length === 0) add('Restaurant', 'default');
+
+  return out;
 }
 
 export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMeal }: Props) {
@@ -107,12 +185,17 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
   // Modal States
   const [showLogModal, setShowLogModal] = useState(false);
   const [showManualModal, setShowManualModal] = useState(false);
-  
+
   // Selected Meal Context - Single source of truth for swaps
   const [selectedMealSwaps, setSelectedMealSwaps] = useState<SwapOption[]>([]);
   const [isLoadingSwaps, setIsLoadingSwaps] = useState(false);
   const [selectedSwapIds, setSelectedSwapIds] = useState<string[]>([]);
-  
+
+  // Restaurant sauces - only for this meal's restaurant
+  const [restaurantSauces, setRestaurantSauces] = useState<SauceItem[]>([]);
+  const [isLoadingSauces, setIsLoadingSauces] = useState(false);
+  const [selectedSauceIds, setSelectedSauceIds] = useState<string[]>([]);
+
   // Manual Form State
   const [manualName, setManualName] = useState('');
   const [manualCals, setManualCals] = useState('');
@@ -135,23 +218,22 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
   // Only show prepTime if we have real data, otherwise show nothing or "Nearby"
   const prepTime = meal.prepTime ? `${meal.prepTime} min` : null;
   const locationLabel = distance ? null : (meal.latitude && meal.longitude ? "Nearby" : null);
-  const whyText = generateWhyText(meal);
   const smartTags = generateSmartTags(meal, isDark);
   const proteinDensity = getProteinDensity(meal);
 
   // Get user goals and loggedMeals from nutrition context (must be called at top level)
   const { targets, todaysTotals, loggedMeals, isLoading: isLogLoading } = useNutrition();
-  
+
   // Determine if log data is ready (not loading and targets are available)
   const logReady = !isLogLoading && targets !== null;
-  
+
   // Extract stable primitives for memoization (not objects/arrays)
   const dailyTargetCalories = useMemo(() => {
-    return typeof targets?.targetCalories === 'number' 
-      ? targets.targetCalories 
+    return typeof targets?.targetCalories === 'number'
+      ? targets.targetCalories
       : (typeof targets?.targetCalories === 'string' ? parseFloat(targets.targetCalories) : 0) || 2000;
   }, [targets?.targetCalories]);
-  
+
   // Calculate stable dependency key for today's meals
   const todaysMealsKey = useMemo(() => {
     const todayStr = new Date().toISOString().slice(0, 10);
@@ -163,7 +245,7 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
     }, 0);
     return `${count}-${total}`;
   }, [loggedMeals]);
-  
+
   // Calculate todaysLoggedCalories as stable number
   const todaysLoggedCalories = useMemo(() => {
     const todayStr = new Date().toISOString().slice(0, 10);
@@ -173,7 +255,21 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
       return sum + (isNaN(cals) ? 0 : Math.round(cals));
     }, 0);
   }, [todaysMealsKey]);
-  
+
+  // Today's logged protein, carbs, fats (for "left after this meal")
+  const todaysLoggedMacros = useMemo(() => {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todaysMeals = (loggedMeals || []).filter(m => m.date === todayStr);
+    return todaysMeals.reduce(
+      (acc, m) => ({
+        protein: acc.protein + (Number(m.meal.protein) || 0),
+        carbs: acc.carbs + (Number(m.meal.carbs) || 0),
+        fats: acc.fats + (Number(m.meal.fats) || 0),
+      }),
+      { protein: 0, carbs: 0, fats: 0 }
+    );
+  }, [todaysMealsKey]);
+
   // Memoize calorieCalc with stable primitives only (not objects/arrays)
   const calorieCalc = useMemo(() => {
     const userProfileForCalc: UserProfile = {
@@ -200,11 +296,11 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
         setSelectedMealSwaps([]);
         return;
       }
-      
+
       setIsLoadingSwaps(true);
       // Reset selected swap IDs when meal changes
       setSelectedSwapIds([]);
-      
+
       try {
         const res = await fetch('/api/swaps', {
           method: 'POST',
@@ -226,15 +322,15 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
             user_goals: {} // Legacy format, kept for compatibility
           }),
         });
-        
+
         const data = await res.json();
-        
+
         // API now returns { modifications: [...], alternatives: [...] }
         // Modifications are PRIMARY (edits to THIS meal)
         // Alternatives are SECONDARY (only shown if no modifications exist)
         const allSwaps: SwapOption[] = [];
-        
-          // Add modifications first (PRIMARY - edits to this meal)
+
+        // Add modifications first (PRIMARY - edits to this meal)
         if (data.modifications && Array.isArray(data.modifications) && data.modifications.length > 0) {
           const modSwaps: SwapOption[] = data.modifications.map((mod: any) => ({
             id: mod.id || `mod::${meal.id}::${mod.label || mod.swapTitle || 'Modification'}`,
@@ -252,7 +348,7 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
           }));
           allSwaps.push(...modSwaps);
         }
-        
+
         // Add alternatives ONLY if no modifications exist (true fallback)
         if (allSwaps.length === 0 && data.alternatives && Array.isArray(data.alternatives) && data.alternatives.length > 0) {
           const altSwaps: SwapOption[] = data.alternatives.map((alt: any) => ({
@@ -269,7 +365,7 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
           }));
           allSwaps.push(...altSwaps);
         }
-        
+
         setSelectedMealSwaps(allSwaps);
       } catch (error) {
         console.error('Failed to fetch meal swaps:', error);
@@ -292,7 +388,7 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
   useEffect(() => {
     const fetchSimilarMeals = async () => {
       if (!meal.restaurant) return;
-      
+
       setIsLoadingSimilar(true);
       try {
         // Search for meals from the same restaurant
@@ -301,31 +397,31 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query: meal.restaurant }),
         });
-        
+
         const data = await res.json();
         let normalizedResults: any[] = [];
-        
+
         if (Array.isArray(data)) {
           normalizedResults = data;
         } else if (data && typeof data === 'object' && Array.isArray(data.results)) {
           normalizedResults = data.results;
         }
-        
+
         // Convert to Meal type and filter
         const allMeals = normalizedResults.map((item: any) => {
           // Handle fats - normalize fat/fats consistently
           // Prefer fat (singular) from DB, fallback to fats (plural)
           // Also check _g suffixed variants for compatibility
-          const fats = item.fat ?? item.fats ?? 
-                       item.fat_g ?? item.fats_g ?? 
-                       (item.nutrition_info?.fat) ?? 
-                       (item.nutrition_info?.fats) ?? 
-                       (item.nutrition_info?.fat_g) ?? 
-                       (item.nutrition_info?.fats_g) ?? 0;
-          
+          const fats = item.fat ?? item.fats ??
+            item.fat_g ?? item.fats_g ??
+            (item.nutrition_info?.fat) ??
+            (item.nutrition_info?.fats) ??
+            (item.nutrition_info?.fat_g) ??
+            (item.nutrition_info?.fats_g) ?? 0;
+
           const restaurantName = item.restaurant_name || 'Unknown Restaurant';
           const mealName = item.item_name || item.name || 'Unknown Item';
-          
+
           return {
             id: item.id || `${restaurantName}::${mealName}`,
             name: mealName,
@@ -339,16 +435,16 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
             category: item.category === 'Grocery' || item.category === 'Hot Bar' ? 'grocery' as const : 'restaurant' as const,
           };
         });
-        
+
         // Filter to same restaurant, exclude current meal, and take 3-5
         const similar = allMeals
-          .filter((m: Meal) => 
-            m.restaurant.toLowerCase() === meal.restaurant.toLowerCase() && 
+          .filter((m: Meal) =>
+            m.restaurant.toLowerCase() === meal.restaurant.toLowerCase() &&
             m.id !== meal.id &&
             m.calories >= 150 // Only full meals
           )
           .slice(0, 5);
-        
+
         setSimilarMeals(similar);
       } catch (error) {
         console.error('Failed to fetch similar meals:', error);
@@ -361,22 +457,100 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
     fetchSimilarMeals();
   }, [meal.id, meal.restaurant]);
 
-  const totalMacros = meal.protein + (meal.carbs || 0) + (meal.fats || 0);
-  const pPercent = Math.round((meal.protein / totalMacros) * 100);
-  const cPercent = Math.round(((meal.carbs || 0) / totalMacros) * 100);
-  const fPercent = Math.round(((meal.fats || 0) / totalMacros) * 100);
-  
-  // Compute directly from stable primitives (don't call remainingIfEatMeal)
-  const mealCaloriesNum = Number(meal.calories ?? 0);
+  // Fetch sauces for this meal's restaurant (only when meal has a restaurant)
+  useEffect(() => {
+    const restaurant = meal.restaurant_name || meal.restaurant;
+    if (!restaurant?.trim()) {
+      setRestaurantSauces([]);
+      setSelectedSauceIds([]);
+      return;
+    }
+    setSelectedSauceIds([]);
+    setIsLoadingSauces(true);
+    fetch(`/api/sauces?restaurant=${encodeURIComponent(restaurant)}`)
+      .then((res) => res.json())
+      .then((data: { sauces?: SauceItem[] }) => {
+        setRestaurantSauces(Array.isArray(data.sauces) ? data.sauces : []);
+      })
+      .catch(() => setRestaurantSauces([]))
+      .finally(() => setIsLoadingSauces(false));
+  }, [meal.id, meal.restaurant_name, meal.restaurant]);
+
+  // Sum of selected sauces' macros (for effective totals)
+  const sauceMacrosSum = useMemo(() => {
+    return selectedSauceIds.reduce(
+      (acc, id) => {
+        const s = restaurantSauces.find((x) => x.id === id);
+        if (!s) return acc;
+        return {
+          calories: acc.calories + (s.macros.calories || 0),
+          protein: acc.protein + (s.macros.protein || 0),
+          carbs: acc.carbs + (s.macros.carbs || 0),
+          fats: acc.fats + (s.macros.fat ?? 0),
+        };
+      },
+      { calories: 0, protein: 0, carbs: 0, fats: 0 }
+    );
+  }, [selectedSauceIds, restaurantSauces]);
+
+  // Effective macros = meal + selected swaps + selected sauces (used for display and log)
+  const effectiveMacros = useMemo(() => {
+    const swapDelta = {
+      calories: selectedSwapIds.reduce((sum, id) => {
+        const swap = selectedMealSwaps.find((s) => s.id === id);
+        return sum + (swap?.deltaMacros.calories || 0);
+      }, 0),
+      protein: selectedSwapIds.reduce((sum, id) => {
+        const swap = selectedMealSwaps.find((s) => s.id === id);
+        return sum + (swap?.deltaMacros.protein || 0);
+      }, 0),
+      carbs: selectedSwapIds.reduce((sum, id) => {
+        const swap = selectedMealSwaps.find((s) => s.id === id);
+        return sum + (swap?.deltaMacros.carbs || 0);
+      }, 0),
+      fats: selectedSwapIds.reduce((sum, id) => {
+        const swap = selectedMealSwaps.find((s) => s.id === id);
+        return sum + (swap?.deltaMacros.fats || 0);
+      }, 0),
+    };
+    return {
+      calories: meal.calories + swapDelta.calories + sauceMacrosSum.calories,
+      protein: meal.protein + swapDelta.protein + sauceMacrosSum.protein,
+      carbs: (meal.carbs || 0) + swapDelta.carbs + sauceMacrosSum.carbs,
+      fats: (meal.fats || 0) + swapDelta.fats + sauceMacrosSum.fats,
+    };
+  }, [meal.calories, meal.protein, meal.carbs, meal.fats, selectedSwapIds, selectedMealSwaps, sauceMacrosSum]);
+
+  // "Left after this meal" = target - logged today - effective meal (updates with sauces/swaps)
+  const leftAfterThisMeal = useMemo(() => {
+    const targetCal = dailyTargetCalories;
+    const targetPro = targets?.targetProtein ?? 150;
+    const targetCarb = targets?.targetCarbs ?? 200;
+    const targetFat = targets?.targetFats ?? 70;
+    return {
+      calories: Math.round(targetCal - todaysLoggedCalories - effectiveMacros.calories),
+      protein: Math.round(targetPro - todaysLoggedMacros.protein - effectiveMacros.protein),
+      carbs: Math.round(targetCarb - todaysLoggedMacros.carbs - effectiveMacros.carbs),
+      fats: Math.round(targetFat - todaysLoggedMacros.fats - effectiveMacros.fats),
+    };
+  }, [dailyTargetCalories, todaysLoggedCalories, todaysLoggedMacros, targets, effectiveMacros]);
+
+  const totalMacros = effectiveMacros.protein + effectiveMacros.carbs + effectiveMacros.fats;
+  const pPercent = totalMacros > 0 ? Math.round((effectiveMacros.protein / totalMacros) * 100) : 0;
+  const cPercent = totalMacros > 0 ? Math.round((effectiveMacros.carbs / totalMacros) * 100) : 0;
+  const fPercent = totalMacros > 0 ? Math.round((effectiveMacros.fats / totalMacros) * 100) : 0;
+
+  // Compute directly from stable primitives (use effective calories for "if you eat this")
+  const mealCaloriesNum = effectiveMacros.calories;
   const todaysRemainingNum = logReady ? Number(calorieCalc?.todaysRemainingCalories ?? 0) : 0;
   const calsAfter = logReady ? Math.round(todaysRemainingNum - mealCaloriesNum) : null;
   const calsRemaining = logReady ? todaysRemainingNum : null;
-  
+
   // Dev log
   if (process.env.NODE_ENV === 'development' && logReady) {
     console.log('[calorieCalc]', { todaysRemainingNum, mealCaloriesNum, calsAfter });
   }
-  
+
   // Keep for compatibility with existing code
   const targetCalories = calorieCalc.targetCalories;
   const todaysConsumedCalories = calorieCalc.todaysConsumedCalories;
@@ -386,33 +560,15 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
     // Only allow toggling swaps that exist in selectedMealSwaps
     const swapExists = selectedMealSwaps.some(s => s.id === id);
     if (!swapExists) return;
-    
-    setSelectedSwapIds(prev => 
+
+    setSelectedSwapIds(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     );
   };
 
   const handleConfirmLog = () => {
-    // Calculate final macros with selected swaps
-    // finalMacros = baseMeal + sum(selected deltaMacros)
-    const finalMacros = {
-      calories: meal.calories + selectedSwapIds.reduce((sum, id) => {
-        const swap = selectedMealSwaps.find(s => s.id === id);
-        return sum + (swap?.deltaMacros.calories || 0);
-      }, 0),
-      protein: meal.protein + selectedSwapIds.reduce((sum, id) => {
-        const swap = selectedMealSwaps.find(s => s.id === id);
-        return sum + (swap?.deltaMacros.protein || 0);
-      }, 0),
-      carbs: meal.carbs + selectedSwapIds.reduce((sum, id) => {
-        const swap = selectedMealSwaps.find(s => s.id === id);
-        return sum + (swap?.deltaMacros.carbs || 0);
-      }, 0),
-      fats: meal.fats + selectedSwapIds.reduce((sum, id) => {
-        const swap = selectedMealSwaps.find(s => s.id === id);
-        return sum + (swap?.deltaMacros.fats || 0);
-      }, 0)
-    };
+    // Final macros = base meal + selected swaps + selected sauces (use effectiveMacros)
+    const finalMacros = { ...effectiveMacros };
 
     // Get selected swaps with full information
     const selectedSwapsData = selectedSwapIds
@@ -427,7 +583,7 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
     // Get all selected modifier IDs (flattened)
     const selectedModifierIds = selectedSwapsData.flatMap(swap => swap.modifierItemIds);
 
-    // Create modified meal object with final macros (base + swaps)
+    // Create modified meal object with final macros (base + swaps + sauces)
     const modifiedMeal: Meal = {
       ...meal,
       calories: finalMacros.calories,
@@ -447,7 +603,7 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
       selectedModifierIds: selectedModifierIds,
       finalMacros: finalMacros
     };
-    
+
     // Debug log when confirming log (should match MainApp debug log)
     // Note: We don't have access to loggedMeals here, so we log what we can
     console.log('[MealDetail] Confirming log with swaps:', {
@@ -456,12 +612,13 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
       swapsApplied: selectedSwapsData.length,
       logEntry,
     });
-    
+
     // Pass modified meal to parent (with swaps applied)
     onLogMeal(modifiedMeal);
-    
+
     setShowLogModal(false);
     setSelectedSwapIds([]);
+    setSelectedSauceIds([]);
   };
 
   const handleManualSubmit = () => {
@@ -469,7 +626,7 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
     setShowManualModal(false);
     setManualName(''); setManualCals(''); setManualPro(''); setManualCarbs(''); setManualFats('');
   };
-  
+
   const handleOrderOnline = () => {
     window.open("https://www.ubereats.com", "_blank");
   };
@@ -478,9 +635,9 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
     // Create share text with meal information
     const shareText = `${meal.name} from ${meal.restaurant}\n` +
       `${meal.calories} cal • ${meal.protein}g protein • ${meal.carbs || 0}g carbs • ${meal.fats || 0}g fats`;
-    
+
     const success = await copyToClipboard(shareText);
-    
+
     if (success) {
       // You could show a toast notification here
       // For now, we'll just log success
@@ -498,191 +655,251 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
       {/* --- MOBILE-FIRST CONTAINER --- */}
       <div className={`max-w-lg mx-auto shadow-2xl h-full w-full flex flex-col ${isDark ? 'bg-gray-950' : 'bg-white'}`}>
         {/* --- SCROLLABLE CONTENT --- */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide pb-6 pb-safe"> 
-        
-        {/* HEADER IMAGE */}
-        <div className="relative h-80 w-full shrink-0 bg-gradient-to-br from-cyan-500/20 via-blue-500/20 to-indigo-500/20">
-          {meal.image && meal.image !== '/placeholder-food.jpg' && meal.image !== '' ? (
-            <img 
-              src={meal.image} 
-              alt={meal.name}
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.src = getLogo(meal.restaurant || '');
-                e.currentTarget.className = 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-h-52 max-w-[80%] object-contain drop-shadow-xl';
-                e.currentTarget.onerror = null;
-              }}
-            />
-          ) : (
-            <img 
-              src={getLogo(meal.restaurant || '')}
-              alt={meal.restaurant || 'Restaurant logo'}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-h-52 max-w-[80%] object-contain drop-shadow-xl"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent pointer-events-none"></div>
-          
-          <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-10">
-            <button onClick={onBack} className="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 hover:bg-black/60">
-              <ArrowLeft className="w-5 h-5 text-white" />
+        <div className="flex-1 overflow-y-auto scrollbar-hide pb-6 pb-safe">
+
+          {/* TOP BAR: Back, Favorite, Share (no header image) */}
+          <div className="sticky top-0 z-20 flex items-center justify-between px-4 py-3 bg-background/95 backdrop-blur border-b border-border">
+            <button onClick={onBack} className="w-10 h-10 rounded-full flex items-center justify-center border border-border bg-muted/50 hover:bg-muted">
+              <ArrowLeft className="w-5 h-5 text-foreground" />
             </button>
-            <div className="flex gap-3">
-              <button onClick={onToggleFavorite} className={`w-10 h-10 backdrop-blur-md rounded-full flex items-center justify-center border ${isFavorite ? 'bg-pink-500/20 text-pink-500 border-pink-500/50' : 'bg-black/40 text-white border-white/10'}`}>
+            <div className="flex gap-2">
+              <button onClick={onToggleFavorite} className={`w-10 h-10 rounded-full flex items-center justify-center border ${isFavorite ? 'bg-pink-500/20 text-pink-500 border-pink-500/50' : 'border-border bg-muted/50 hover:bg-muted'}`}>
                 <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
               </button>
-              <button 
-                onClick={handleShare}
-                className="w-10 h-10 bg-black/40 backdrop-blur-md rounded-full flex items-center justify-center border border-white/10 hover:bg-black/60 transition-colors"
-                aria-label="Share meal information"
-              >
-                <Share className="w-4 h-4 text-white" />
+              <button onClick={handleShare} className="w-10 h-10 rounded-full flex items-center justify-center border border-border bg-muted/50 hover:bg-muted" aria-label="Share meal information">
+                <Share className="w-4 h-4 text-foreground" />
               </button>
             </div>
           </div>
-        </div>
 
-        {/* MAIN CONTENT */}
-        <div className="px-5 pt-5 relative z-10 space-y-5">
-          
-          {/* TITLE & INFO */}
-          <div>
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1">
-                <h1 className="text-foreground text-2xl font-extrabold leading-tight tracking-tight">{meal.name}</h1>
+          {/* MAIN CONTENT */}
+          <div className="px-5 pt-4 space-y-6">
+
+            {/* TITLE & INFO: Restaurant bigger/bold, dish name smaller underneath */}
+            <div>
+              <h1 className="text-foreground text-xl font-bold leading-tight">{meal.restaurant_name || meal.restaurant}</h1>
+              <div className="flex items-center gap-2 flex-wrap mt-1">
+                <p className="text-muted-foreground text-base font-medium leading-tight">{meal.name}</p>
                 {proteinDensity.badge && (
-                  <span className={`${proteinDensity.badge.bg} border px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 mt-2`}>
+                  <span className={`${proteinDensity.badge.bg} border px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shrink-0`}>
                     <span>{proteinDensity.badge.emoji}</span>
                     <span>{proteinDensity.badge.text}</span>
                   </span>
                 )}
               </div>
-              <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-xl shrink-0">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span className="text-emerald-400 text-xs font-bold">93% Match</span>
-              </div>
-            </div>
-            <p className="text-muted-foreground text-sm mt-2 italic leading-relaxed">"{whyText}"</p>
-            <div className="flex items-center flex-wrap gap-2 mt-3">
-               <span className="font-bold text-sm text-foreground">{meal.restaurant}</span>
-               {distance && (
-                 <>
-                   <span className="w-1 h-1 rounded-full bg-border"></span>
-                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                     <MapPin className="w-3 h-3" />
-                     {distance} away
-                   </div>
-                 </>
-               )}
-               {prepTime && (
-                 <>
-                   <span className="w-1 h-1 rounded-full bg-border"></span>
-                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                     <Clock className="w-3 h-3" />
-                     {prepTime} pickup
-                   </div>
-                 </>
-               )}
-               {locationLabel && (
-                 <>
-                   <span className="w-1 h-1 rounded-full bg-border"></span>
-                   <span className="text-xs text-muted-foreground">{locationLabel}</span>
-                 </>
-               )}
-            </div>
-          </div>
-
-          {/* SMART TAGS */}
-          <div>
-            <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest mb-2.5">Highlights</p>
-            <div className="flex flex-wrap gap-2">
-              {smartTags.map((tag, i) => (
-                <span key={i} className={`${tag.bg} border px-3.5 py-1.5 rounded-full text-xs font-semibold`}>
-                  {tag.text}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* MACROS CARD */}
-          <div className="bg-card border border-border p-5 rounded-3xl shadow-lg relative overflow-hidden">
-             <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full pointer-events-none"></div>
-
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-card-foreground text-sm font-semibold">Nutritional Information</p>
-              <Info className="w-4 h-4 text-muted-foreground" />
-            </div>
-
-            {/* Calories - Purple/Pink Gradient (Moved here) */}
-            <div className="mb-5">
-              <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-3 text-center w-full">
-                <Flame className="w-4 h-4 text-pink-400 mx-auto mb-1.5" />
-                <p className="text-card-foreground text-xl font-bold leading-none mb-0.5">{meal.calories}</p>
-                <p className="text-pink-300/60 text-[10px] font-medium uppercase">Calories</p>
+              <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
+                {distance && (
+                  <>
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      {distance} away
+                    </div>
+                  </>
+                )}
+                {prepTime && (
+                  <>
+                    <span className="w-1 h-1 rounded-full bg-border"></span>
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {prepTime} pickup
+                    </div>
+                  </>
+                )}
+                {locationLabel && (
+                  <>
+                    <span className="w-1 h-1 rounded-full bg-border"></span>
+                    <span>{locationLabel}</span>
+                  </>
+                )}
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 pt-4 border-t border-border/50">
-               <div className="text-center">
-                 <div className="h-1 w-full bg-muted rounded-full mb-2 overflow-hidden">
-                   <div style={{ width: `${cPercent}%` }} className="h-full bg-emerald-500 rounded-full"></div>
-                 </div>
-                 <p className="text-emerald-400 font-bold text-sm">{meal.carbs || 35}g</p>
-                 <p className="text-muted-foreground text-[10px]">Carbs ({cPercent}%)</p>
-               </div>
-               <div className="text-center">
-                 <div className="h-1 w-full bg-muted rounded-full mb-2 overflow-hidden">
-                   <div style={{ width: `${fPercent}%` }} className="h-full bg-amber-500 rounded-full"></div>
-                 </div>
-                 <p className="text-amber-400 font-bold text-sm">{meal.fats || 12}g</p>
-                 <p className="text-muted-foreground text-[10px]">Fats ({fPercent}%)</p>
-               </div>
-               <div className="text-center">
-                 <div className="h-1 w-full bg-muted rounded-full mb-2 overflow-hidden">
-                   <div style={{ width: `${pPercent}%` }} className="h-full bg-cyan-500 rounded-full"></div>
-                 </div>
-                 <p className="text-cyan-400 font-bold text-sm">{meal.protein}g</p>
-                 <p className="text-muted-foreground text-[10px]">Protein ({pPercent}%)</p>
-               </div>
+            {/* SMART TAGS */}
+            <div>
+              <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest mb-2.5">Highlights</p>
+              <div className="flex flex-wrap gap-2">
+                {smartTags.map((tag, i) => (
+                  <span key={i} className={`${tag.bg} border px-3.5 py-1.5 rounded-full text-xs font-semibold`}>
+                    {tag.text}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* IMPACT PREVIEW */}
-          <div className="bg-card/50 rounded-2xl p-4 border border-border/80">
-            <h3 className="text-foreground/80 text-xs font-semibold uppercase tracking-wider mb-3">Impact on Today</h3>
-            <div className="flex items-center justify-between text-sm">
-               <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                     <TrendingUp className="w-4 h-4 text-muted-foreground" />
+            {/* MACROS CARD - Calories, carbs, fats more visible */}
+            <div className="bg-card border border-border p-5 rounded-3xl shadow-lg relative overflow-hidden">
+              <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full pointer-events-none"></div>
+
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-card-foreground text-sm font-semibold">Nutritional Information</p>
+                <Info className="w-4 h-4 text-muted-foreground" />
+              </div>
+
+              {/* Calories - larger, more visible */}
+              <div className="mb-5">
+                <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-4 text-center w-full">
+                  <Flame className="w-5 h-5 text-pink-400 mx-auto mb-2" />
+                  <p className="text-card-foreground text-2xl font-bold leading-none mb-1">
+                    <AnimatedNumber value={effectiveMacros.calories} />
+                  </p>
+                  <p className="text-pink-600 dark:text-pink-400 text-sm font-semibold uppercase tracking-wide">Calories</p>
+                  {(selectedSauceIds.length > 0 || selectedSwapIds.length > 0) && (
+                    <p className="text-pink-500/70 text-xs mt-1">meal + sauces & swaps</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border/50">
+                <div className="text-center">
+                  <div className="h-3 w-full bg-muted rounded-full mb-2.5 overflow-hidden">
+                    <motion.div
+                      layout
+                      style={{ width: `${cPercent}%` }}
+                      className="h-full bg-emerald-500 rounded-full"
+                      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                    />
                   </div>
-                  <div>
-                    <p className="text-foreground">Calories Remaining</p>
-                    <p className="text-muted-foreground text-xs">If you eat this</p>
+                  <p className="text-emerald-600 dark:text-emerald-400 font-bold text-lg">
+                    <AnimatedNumber value={effectiveMacros.carbs} suffix="g" />
+                  </p>
+                  <p className="text-muted-foreground text-xs font-medium">Carbs ({cPercent}%)</p>
+                </div>
+                <div className="text-center">
+                  <div className="h-3 w-full bg-muted rounded-full mb-2.5 overflow-hidden">
+                    <motion.div
+                      layout
+                      style={{ width: `${fPercent}%` }}
+                      className="h-full bg-amber-500 rounded-full"
+                      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                    />
                   </div>
-               </div>
-               <div className="text-right">
-                 {!logReady || calsAfter === null ? (
-                   <p className="font-bold text-muted-foreground">—</p>
-                 ) : (
-                   <>
-                     <p className={`font-bold ${calsAfter < 0 ? 'text-red-400' : 'text-foreground'}`}>
-                        {calsAfter < 0 ? `${Math.abs(calsAfter)} over` : `${calsAfter} cal`}
-                     </p>
-                     {calsAfter >= 0 && (
-                       <p className="text-muted-foreground text-xs">
-                          Left for today
-                       </p>
-                     )}
-                   </>
-                 )}
-               </div>
+                  <p className="text-amber-600 dark:text-amber-400 font-bold text-lg">
+                    <AnimatedNumber value={effectiveMacros.fats} suffix="g" />
+                  </p>
+                  <p className="text-muted-foreground text-xs font-medium">Fats ({fPercent}%)</p>
+                </div>
+                <div className="text-center">
+                  <div className="h-3 w-full bg-muted rounded-full mb-2.5 overflow-hidden">
+                    <motion.div
+                      layout
+                      style={{ width: `${pPercent}%` }}
+                      className="h-full bg-cyan-500 rounded-full"
+                      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                    />
+                  </div>
+                  <p className="text-cyan-600 dark:text-cyan-400 font-bold text-lg">
+                    <AnimatedNumber value={effectiveMacros.protein} suffix="g" />
+                  </p>
+                  <p className="text-muted-foreground text-xs font-medium">Protein ({pPercent}%)</p>
+                </div>
+              </div>
             </div>
-          </div>
 
-          {/* AI SUGGESTED SWAPS - Uses selectedMealSwaps (same as log modal) */}
-          <div>
+            {/* IMPACT AFTER THIS MEAL - Card grid with animated numbers */}
+            <div className="rounded-3xl overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900/80 dark:to-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 shadow-lg shadow-slate-200/50 dark:shadow-slate-900/50">
+              <div className="flex items-center gap-3 px-5 py-4 bg-gradient-to-r from-primary/10 to-primary/5 dark:from-primary/20 dark:to-primary/10 border-b border-slate-200/80 dark:border-slate-700/80">
+                <div className="w-10 h-10 rounded-xl bg-primary/15 dark:bg-primary/25 flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-foreground font-bold text-base tracking-tight">After this meal</h3>
+                  <p className="text-muted-foreground text-xs mt-0.5">If you log this meal, here’s what you’d have left for the day.</p>
+                </div>
+              </div>
+              {!logReady ? (
+                <p className="text-muted-foreground text-sm px-5 py-6">Load your goals to see remaining.</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-3 p-4">
+                  <motion.div
+                    className="rounded-2xl bg-white dark:bg-slate-800/60 border border-orange-200/60 dark:border-orange-500/20 p-4 shadow-sm flex flex-col items-center gap-1"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  >
+                    <Flame className="w-6 h-6 text-orange-500 dark:text-orange-400 mb-1" />
+                    <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">Calories left</span>
+                    <span className={`text-xl font-bold ${leftAfterThisMeal.calories < 0 ? 'text-red-500 dark:text-red-400' : 'text-foreground'}`}>
+                      <AnimatedNumber value={leftAfterThisMeal.calories} showOverWhenNegative className={leftAfterThisMeal.calories < 0 ? 'text-red-500 dark:text-red-400' : ''} />
+                    </span>
+                  </motion.div>
+                  <motion.div
+                    className="rounded-2xl bg-white dark:bg-slate-800/60 border border-cyan-200/60 dark:border-cyan-500/20 p-4 shadow-sm flex flex-col items-center gap-1"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  >
+                    <Beef className="w-6 h-6 text-cyan-500 dark:text-cyan-400 mb-1" />
+                    <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">Protein left</span>
+                    <span className={`text-xl font-bold ${leftAfterThisMeal.protein < 0 ? 'text-red-500 dark:text-red-400' : 'text-foreground'}`}>
+                      <AnimatedNumber value={leftAfterThisMeal.protein} suffix="g" showOverWhenNegative className={leftAfterThisMeal.protein < 0 ? 'text-red-500 dark:text-red-400' : ''} />
+                    </span>
+                  </motion.div>
+                  <motion.div
+                    className="rounded-2xl bg-white dark:bg-slate-800/60 border border-emerald-200/60 dark:border-emerald-500/20 p-4 shadow-sm flex flex-col items-center gap-1"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  >
+                    <Wheat className="w-6 h-6 text-emerald-500 dark:text-emerald-400 mb-1" />
+                    <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">Carbs left</span>
+                    <span className={`text-xl font-bold ${leftAfterThisMeal.carbs < 0 ? 'text-red-500 dark:text-red-400' : 'text-foreground'}`}>
+                      <AnimatedNumber value={leftAfterThisMeal.carbs} suffix="g" showOverWhenNegative className={leftAfterThisMeal.carbs < 0 ? 'text-red-500 dark:text-red-400' : ''} />
+                    </span>
+                  </motion.div>
+                  <motion.div
+                    className="rounded-2xl bg-white dark:bg-slate-800/60 border border-amber-200/60 dark:border-amber-500/20 p-4 shadow-sm flex flex-col items-center gap-1"
+                    whileHover={{ scale: 1.02 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  >
+                    <Droplets className="w-6 h-6 text-amber-500 dark:text-amber-400 mb-1" />
+                    <span className="text-muted-foreground text-xs font-medium uppercase tracking-wider">Fats left</span>
+                    <span className={`text-xl font-bold ${leftAfterThisMeal.fats < 0 ? 'text-red-500 dark:text-red-400' : 'text-foreground'}`}>
+                      <AnimatedNumber value={leftAfterThisMeal.fats} suffix="g" showOverWhenNegative className={leftAfterThisMeal.fats < 0 ? 'text-red-500 dark:text-red-400' : ''} />
+                    </span>
+                  </motion.div>
+                </div>
+              )}
+            </div>
+
+            {/* SAUCES - Restaurant-specific; selection updates macros and Log to Tracker */}
+            {restaurantSauces.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
+                    <UtensilsCrossed className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-foreground font-medium">Sauces</p>
+                </div>
+                <p className="text-muted-foreground text-xs mb-2">Add sauces to include their calories and macros in your log.</p>
+                {isLoadingSauces ? (
+                  <div className="text-center py-3 text-muted-foreground text-sm">Loading sauces...</div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {restaurantSauces.map((sauce) => {
+                      const isSelected = selectedSauceIds.includes(sauce.id);
+                      return (
+                        <button
+                          key={sauce.id}
+                          onClick={() => setSelectedSauceIds((prev) => (prev.includes(sauce.id) ? prev.filter((x) => x !== sauce.id) : [...prev, sauce.id]))}
+                          className={`rounded-xl border px-3 py-2 text-left text-sm transition-all ${isSelected
+                              ? 'bg-amber-500/20 border-amber-500/50 text-foreground'
+                              : 'bg-muted/50 border-border text-muted-foreground hover:border-amber-500/30'
+                            }`}
+                        >
+                          <span className="font-medium">{sauce.name}</span>
+                          <span className="block text-[10px] opacity-80">{sauce.macros.calories} cal</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+                {selectedSauceIds.length > 0 && (
+                  <p className="text-amber-600 dark:text-amber-400 text-xs mt-2">
+                    +{sauceMacrosSum.calories} cal from sauces — Log to Tracker reflects updated total.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* AI SUGGESTED SWAPS - Uses selectedMealSwaps (same as log modal) */}
+            <div>
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-lg flex items-center justify-center">
                   <Sparkles className="w-4 h-4 text-white" />
@@ -703,9 +920,8 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                     return (
                       <div
                         key={swap.id}
-                        className={`bg-gradient-to-br from-indigo-500/10 to-blue-500/10 border rounded-2xl p-4 ${
-                          isSelected ? 'border-indigo-500/50 bg-indigo-500/20' : 'border-indigo-500/30'
-                        }`}
+                        className={`bg-gradient-to-br from-indigo-500/10 to-blue-500/10 border rounded-2xl p-4 ${isSelected ? 'border-indigo-500/50 bg-indigo-500/20' : 'border-indigo-500/30'
+                          }`}
                       >
                         <p className="text-foreground/80 text-sm font-medium leading-snug">{swap.label}</p>
                         <p className="text-muted-foreground text-xs mt-1">
@@ -718,154 +934,156 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                   })
                 )}
               </div>
-          </div>
+            </div>
 
-          {/* SIMILAR OPTIONS - Only show if no modifications/alternatives exist */}
-          {similarMeals.length > 0 && selectedMealSwaps.length === 0 && (
-            <div className="mb-6">
-              <p className="text-foreground text-sm font-semibold mb-3">Similar Options</p>
-              {isLoadingSimilar ? (
-                <div className="text-center py-4 text-muted-foreground text-sm">Loading similar meals...</div>
-              ) : (
-                <div className="grid grid-cols-2 gap-2.5">
-                  {similarMeals.map(similar => (
-                    <div 
-                      key={similar.id} 
-                      className="bg-gradient-to-br from-card to-muted dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer overflow-hidden hover:border-cyan-500/50 hover:scale-[1.02] group relative border border-border"
-                      onClick={() => {
-                        // Navigate to meal detail - would need to be handled by parent
-                        window.location.href = `#meal-${similar.id}`;
-                      }}
-                    >
-                      {/* Image Container */}
-                      <div 
-                        className="relative w-full overflow-hidden rounded-t-2xl bg-gradient-to-br from-muted to-muted/50"
-                        style={{
-                          aspectRatio: '16 / 9',
-                          padding: '10px'
+            {/* SIMILAR OPTIONS - Only show if no modifications/alternatives exist */}
+            {similarMeals.length > 0 && selectedMealSwaps.length === 0 && (
+              <div className="mb-6">
+                <p className="text-foreground text-sm font-semibold mb-3">Similar Options</p>
+                {isLoadingSimilar ? (
+                  <div className="text-center py-4 text-muted-foreground text-sm">Loading similar meals...</div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {similarMeals.map(similar => (
+                      <div
+                        key={similar.id}
+                        className="bg-gradient-to-br from-card to-muted dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer overflow-hidden hover:border-cyan-500/50 hover:scale-[1.02] group relative border border-border"
+                        onClick={() => {
+                          // Navigate to meal detail - would need to be handled by parent
+                          window.location.href = `#meal-${similar.id}`;
                         }}
                       >
-                        {/* Meal Image */}
-                        {similar.image && similar.image !== '/placeholder-food.jpg' && similar.image !== '' ? (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <img 
-                              src={similar.image} 
-                              alt={similar.name}
-                              className="w-full h-full object-contain object-center"
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'contain',
-                                objectPosition: 'center',
-                                display: 'block',
-                                maxWidth: '100%',
-                                maxHeight: '100%'
-                              }}
-                              onError={(e) => {
-                                // Fallback to default.png if meal image fails
-                                e.currentTarget.src = '/logos/default.png';
-                                e.currentTarget.onerror = null;
-                              }}
-                            />
-                          </div>
-                        ) : (
-                          /* Fallback to default.png if no meal image */
-                          <div className="w-full h-full flex items-center justify-center">
-                            <img 
-                              src="/logos/default.png" 
-                              alt="Default meal"
-                              className="w-full h-full object-contain object-center"
-                              style={{ maxWidth: '100%', maxHeight: '100%' }}
-                              onError={(e) => {
-                                // Final fallback - hide image if default.png also fails
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
-                          </div>
-                        )}
-                        {/* Gradient overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-background dark:from-gray-950 via-background/20 dark:via-gray-950/20 to-transparent pointer-events-none" />
-                      </div>
-
-                      <div className="p-2.5">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1 min-w-0 pr-1">
-                            <h3 className="text-foreground mb-0.5 font-semibold text-xs line-clamp-2 break-words leading-tight">{similar.name}</h3>
-                            <div className="flex items-center gap-1 min-w-0">
-                              <p className="text-muted-foreground text-[10px] truncate">{similar.restaurant}</p>
+                        {/* Image Container */}
+                        <div
+                          className="relative w-full overflow-hidden rounded-t-2xl bg-gradient-to-br from-muted to-muted/50"
+                          style={{
+                            aspectRatio: '16 / 9',
+                            padding: '10px'
+                          }}
+                        >
+                          {/* Meal Image */}
+                          {similar.image && similar.image !== '/placeholder-food.jpg' && similar.image !== '' ? (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <img
+                                src={similar.image}
+                                alt={similar.name}
+                                className="w-full h-full object-contain object-center"
+                                style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  objectFit: 'contain',
+                                  objectPosition: 'center',
+                                  display: 'block',
+                                  maxWidth: '100%',
+                                  maxHeight: '100%'
+                                }}
+                                onError={(e) => {
+                                  // Fallback to default.png if meal image fails
+                                  e.currentTarget.src = '/logos/default.png';
+                                  e.currentTarget.onerror = null;
+                                }}
+                              />
                             </div>
-                            {similar.distance !== undefined && similar.distance !== null && (
-                              <p className="text-muted-foreground mt-0.5 text-[9px]">{similar.distance.toFixed(1)} mi</p>
-                            )}
-                          </div>
+                          ) : (
+                            /* Fallback to default.png if no meal image */
+                            <div className="w-full h-full flex items-center justify-center">
+                              <img
+                                src="/logos/default.png"
+                                alt="Default meal"
+                                className="w-full h-full object-contain object-center"
+                                style={{ maxWidth: '100%', maxHeight: '100%' }}
+                                onError={(e) => {
+                                  // Final fallback - hide image if default.png also fails
+                                  e.currentTarget.style.display = 'none';
+                                }}
+                              />
+                            </div>
+                          )}
+                          {/* Gradient overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-background dark:from-gray-950 via-background/20 dark:via-gray-950/20 to-transparent pointer-events-none" />
                         </div>
 
-                        <div className="grid grid-cols-4 gap-1 text-[9px]">
-                          <div className="bg-gradient-to-br from-pink-500/20 to-rose-500/20 rounded-md p-1 text-center border border-pink-500/30">
-                            <div className="flex items-center justify-center mb-0.5">
-                              <Flame className="w-2 h-2 text-pink-400" />
+                        <div className="p-2.5">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1 min-w-0 pr-1">
+                              <h3 className="text-foreground mb-0.5 font-semibold text-xs line-clamp-2 break-words leading-tight">{similar.name}</h3>
+                              <div className="flex items-center gap-1 min-w-0">
+                                <p className="text-muted-foreground text-[10px] truncate">{similar.restaurant}</p>
+                              </div>
+                              {similar.distance !== undefined && similar.distance !== null && (
+                                <p className="text-muted-foreground mt-0.5 text-[9px]">{similar.distance.toFixed(1)} mi</p>
+                              )}
                             </div>
-                            <p className="text-foreground font-bold text-[10px]">{similar.calories}</p>
-                            <p className="text-pink-600 dark:text-pink-300/70 text-[8px]">cal</p>
                           </div>
-                          <div className="bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-md p-1 text-center border border-cyan-400/30">
-                            <div className="flex items-center justify-center mb-0.5">
-                              <Zap className="w-2 h-2 text-cyan-400" />
+
+                          <div className="grid grid-cols-4 gap-1 text-[9px]">
+                            <div className="bg-gradient-to-br from-pink-500/20 to-rose-500/20 rounded-md p-1 text-center border border-pink-500/30">
+                              <div className="flex items-center justify-center mb-0.5">
+                                <Flame className="w-2 h-2 text-pink-400" />
+                              </div>
+                              <p className="text-foreground font-bold text-[10px]">{similar.calories}</p>
+                              <p className="text-pink-600 dark:text-pink-300/70 text-[8px]">cal</p>
                             </div>
-                            <p className="text-foreground font-bold text-[10px]">{similar.protein}g</p>
-                            <p className="text-cyan-600 dark:text-cyan-300/70 text-[8px]">pro</p>
-                          </div>
-                          <div className="bg-gradient-to-br from-green-400/20 to-emerald-500/20 rounded-md p-1 text-center border border-green-400/30">
-                            <div className="flex items-center justify-center mb-0.5">
-                              <TrendingUp className="w-2 h-2 text-green-400" />
+                            <div className="bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-md p-1 text-center border border-cyan-400/30">
+                              <div className="flex items-center justify-center mb-0.5">
+                                <Zap className="w-2 h-2 text-cyan-400" />
+                              </div>
+                              <p className="text-foreground font-bold text-[10px]">{similar.protein}g</p>
+                              <p className="text-cyan-600 dark:text-cyan-300/70 text-[8px]">pro</p>
                             </div>
-                            <p className="text-foreground font-bold text-[10px]">{similar.carbs}g</p>
-                            <p className="text-green-600 dark:text-green-300/70 text-[8px]">carb</p>
-                          </div>
-                          <div className="bg-gradient-to-br from-amber-400/20 to-orange-500/20 rounded-md p-1 text-center border border-amber-400/30">
-                            <div className="flex items-center justify-center mb-0.5">
-                              <div className="w-2 h-2 rounded-full bg-amber-400" />
+                            <div className="bg-gradient-to-br from-green-400/20 to-emerald-500/20 rounded-md p-1 text-center border border-green-400/30">
+                              <div className="flex items-center justify-center mb-0.5">
+                                <TrendingUp className="w-2 h-2 text-green-400" />
+                              </div>
+                              <p className="text-foreground font-bold text-[10px]">{similar.carbs}g</p>
+                              <p className="text-green-600 dark:text-green-300/70 text-[8px]">carb</p>
                             </div>
-                            <p className="text-foreground font-bold text-[10px]">{similar.fats}g</p> 
-                            <p className="text-amber-300/70 text-[8px]">fat</p>
+                            <div className="bg-gradient-to-br from-amber-400/20 to-orange-500/20 rounded-md p-1 text-center border border-amber-400/30">
+                              <div className="flex items-center justify-center mb-0.5">
+                                <div className="w-2 h-2 rounded-full bg-amber-400" />
+                              </div>
+                              <p className="text-foreground font-bold text-[10px]">{similar.fats}g</p>
+                              <p className="text-amber-300/70 text-[8px]">fat</p>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* --- ACTION BUTTONS (Inside scrollable content, only visible when scrolled to bottom) --- */}
+            <div className="mt-4 mb-8 space-y-3" style={{ height: '140px' }}>
+              <button
+                onClick={() => setShowLogModal(true)}
+                className="w-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-[#020617] font-bold text-sm py-4 rounded-2xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                {effectiveMacros.calories !== meal.calories
+                  ? `Log to Daily Tracker • ${effectiveMacros.calories} cal`
+                  : 'Log to Daily Tracker'}
+              </button>
+
+              <button
+                onClick={() => setShowManualModal(true)}
+                className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-sm py-4 rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+              >
+                <Plus className="w-4 h-4" />
+                Add Meal Manually
+              </button>
+
+              <button
+                onClick={handleOrderOnline}
+                className="w-full rounded-2xl bg-muted border border-border text-foreground hover:bg-muted/80 font-semibold text-sm py-3.5 flex items-center justify-center gap-2 transition-colors"
+              >
+                Order Online
+                <ExternalLink className="w-4 h-4 text-muted-foreground" />
+              </button>
             </div>
-          )}
-          
-          {/* --- ACTION BUTTONS (Inside scrollable content, only visible when scrolled to bottom) --- */}
-          <div className="mt-4 mb-8 space-y-3" style={{ height: '140px' }}>
-            <button 
-              onClick={() => setShowLogModal(true)}
-              className="w-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-[#020617] font-bold text-sm py-4 rounded-2xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-            >
-              <Plus className="w-4 h-4" />
-              Log to Daily Tracker
-            </button>
-            
-            <button 
-              onClick={() => setShowManualModal(true)}
-              className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-sm py-4 rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
-            >
-              <Plus className="w-4 h-4" />
-              Add Meal Manually
-            </button>
-
-            <button 
-              onClick={handleOrderOnline}
-              className="w-full rounded-2xl bg-muted border border-border text-foreground hover:bg-muted/80 font-semibold text-sm py-3.5 flex items-center justify-center gap-2 transition-colors"
-            >
-              Order Online
-              <ExternalLink className="w-4 h-4 text-muted-foreground" />
-            </button>
           </div>
         </div>
-      </div>
       </div>
 
       {/* --- LOG MODAL (CUSTOMIZE) --- */}
@@ -876,17 +1094,40 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
               <h2 className="text-card-foreground font-semibold">Customize Your Meal</h2>
               <button onClick={() => {
                 setShowLogModal(false);
-                setSelectedSwapIds([]); // Reset swap selections when closing modal
+                setSelectedSwapIds([]);
+                setSelectedSauceIds([]);
               }} className="text-muted-foreground hover:text-foreground p-2">
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <p className="text-muted-foreground text-sm mb-4">
               {selectedMealSwaps.length > 0 && selectedMealSwaps[0]?.isModification !== false
                 ? 'Customize this meal with these modifications:'
                 : 'Alternative options:'}
             </p>
+
+            {/* Sauces in modal - same as on card */}
+            {restaurantSauces.length > 0 && (
+              <div className="mb-4">
+                <p className="text-card-foreground text-xs font-medium mb-2">Sauces</p>
+                <div className="flex flex-wrap gap-2">
+                  {restaurantSauces.map((sauce) => {
+                    const isSelected = selectedSauceIds.includes(sauce.id);
+                    return (
+                      <button
+                        key={sauce.id}
+                        onClick={() => setSelectedSauceIds((prev) => (prev.includes(sauce.id) ? prev.filter((x) => x !== sauce.id) : [...prev, sauce.id]))}
+                        className={`rounded-xl border px-2.5 py-1.5 text-xs transition-all ${isSelected ? 'bg-amber-500/20 border-amber-500/50' : 'bg-muted border-border'
+                          }`}
+                      >
+                        {sauce.name} ({sauce.macros.calories} cal)
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             <div className="space-y-2 mb-6">
               {isLoadingSwaps ? (
@@ -903,11 +1144,10 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                     <button
                       key={swap.id}
                       onClick={() => toggleSwap(swap.id)}
-                      className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${
-                        isSelected
+                      className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${isSelected
                           ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-cyan-500 shadow-lg shadow-cyan-500/20'
                           : 'bg-muted border-border hover:border-border/80'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-cyan-400 bg-cyan-500' : 'border-border'}`}>
@@ -929,45 +1169,25 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
               )}
             </div>
 
-            {/* Live Macro Preview */}
-            {selectedSwapIds.length > 0 && (
+            {/* Live Macro Preview (meal + swaps + sauces) */}
+            {(selectedSwapIds.length > 0 || selectedSauceIds.length > 0) && (
               <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-2xl p-4 mb-6">
                 <p className="text-purple-300 text-xs mb-2 uppercase font-bold">Updated Macros</p>
                 <div className="grid grid-cols-4 gap-2 text-center">
                   <div>
-                    <p className="text-card-foreground font-bold">
-                      {meal.calories + selectedSwapIds.reduce((sum, id) => {
-                        const swap = selectedMealSwaps.find(s => s.id === id);
-                        return sum + (swap?.deltaMacros.calories || 0);
-                      }, 0)}
-                    </p>
+                    <p className="text-card-foreground font-bold">{effectiveMacros.calories}</p>
                     <p className="text-muted-foreground text-[10px]">cal</p>
                   </div>
                   <div>
-                    <p className="text-card-foreground font-bold">
-                      {meal.protein + selectedSwapIds.reduce((sum, id) => {
-                        const swap = selectedMealSwaps.find(s => s.id === id);
-                        return sum + (swap?.deltaMacros.protein || 0);
-                      }, 0)}g
-                    </p>
+                    <p className="text-card-foreground font-bold">{effectiveMacros.protein}g</p>
                     <p className="text-muted-foreground text-[10px]">pro</p>
                   </div>
                   <div>
-                    <p className="text-card-foreground font-bold">
-                      {meal.carbs + selectedSwapIds.reduce((sum, id) => {
-                        const swap = selectedMealSwaps.find(s => s.id === id);
-                        return sum + (swap?.deltaMacros.carbs || 0);
-                      }, 0)}g
-                    </p>
+                    <p className="text-card-foreground font-bold">{effectiveMacros.carbs}g</p>
                     <p className="text-muted-foreground text-[10px]">carbs</p>
                   </div>
                   <div>
-                    <p className="text-card-foreground font-bold">
-                      {meal.fats + selectedSwapIds.reduce((sum, id) => {
-                        const swap = selectedMealSwaps.find(s => s.id === id);
-                        return sum + (swap?.deltaMacros.fats || 0);
-                      }, 0)}g
-                    </p>
+                    <p className="text-card-foreground font-bold">{effectiveMacros.fats}g</p>
                     <p className="text-muted-foreground text-[10px]">fats</p>
                   </div>
                 </div>
@@ -977,7 +1197,8 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
             <div className="flex gap-3">
               <button onClick={() => {
                 setShowLogModal(false);
-                setSelectedSwapIds([]); // Reset swap selections when canceling
+                setSelectedSwapIds([]);
+                setSelectedSauceIds([]);
               }} className="flex-1 h-12 rounded-full bg-muted border border-border text-foreground font-medium hover:bg-muted/80">
                 Cancel
               </button>
@@ -1004,19 +1225,19 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
             <div className="space-y-4">
               <div>
                 <label className="text-foreground/80 text-xs mb-1.5 block ml-1">Meal Name</label>
-                <input 
-                  value={manualName} 
-                  onChange={e => setManualName(e.target.value)} 
+                <input
+                  value={manualName}
+                  onChange={e => setManualName(e.target.value)}
                   placeholder="e.g. Grilled Chicken Salad"
                   className="w-full h-12 rounded-xl bg-muted/50 border border-border text-foreground px-4 placeholder:text-muted-foreground focus:outline-none focus:border-cyan-500"
                 />
               </div>
               <div>
                 <label className="text-foreground/80 text-xs mb-1.5 block ml-1">Calories</label>
-                <input 
-                  type="number" 
-                  value={manualCals} 
-                  onChange={e => setManualCals(e.target.value)} 
+                <input
+                  type="number"
+                  value={manualCals}
+                  onChange={e => setManualCals(e.target.value)}
                   placeholder="500"
                   className="w-full h-12 rounded-xl bg-muted/50 border border-border text-foreground px-4 placeholder:text-muted-foreground focus:outline-none focus:border-cyan-500"
                 />
@@ -1041,8 +1262,8 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
               <button onClick={() => setShowManualModal(false)} className="flex-1 h-12 rounded-full bg-muted border border-border text-foreground font-medium hover:bg-muted/80">
                 Cancel
               </button>
-              <button 
-                onClick={handleManualSubmit} 
+              <button
+                onClick={handleManualSubmit}
                 disabled={!isManualValid}
                 className={`flex-1 h-12 rounded-full font-medium shadow-lg flex items-center justify-center transition-all ${isManualValid ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-cyan-500/30 hover:shadow-cyan-500/50' : 'bg-muted text-muted-foreground cursor-not-allowed'}`}
               >

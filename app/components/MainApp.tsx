@@ -218,8 +218,10 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     if (!isMounted) return;
 
     const initializeApp = async () => {
+      let isOnboarded = false;
+      try {
       // Check localStorage for onboarding completion
-      const isOnboarded = typeof window !== 'undefined'
+      isOnboarded = typeof window !== 'undefined'
         ? localStorage.getItem('onboarded') === 'true' ||
         localStorage.getItem('hasCompletedOnboarding') === 'true'
         : false;
@@ -341,8 +343,8 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
                   setAppState('auth');
                 }
               }, 1000);
-              // Return current state while waiting
-              return currentState || 'app';
+              // Show app while waiting for session retry (don't stay on loading)
+              return 'app';
             }
           }
           // Onboarded but not authenticated - show auth
@@ -352,10 +354,30 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           return 'app';
         }
       });
+      } catch (err) {
+        console.warn('initializeApp error, showing app:', err);
+        setAppState(isChatRoute ? 'app' : isOnboarded ? 'auth' : 'onboarding');
+      }
     };
 
     initializeApp();
   }, [supabase, isMounted, isChatRoute]);
+
+  // Safety: if still loading after 5s (e.g. getUser/profile hung), force a visible state
+  useEffect(() => {
+    if (!isMounted || appState !== 'loading') return;
+    const t = setTimeout(() => {
+      setAppState((s) => {
+        if (s !== 'loading') return s;
+        const isOnboarded = typeof window !== 'undefined'
+          ? localStorage.getItem('onboarded') === 'true' ||
+            localStorage.getItem('hasCompletedOnboarding') === 'true'
+          : false;
+        return isChatRoute ? 'app' : isOnboarded ? 'auth' : 'onboarding';
+      });
+    }, 5000);
+    return () => clearTimeout(t);
+  }, [isMounted, appState, isChatRoute]);
 
   // Set up auth state change listener - this is the primary way we react to sign-in
   useEffect(() => {
@@ -674,6 +696,12 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     setLoggedMeals((prev) => prev.filter((meal) => meal.id !== id));
   };
 
+  const handleUpdateLoggedMeal = (logId: string, meal: Meal) => {
+    setLoggedMeals((prev) =>
+      prev.map((log) => (log.id === logId ? { ...log, meal } : log))
+    );
+  };
+
   const handleUpdateProfile = (updates: Partial<UserProfile>) => {
     setUserProfile((prev) => ({ ...prev, ...updates }));
   };
@@ -743,6 +771,8 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
             userProfile={userProfile}
             loggedMeals={loggedMeals}
             onRemoveMeal={handleRemoveMeal}
+            onAddMeal={handleLogMeal}
+            onUpdateMeal={handleUpdateLoggedMeal}
           />
         )}
         {currentScreen === 'chat' && (

@@ -233,11 +233,11 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
     );
   }
 
-  // Regular mode: original vertical layout with image
+  // Regular mode: vertical card layout for grid/list views
   return (
     <div
       onClick={onClick}
-      className={`bg-gradient-to-br from-card to-muted dark:from-gray-900 dark:to-gray-800 rounded-3xl shadow-xl hover:shadow-2xl transition-all cursor-pointer overflow-hidden hover:border-cyan-500/50 hover:scale-[1.02] group relative w-full ${isGrocery
+      className={`h-full flex flex-col bg-gradient-to-br from-card to-muted dark:from-gray-900 dark:to-gray-800 rounded-3xl shadow-xl hover:shadow-2xl transition-all cursor-pointer overflow-hidden hover:border-cyan-500/50 hover:scale-[1.02] group relative w-full ${isGrocery
         ? 'border-2 border-green-500/30'
         : 'border border-border'
         }`}
@@ -322,12 +322,16 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
         )}
       </div>
 
-      <div className="p-4">
-        <div className="flex items-start justify-between mb-3 gap-3">
+      <div className="p-3 sm:p-4 flex flex-col flex-1">
+        <div className="flex items-start mb-3 gap-3">
           <div className="flex-1 min-w-0">
-            <h3 className="text-foreground mb-1 font-semibold line-clamp-2 break-words">{meal.name}</h3>
+            <h3 className="text-foreground mb-1 font-semibold line-clamp-2 break-words text-base sm:text-lg">
+              {meal.name}
+            </h3>
             <div className="flex items-center gap-1.5 min-w-0">
-              <p className="text-muted-foreground text-sm truncate">{restaurantName}</p>
+              <p className="text-muted-foreground text-sm sm:text-base truncate">
+                {restaurantName}
+              </p>
               {hasVariableAvailability && (
                 <div
                   className="group/alert relative flex-shrink-0"
@@ -345,22 +349,9 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
               <p className="text-muted-foreground mt-0.5 text-xs">{meal.distance.toFixed(1)} miles away</p>
             )}
           </div>
-
-          {/* Big restaurant logo on the far right */}
-          <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-muted/80 border border-border flex items-center justify-center overflow-hidden shadow-sm">
-            <img
-              src={getLogo(restaurantName)}
-              alt={restaurantName}
-              className="w-full h-full object-contain p-1.5"
-              onError={(e) => {
-                e.currentTarget.onerror = null;
-                e.currentTarget.src = '/logos/default.png';
-              }}
-            />
-          </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-2 text-xs">
+        <div className="mt-auto grid grid-cols-4 gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
           <div className="bg-gradient-to-br from-pink-500/20 to-rose-500/20 rounded-md p-2 text-center border border-pink-500/30">
             <div className="flex items-center justify-center mb-1">
               <Flame className="w-3 h-3 text-pink-400" />

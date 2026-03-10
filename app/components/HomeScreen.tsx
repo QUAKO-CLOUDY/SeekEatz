@@ -457,7 +457,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           macroFilters: macroFilters || undefined,
           calorieMode: calorieMode || undefined,
           isHomepage: true,
-          limit: 5,
+          limit: 8,
           ...(searchKey ? { searchKey, isPagination: true } : {}),
           ...(userLocation ? {
             user_location_lat: userLocation.latitude,
@@ -632,7 +632,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         ? meals.filter(meal => mealMatchesCuisine(meal, selectedCuisine))
         : meals;
       filteredMeals = filterMealsByProfile(filteredMeals, userProfile);
-      const newMeals = filteredMeals.slice(0, 3);
+      const newMeals = filteredMeals.slice(0, 4);
       setRecommendedMeals(newMeals);
 
       const searchParams = {
@@ -757,12 +757,12 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     // Get existing meal IDs to avoid duplicates
     const existingIds = new Set(recommendedMeals.map(m => m.id));
     
-    // Filter out duplicates - fetch up to 15 results to have better chance of getting 3 unique ones
+    // Filter out duplicates - fetch up to 15 results to have better chance of getting unique ones
     const uniqueMeals = filteredMeals.filter((m: Meal) => !existingIds.has(m.id));
     
-    // Shuffle and take 3 new meals for variety
+    // Shuffle and take 4 new meals for variety (full 2x2 rows)
     const shuffled = [...uniqueMeals].sort(() => Math.random() - 0.5);
-    const newMeals = shuffled.slice(0, 3);
+    const newMeals = shuffled.slice(0, 4);
     
     if (newMeals.length > 0) {
       // Append new meals to existing list
@@ -1061,9 +1061,9 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
             </div>
           ) : recommendedMeals.length > 0 ? (
             <>
-              <div className="space-y-3 sm:space-y-4 px-4">
+              <div className="px-4 grid grid-cols-2 gap-3 sm:gap-4 items-stretch">
                 {recommendedMeals.map((meal) => (
-                  <div key={meal.id} data-meal-id={meal.id}>
+                  <div key={meal.id} data-meal-id={meal.id} className="h-full">
                     <MealCard
                       meal={meal}
                       isFavorite={favoriteMeals.includes(meal.id)}

@@ -865,15 +865,13 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   const handleLogout = async () => {
     if (confirm('Are you sure you want to log out?')) {
       try {
-        // Clear chat state before signing out
         clearChat();
         await supabase.auth.signOut();
-        // Redirect to sign-in page after successful logout
-        router.replace('/auth/signin');
       } catch (error) {
         console.error('Error signing out:', error);
-        // Still redirect even if signOut fails
-        router.replace('/auth/signin');
+      } finally {
+        // Full page redirect so the app reloads and root page sees no session
+        window.location.href = '/';
       }
     }
   };

@@ -96,6 +96,7 @@ function getRadius(): number {
 export default function FeaturesSection() {
     const triggerRef = useRef<HTMLDivElement>(null);
     const [triggered, setTriggered] = useState(false);
+    const [orbitAngle, setOrbitAngle] = useState(0);
     const [radius, setRadius] = useState(RADIUS.xl);
     const ioRef = useRef<IntersectionObserver | null>(null);
 
@@ -132,11 +133,21 @@ export default function FeaturesSection() {
     useEffect(() => {
         const onReset = () => {
             setTriggered(false);
+            setOrbitAngle(0);
             setTimeout(attachObserver, 100);
         };
         window.addEventListener('seekResetAnimations', onReset);
         return () => window.removeEventListener('seekResetAnimations', onReset);
     }, [attachObserver]);
+
+    // Slow continuous rotation for the orbiting boxes once triggered
+    useEffect(() => {
+        if (!triggered) return;
+        const id = window.setInterval(() => {
+            setOrbitAngle((prev) => (prev + 0.25) % 360);
+        }, 40);
+        return () => window.clearInterval(id);
+    }, [triggered]);
 
     return (
         <section
@@ -157,47 +168,6 @@ export default function FeaturesSection() {
             {/* Ambient glow blobs */}
             <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-cyan-300/8 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-violet-300/8 rounded-full blur-3xl pointer-events-none" />
-
-            {/* Background app screenshots — vertically centered on sides, visible without scrolling */}
-            <img
-                src="/logos/waitlist_photo.png"
-                alt=""
-                aria-hidden
-                className="absolute pointer-events-none select-none object-contain rounded-2xl"
-                style={{
-                    top: '30%',
-                    left: '7rem',
-                    width: 280,
-                    maxWidth: '20%',
-                    opacity: triggered ? 0.62 : 0,
-                    filter: 'blur(0.5px) saturate(0.5)',
-                    transform: triggered
-                        ? 'translateY(-50%) rotate(-3deg) scale(1)'
-                        : 'translateY(-50%) rotate(-3deg) scale(0.9)',
-                    transition: 'opacity 1.8s ease 5.5s, transform 1.8s ease 5.5s',
-                    zIndex: 0,
-                }}
-            />
-            <img
-                src="/images/low_fat.jpeg"
-                alt=""
-                aria-hidden
-                className="absolute pointer-events-none select-none object-contain rounded-2xl"
-                style={{
-                    top: '60%',
-                    right: '7rem',
-                    width: 280,
-                    maxWidth: '20%',
-                    opacity: triggered ? 0.62 : 0,
-                    filter: 'blur(0.5px) saturate(0.5)',
-                    transform: triggered
-                        ? 'translateY(-50%) rotate(3deg) scale(1)'
-                        : 'translateY(-50%) rotate(3deg) scale(0.9)',
-                    transition: 'opacity 1.8s ease 5.5s, transform 1.8s ease 5.5s',
-                    zIndex: 0,
-                }}
-            />
-
 
             <div className="max-w-6xl mx-auto px-6">
                 {/* Section label — always visible */}
@@ -267,15 +237,15 @@ export default function FeaturesSection() {
                         </div>
                     </div>
 
-                    {/* Feature cards around hexagon */}
+                    {/* Feature boxes orbiting in a circle */}
                     {FEATURES.map((f, i) => {
-                        const angleRad = (HEX_ANGLES_DEG[i] * Math.PI) / 180;
-                        const cx = (radius * 2 + 260) / 2 + Math.cos(angleRad) * radius;
-                        const cy = (radius * 2 + 260) / 2 + Math.sin(angleRad) * radius;
+                        const angleDeg = HEX_ANGLES_DEG[i] + orbitAngle;
+                        const angleRad = (angleDeg * Math.PI) / 180;
+                        const orbitRadius = radius + 80; // push cards further out so they don't overlap center
+                        const cx = (radius * 2 + 260) / 2 + Math.cos(angleRad) * orbitRadius;
+                        const cy = (radius * 2 + 260) / 2 + Math.sin(angleRad) * orbitRadius;
                         // One-by-one reveal: 800ms gap between each card
                         const delay = 100 + i * 800;
-                        // Float starts after entrance completes; stagger phase per card
-                        const floatDelay = delay + 900 + i * 400;
 
                         return (
                             <div
@@ -292,10 +262,7 @@ export default function FeaturesSection() {
                                     transitionDuration: '900ms',
                                     transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
                                     transitionDelay: `${delay}ms`,
-                                    animation: triggered
-                                        ? `seekFloat 4.5s ease-in-out ${floatDelay}ms infinite`
-                                        : 'none',
-                                    willChange: 'transform, opacity',
+                                    willChange: 'transform, opacity, left, top',
                                 }}
                             >
                                 <div

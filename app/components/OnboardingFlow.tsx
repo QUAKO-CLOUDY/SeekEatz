@@ -60,7 +60,7 @@ export function OnboardingFlow({ onComplete }: Props) {
 
           <h1 className="text-3xl font-bold text-foreground mb-4">Eat Anywhere</h1>
           <p className="text-muted-foreground text-lg mb-12 leading-relaxed">
-          Whether you’re at a restaurant, in a new city, or eating out nearby, SeekEatz finds meals that fit your goals.
+          Whether you're on the go, in a new city, or eating out locally, SeekEatz finds meals that fit your goals.
           </p>
 
           <ProgressDots />
@@ -137,7 +137,7 @@ export function OnboardingFlow({ onComplete }: Props) {
 
           <h1 className="text-3xl font-bold text-foreground mb-4">No Guesswork</h1>
           <p className="text-muted-foreground text-lg mb-12 leading-relaxed">
-          SeekEatz pulls nutrition from real restaurant sources when available — no crowdsourced guesses, no made-up macros.
+          SeekEatz pulls nutrition from real restaurant nutritional menus and databases, eliminating crowdsourced guesses, made up numbers, and AI hallucinations.
           </p>
 
           <ProgressDots />
@@ -164,43 +164,10 @@ export function OnboardingFlow({ onComplete }: Props) {
   }
 
   // STEP 3: Location Permission (Last step before app access)
+  // For a frictionless experience, we no longer block on geolocation.
+  // Tapping "Allow Location" immediately completes onboarding and sends user into the app.
   const handleLocationRequest = async () => {
-    setIsRequestingLocation(true);
-
     try {
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            // Success - location granted
-            console.log("Location granted:", position.coords);
-            
-            // Save location if needed (optional)
-            // You can store lat/lng in Supabase or localStorage if needed
-            
-            // Complete onboarding and redirect
-            await completeOnboarding();
-          },
-          async (error) => {
-            // User denied or error occurred - still proceed
-            console.log("Location denied or error:", error);
-            
-            // Complete onboarding anyway
-            await completeOnboarding();
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0,
-          }
-        );
-      } else {
-        // Geolocation not supported - proceed anyway
-        console.log("Geolocation not supported");
-        await completeOnboarding();
-      }
-    } catch (error) {
-      console.error("Error requesting location:", error);
-      // Still complete onboarding
       await completeOnboarding();
     } finally {
       setIsRequestingLocation(false);
@@ -312,17 +279,12 @@ export function OnboardingFlow({ onComplete }: Props) {
       // Wait a moment to ensure all state is saved
       await new Promise((resolve) => setTimeout(resolve, 300));
 
-      // Call onComplete callback
+      // Call onComplete callback - parent component handles navigation (e.g., to AI chat)
       onComplete();
-
-      // Always redirect to chat after onboarding completion (for both signed-in and signed-out users)
-      // Signed-out users will get guest trial access (3 uses), signed-in users get full access
-      router.push("/chat");
     } catch (error) {
       console.error("Error completing onboarding:", error);
-      // Always try to redirect to chat - the app will handle auth check
-      // Don't redirect to signin on error, let the chat page handle it
-      window.location.href = "/chat";
+      // On error, still notify parent so it can decide how to handle navigation
+      onComplete();
     }
   };
 
@@ -341,7 +303,7 @@ export function OnboardingFlow({ onComplete }: Props) {
 
           <h1 className="text-3xl font-bold text-foreground mb-4">Use your location</h1>
           <p className="text-muted-foreground text-lg mb-12 leading-relaxed">
-          Let SeekEatz use your location to find nearby restaurants and recommend the best meals nearby.
+            Allow SeekEatz to use your location to find resaurants and menu items nearby.
           </p>
 
           <ProgressDots />

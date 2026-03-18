@@ -51,7 +51,7 @@ export interface HybridSwapResult {
 
 // ---------- Configuration ----------
 
-const MAX_TOTAL_SWAPS = 5;
+const MAX_TOTAL_SWAPS = 3; // Limit to 2-3 swaps for better UX
 const MAX_GLOBAL_SWAPS = 5; // Max global swaps before DB+global merge
 
 // ---------- Swap prioritization ----------
@@ -251,10 +251,14 @@ export async function generateHybridSwaps(
 
     const totalSwaps = dbModifications.length + globalSwaps.length;
 
-    if (totalSwaps < 3) {
-        // Guarantee at least 3 swaps total: LLM fallback
+    // Target 2-3 swaps total (prefer 2, allow 3 if needed)
+    const targetSwapCount = 2;
+    const maxSwapCount = 3;
+
+    if (totalSwaps < targetSwapCount) {
+        // Guarantee at least 2 swaps total: LLM fallback
         if (process.env.ENABLE_SWAP_LLM_FALLBACK !== 'false') {
-            const neededSwaps = 3 - totalSwaps;
+            const neededSwaps = Math.min(targetSwapCount - totalSwaps, maxSwapCount - totalSwaps);
             llmSwaps = await generateLLMSwaps(mealName, restaurantName, mealMacros, neededSwaps);
         }
 
@@ -267,6 +271,69 @@ export async function generateHybridSwaps(
         source = 'db';
     } else if (dbModifications.length === 0 && globalSwaps.length > 0) {
         source = 'global';
+    }
+
+    // Step 7: Rotate and limit final swaps based on meal and user profile
+    // Create a simple hash from meal name for rotation
+    const mealHash = mealName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    
+    // Create unified swap list with priority scoring
+    type UnifiedSwap = {
+        type: 'db' | 'global' | 'llm';
+        swap: SwapModification | GlobalSwapSuggestion | LLMSwapSuggestion;
+        priority: number;
+    };
+    
+    const unifiedSwaps: UnifiedSwap[] = [
+        ...dbModifications.map((swap, idx) => ({
+            type: 'db' as const,
+            swap,
+            priority: idx + (macroGoals.lowerCalories && (swap.swapType === 'lowerCalories' || swap.swapType === 'calorieDown') ? -20 : 0) +
+                     (macroGoals.higherProtein && swap.swapType === 'higherProtein' ? -20 : 0) +
+                     (macroGoals.lowerCarbs && (swap.swapType === 'lowerCarbs' || swap.swapType === 'carbDown') ? -20 : 0)
+        })),
+        ...globalSwaps.map((swap, idx) => ({
+            type: 'global' as const,
+            swap,
+            priority: idx + 100 // Global swaps have lower priority than DB swaps
+        })),
+        ...llmSwaps.map((swap, idx) => ({
+            type: 'llm' as const,
+            swap,
+            priority: idx + 200 // LLM swaps have lowest priority
+        }))
+    ];
+    
+    // Sort by priority (lower = better)
+    unifiedSwaps.sort((a, b) => a.priority - b.priority);
+    
+    // Apply rotation based on meal hash for variety
+    const rotationOffset = mealHash % Math.max(1, unifiedSwaps.length);
+    if (rotationOffset > 0 && unifiedSwaps.length > maxSwapCount) {
+        // Only rotate if we have more swaps than needed
+        const rotated = [...unifiedSwaps];
+        rotated.push(...rotated.splice(0, rotationOffset));
+        // Re-sort after rotation to maintain goal-based priority
+        rotated.sort((a, b) => a.priority - b.priority);
+        unifiedSwaps.splice(0, unifiedSwaps.length, ...rotated);
+    }
+    
+    // Select top swaps up to maxSwapCount (3)
+    const selectedSwaps = unifiedSwaps.slice(0, maxSwapCount);
+    
+    // Separate back into their types
+    const finalDbMods: SwapModification[] = [];
+    const finalGlobalSwaps: GlobalSwapSuggestion[] = [];
+    const finalLlmSwaps: LLMSwapSuggestion[] = [];
+    
+    for (const { type, swap } of selectedSwaps) {
+        if (type === 'db') {
+            finalDbMods.push(swap as SwapModification);
+        } else if (type === 'global') {
+            finalGlobalSwaps.push(swap as GlobalSwapSuggestion);
+        } else if (type === 'llm') {
+            finalLlmSwaps.push(swap as LLMSwapSuggestion);
+        }
     }
 
     // Dev logging
@@ -284,9 +351,9 @@ export async function generateHybridSwaps(
     }
 
     return {
-        modifications: dbModifications,
-        globalSwaps,
-        llmSwaps,
+        modifications: finalDbMods,
+        globalSwaps: finalGlobalSwaps,
+        llmSwaps: finalLlmSwaps,
         source,
     };
 }

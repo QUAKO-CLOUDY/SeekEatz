@@ -870,8 +870,8 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
       } catch (error) {
         console.error('Error signing out:', error);
       } finally {
-        // Full page redirect so the app reloads and root page sees no session
-        window.location.href = '/';
+        // Full page redirect so the app reloads and root page shows the landing screen
+        window.location.href = '/?loggedOut=1';
       }
     }
   };
@@ -894,30 +894,22 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-background h-full">
       {/* Header */}
-      <div className="bg-gradient-to-br from-muted/50 via-muted/30 to-background p-6 border-b">
-        <div className="flex items-center gap-3">
-          <div className="size-12 bg-gradient-to-br from-gray-600 to-gray-700 rounded-2xl flex items-center justify-center shadow-lg">
-            <User className="size-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Settings</h1>
-            <p className="text-muted-foreground">Manage your preferences</p>
-          </div>
-        </div>
+      <div className="border-b p-6">
+        <h1 className="text-xl font-semibold text-foreground">Settings</h1>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-background pb-24">
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-background pb-24">
         {/* Profile & Goals Section */}
-        <div className="bg-card border rounded-3xl p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-foreground">Profile & Goals</h2>
+        <div className="bg-card border rounded-lg p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-base font-medium text-foreground">Profile & Goals</h2>
             {!isEditing ? (
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleEditClick}
-                className="rounded-full text-cyan-500 hover:text-cyan-600 hover:bg-cyan-500/10"
+                className="h-8"
               >
                 <Edit className="size-4 mr-2" />
                 Edit
@@ -929,7 +921,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                   size="sm"
                   onClick={handleCancelEdit}
                   disabled={isSaving}
-                  className="rounded-full"
+                  className="h-8"
                 >
                   <X className="size-4 mr-2" />
                   Cancel
@@ -939,11 +931,11 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                   size="sm"
                   onClick={handleSaveProfile}
                   disabled={isSaving}
-                  className="rounded-full text-cyan-500 hover:text-cyan-600 hover:bg-cyan-500/10"
+                  className="h-8"
                 >
                   {isSaving ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-500 mr-2"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-foreground mr-2"></div>
                       Saving...
                     </>
                   ) : (
@@ -959,19 +951,19 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
 
           {/* Error messages */}
           {editError && (
-            <div className="mb-4 bg-red-500/10 border border-red-500/20 text-red-600 rounded-2xl p-3 text-sm">
+            <div className="mb-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-md p-3 text-sm">
               {editError}
             </div>
           )}
           {updateError && (
-            <div className="mb-4 bg-red-500/10 border border-red-500/20 text-red-600 rounded-2xl p-3 text-sm">
+            <div className="mb-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-md p-3 text-sm">
               {updateError}
             </div>
           )}
 
           {/* Avatar and Name/Email */}
           <div className="flex items-center gap-4 mb-6 pb-6 border-b">
-            <div className="size-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-lg">
+            <div className="size-12 bg-muted rounded-md flex items-center justify-center text-foreground text-sm font-medium">
               {getInitials(isEditing ? inputValues.full_name : (userProfile.full_name || userFullName))}
             </div>
             <div className="flex-1 min-w-0">
@@ -981,36 +973,16 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                   value={inputValues.full_name}
                   onChange={(e) => setInputValues(prev => ({ ...prev, full_name: e.target.value }))}
                   placeholder="Enter your name"
-                  className="text-lg font-semibold h-9 mb-1"
+                  className="text-base font-medium h-9 mb-1"
                   autoFocus
                 />
               ) : (
-                <h3 className="text-lg font-semibold text-foreground truncate">
+                <h3 className="text-base font-medium text-foreground truncate">
                   {userProfile.full_name || userFullName || 'User'}
                 </h3>
               )}
               <p className="text-sm text-muted-foreground truncate">
                 {userEmail || 'user@example.com'}
-              </p>
-            </div>
-          </div>
-
-          {/* Diet Type Section - Disabled for MVP */}
-          <div className="mb-6">
-            <Label className="text-sm text-muted-foreground mb-3 block">Diet Type</Label>
-            <div className="p-4 rounded-xl border border-border bg-muted/30">
-              <p className="text-xs text-muted-foreground/70 italic">
-                Diet type selection (coming soon — verified only)
-              </p>
-            </div>
-          </div>
-
-          {/* Dietary Options & Restrictions Section - Disabled for MVP */}
-          <div className="mb-6">
-            <Label className="text-sm text-muted-foreground mb-3 block">Dietary Options & Restrictions</Label>
-            <div className="p-4 rounded-xl border border-border bg-muted/30">
-              <p className="text-xs text-muted-foreground/70 italic">
-                Dietary options & restrictions (coming soon — verified only)
               </p>
             </div>
           </div>
@@ -1094,61 +1066,42 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               )}
             </div>
           </div>
-
-          {/* Search Distance Section */}
-          <div className="mb-6 opacity-50 pointer-events-none">
-            <Label className="text-sm text-muted-foreground mb-3 block">Search Distance</Label>
-            <p className="text-xs text-muted-foreground mb-3">Default radius for finding nearby restaurants</p>
-            <div className="grid grid-cols-6 gap-2">
-              {[1, 2, 5, 10, 15, 20].map((distance) => {
-                return (
-                  <button
-                    key={distance}
-                    disabled
-                    className="p-2.5 rounded-xl border-2 transition-all text-xs font-medium cursor-not-allowed border-border bg-muted/50 text-muted-foreground"
-                  >
-                    {distance} mi
-                  </button>
-                );
-              })}
-            </div>
-          </div>
         </div>
 
         {/* Appearance Section */}
-        <div className="bg-card border rounded-3xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Appearance</h2>
+        <div className="bg-card border rounded-lg p-6">
+          <h2 className="text-base font-medium text-foreground mb-4">Appearance</h2>
           <Label className="mb-3 block text-muted-foreground">Theme</Label>
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => handleThemeChange('light')}
-              className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center justify-center gap-2 ${
+              className={`p-3 rounded-md border transition-all flex flex-col items-center justify-center gap-2 ${
                 (theme === 'light' || resolvedTheme === 'light')
-                  ? 'border-cyan-500 bg-cyan-500/10'
-                  : 'border-border bg-muted/50 hover:bg-muted'
+                  ? 'border-foreground bg-muted'
+                  : 'border-border hover:bg-muted/50'
               }`}
             >
-              <Sun className={`size-5 ${(theme === 'light' || resolvedTheme === 'light') ? 'text-cyan-500' : 'text-muted-foreground'}`} />
-              <p className={`text-sm font-medium ${(theme === 'light' || resolvedTheme === 'light') ? 'text-cyan-600' : 'text-muted-foreground'}`}>Light</p>
+              <Sun className={`size-4 ${(theme === 'light' || resolvedTheme === 'light') ? 'text-foreground' : 'text-muted-foreground'}`} />
+              <p className={`text-sm ${(theme === 'light' || resolvedTheme === 'light') ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>Light</p>
             </button>
             <button
               onClick={() => handleThemeChange('dark')}
-              className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center justify-center gap-2 ${
+              className={`p-3 rounded-md border transition-all flex flex-col items-center justify-center gap-2 ${
                 (theme === 'dark' || resolvedTheme === 'dark')
-                  ? 'border-cyan-500 bg-cyan-500/10'
-                  : 'border-border bg-muted/50 hover:bg-muted'
+                  ? 'border-foreground bg-muted'
+                  : 'border-border hover:bg-muted/50'
               }`}
             >
-              <Moon className={`size-5 ${(theme === 'dark' || resolvedTheme === 'dark') ? 'text-cyan-500' : 'text-muted-foreground'}`} />
-              <p className={`text-sm font-medium ${(theme === 'dark' || resolvedTheme === 'dark') ? 'text-cyan-600' : 'text-muted-foreground'}`}>Dark</p>
+              <Moon className={`size-4 ${(theme === 'dark' || resolvedTheme === 'dark') ? 'text-foreground' : 'text-muted-foreground'}`} />
+              <p className={`text-sm ${(theme === 'dark' || resolvedTheme === 'dark') ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>Dark</p>
             </button>
           </div>
         </div>
 
         {/* Notifications Section */}
-        <div className="bg-card border rounded-3xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Notifications</h2>
-          <div className="space-y-6">
+        <div className="bg-card border rounded-lg p-6">
+          <h2 className="text-base font-medium text-foreground mb-4">Notifications</h2>
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <Label htmlFor="mealSuggestions" className="text-foreground">Meal Suggestions</Label>
@@ -1186,8 +1139,8 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
         </div>
 
         {/* Subscription Section */}
-        <div className="bg-card border rounded-3xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Subscription</h2>
+        <div className="bg-card border rounded-lg p-6">
+          <h2 className="text-base font-medium text-foreground mb-4">Subscription</h2>
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-foreground font-medium">Plan: Free</p>
@@ -1196,71 +1149,72 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
           </div>
           <Button
             onClick={() => router.push('/settings/subscription')}
-            className="w-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white"
+            variant="outline"
+            className="w-full text-black dark:text-black hover:text-white"
           >
             Manage Subscription
           </Button>
         </div>
 
         {/* Help & Support Section */}
-        <div className="bg-card border rounded-3xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Help & Support</h2>
-          <div className="space-y-2">
+        <div className="bg-card border rounded-lg p-6">
+          <h2 className="text-base font-medium text-foreground mb-4">Help & Support</h2>
+          <div className="space-y-1">
             <button
               onClick={() => router.push('/help/faq')}
-              className="w-full flex items-center justify-between p-4 bg-muted/50 hover:bg-muted rounded-2xl transition-all group"
+              className="w-full flex items-center justify-between p-3 hover:bg-muted rounded-md transition-colors"
             >
               <div className="flex items-center gap-3">
-                <HelpCircle className="size-5 text-muted-foreground group-hover:text-cyan-500 transition-colors" />
+                <HelpCircle className="size-4 text-muted-foreground" />
                 <span className="text-foreground">FAQ</span>
               </div>
-              <ChevronRight className="size-5 text-muted-foreground" />
+              <ChevronRight className="size-4 text-muted-foreground" />
             </button>
             
             <button
               onClick={() => router.push('/help/contact')}
-              className="w-full flex items-center justify-between p-4 bg-muted/50 hover:bg-muted rounded-2xl transition-all group"
+              className="w-full flex items-center justify-between p-3 hover:bg-muted rounded-md transition-colors"
             >
               <div className="flex items-center gap-3">
-                <MessageCircle className="size-5 text-muted-foreground group-hover:text-cyan-500 transition-colors" />
+                <MessageCircle className="size-4 text-muted-foreground" />
                 <span className="text-foreground">Contact Support</span>
               </div>
-              <ChevronRight className="size-5 text-muted-foreground" />
+              <ChevronRight className="size-4 text-muted-foreground" />
             </button>
             
             <button
               onClick={() => router.push('/legal/terms')}
-              className="w-full flex items-center justify-between p-4 bg-muted/50 hover:bg-muted rounded-2xl transition-all group"
+              className="w-full flex items-center justify-between p-3 hover:bg-muted rounded-md transition-colors"
             >
               <div className="flex items-center gap-3">
-                <FileText className="size-5 text-muted-foreground group-hover:text-cyan-500 transition-colors" />
+                <FileText className="size-4 text-muted-foreground" />
                 <span className="text-foreground">Terms of Service</span>
               </div>
-              <ChevronRight className="size-5 text-muted-foreground" />
+              <ChevronRight className="size-4 text-muted-foreground" />
             </button>
             
             <button
               onClick={() => router.push('/legal/privacy')}
-              className="w-full flex items-center justify-between p-4 bg-muted/50 hover:bg-muted rounded-2xl transition-all group"
+              className="w-full flex items-center justify-between p-3 hover:bg-muted rounded-md transition-colors"
             >
               <div className="flex items-center gap-3">
-                <Shield className="size-5 text-muted-foreground group-hover:text-cyan-500 transition-colors" />
+                <Shield className="size-4 text-muted-foreground" />
                 <span className="text-foreground">Privacy Policy</span>
               </div>
-              <ChevronRight className="size-5 text-muted-foreground" />
+              <ChevronRight className="size-4 text-muted-foreground" />
             </button>
           </div>
         </div>
 
         {/* Account Section */}
-        <div className="bg-card border rounded-3xl p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-foreground mb-4">Account</h2>
+        <div className="bg-card border rounded-lg p-6">
+          <h2 className="text-base font-medium text-foreground mb-4">Account</h2>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-3 p-4 bg-red-500/5 border border-red-500/20 rounded-2xl hover:bg-red-500/10 hover:border-red-500/30 transition-all"
+            className="w-full flex items-center justify-center gap-3 p-3 border border-red-200 dark:border-red-800 rounded-md hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
           >
-            <LogOut className="size-5 text-red-500" />
-            <span className="text-red-500 font-medium">Log Out</span>
+            <LogOut className="size-4 text-red-600 dark:text-red-400" />
+            <span className="text-red-600 dark:text-red-400 font-medium">Log Out</span>
           </button>
         </div>
       </div>

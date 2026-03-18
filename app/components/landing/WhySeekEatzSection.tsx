@@ -2,6 +2,16 @@
 
 import React, { useEffect, useRef } from 'react';
 import { Check, Minus, X, Sparkles } from 'lucide-react';
+import { motion, useInView } from 'framer-motion';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+} from '@/app/components/ui/animated-table';
 
 const COMPARISONS = [
     { feature: 'Decision-first, not logging-first', seekeatz: true, mfp: false, loseit: false },
@@ -35,6 +45,40 @@ function CheckCell({ value }: { value: boolean | 'partial' }) {
                 <X className="w-4 h-4 text-red-400 stroke-[2.5]" />
             </span>
         </div>
+    );
+}
+
+// Animated table row component with scroll-triggered animation
+function AnimatedTableRow({ 
+    children, 
+    index = 0, 
+    className 
+}: { 
+    children: React.ReactNode; 
+    index?: number;
+    className?: string;
+}) {
+    const ref = React.useRef<HTMLTableRowElement>(null);
+    const isInView = useInView(ref, { 
+        once: true, 
+        margin: '-50px 0px',
+        amount: 0.3
+    });
+
+    return (
+        <motion.tr
+            ref={ref}
+            initial={{ opacity: 0, x: -20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+            transition={{ 
+                duration: 0.4, 
+                delay: index * 0.1,
+                ease: [0.22, 1, 0.36, 1]
+            }}
+            className={className}
+        >
+            {children}
+        </motion.tr>
     );
 }
 
@@ -111,91 +155,92 @@ export default function WhySeekEatzSection() {
                     <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-400/20 via-transparent to-violet-400/20 pointer-events-none z-0" />
 
                     <div className="relative z-10 overflow-x-auto rounded-3xl border border-white/80 bg-white/60 backdrop-blur-xl">
-                        <table className="w-full text-sm">
+                        <Table className="w-full text-sm">
                             {/* Header */}
-                            <thead>
-                                <tr>
-                                    <th className="text-left py-5 px-6 text-gray-500 font-semibold text-xs uppercase tracking-widest w-[42%]">
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead className="text-left py-5 px-6 text-gray-500 font-semibold text-xs uppercase tracking-widest w-[42%]">
                                         Feature
-                                    </th>
+                                    </TableHead>
                                     {/* SeekEatz column — highlighted */}
-                                    <th className="py-5 px-4 text-center w-[19%]">
+                                    <TableHead className="py-5 px-4 text-center w-[19%]">
                                         <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md shadow-cyan-300/40">
                                             <Sparkles className="w-3 h-3" />
                                             SeekEatz
                                         </div>
-                                    </th>
-                                    <th className="py-5 px-4 text-center text-gray-400 font-semibold text-xs uppercase tracking-widest w-[19%]">
+                                    </TableHead>
+                                    <TableHead className="py-5 px-4 text-center text-gray-400 font-semibold text-xs uppercase tracking-widest w-[19%]">
                                         MyFitnessPal
-                                    </th>
-                                    <th className="py-5 px-4 text-center text-gray-400 font-semibold text-xs uppercase tracking-widest w-[19%]">
+                                    </TableHead>
+                                    <TableHead className="py-5 px-4 text-center text-gray-400 font-semibold text-xs uppercase tracking-widest w-[19%]">
                                         LoseIt
-                                    </th>
-                                </tr>
+                                    </TableHead>
+                                </TableRow>
                                 {/* Thin separator */}
-                                <tr>
-                                    <td colSpan={4} className="p-0">
+                                <TableRow>
+                                    <TableCell colSpan={4} className="p-0">
                                         <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-                                    </td>
-                                </tr>
-                            </thead>
+                                    </TableCell>
+                                </TableRow>
+                            </TableHeader>
 
-                            <tbody>
+                            <TableBody>
                                 {COMPARISONS.map((row, i) => (
                                     <React.Fragment key={i}>
-                                        <tr
+                                        <AnimatedTableRow
+                                            index={i}
                                             className="group transition-colors duration-150 hover:bg-cyan-50/40"
                                         >
-                                            <td className="py-4 px-6 text-gray-700 font-medium">
+                                            <TableCell className="py-4 px-6 text-gray-700 font-medium">
                                                 {row.feature}
-                                            </td>
+                                            </TableCell>
                                             {/* SeekEatz col — soft highlight strip */}
-                                            <td className="py-4 px-4 bg-gradient-to-b from-cyan-50/60 to-blue-50/40 border-x border-cyan-100/60">
+                                            <TableCell className="py-4 px-4 bg-gradient-to-b from-cyan-50/60 to-blue-50/40 border-x border-cyan-100/60">
                                                 <CheckCell value={row.seekeatz} />
-                                            </td>
-                                            <td className="py-4 px-4">
+                                            </TableCell>
+                                            <TableCell className="py-4 px-4">
                                                 <CheckCell value={row.mfp} />
-                                            </td>
-                                            <td className="py-4 px-4">
+                                            </TableCell>
+                                            <TableCell className="py-4 px-4">
                                                 <CheckCell value={row.loseit} />
-                                            </td>
-                                        </tr>
+                                            </TableCell>
+                                        </AnimatedTableRow>
                                         {i < COMPARISONS.length - 1 && (
-                                            <tr>
-                                                <td colSpan={4} className="p-0">
+                                            <TableRow>
+                                                <TableCell colSpan={4} className="p-0">
                                                     <div className="h-px bg-gray-100 mx-6" />
-                                                </td>
-                                            </tr>
+                                                </TableCell>
+                                            </TableRow>
                                         )}
                                     </React.Fragment>
                                 ))}
-                            </tbody>
+                            </TableBody>
 
                             {/* Footer score row */}
-                            <tfoot>
-                                <tr>
-                                    <td colSpan={4} className="p-0">
+                            <TableFooter>
+                                <TableRow>
+                                    <TableCell colSpan={4} className="p-0">
                                         <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-                                    </td>
-                                </tr>
-                                <tr className="bg-gray-50/60">
-                                    <td className="py-4 px-6 text-gray-500 text-xs font-semibold uppercase tracking-widest">
+                                    </TableCell>
+                                </TableRow>
+                                <AnimatedTableRow className="bg-gray-50/60">
+                                    <TableCell className="py-4 px-6 text-gray-500 text-xs font-semibold uppercase tracking-widest">
                                         Score
-                                    </td>
-                                    <td className="py-4 px-4 text-center bg-gradient-to-b from-cyan-50/60 to-blue-50/40 border-x border-cyan-100/60">
+                                    </TableCell>
+                                    <TableCell className="py-4 px-4 text-center bg-gradient-to-b from-cyan-50/60 to-blue-50/40 border-x border-cyan-100/60">
                                         <span className="text-base font-extrabold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
                                             6 / 6
                                         </span>
-                                    </td>
-                                    <td className="py-4 px-4 text-center">
+                                    </TableCell>
+                                    <TableCell className="py-4 px-4 text-center">
                                         <span className="text-base font-bold text-gray-400">1 / 6</span>
-                                    </td>
-                                    <td className="py-4 px-4 text-center">
+                                    </TableCell>
+                                    <TableCell className="py-4 px-4 text-center">
                                         <span className="text-base font-bold text-gray-400">1 / 6</span>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                                    </TableCell>
+                                </AnimatedTableRow>
+                            </TableFooter>
+                        </Table>
                     </div>
                 </div>
             </div>

@@ -12,7 +12,6 @@ import {
   Clock,
   MapPin,
   Info,
-  ExternalLink,
   Sparkles,
   X,
   Check,
@@ -179,6 +178,51 @@ function generateSmartTags(meal: Meal, isDark: boolean = false): Array<{ text: s
   if (out.length < 3 && meal.category === 'restaurant' && out.length === 0) add('Restaurant', 'default');
 
   return out;
+}
+
+/** Converts delta macros into descriptive text (e.g., "more protein", "reduce calories") */
+function getSwapDescription(delta: { calories: number; protein: number; carbs: number; fats: number }): string {
+  const descriptions: string[] = [];
+  
+  // Prioritize the most impactful changes
+  if (delta.protein > 0) {
+    descriptions.push('more protein');
+  }
+  if (delta.calories < 0) {
+    descriptions.push('reduce calories');
+  }
+  if (delta.carbs < 0) {
+    descriptions.push('less carbs');
+  }
+  if (delta.fats < 0) {
+    descriptions.push('less fats');
+  }
+  if (delta.protein < 0) {
+    descriptions.push('less protein');
+  }
+  if (delta.calories > 0) {
+    descriptions.push('more calories');
+  }
+  if (delta.carbs > 0) {
+    descriptions.push('more carbs');
+  }
+  if (delta.fats > 0) {
+    descriptions.push('more fats');
+  }
+  
+  // If no changes, return a neutral message
+  if (descriptions.length === 0) {
+    return 'no macro change';
+  }
+  
+  // Join with commas, with "and" before the last item if multiple
+  if (descriptions.length === 1) {
+    return descriptions[0];
+  } else if (descriptions.length === 2) {
+    return `${descriptions[0]} and ${descriptions[1]}`;
+  } else {
+    return `${descriptions.slice(0, -1).join(', ')}, and ${descriptions[descriptions.length - 1]}`;
+  }
 }
 
 export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMeal }: Props) {
@@ -495,33 +539,15 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
     );
   }, [selectedSauceIds, restaurantSauces]);
 
-  // Effective macros = meal + selected swaps + selected sauces (used for display and log)
+  // Effective macros = meal + selected sauces ONLY (swaps do NOT change macros)
   const effectiveMacros = useMemo(() => {
-    const swapDelta = {
-      calories: selectedSwapIds.reduce((sum, id) => {
-        const swap = selectedMealSwaps.find((s) => s.id === id);
-        return sum + (swap?.deltaMacros.calories || 0);
-      }, 0),
-      protein: selectedSwapIds.reduce((sum, id) => {
-        const swap = selectedMealSwaps.find((s) => s.id === id);
-        return sum + (swap?.deltaMacros.protein || 0);
-      }, 0),
-      carbs: selectedSwapIds.reduce((sum, id) => {
-        const swap = selectedMealSwaps.find((s) => s.id === id);
-        return sum + (swap?.deltaMacros.carbs || 0);
-      }, 0),
-      fats: selectedSwapIds.reduce((sum, id) => {
-        const swap = selectedMealSwaps.find((s) => s.id === id);
-        return sum + (swap?.deltaMacros.fats || 0);
-      }, 0),
-    };
     return {
-      calories: meal.calories + swapDelta.calories + sauceMacrosSum.calories,
-      protein: meal.protein + swapDelta.protein + sauceMacrosSum.protein,
-      carbs: (meal.carbs || 0) + swapDelta.carbs + sauceMacrosSum.carbs,
-      fats: (meal.fats || 0) + swapDelta.fats + sauceMacrosSum.fats,
+      calories: meal.calories + sauceMacrosSum.calories,
+      protein: meal.protein + sauceMacrosSum.protein,
+      carbs: (meal.carbs || 0) + sauceMacrosSum.carbs,
+      fats: (meal.fats || 0) + sauceMacrosSum.fats,
     };
-  }, [meal.calories, meal.protein, meal.carbs, meal.fats, selectedSwapIds, selectedMealSwaps, sauceMacrosSum]);
+  }, [meal.calories, meal.protein, meal.carbs, meal.fats, sauceMacrosSum]);
 
   // "Left after this meal" = target - logged today - effective meal (updates with sauces/swaps)
   const leftAfterThisMeal = useMemo(() => {
@@ -629,10 +655,6 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
     setManualName(''); setManualCals(''); setManualPro(''); setManualCarbs(''); setManualFats('');
   };
 
-  const handleOrderOnline = () => {
-    window.open("https://www.ubereats.com", "_blank");
-  };
-
   const handleShare = async () => {
     // Create share text with meal information
     const shareText = `${meal.name} from ${meal.restaurant}\n` +
@@ -717,8 +739,8 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                 </div>
               </div>
 
-              {/* Restaurant logo — larger square box to the far right */}
-              <div className="flex-shrink-0 w-20 h-20 rounded-2xl bg-muted/80 border border-border flex items-center justify-center overflow-hidden shadow-sm">
+              {/* Restaurant logo — larger square box to the far right, fills extra whitespace without overlapping text */}
+              <div className="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-muted/80 border border-border flex items-center justify-center overflow-hidden shadow-sm">
                 <img
                   src={getLogo(meal.restaurant_name || meal.restaurant || '')}
                   alt={meal.restaurant_name || meal.restaurant || ''}
@@ -760,8 +782,8 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                     <AnimatedNumber value={effectiveMacros.calories} />
                   </p>
                   <p className="text-pink-600 dark:text-pink-400 text-sm font-semibold uppercase tracking-wide">Calories</p>
-                  {(selectedSauceIds.length > 0 || selectedSwapIds.length > 0) && (
-                    <p className="text-pink-500/70 text-xs mt-1">meal + sauces & swaps</p>
+                  {selectedSauceIds.length > 0 && (
+                    <p className="text-pink-500/70 text-xs mt-1">meal + sauces</p>
                   )}
                 </div>
               </div>
@@ -895,13 +917,15 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                         <button
                           key={sauce.id}
                           onClick={() => setSelectedSauceIds((prev) => (prev.includes(sauce.id) ? prev.filter((x) => x !== sauce.id) : [...prev, sauce.id]))}
-                          className={`rounded-xl border px-3 py-2 text-left text-sm transition-all ${isSelected
-                            ? 'bg-amber-500/20 border-amber-500/50 text-foreground'
-                            : 'bg-muted/50 border-border text-muted-foreground hover:border-amber-500/30'
+                          className={`rounded-xl border px-3 py-2 text-left text-sm transition-all flex flex-col ${isSelected
+                            ? 'bg-amber-500/20 border-amber-500/60 text-foreground'
+                            : 'bg-muted/60 border-border text-muted-foreground hover:border-amber-500/40'
                             }`}
                         >
-                          <span className="font-medium">{sauce.name}</span>
-                          <span className="block text-[10px] opacity-80">{sauce.macros.calories} cal</span>
+                          <span className="font-semibold text-xs">{sauce.name}</span>
+                          <span className="block text-[11px] font-bold text-amber-700 dark:text-amber-300">
+                            {sauce.macros.calories} cal
+                          </span>
                         </button>
                       );
                     })}
@@ -941,10 +965,8 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                           }`}
                       >
                         <p className="text-foreground/80 text-sm font-medium leading-snug">{swap.label}</p>
-                        <p className="text-muted-foreground text-xs mt-1">
-                          {delta.protein !== 0 && `${delta.protein > 0 ? '+' : ''}${delta.protein}g protein`}
-                          {delta.protein !== 0 && delta.calories !== 0 && ' • '}
-                          {delta.calories !== 0 && `${delta.calories > 0 ? '+' : ''}${delta.calories} cal`}
+                        <p className="text-muted-foreground text-xs mt-1 capitalize">
+                          {getSwapDescription(delta)}
                         </p>
                       </div>
                     );
@@ -1072,7 +1094,7 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
             )}
 
             {/* --- ACTION BUTTONS (Inside scrollable content, only visible when scrolled to bottom) --- */}
-            <div className="mt-4 mb-8 space-y-3" style={{ height: '140px' }}>
+            <div className="mt-4 mb-8 space-y-3" style={{ height: '96px' }}>
               <button
                 onClick={() => setShowLogModal(true)}
                 className="w-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-[#020617] font-bold text-sm py-4 rounded-2xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
@@ -1089,14 +1111,6 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
               >
                 <Plus className="w-4 h-4" />
                 Add Meal Manually
-              </button>
-
-              <button
-                onClick={handleOrderOnline}
-                className="w-full rounded-2xl bg-muted border border-border text-foreground hover:bg-muted/80 font-semibold text-sm py-3.5 flex items-center justify-center gap-2 transition-colors"
-              >
-                Order Online
-                <ExternalLink className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
           </div>
@@ -1135,10 +1149,13 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                       <button
                         key={sauce.id}
                         onClick={() => setSelectedSauceIds((prev) => (prev.includes(sauce.id) ? prev.filter((x) => x !== sauce.id) : [...prev, sauce.id]))}
-                        className={`rounded-xl border px-2.5 py-1.5 text-xs transition-all ${isSelected ? 'bg-amber-500/20 border-amber-500/50' : 'bg-muted border-border'
+                        className={`rounded-xl border px-2.5 py-1.5 text-xs transition-all flex items-center gap-1 ${isSelected ? 'bg-amber-500/20 border-amber-500/60' : 'bg-muted border-border'
                           }`}
                       >
-                        {sauce.name} ({sauce.macros.calories} cal)
+                        <span className="font-medium">{sauce.name}</span>
+                        <span className="font-bold text-amber-700 dark:text-amber-300">
+                          {sauce.macros.calories} cal
+                        </span>
                       </button>
                     );
                   })}
@@ -1172,11 +1189,8 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                         </div>
                         <div className="text-left">
                           <p className="text-card-foreground text-sm font-medium">{swap.label}</p>
-                          <p className="text-muted-foreground text-xs">
-                            {delta.protein !== 0 && `${delta.protein > 0 ? '+' : ''}${delta.protein}g protein`}
-                            {delta.protein !== 0 && delta.calories !== 0 && ' • '}
-                            {delta.calories !== 0 && `${delta.calories > 0 ? '+' : ''}${delta.calories} cal`}
-                            {delta.protein === 0 && delta.calories === 0 && 'No macro change'}
+                          <p className="text-muted-foreground text-xs capitalize">
+                            {getSwapDescription(delta)}
                           </p>
                         </div>
                       </div>

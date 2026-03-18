@@ -209,6 +209,72 @@
                 "carbs": 0,
                 "fat": 20
             }
+        },
+        {
+            "name": "Lemon Herb Tahini",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 70,
+                "protein": 2,
+                "carbs": 4,
+                "fat": 6
+            }
+        },
+        {
+            "name": "Tahin Caesar",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 90,
+                "protein": 2,
+                "carbs": 3,
+                "fat": 8
+            }
+        },
+        {
+            "name": "Skhung",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 80,
+                "protein": 0,
+                "carbs": 1,
+                "fat": 9
+            }
+        },
+        {
+            "name": "Hot Harissa Vinaigrette",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 70,
+                "protein": 0,
+                "carbs": 1,
+                "fat": 7
+            }
+        },
+        {
+            "name": "Balsamic Date Vinaigrette",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 60,
+                "protein": 0,
+                "carbs": 7,
+                "fat": 4
+            }
+        },
+        {
+            "name": "Yogurt Dill",
+            "category": "Sauce",
+            "price_estimate": null,
+            "macros": {
+                "calories": 30,
+                "protein": 2,
+                "carbs": 1,
+                "fat": 2
+            }
         }
     ]
 }

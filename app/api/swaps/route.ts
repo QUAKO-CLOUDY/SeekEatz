@@ -225,49 +225,71 @@ export async function POST(req: Request) {
     });
 
     // 2. Map global swaps to same response shape (modifierItemIds = [], heuristic deltas)
-    const mappedGlobalSwaps = hybridResult.globalSwaps.map((gs) => ({
-      id: gs.id,
-      label: gs.label,
-      expectedEffect: gs.impactLabels.join(', '),
-      estimatedDelta: gs.estimatedDelta,
-      confidenceLabel: gs.impactType === 'deterministic' ? 'Likely available' as const : 'Ask if available' as const,
-      type: 'modify' as const,
-      swapType: 'neutral' as const,
-      details: gs.details,
-      modifierItemIds: [] as string[], // Global swaps have no DB modifier IDs
-      impactLabels: gs.impactLabels,
-      source: 'global' as const,
-      deltaMacros: {
-        calories: gs.estimatedDelta.calories,
-        protein: gs.estimatedDelta.protein,
-        carbs: gs.estimatedDelta.carbs,
-        fats: gs.estimatedDelta.fats,
-      },
-    }));
+    // Simplify impactLabels to show only the most important one
+    const mappedGlobalSwaps = hybridResult.globalSwaps.map((gs) => {
+      // Get the most impactful label (prioritize calorie/protein changes)
+      const primaryLabel = gs.impactLabels.find(l => 
+        l.toLowerCase().includes('calorie') || 
+        l.toLowerCase().includes('protein')
+      ) || gs.impactLabels[0] || '';
+      
+      return {
+        id: gs.id,
+        label: gs.label,
+        expectedEffect: primaryLabel, // Show only the most important impact
+        estimatedDelta: gs.estimatedDelta,
+        confidenceLabel: gs.impactType === 'deterministic' ? 'Likely available' as const : 'Ask if available' as const,
+        type: 'modify' as const,
+        swapType: 'neutral' as const,
+        details: gs.details,
+        modifierItemIds: [] as string[], // Global swaps have no DB modifier IDs
+        impactLabels: [primaryLabel], // Keep only the primary label
+        source: 'global' as const,
+        deltaMacros: {
+          calories: gs.estimatedDelta.calories,
+          protein: gs.estimatedDelta.protein,
+          carbs: gs.estimatedDelta.carbs,
+          fats: gs.estimatedDelta.fats,
+        },
+      };
+    });
 
     // 3. Map LLM swaps to same response shape
-    const mappedLLMSwaps = hybridResult.llmSwaps.map((ls) => ({
-      id: ls.id,
-      label: ls.label,
-      expectedEffect: ls.impactLabels.join(', '),
-      estimatedDelta: ls.estimatedDelta || { calories: 0, protein: 0, carbs: 0, fats: 0 },
-      confidenceLabel: 'Ask if available' as const,
-      type: 'modify' as const,
-      swapType: 'neutral' as const,
-      details: ls.details,
-      modifierItemIds: [] as string[],
-      impactLabels: ls.impactLabels,
-      source: 'llm' as const,
-      deltaMacros: ls.estimatedDelta ? {
-        calories: ls.estimatedDelta.calories,
-        protein: ls.estimatedDelta.protein,
-        carbs: ls.estimatedDelta.carbs,
-        fats: ls.estimatedDelta.fats,
-      } : { calories: 0, protein: 0, carbs: 0, fats: 0 },
-    }));
+    // Simplify impactLabels to show only the most important one
+    const mappedLLMSwaps = hybridResult.llmSwaps.map((ls) => {
+      // Get the most impactful label (prioritize calorie/protein changes)
+      const primaryLabel = ls.impactLabels.find(l => 
+        l.toLowerCase().includes('calorie') || 
+        l.toLowerCase().includes('protein')
+      ) || ls.impactLabels[0] || '';
+      
+      return {
+        id: ls.id,
+        label: ls.label,
+        expectedEffect: primaryLabel, // Show only the most important impact
+        estimatedDelta: ls.estimatedDelta || { calories: 0, protein: 0, carbs: 0, fats: 0 },
+        confidenceLabel: 'Ask if available' as const,
+        type: 'modify' as const,
+        swapType: 'neutral' as const,
+        details: ls.details,
+        modifierItemIds: [] as string[],
+        impactLabels: [primaryLabel], // Keep only the primary label
+        source: 'llm' as const,
+        deltaMacros: ls.estimatedDelta ? {
+          calories: ls.estimatedDelta.calories,
+          protein: ls.estimatedDelta.protein,
+          carbs: ls.estimatedDelta.carbs,
+          fats: ls.estimatedDelta.fats,
+        } : { calories: 0, protein: 0, carbs: 0, fats: 0 },
+      };
+    });
 
     // Combine all swap types into unified modifications array
     const allModifications = [...validDBMods, ...mappedGlobalSwaps, ...mappedLLMSwaps];
+    
+    // Limit to 2-3 swaps total (already limited by hybrid generator, but ensure here too)
+    const MAX_FINAL_SWAPS = 3;
+    const finalModifications = allModifications.slice(0, MAX_FINAL_SWAPS);
 
     if (process.env.NODE_ENV === 'development') {
       console.log('[swaps] Final response:', {
@@ -275,12 +297,13 @@ export async function POST(req: Request) {
         globalSwaps: mappedGlobalSwaps.length,
         llmSwaps: mappedLLMSwaps.length,
         total: allModifications.length,
+        finalTotal: finalModifications.length,
         source: hybridResult.source,
       });
     }
 
     return NextResponse.json({
-      modifications: allModifications,
+      modifications: finalModifications,
       alternatives: alternatives,
       source: hybridResult.source,
     });

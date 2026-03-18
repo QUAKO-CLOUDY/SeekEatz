@@ -514,13 +514,18 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
   // Handle onboarding completion
   const handleOnboardingComplete = () => {
-    // Save onboarding flag
+    // Save onboarding flags and default post-onboarding destination
     if (typeof window !== 'undefined') {
       localStorage.setItem('onboarded', 'true');
       localStorage.setItem('hasCompletedOnboarding', 'true');
+      // After onboarding (including Allow Location), always start user in AI chat
+      localStorage.setItem('seekeatz_current_screen', 'chat');
+      localStorage.setItem('seekeatz_nav_history', JSON.stringify(['chat']));
     }
-    // Move to auth screen
-    setAppState('auth');
+    // Give full app access and jump straight to AI chat
+    setCurrentScreen('chat');
+    setNavHistory(['chat']);
+    setAppState('app');
   };
 
   // Handle auth success (fallback, but onAuthStateChange should handle it)

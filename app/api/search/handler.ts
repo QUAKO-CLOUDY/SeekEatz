@@ -2129,8 +2129,13 @@ export async function searchHandler(params: SearchParams) {
     try {
       // Build query - we'll filter macros in code after fetching for reliability
       // (Supabase PostgREST JSONB filtering syntax is complex and may vary by version)
-      // Fetch a larger pool, then filter in code (still more efficient than fetching everything)
-      const { data: dbItems, error: dbError } = await supabase
+      // For homepage: fetch a large pool ordered by restaurant_name so we get items from
+      // all restaurants (not just the first N by id, which can be same few restaurants).
+      const isHomepageFetch = params.isHomepage && !params.isPagination;
+      const fetchLimit = isHomepageFetch ? 10000 : 2000;
+      const orderByRestaurantFirst = isHomepageFetch;
+
+      let query = supabase
         .from('menu_items')
         .select(`
           id,
@@ -2141,9 +2146,14 @@ export async function searchHandler(params: SearchParams) {
           price_estimate,
           macros
         `)
-        .not('macros', 'is', null) // Ensure macros exist
-        .order('id', { ascending: true }) // Deterministic ordering
-        .limit(2000); // Fetch larger pool for macro filtering
+        .not('macros', 'is', null); // Ensure macros exist
+
+      if (orderByRestaurantFirst) {
+        query = query.order('restaurant_name', { ascending: true }).order('id', { ascending: true });
+      } else {
+        query = query.order('id', { ascending: true });
+      }
+      const { data: dbItems, error: dbError } = await query.limit(fetchLimit);
 
       if (dbError) {
         console.error('[searchHandler] DB_GENERIC query error:', dbError);
@@ -2166,8 +2176,12 @@ export async function searchHandler(params: SearchParams) {
     console.log(`[searchHandler] Retrieval strategy: DB_GENERIC because ${retrievalReason}`);
 
     try {
-      // Deterministic DB query - no OpenAI required
-      const { data: dbItems, error: dbError } = await supabase
+      // For homepage: large pool ordered by restaurant_name so results span all restaurants.
+      const isHomepageFetch = params.isHomepage && !params.isPagination;
+      const fetchLimit = isHomepageFetch ? 10000 : 1000;
+      const orderByRestaurantFirst = isHomepageFetch;
+
+      let query = supabase
         .from('menu_items')
         .select(`
           id,
@@ -2177,9 +2191,13 @@ export async function searchHandler(params: SearchParams) {
           image_url,
           price_estimate,
           macros
-        `)
-        .order('id', { ascending: true }) // Deterministic ordering
-        .limit(1000);
+        `);
+      if (orderByRestaurantFirst) {
+        query = query.order('restaurant_name', { ascending: true }).order('id', { ascending: true });
+      } else {
+        query = query.order('id', { ascending: true });
+      }
+      const { data: dbItems, error: dbError } = await query.limit(fetchLimit);
 
       if (dbError) {
         console.error('[searchHandler] DB_GENERIC query error:', dbError);

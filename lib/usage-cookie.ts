@@ -17,7 +17,9 @@ const supabase = createClient(supabaseUrl, serviceKey, {
 // In production, this should be a robust secret env var
 const SECRET_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'default-secret-key-do-not-use-in-prod';
 const COOKIE_NAME = 'usage_token';
-const MAX_USAGE = 3; // 3 free searches/chats for unregistered users
+// Effectively disable the 3-use trial limit by setting a very high max usage.
+// Anonymous/guest users now have full access just like authenticated users.
+const MAX_USAGE = Number.MAX_SAFE_INTEGER;
 
 function sign(value: string) {
     const hmac = createHmac('sha256', SECRET_KEY);
@@ -119,18 +121,9 @@ export async function incrementUsageCount(): Promise<number> {
 }
 
 export async function hasRemainingUsage(): Promise<boolean> {
-    const headersList = await headers();
-    if (process.env.NODE_ENV === 'development' && headersList.get('x-bypass-usage') === 'seekeatz-test') {
-        return true;
-    }
-
-    const cookieCount = await getUsageCount();
-    const ip = await getIpAddress();
-    const ipCount = await getIpUsage(ip);
-
-    const count = Math.max(cookieCount, ipCount);
-
-    return count < MAX_USAGE;
+    // With MAX_USAGE set to a very high value, usage gating is effectively disabled.
+    // We keep this function for API compatibility, but it always returns true.
+    return true;
 }
 
 export function getUsageLimit(): number {

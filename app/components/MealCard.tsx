@@ -141,14 +141,14 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             />
           </div>
 
-          {/* Middle - Meal Name and Restaurant */}
+          {/* Middle - Restaurant and Meal Name */}
           <div className="flex-1 min-w-0 flex flex-col justify-center pr-1.5">
-            <h3 className="text-foreground text-sm font-bold leading-tight line-clamp-2 mb-0.5 break-words">
-              {meal.name}
-            </h3>
-            <p className="text-muted-foreground text-[10px] truncate">
+            <p className="text-muted-foreground text-[10px] truncate mb-0.5">
               {restaurantName}
             </p>
+            <h3 className="text-foreground text-sm font-bold leading-tight line-clamp-2 break-words">
+              {meal.name}
+            </h3>
           </div>
 
           {/* Right - Nutritional Boxes */}
@@ -325,10 +325,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
       <div className="p-3 sm:p-4 flex flex-col flex-1">
         <div className="flex items-start mb-3 gap-3">
           <div className="flex-1 min-w-0">
-            <h3 className="text-foreground mb-1 font-semibold line-clamp-2 break-words text-base sm:text-lg">
-              {meal.name}
-            </h3>
-            <div className="flex items-center gap-1.5 min-w-0">
+            <div className="flex items-center gap-1.5 min-w-0 mb-1">
               <p className="text-muted-foreground text-sm sm:text-base truncate">
                 {restaurantName}
               </p>
@@ -345,6 +342,9 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
                 </div>
               )}
             </div>
+            <h3 className="text-foreground mt-0.5 font-semibold line-clamp-2 break-words text-base sm:text-lg">
+              {meal.name}
+            </h3>
             {meal.distance !== undefined && meal.distance !== null && (
               <p className="text-muted-foreground mt-0.5 text-xs">{meal.distance.toFixed(1)} miles away</p>
             )}

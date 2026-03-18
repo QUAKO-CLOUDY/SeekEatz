@@ -12,6 +12,7 @@ import { canUseFeature, incrementUsage } from "@/lib/usage-gate";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { AnimatedNumber } from "./AnimatedNumber";
+import { diversifyMealsByRestaurant } from "@/lib/restaurant-diversity";
 import {
   Select,
   SelectContent,
@@ -167,6 +168,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
 
   // Load persisted meals and search state
   const [recommendedMeals, setRecommendedMeals] = useState<Meal[]>([]);
+  const [allSearchMeals, setAllSearchMeals] = useState<Meal[]>([]);
   
   const [isLoadingMeals, setIsLoadingMeals] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
@@ -457,7 +459,9 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           macroFilters: macroFilters || undefined,
           calorieMode: calorieMode || undefined,
           isHomepage: true,
-          limit: 8,
+          // Request a large result set so we get meals from many restaurants
+          // and can paginate on the client (8 at a time).
+          limit: 500,
           ...(searchKey ? { searchKey, isPagination: true } : {}),
           ...(userLocation ? {
             user_location_lat: userLocation.latitude,
@@ -626,13 +630,19 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
 
       const mealsResult = await searchMeals(query, activeDistance, false, undefined, undefined, filters, macroFilters, calorieMode);
       const meals = Array.isArray(mealsResult) ? mealsResult : mealsResult.meals || [];
-      const searchKey = Array.isArray(mealsResult) ? undefined : mealsResult.searchKey;
 
       let filteredMeals = selectedCuisine
         ? meals.filter(meal => mealMatchesCuisine(meal, selectedCuisine))
         : meals;
       filteredMeals = filterMealsByProfile(filteredMeals, userProfile);
-      const newMeals = filteredMeals.slice(0, 4);
+
+      // Build a single diversified ordering across the full valid pool.
+      const diversifiedAll = diversifyMealsByRestaurant(filteredMeals);
+      setAllSearchMeals(diversifiedAll);
+
+      // Show the first page (8 cards) from the diversified list.
+      const PAGE_SIZE = 8;
+      const newMeals = diversifiedAll.slice(0, PAGE_SIZE);
       setRecommendedMeals(newMeals);
 
       const searchParams = {
@@ -640,7 +650,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         macroDirections: { ...macroDirections },
         selectedCuisine,
         distance: activeDistance,
-        searchKey,
+        searchKey: undefined,
       };
       setLastSearchParams(searchParams);
       if (typeof window !== 'undefined') {
@@ -667,109 +677,24 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   const handleFindMoreMeals = async () => {
     updateActivity(); // Update activity on button click
     setIsLoadingMeals(true);
-    
-    // Build minimal query (no macro text - backend uses structured constraints)
-    const query = "find meals";
-    
-    const calorieMode = macroDirections.calories === "below" ? "UNDER" : "OVER";
-    
-    const filters: {
-      calories?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
-      protein?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
-      carbs?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
-      fats?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
-    } = {};
-    
-    if (macroEnabled.calories) {
-      filters.calories = {
-        enabled: true,
-        mode: calorieMode === "UNDER" ? "BELOW" : "ABOVE",
-        value: macroValues.calories,
-      };
+
+    try {
+      // If we don't have a cached pool (edge case), nothing to do.
+      if (!allSearchMeals || allSearchMeals.length === 0) {
+        setIsLoadingMeals(false);
+        return;
+      }
+
+      const PAGE_SIZE = 8;
+      const start = recommendedMeals.length;
+      const next = allSearchMeals.slice(start, start + PAGE_SIZE);
+
+      if (next.length > 0) {
+        setRecommendedMeals(prev => [...prev, ...next]);
+      }
+    } finally {
+      setIsLoadingMeals(false);
     }
-    if (macroEnabled.protein) {
-      filters.protein = {
-        enabled: true,
-        mode: macroDirections.protein === "below" ? "BELOW" : "ABOVE",
-        value: macroValues.protein,
-      };
-    }
-    if (macroEnabled.carbs) {
-      filters.carbs = {
-        enabled: true,
-        mode: macroDirections.carbs === "below" ? "BELOW" : "ABOVE",
-        value: macroValues.carbs,
-      };
-    }
-    if (macroEnabled.fats) {
-      filters.fats = {
-        enabled: true,
-        mode: macroDirections.fats === "below" ? "BELOW" : "ABOVE",
-        value: macroValues.fats,
-      };
-    }
-    
-    const macroFilters: {
-      proteinMin?: number;
-      proteinMax?: number;
-      carbsMin?: number;
-      carbsMax?: number;
-      fatsMin?: number;
-      fatsMax?: number;
-      caloriesMax?: number;
-      caloriesMin?: number;
-    } = {};
-    
-    if (filters.calories?.enabled) {
-      if (filters.calories.mode === "BELOW") macroFilters.caloriesMax = filters.calories.value;
-      else macroFilters.caloriesMin = filters.calories.value;
-    }
-    if (filters.protein?.enabled) {
-      if (filters.protein.mode === "BELOW") macroFilters.proteinMax = filters.protein.value;
-      else macroFilters.proteinMin = filters.protein.value;
-    }
-    if (filters.carbs?.enabled) {
-      if (filters.carbs.mode === "BELOW") macroFilters.carbsMax = filters.carbs.value;
-      else macroFilters.carbsMin = filters.carbs.value;
-    }
-    if (filters.fats?.enabled) {
-      if (filters.fats.mode === "BELOW") macroFilters.fatsMax = filters.fats.value;
-      else macroFilters.fatsMin = filters.fats.value;
-    }
-    
-    const mealsResult = await searchMeals(query, activeDistance, false, undefined, lastSearchParams?.searchKey, filters, macroFilters, calorieMode);
-    const meals: Meal[] = Array.isArray(mealsResult) ? mealsResult : (mealsResult.meals || []);
-    const responseSearchKey = Array.isArray(mealsResult) ? undefined : mealsResult.searchKey;
-    
-    // Update lastSearchParams with new searchKey if received
-    if (responseSearchKey && lastSearchParams) {
-      setLastSearchParams({ ...lastSearchParams, searchKey: responseSearchKey });
-    }
-    
-    // Filter meals by selected cuisine if one is selected (client-side fallback)
-    let filteredMeals: Meal[] = selectedCuisine 
-      ? meals.filter((meal: Meal) => mealMatchesCuisine(meal, selectedCuisine))
-      : meals;
-    
-    // Diet filtering removed - filterMealsByProfile now returns meals unchanged
-    filteredMeals = filterMealsByProfile(filteredMeals, userProfile);
-    
-    // Get existing meal IDs to avoid duplicates
-    const existingIds = new Set(recommendedMeals.map(m => m.id));
-    
-    // Filter out duplicates - fetch up to 15 results to have better chance of getting unique ones
-    const uniqueMeals = filteredMeals.filter((m: Meal) => !existingIds.has(m.id));
-    
-    // Shuffle and take 4 new meals for variety (full 2x2 rows)
-    const shuffled = [...uniqueMeals].sort(() => Math.random() - 0.5);
-    const newMeals = shuffled.slice(0, 4);
-    
-    if (newMeals.length > 0) {
-      // Append new meals to existing list
-      setRecommendedMeals(prev => [...prev, ...newMeals]);
-    }
-    
-    setIsLoadingMeals(false);
   };
 
   // Restore scroll position to specific meal card or saved position

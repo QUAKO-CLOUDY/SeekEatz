@@ -1,6 +1,6 @@
 'use client';
 
-import { Send, Copy, AlertCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Send, Copy, AlertCircle, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -10,8 +10,8 @@ import { copyToClipboard } from "@/lib/clipboard-utils";
 import { createClient } from "@/utils/supabase/client";
 import { useTheme } from "../contexts/ThemeContext";
 import { useChat } from "../contexts/ChatContext";
-import { canUseFeature, incrementUsage, hasReachedLimit as checkHasReachedLimit } from "@/lib/usage-gate";
 import { getGuestSessionId, getGuestChatMessages, saveGuestChatMessages, touchGuestActivity, getCurrentSessionId, clearGuestSession, clearGuestSessionFull } from "@/lib/guest-session";
+import { diversifyMealsByRestaurant } from "@/lib/restaurant-diversity";
 
 interface AIChatProps {
   userId?: string;
@@ -46,7 +46,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const { messages, visibleMealsCount, isLoading, setMessages, setVisibleMealsCount, setIsLoading, clearChat, updateActivity } = useChat();
   // Check if user is signed in (userId prop or check session)
   const [isSignedIn, setIsSignedIn] = useState(!!userId);
-  const [isLimitReached, setIsLimitReached] = useState(false);
+  const [isLimitReached, setIsLimitReached] = useState(false); // kept for compatibility, but no longer used for gating
 
   // Current session ID (stable per tab)
   const [currentSessionId, setCurrentSessionId] = useState<string>(() => {
@@ -328,44 +328,11 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     }
   }, [isSignedIn, userId, currentSessionId, ensureChatSessionOwned, setMessages]);
 
-  // Check trial limit on mount and when auth state changes
+  // Trial limits have been removed – always allow chat usage and clear any legacy gate messages.
   useEffect(() => {
-    const checkLimit = async () => {
-      if (isSignedIn) {
-        // User is signed in - remove all restrictions and gate messages
-        setIsLimitReached(false);
-        // Remove any gate messages that might be in the chat
-        setMessages(prev => prev.filter(msg => !msg.isGateMessage));
-        return;
-      }
-
-      // User is not signed in - check trial limit
-      const limitReached = await checkHasReachedLimit();
-      setIsLimitReached(limitReached);
-
-      // Show gate message if limit reached and not already shown
-      if (limitReached) {
-        setMessages(prev => {
-          const hasGateMessage = prev.some(msg => msg.isGateMessage);
-          if (!hasGateMessage) {
-            const gateMessage: ChatMessage = {
-              id: `assistant-gate-${Date.now()}`,
-              role: 'assistant',
-              content: "You have ran out of your 3 free trial uses, please create an account to continue using the app for free.",
-              isGateMessage: true
-            };
-            return [...prev, gateMessage];
-          }
-          return prev;
-        });
-      } else {
-        // Limit not reached - remove any existing gate messages
-        setMessages(prev => prev.filter(msg => !msg.isGateMessage));
-      }
-    };
-
-    checkLimit();
-  }, [isSignedIn, setMessages]);
+    setIsLimitReached(false);
+    setMessages(prev => prev.filter(msg => !msg.isGateMessage));
+  }, [setMessages]);
 
   // Log to Supabase (only for authenticated users)
   const logChatMessage = useCallback(async (role: 'user' | 'assistant', content: string, meals?: any[], mealSearchContext?: any) => {
@@ -828,31 +795,6 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       return;
     }
 
-    // If user is signed in, skip gate check entirely (unlimited access)
-    if (!isSignedIn) {
-      // Check if user can use the feature (gate check BEFORE sending)
-      const canUse = await canUseFeature('chat');
-      if (!canUse) {
-        // Limit reached - show gate message if not already shown
-        setIsLimitReached(true);
-        setMessages(prev => {
-          const hasGateMessage = prev.some(msg => msg.isGateMessage);
-          if (!hasGateMessage) {
-            const gateMessage: ChatMessage = {
-              id: `assistant-gate-${Date.now()}`,
-              role: 'assistant',
-              content: "You have ran out of your 3 free trial uses, please create an account to continue using the app for free.",
-              isGateMessage: true
-            };
-            return [...prev, gateMessage];
-          }
-          return prev;
-        });
-        setTimeout(() => scrollToBottom(), 100);
-        return;
-      }
-    }
-
     // Touch activity when user sends a message
     touchGuestActivity();
 
@@ -1016,25 +958,11 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           console.error(`[AIChat] /api/chat failed with status ${response.status}:`, rawResponseText || '(empty response body)');
         }
 
-        // Handle usage limit specifically
+        // Handle legacy usage limit errors (no longer expected now that gating is disabled)
         if (isUsageLimitError && !isSignedIn) {
-          setIsLimitReached(true);
-          setMessages(prev => {
-            const hasGateMessage = prev.some(msg => msg.isGateMessage);
-            if (!hasGateMessage) {
-              const gateMessage: ChatMessage = {
-                id: `assistant-gate-${Date.now()}`,
-                role: 'assistant',
-                content: "You have ran out of your 3 free trial uses, please create an account to continue using the app for free.",
-                isGateMessage: true
-              };
-              // Filter out the failed user message before adding gate message
-              const filtered = prev.filter(msg => msg.id !== userMessage.id);
-              return [...filtered, gateMessage];
-            }
-            return prev.filter(msg => msg.id !== userMessage.id);
-          });
-          setTimeout(() => scrollToBottom(), 100);
+          // Just surface a generic error instead of showing a trial gate message
+          setError(serverMessage || 'Chat request failed');
+          setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
           return;
         }
 
@@ -1113,6 +1041,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               console.log('[AIChat] First meal from /api/chat:', parsedMeals[0]);
             }
 
+            // Apply restaurant-level diversity to final displayed meals
+            const diversifiedMeals = diversifyMealsByRestaurant(parsedMeals);
+
             // Store original query and filters for pagination
             const mealSearchContext = hasMore && responseSearchKey ? {
               searchKey: responseSearchKey,
@@ -1130,43 +1061,18 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               summaryLine = message;
             } else {
               // Use server summary if provided, otherwise generate from actual meals.length
-              summaryLine = serverSummary || generateSummaryLine(trimmedText, parsedMeals.length);
+              summaryLine = serverSummary || generateSummaryLine(trimmedText, diversifiedMeals.length);
             }
 
             const assistantMessage: ChatMessage = {
               id: assistantMessageId,
               role: 'assistant',
               content: summaryLine,
-              meals: parsedMeals,
+              meals: diversifiedMeals,
               mealSearchContext
             };
 
             setMessages(prev => [...prev, assistantMessage]);
-
-            // Increment usage for guest users (only on successful response)
-            if (!isSignedIn) {
-              const newCount = await incrementUsage('chat');
-              // Check if limit is now reached and update state immediately
-              if (newCount >= 3) {
-                setIsLimitReached(true);
-                // Immediately show gate message after the response
-                setMessages(prev => {
-                  const hasGateMessage = prev.some(msg => msg.isGateMessage);
-                  if (!hasGateMessage) {
-                    const gateMessage: ChatMessage = {
-                      id: `assistant-gate-${Date.now()}`,
-                      role: 'assistant',
-                      content: "You have ran out of your 3 free trial uses, please create an account to continue using the app for free.",
-                      isGateMessage: true
-                    };
-                    return [...prev, gateMessage];
-                  }
-                  return prev;
-                });
-                // Scroll to bottom to show gate message
-                setTimeout(() => scrollToBottom(), 100);
-              }
-            }
 
             // Log to Supabase — fire-and-forget, never block the UI while isLoading=true
             if (isSignedIn) {
@@ -1188,31 +1094,6 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             };
 
             setMessages(prev => [...prev, assistantMessage]);
-
-            // Increment usage for guest users (only on successful response)
-            if (!isSignedIn) {
-              const newCount = await incrementUsage('chat');
-              // Check if limit is now reached and update state immediately
-              if (newCount >= 3) {
-                setIsLimitReached(true);
-                // Immediately show gate message after the response
-                setMessages(prev => {
-                  const hasGateMessage = prev.some(msg => msg.isGateMessage);
-                  if (!hasGateMessage) {
-                    const gateMessage: ChatMessage = {
-                      id: `assistant-gate-${Date.now()}`,
-                      role: 'assistant',
-                      content: "You have ran out of your 3 free trial uses, please create an account to continue using the app for free.",
-                      isGateMessage: true
-                    };
-                    return [...prev, gateMessage];
-                  }
-                  return prev;
-                });
-                // Scroll to bottom to show gate message
-                setTimeout(() => scrollToBottom(), 100);
-              }
-            }
 
             // Log to Supabase — fire-and-forget, never block the UI while isLoading=true
             if (isSignedIn) {
@@ -1645,6 +1526,21 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               className={`flex-shrink-0 p-1.5 md:p-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all ${isLimitReached && !isSignedIn ? 'cursor-not-allowed' : ''}`}
             >
               <Send size={16} className="md:w-[18px] md:h-[18px]" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (confirm('Clear all chat messages?')) {
+                  clearChat();
+                  setInputText('');
+                  clearGuestSession();
+                  setCurrentSessionId(getGuestSessionId());
+                }
+              }}
+              className={`flex-shrink-0 p-1.5 md:p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all ${isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`}
+              title="Clear chat"
+            >
+              <Trash2 size={16} className="md:w-[18px] md:h-[18px]" />
             </button>
           </form>
         </div>

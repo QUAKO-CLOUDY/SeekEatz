@@ -17,6 +17,14 @@ export default function RootPage() {
 
   useEffect(() => {
     const checkReturningUser = async () => {
+      // If the user just logged out, always show the landing page
+      const justLoggedOut = window.location.search.includes('loggedOut=1');
+      if (justLoggedOut) {
+        setShowLanding(true);
+        setChecking(false);
+        return;
+      }
+
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
 

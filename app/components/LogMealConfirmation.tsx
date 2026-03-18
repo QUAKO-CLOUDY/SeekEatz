@@ -14,13 +14,12 @@ type Props = {
 export function LogMealConfirmation({ meal, onConfirm, onCancel }: Props) {
   const [selectedSwaps, setSelectedSwaps] = useState<string[]>([]);
 
-  // Define swap options with their macro adjustments
-  // Use "fats" (plural) to match Meal type
+  // Define swap options – informational only (no macro changes)
   const swapOptions = [
-    { id: 'extra-protein', label: 'Add Extra Protein', protein: 15, calories: 75, fats: 0, carbs: 0 },
-    { id: 'less-carbs', label: 'Reduce Carbs', carbs: -20, calories: -80, protein: 0, fats: 0 },
-    { id: 'healthy-fats', label: 'Add Healthy Fats', fats: 10, calories: 90, protein: 0, carbs: 0 },
-    { id: 'double-protein', label: 'Double Protein', protein: meal.protein, calories: meal.protein * 4, fats: 0, carbs: 0 },
+    { id: 'extra-protein', label: 'Add Extra Protein' },
+    { id: 'less-carbs', label: 'Reduce Carbs' },
+    { id: 'healthy-fats', label: 'Add Healthy Fats' },
+    { id: 'double-protein', label: 'Double Protein' },
   ];
 
   const toggleSwap = (swapId: string) => {
@@ -30,20 +29,8 @@ export function LogMealConfirmation({ meal, onConfirm, onCancel }: Props) {
   };
 
   const handleConfirm = () => {
-    // Calculate adjusted meal with selected swaps
-    const adjustedMeal = { ...meal };
-    
-    selectedSwaps.forEach(swapId => {
-      const swap = swapOptions.find(s => s.id === swapId);
-      if (swap) {
-        adjustedMeal.protein += swap.protein || 0;
-        adjustedMeal.carbs += swap.carbs || 0;
-        adjustedMeal.fats += swap.fats || 0;
-        adjustedMeal.calories += swap.calories || 0;
-      }
-    });
-
-    onConfirm(adjustedMeal, selectedSwaps);
+    // Swaps do NOT change macros anymore; pass original meal + selected swap IDs
+    onConfirm(meal, selectedSwaps);
   };
 
   return (
@@ -89,11 +76,7 @@ export function LogMealConfirmation({ meal, onConfirm, onCancel }: Props) {
                 <div className="text-left">
                   <p className="text-white font-medium">{swap.label}</p>
                   <p className="text-gray-400 text-xs">
-                    {swap.protein ? `+${swap.protein}g protein ` : ''}
-                    {swap.carbs ? `${swap.carbs}g carbs ` : ''}
-                    {swap.fats ? `+${swap.fats}g fats ` : ''}
-                    {' • '}
-                    {swap.calories > 0 ? '+' : ''}{swap.calories} cal
+                    This is a recommended tweak, but your logged calories and macros stay the same.
                   </p>
                 </div>
               </div>
@@ -101,50 +84,7 @@ export function LogMealConfirmation({ meal, onConfirm, onCancel }: Props) {
           ))}
         </div>
 
-        {/* Preview of adjusted macros */}
-        {selectedSwaps.length > 0 && (
-          <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-2xl p-4 mb-6">
-            <p className="text-purple-300 mb-2 text-sm font-medium">Updated Macros:</p>
-            <div className="grid grid-cols-4 gap-2 text-center">
-              <div>
-                <p className="text-white font-bold">
-                  {meal.calories + selectedSwaps.reduce((sum, id) => {
-                    const swap = swapOptions.find(s => s.id === id);
-                    return sum + (swap?.calories || 0);
-                  }, 0)}
-                </p>
-                <p className="text-gray-400 text-xs">cal</p>
-              </div>
-              <div>
-                <p className="text-white font-bold">
-                  {meal.protein + selectedSwaps.reduce((sum, id) => {
-                    const swap = swapOptions.find(s => s.id === id);
-                    return sum + (swap?.protein || 0);
-                  }, 0)}g
-                </p>
-                <p className="text-gray-400 text-xs">pro</p>
-              </div>
-              <div>
-                <p className="text-white font-bold">
-                  {meal.carbs + selectedSwaps.reduce((sum, id) => {
-                    const swap = swapOptions.find(s => s.id === id);
-                    return sum + (swap?.carbs || 0);
-                  }, 0)}g
-                </p>
-                <p className="text-gray-400 text-xs">carbs</p>
-              </div>
-              <div>
-                <p className="text-white font-bold">
-                  {meal.fats + selectedSwaps.reduce((sum, id) => {
-                    const swap = swapOptions.find(s => s.id === id);
-                    return sum + (swap?.fats || 0);
-                  }, 0)}g
-                </p>
-                <p className="text-gray-400 text-xs">fats</p>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Preview of adjusted macros intentionally removed – swaps do not affect macros */}
 
         {/* Actions */}
         <div className="flex gap-3">

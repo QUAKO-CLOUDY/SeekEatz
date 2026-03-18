@@ -7,7 +7,7 @@ export default function ContactPage() {
   const router = useRouter();
 
   const handleBack = () => {
-    router.push('/settings');
+    router.back();
   };
 
   return (

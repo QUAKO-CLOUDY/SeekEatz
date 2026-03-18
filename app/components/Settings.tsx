@@ -15,7 +15,8 @@ import {
   Shield,
   MessageCircle,
   Save,
-  X
+  X,
+  ArrowLeft,
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Switch } from './ui/switch';
@@ -25,6 +26,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useChat } from '../contexts/ChatContext';
 import { createClient } from '@/utils/supabase/client';
 import type { UserProfile } from '../types';
+import { requestNotificationPermission, sendMealSuggestionNotification } from '@/utils/notifications';
 
 type Props = {
   userProfile: UserProfile;
@@ -134,10 +136,13 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   const [showOtherDietaryInput, setShowOtherDietaryInput] = useState(false);
   const [customDietaryOption, setCustomDietaryOption] = useState<string>('');
   
-  // Notification preferences - local-only for now
+  // Notification preferences
   const [mealSuggestions, setMealSuggestions] = useState(false);
   const [dailySummary, setDailySummary] = useState(false);
   const [progressReminders, setProgressReminders] = useState(false);
+
+  // Settings subviews
+  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
 
   // Migrate 'auto' theme to 'light' on mount
   useEffect(() => {
@@ -703,13 +708,65 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
     }
   };
 
-  // Handle notification toggle - local-only for now
+  // Helper to pick a simple meal suggestion from static data
+  const getRandomMealSuggestion = () => {
+    // For now, pick a random meal from CAVA data; this can be swapped
+    // to use the active meal database / user context later.
+    try {
+      // Dynamic import to avoid affecting bundle size too much
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const cavaData = require('@/data/jsons/cava_raw.json') as {
+        restaurant_name: string;
+        items: Array<{
+          name: string;
+          macros?: { calories?: number; protein?: number };
+        }>;
+      };
+
+      const items = cavaData?.items ?? [];
+      if (!items.length) return null;
+
+      const randomItem = items[Math.floor(Math.random() * items.length)];
+      const calories = randomItem.macros?.calories;
+      const protein = randomItem.macros?.protein;
+
+      const title = `Meal from ${cavaData.restaurant_name}`;
+      const bodyParts = [`${randomItem.name}`];
+      if (typeof calories === 'number') bodyParts.push(`${calories} cal`);
+      if (typeof protein === 'number') bodyParts.push(`${protein}g protein`);
+
+      return {
+        title,
+        body: bodyParts.join(' • '),
+      };
+    } catch (err) {
+      console.error('Error selecting meal suggestion:', err);
+      return null;
+    }
+  };
+
+  // Handle notification toggle
   const handleNotificationChange = (
     key: 'mealSuggestions' | 'dailySummary' | 'progressReminders',
     value: boolean
   ) => {
-    // Only update local state - no Supabase calls
-    if (key === 'mealSuggestions') setMealSuggestions(value);
+    // Only update local state for now (no Supabase persistence yet)
+    if (key === 'mealSuggestions') {
+      setMealSuggestions(value);
+
+      // When user turns Meal Suggestions ON, immediately send a suggestion
+      if (value) {
+        (async () => {
+          const permission = await requestNotificationPermission();
+          if (permission === 'granted') {
+            const suggestion = getRandomMealSuggestion();
+            if (suggestion) {
+              sendMealSuggestionNotification(suggestion);
+            }
+          }
+        })();
+      }
+    }
     if (key === 'dailySummary') setDailySummary(value);
     if (key === 'progressReminders') setProgressReminders(value);
   };
@@ -894,11 +951,23 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-background h-full">
       {/* Header */}
-      <div className="border-b p-6">
-        <h1 className="text-xl font-semibold text-foreground">Settings</h1>
+      <div className="border-b px-4 py-4 flex items-center gap-3">
+        {showPrivacyPolicy && (
+          <button
+            type="button"
+            onClick={() => setShowPrivacyPolicy(false)}
+            className="p-2 -ml-2 rounded-lg hover:bg-muted transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 text-foreground" />
+          </button>
+        )}
+        <h1 className="text-xl font-semibold text-foreground">
+          {showPrivacyPolicy ? 'Privacy Policy' : 'Settings'}
+        </h1>
       </div>
 
       {/* Content */}
+      {!showPrivacyPolicy ? (
       <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-background pb-24">
         {/* Profile & Goals Section */}
         <div className="bg-card border rounded-lg p-6">
@@ -1194,7 +1263,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
             </button>
             
             <button
-              onClick={() => router.push('/legal/privacy')}
+              onClick={() => setShowPrivacyPolicy(true)}
               className="w-full flex items-center justify-between p-3 hover:bg-muted rounded-md transition-colors"
             >
               <div className="flex items-center gap-3">
@@ -1218,6 +1287,223 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
           </button>
         </div>
       </div>
+      ) : (
+        <div className="flex-1 overflow-y-auto px-4 py-6 bg-background pb-24">
+          <div className="max-w-2xl mx-auto space-y-6 text-sm text-muted-foreground">
+            <div className="space-y-2">
+              <h2 className="text-lg font-semibold text-foreground">Privacy Policy</h2>
+              <p className="font-semibold text-foreground">Last updated: March 17, 2026</p>
+              <p>
+                <span className="font-semibold text-foreground">SeekEatz</span> (“SeekEatz,” “we,” “us,” or “our”) respects your privacy and is committed to protecting the information you share with us.
+                This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our applications, website,
+                and related services (the “Service”).
+              </p>
+              <p>
+                By using the Service, you agree to the practices described in this Privacy Policy. If you do not agree with this policy, please do not use the Service.
+              </p>
+            </div>
+
+            <section className="space-y-2">
+              <h3 className="text-base font-semibold text-foreground">1. Information We Collect</h3>
+              <p>We collect information in the following ways:</p>
+
+              <p className="font-semibold text-foreground">Information You Provide</p>
+              <p>When you create an account or use certain features, you may provide information such as:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Name and email address</li>
+                <li>Account authentication details</li>
+                <li>Dietary preferences, goals, and restrictions</li>
+                <li>Target calories, macros, or other nutritional goals</li>
+                <li>Meals you log, favorite, or save</li>
+                <li>Searches and interactions within the app</li>
+                <li>Messages or prompts sent through AI chat features</li>
+                <li>Feedback, ratings, or comments you choose to provide</li>
+              </ul>
+
+              <p className="font-semibold text-foreground">Automatically Collected Information</p>
+              <p>When you use the Service, certain technical information may be collected automatically, including:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Device type and operating system</li>
+                <li>App version</li>
+                <li>IP address</li>
+                <li>Language settings</li>
+                <li>Diagnostic information such as crash reports and performance data</li>
+              </ul>
+
+              <p className="font-semibold text-foreground">Location Information (Optional)</p>
+              <p>
+                If you enable location services, we may collect approximate or precise location data in order to show restaurants and menu items near you.
+                You can disable location access at any time through your device settings.
+              </p>
+
+              <p className="font-semibold text-foreground">Information from Third Parties</p>
+              <p>We may receive limited information from third-party services that support our platform, such as:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Authentication providers</li>
+                <li>Analytics tools</li>
+                <li>Restaurant and menu data providers</li>
+              </ul>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-base font-semibold text-foreground">2. How We Use Your Information</h3>
+              <p>We use collected information to operate and improve SeekEatz, including to:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Provide core features such as meal discovery, logging, and recommendations</li>
+                <li>Personalize results based on your goals, preferences, and location (if enabled)</li>
+                <li>Generate AI-powered responses and recommendations</li>
+                <li>Maintain and improve the functionality, performance, and reliability of the Service</li>
+                <li>Detect, prevent, and address security or misuse issues</li>
+                <li>Communicate with you regarding updates, service notices, or account matters</li>
+                <li>Comply with legal obligations and enforce our terms</li>
+              </ul>
+              <p>
+                We do not sell your personal information. We may use or share aggregated or anonymized data that cannot reasonably identify you.
+              </p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-base font-semibold text-foreground">3. AI Features and Your Data</h3>
+              <p>
+                SeekEatz includes AI-powered features designed to help users discover meals and receive personalized recommendations.
+              </p>
+              <p>
+                To generate responses, certain inputs—such as chat messages, search queries, and relevant profile information—may be processed by AI service providers
+                operating on our behalf.
+              </p>
+              <p>
+                We may review aggregated or anonymized interaction data to improve the performance, accuracy, and safety of these AI features.
+              </p>
+              <p className="font-semibold text-foreground">
+                SeekEatz provides informational tools and recommendations only and is not a substitute for professional medical, nutritional, or healthcare advice.
+                Always consult qualified professionals regarding health or dietary decisions.
+              </p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-base font-semibold text-foreground">4. Cookies and Similar Technologies</h3>
+              <p>
+                We may use cookies, local storage, and similar technologies to:
+              </p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Keep you signed in</li>
+                <li>Remember preferences and settings</li>
+                <li>Understand how the Service is used</li>
+                <li>Improve functionality and performance</li>
+              </ul>
+              <p>
+                You can control cookie settings through your browser or device. Some features may not function properly if cookies are disabled.
+              </p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-base font-semibold text-foreground">5. How We Share Information</h3>
+              <p>We may share information in the following situations:</p>
+              <p className="font-semibold text-foreground">Service Providers</p>
+              <p>
+                We work with trusted third-party providers that assist with hosting, analytics, infrastructure, customer support, and related services.
+                These providers process information only on our behalf and under contractual safeguards.
+              </p>
+              <p className="font-semibold text-foreground">AI Infrastructure Providers</p>
+              <p>
+                AI providers may process user inputs in order to generate responses or recommendations within the Service.
+              </p>
+              <p className="font-semibold text-foreground">Business Transactions</p>
+              <p>
+                If SeekEatz is involved in a merger, acquisition, financing, or sale of assets, user information may be transferred as part of that transaction.
+              </p>
+              <p className="font-semibold text-foreground">Legal and Safety Requirements</p>
+              <p>
+                We may disclose information if required by law or when necessary to protect the rights, safety, or property of SeekEatz, our users, or others.
+              </p>
+              <p>
+                We do not share personal information with third parties for their independent marketing purposes without your consent.
+              </p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-base font-semibold text-foreground">6. Data Retention</h3>
+              <p>
+                We retain personal information only for as long as necessary to provide the Service and fulfill legitimate business or legal obligations.
+              </p>
+              <p>
+                When information is no longer needed, we take reasonable steps to delete or anonymize it.
+              </p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-base font-semibold text-foreground">7. Security</h3>
+              <p>
+                We implement reasonable technical and organizational safeguards designed to protect your information, including encryption in transit,
+                access controls, and system monitoring.
+              </p>
+              <p>
+                However, no system can be guaranteed completely secure, and users are responsible for maintaining the confidentiality of their account credentials.
+              </p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-base font-semibold text-foreground">8. Your Rights and Choices</h3>
+              <p>
+                Depending on your location, you may have rights regarding your personal information, including the ability to:
+              </p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Access or correct your data</li>
+                <li>Request deletion of your information</li>
+                <li>Object to certain processing activities</li>
+                <li>Request a copy of your data</li>
+              </ul>
+              <p>
+                Many changes can be made directly within the app, such as updating profile information or deleting logged meals.
+              </p>
+              <p>
+                For additional requests, please contact us using the information below. We may need to verify your identity before fulfilling requests.
+              </p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-base font-semibold text-foreground">9. Children&apos;s Privacy</h3>
+              <p>
+                SeekEatz is not intended for children under the age of 13 (or under 16 in certain jurisdictions). We do not knowingly collect personal
+                information from children in these age groups.
+              </p>
+              <p>
+                If we become aware that personal information from a child has been collected, we will take steps to delete it. If you believe this has occurred,
+                please contact us.
+              </p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-base font-semibold text-foreground">10. Third-Party Links</h3>
+              <p>
+                The Service may contain links to third-party websites or services. SeekEatz is not responsible for the privacy practices of those third parties,
+                and we encourage you to review their privacy policies.
+              </p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-base font-semibold text-foreground">11. Changes to This Policy</h3>
+              <p>
+                We may update this Privacy Policy periodically to reflect changes in our practices, technology, or legal requirements. When updates occur,
+                the “Last updated” date will be revised.
+              </p>
+              <p>
+                Continued use of the Service after changes become effective constitutes acceptance of the updated policy.
+              </p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-base font-semibold text-foreground">12. Contact Us</h3>
+              <p>
+                If you have questions about this Privacy Policy or our data practices, please contact us at:
+              </p>
+              <p className="text-foreground">
+                <span className="font-semibold">Email:</span> support@seekeatz.com
+              </p>
+            </section>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

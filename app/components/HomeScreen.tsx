@@ -1561,15 +1561,18 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
                 <span
                   className={`font-bold ${isActive ? 'text-[#4DDDF9]' : 'text-muted-foreground'}`}
                   style={{
-                    fontSize: isActive ? '1.1rem' : '0.75rem', // Further reduced from 1.25rem to prevent overlap
-                    textShadow: isActive 
-                      ? '0 0 20px rgba(77, 221, 249, 0.8), 0 2px 8px rgba(0, 0, 0, 0.3)' 
-                      : 'none',
+                    fontSize: isActive ? '1.05rem' : '0.75rem',
+                    // Remove glow so numbers stay razor-sharp, especially on dark backgrounds.
+                    textShadow: 'none',
+                    WebkitFontSmoothing: 'antialiased',
+                    MozOsxFontSmoothing: 'grayscale',
                     willChange: 'font-size, color',
-                    lineHeight: '1.2', // Fixed line height
-                    minHeight: '1.1rem', // Reduced to match smaller font
-                    display: 'inline-block', // Prevent layout shifts
-                    transition: isScrolling ? 'none' : 'font-size 0.2s ease-out, color 0.2s ease-out, text-shadow 0.2s ease-out',
+                    lineHeight: '1.2',
+                    minHeight: '1.05rem',
+                    display: 'inline-block',
+                    transition: isScrolling
+                      ? 'none'
+                      : 'font-size 0.2s ease-out, color 0.2s ease-out',
                   }}
                 >
                   {val}

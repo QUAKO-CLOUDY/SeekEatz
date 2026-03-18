@@ -17,9 +17,6 @@ export function OnboardingFlow({ onComplete }: Props) {
   const supabase = createClient();
   const [step, setStep] = useState(0); // Step 0 = Eat Anywhere, Step 1 = AI Menu Scraper, Step 2 = No Guesswork, Step 3 = Location
 
-  // Location state
-  const [isRequestingLocation, setIsRequestingLocation] = useState(false);
-
   // Progress dots component
   const ProgressDots = () => {
     return (
@@ -164,13 +161,28 @@ export function OnboardingFlow({ onComplete }: Props) {
   }
 
   // STEP 3: Location Permission (Last step before app access)
-  // For a frictionless experience, we no longer block on geolocation.
-  // Tapping "Allow Location" immediately completes onboarding and sends user into the app.
-  const handleLocationRequest = async () => {
+  // For a frictionless experience, we send the user straight to AI chat on "Allow Location"
+  // and set the minimal onboarding flags synchronously so the app treats them as onboarded.
+  const handleLocationRequest = () => {
     try {
-      await completeOnboarding();
-    } finally {
-      setIsRequestingLocation(false);
+      if (typeof window !== "undefined") {
+        const now = Date.now();
+        localStorage.setItem("hasCompletedOnboarding", "true");
+        localStorage.setItem("onboarded", "true");
+        localStorage.setItem("onboardingCompletedTimestamp", now.toString());
+        localStorage.removeItem("seekEatz_onboardingQuestionsComplete");
+        localStorage.removeItem("seekeatz_current_screen");
+        localStorage.removeItem("seekeatz_nav_history");
+      }
+    } catch (e) {
+      console.error("Error setting onboarding flags on Allow Location:", e);
+    }
+
+    // Hard navigation to chat so we can't get stuck on this screen
+    if (typeof window !== "undefined") {
+      window.location.href = "/chat";
+    } else {
+      router.push("/chat");
     }
   };
 
@@ -279,7 +291,7 @@ export function OnboardingFlow({ onComplete }: Props) {
       // Wait a moment to ensure all state is saved
       await new Promise((resolve) => setTimeout(resolve, 300));
 
-      // Call onComplete callback - parent component handles navigation (e.g., to AI chat)
+      // Notify parent that onboarding is complete
       onComplete();
     } catch (error) {
       console.error("Error completing onboarding:", error);
@@ -311,25 +323,22 @@ export function OnboardingFlow({ onComplete }: Props) {
           <div className="space-y-3">
             <Button
               onClick={handleLocationRequest}
-              disabled={isRequestingLocation}
-              className="h-14 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg shadow-green-500/20 w-full text-lg disabled:opacity-60 disabled:cursor-not-allowed"
+              className="h-14 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg shadow-green-500/20 w-full text-lg"
             >
-              {isRequestingLocation ? "Requesting..." : "Allow Location"}
+              Allow Location
             </Button>
 
             <div className="flex gap-3">
               <Button
                 variant="outline"
                 onClick={() => setStep(2)}
-                disabled={isRequestingLocation}
-                className="h-14 rounded-full border-muted-foreground/20 text-foreground hover:bg-muted flex-1 disabled:opacity-50"
+                className="h-14 rounded-full border-muted-foreground/20 text-foreground hover:bg-muted flex-1"
               >
                 Back
               </Button>
               <button
                 onClick={handleSkipLocation}
-                disabled={isRequestingLocation}
-                className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors disabled:opacity-50 flex-1"
+                className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors flex-1"
               >
                 Not now
               </button>

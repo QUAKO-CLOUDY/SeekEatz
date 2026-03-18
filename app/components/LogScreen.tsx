@@ -18,6 +18,7 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { CircularProgress } from "./CircularProgress";
 import { ManualMealEntry } from "./ManualMealEntry";
+import { Spinner } from "./ui/spinner-1";
 import { useTheme } from "../contexts/ThemeContext";
 import type { UserProfile, Meal } from "../types";
 import { useCalorieTracking } from "../hooks/useCalorieTracking";
@@ -27,6 +28,11 @@ export type LoggedMeal = {
   meal: Meal;
   timestamp: string; // ISO
   date: string; // YYYY-MM-DD
+};
+
+type MiniProgressRingProps = {
+  percentage: number;
+  isSpinning: boolean;
 };
 
 type Props = {
@@ -63,35 +69,62 @@ function calculateStreak(loggedDates: string[]): number {
   return streak;
 }
 
-/** Mini animated ring for "track your progress" recommendation – matches log screen ring style */
-function MiniProgressRing() {
+/** Mini animated ring for "track your progress" – mirrors main calorie ring and can spin on tap */
+function MiniProgressRing({ percentage, isSpinning }: MiniProgressRingProps) {
   const id = `mini-ring-${useId().replace(/:/g, "")}`;
-  const size = 32;
+  const size = 36;
   const stroke = 3;
   const r = (size - stroke) / 2;
   const cx = size / 2;
   const circumference = r * 2 * Math.PI;
+
+  // Clamp to 0–100 and mirror the main calorie ring progress
+  // Always show at least a subtle arc so the ring is visible even when there’s no data yet
+  const rawPct = Math.max(0, Math.min(percentage, 100));
+  const pct = rawPct === 0 ? 35 : rawPct;
+  const progressOffset = circumference * (1 - pct / 100);
+
   return (
-    <svg width={size} height={size} className="transform -rotate-90 flex-shrink-0">
-      <defs>
-        <linearGradient id={id} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#f472b6" stopOpacity="0.9" />
-          <stop offset="100%" stopColor="#f43f5e" stopOpacity="0.9" />
-        </linearGradient>
-      </defs>
-      <circle
-        cx={cx}
-        cy={cx}
-        r={r}
-        stroke={`url(#${id})`}
-        strokeWidth={stroke}
-        fill="none"
-        strokeDasharray={circumference}
-        strokeDashoffset={circumference * 0.65}
-        strokeLinecap="round"
-        className="animate-mini-ring"
-      />
-    </svg>
+    <div className="relative flex items-center justify-center flex-shrink-0">
+      <svg
+        width={size}
+        height={size}
+        className="transform -rotate-90 flex-shrink-0 animate-mini-ring"
+      >
+        <defs>
+          <linearGradient id={id} x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#f472b6" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#f43f5e" stopOpacity="0.9" />
+          </linearGradient>
+        </defs>
+        {/* subtle track */}
+        <circle
+          cx={cx}
+          cy={cx}
+          r={r}
+          stroke="rgba(248, 250, 252, 0.25)"
+          strokeWidth={stroke}
+          fill="none"
+        />
+        <circle
+          cx={cx}
+          cy={cx}
+          r={r}
+          stroke={`url(#${id})`}
+          strokeWidth={stroke}
+          fill="none"
+          strokeDasharray={circumference}
+          strokeDashoffset={progressOffset}
+          strokeLinecap="round"
+        />
+      </svg>
+
+      {isSpinning && (
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <Spinner size={size} invert />
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -108,6 +141,7 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal, onAddMeal, o
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [editingLogId, setEditingLogId] = useState<string | null>(null);
   const editingMeal = editingLogId ? loggedMeals.find((l) => l.id === editingLogId)?.meal : undefined;
+  const [isMiniRingSpinning, setIsMiniRingSpinning] = useState(false);
 
   const loggedDates = Array.from(
     new Set(loggedMeals.map((log) => log.date))
@@ -147,6 +181,9 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal, onAddMeal, o
     }
     return typeof value === 'number' ? value : Number(value) || defaultValue;
   };
+
+  const caloriesPct =
+    targetCalories > 0 ? (totals.calories / targetCalories) * 100 : 0;
 
   // Use remaining from hook for calories, compute others from totals
   const remaining = {
@@ -207,10 +244,18 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal, onAddMeal, o
       {/* SCROLLABLE CONTENT */}
       <div className="flex-1 overflow-y-auto overscroll-contain">
       {/* TOP SECTION – RINGS + MACROS */}
-      <div className="bg-gradient-to-br from-card via-muted/40 to-card text-foreground p-6 pb-4 relative" style={{ paddingTop: `calc(1.5rem + env(safe-area-inset-top, 0px))` }}>
+      <div
+        className="bg-gradient-to-br from-card via-muted/40 to-card text-foreground p-6 pb-4 relative"
+        style={{ paddingTop: `calc(1.5rem + env(safe-area-inset-top, 0px))` }}
+        onClick={() => {
+          // Trigger a short spin animation on the mini ring when the top section is tapped/clicked
+          setIsMiniRingSpinning(true);
+          setTimeout(() => setIsMiniRingSpinning(false), 1400);
+        }}
+      >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <MiniProgressRing />
+            <MiniProgressRing percentage={caloriesPct} isSpinning={isMiniRingSpinning} />
             <div>
               <p className="text-muted-foreground mb-1">Daily Tracking</p>
               <h1 className="text-foreground">Your Progress</h1>

@@ -166,6 +166,19 @@
   animation: mini-ring-pulse 2s ease-in-out infinite;
 }
 
+@keyframes mini-ring-spin {
+  0% {
+    transform: rotate(-90deg);
+  }
+  100% {
+    transform: rotate(630deg);
+  }
+}
+
+.animate-mini-ring-spin {
+  animation: mini-ring-spin 0.7s ease-in-out 2;
+}
+
 /* Landing: hero-centric animations (ease-out for snappier feel) */
 @keyframes fade-in-up {
   from {

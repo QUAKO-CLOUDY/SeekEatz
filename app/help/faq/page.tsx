@@ -7,7 +7,7 @@ export default function FAQPage() {
   const router = useRouter();
 
   const handleBack = () => {
-    router.push('/settings');
+    router.back();
   };
 
   return (

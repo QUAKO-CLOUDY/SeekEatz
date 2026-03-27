@@ -231,7 +231,7 @@ export default function TestimonialsSection() {
                             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500" />
                         </span>
                         <p className="text-[13px] font-semibold text-gray-700">
-                            <span className="text-amber-600">247 people</span> on the early access waitlist
+                            <span className="text-amber-600">247 people</span> on the early access waitlist and counting!
                         </p>
                     </div>
                 </div>

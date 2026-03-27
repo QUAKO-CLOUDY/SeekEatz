@@ -1,0 +1,27 @@
+/* Hero image float (matches Next.js page @keyframes heroFloat) */
+@keyframes heroFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+.hero-float {
+  animation: heroFloat 4s ease-in-out infinite;
+}
+
+/* Scroll-triggered fade-up initial state (Tailwind handles transition via arbitrary inline) */
+[data-fade] {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-fade].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}

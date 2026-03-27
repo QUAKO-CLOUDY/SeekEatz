@@ -411,7 +411,7 @@ export default function AppPreviewSection() {
                         </span>
                     </h2>
                     <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-                        AI chat, daily tracking, and personalized settings — explore the full experience.
+                        Explore AI chat, tracking, and smart settings designed to help you stay aligned with your goals anywhere you eat.
                     </p>
                 </div>
 
@@ -479,7 +479,7 @@ export default function AppPreviewSection() {
 
                 {/* Bottom note */}
                 <p className="text-center text-sm text-gray-400 mt-14">
-                    Explore the preview above — sign up to unlock all features
+                    Explore the preview above sign up to unlock all features
                 </p>
             </div>
         </section>

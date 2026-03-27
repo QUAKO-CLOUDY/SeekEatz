@@ -18,20 +18,20 @@ const FAQS = [
         a: "Just type what you're looking for — like \"low carb meal under 500 calories\" — and our AI searches verified restaurant nutrition data to find matching meals near you, ranked by macro fit.",
     },
     {
-        q: 'Is the nutrition data accurate?',
-        a: 'Yes. We pull nutrition data directly from official restaurant PDFs and verified menus. Unlike crowdsourced databases, our data is verified at the source.',
+        q: 'How do we get our data?',
+        a: 'We pull nutrition data from directly from official restaurant PDFs, verefied nutrition menues, and a wide range of vetted databases.',
     },
     {
         q: 'How many restaurants are available?',
-        a: 'We currently cover 30+ major restaurant chains with thousands of menu items. We add new restaurants every week based on user requests.',
+        a: 'We currently have over a couple hundred restaurants available with over 10,000 menue items to choose from.',
     },
     {
         q: 'Is SeekEatz free?',
-        a: 'You get 3 free AI searches to try it out — no signup required. After that, create a free account for unlimited access to all features.',
+        a: 'Free — Access AI chat search with up to 3 chats per day. Monthly subscription — Unlock all features, including unlimited chat, filters, and tracking. Lifetime — One-time payment for full access to all features and future updates.',
     },
     {
         q: 'What diet types are supported?',
-        a: 'We support high-protein, low-carb, low-fat, keto, vegetarian, vegan, pescatarian, and more. You can also set custom macro ranges for any goal.',
+        a: 'We support High-protein, low-carb, keto, vegetarian, vegan, pescatarian or a fully custom one tailored specific to you. Set your own macro targets and find meals that fit.',
     },
 ];
 

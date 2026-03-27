@@ -132,7 +132,7 @@ export default function HeroSection() {
                             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
                         </span>
                         <p className="text-[14px] text-gray-600 font-medium">
-                            <span className="font-extrabold text-gray-900">1,000+</span> people have already joined SeekEatz
+                            <span className="font-extrabold text-gray-900">10,000+</span> menu items available
                         </p>
                     </div>
                 </div>

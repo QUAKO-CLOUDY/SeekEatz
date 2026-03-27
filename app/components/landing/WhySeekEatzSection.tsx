@@ -141,7 +141,7 @@ export default function WhySeekEatzSection() {
                         </span>
                     </h2>
                     <p className="text-base sm:text-lg text-gray-500 mt-3 max-w-2xl mx-auto">
-                        MyFitnessPal and LoseIt are <span className="font-semibold text-gray-700">logging tools</span>. SeekEatz is a <span className="font-semibold text-gray-700">decision tool</span> — built from the ground up for eating out, not manually logging everything after the fact.
+                        Unlike other nutrition apps which focus on logging after you eat, SeekEatz shifts the focus to finding meals that fit, before you order.
                     </p>
                 </div>
 

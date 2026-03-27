@@ -8,27 +8,27 @@ const PAINS = [
     {
         Icon: BookOpen,
         title: 'Restaurant menus rarely list macros',
-        desc: 'Most menus show only the dish name and price — never the protein, carbs or fat you need to decide.',
+        desc: 'Most menues show only the dish name and ingredients. No macros. No real breakdown. Just names and prices.',
     },
     {
         Icon: EyeOff,
-        title: 'Calories are hidden or misleading',
-        desc: 'When calories do appear, they’re often buried in fine print or wildly off from what’s actually served.',
+        title: 'Nutritional data is not always transparent',
+        desc: 'The information exists, but it’s not accessible or usable in the moment.',
     },
     {
         Icon: ClipboardList,
-        title: 'Nutrition info is hard to find mid-order',
-        desc: 'Searching mid-queue on a restaurant’s site is slow, painful, and rarely works — so you give up.',
+        title: 'Finding nutrition mid-order is a mess and time consuming.',
+        desc: 'Digging through websites or PDFs while you’re waiting or with company doesn’t work.',
     },
     {
         Icon: Ruler,
-        title: 'Portions are always bigger than you expect',
-        desc: 'A “medium” entree can swing 300+ calories between restaurants. You can’t plan around a number you don’t have.',
+        title: 'You feel full but there’s still food on the plate and feel obligated to finish',
+        desc: 'So you log it after the fact and hope it didn’t throw off your day.',
     },
     {
         Icon: Dices,
         title: 'You guess… and hope for the best',
-        desc: 'Without data, every meal out is a roll of the dice for your daily targets — and the odds are rarely in your favour.',
+        desc: 'Second guessing if you overate or didn\'t hit your goals.',
     },
 ];
 
@@ -37,8 +37,8 @@ const STEPS = [
     {
         number: '01',
         Icon: Search,
-        title: 'Search by calorie or macro target',
-        desc: 'Tell SeekEatz your goal — "500 cal high-protein lunch" — and it understands exactly what you need.',
+        title: 'Search by calories, macros, or cravings',
+        desc: 'Find me lunch for 850 calories or less and at least 40g of protein.',
         accent: '#06b6d4',
         glow: 'rgba(6,182,212,0.18)',
         iconBg: 'rgba(6,182,212,0.12)',
@@ -46,8 +46,8 @@ const STEPS = [
     {
         number: '02',
         Icon: LocateFixed,
-        title: 'Filter restaurants near you',
-        desc: 'We surface only the places close to you that actually have meals matching your numbers.',
+        title: 'Filters meals from resaurants in your area',
+        desc: 'Only mealcards within your desired radius will be populated.',
         accent: '#8b5cf6',
         glow: 'rgba(139,92,246,0.18)',
         iconBg: 'rgba(139,92,246,0.12)',
@@ -55,8 +55,8 @@ const STEPS = [
     {
         number: '03',
         Icon: CheckCircle2,
-        title: 'See meals that fit your goals',
-        desc: 'Browse verified menu items with full macros — calories, protein, carbs, fat — before you order.',
+        title: 'Browse curated mealcards',
+        desc: 'Browse and pick from a large variety of meals that fit fit your desired needs.',
         accent: '#10b981',
         glow: 'rgba(16,185,129,0.18)',
         iconBg: 'rgba(16,185,129,0.12)',
@@ -64,8 +64,8 @@ const STEPS = [
     {
         number: '04',
         Icon: Search,
-        title: 'Get smart AI swaps instantly',
-        desc: 'Not hitting your targets? SeekEatz suggests a better alternative at the same restaurant — on the spot.',
+        title: 'AI smart swaps',
+        desc: 'Increase protein, reduce calories, and stay aligned with your goals without guessing.',
         accent: '#f59e0b',
         glow: 'rgba(245,158,11,0.18)',
         iconBg: 'rgba(245,158,11,0.12)',
@@ -74,7 +74,7 @@ const STEPS = [
         number: '05',
         Icon: CheckCircle2,
         title: 'Track without the manual logging',
-        desc: 'Decide with confidence before you order. No tedious post-meal entry — the numbers are already there.',
+        desc: 'Auto log to daily tracker with updated data from AI swaps, no manually entry required.',
         accent: '#ef4444',
         glow: 'rgba(239,68,68,0.18)',
         iconBg: 'rgba(239,68,68,0.10)',
@@ -510,8 +510,8 @@ export default function ProblemSolutionSection() {
                                         <path fillRule="evenodd" d="M10 1.5l7 2.8v5.2c0 3.9-2.9 7.5-7 8.8-4.1-1.3-7-4.9-7-8.8V4.3L10 1.5zm3.7 6.2l-4.2 4.2-1.7-1.8-1.1 1.1 2.8 2.8 5.3-5.3-1.1-1z" clipRule="evenodd" />
                                     </svg>
                                     <p className="text-[11px] text-gray-500 font-medium">
-                                        Verified data —{' '}
-                                        <span className="text-gray-700 font-semibold">not AI hallucinations.</span>
+                                        Verified data,{' '}
+                                        <span className="text-gray-700 font-semibold">no AI hallucinations</span>
                                     </p>
                                 </div>
                             </div>

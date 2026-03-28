@@ -26,7 +26,7 @@ export default function HeroSection() {
     return (
         <section
             id="hero"
-            className="relative z-10 min-h-screen flex items-center bg-[#f0f4f8] overflow-hidden pt-24"
+            className="relative z-10 bg-[#f0f4f8] overflow-hidden pt-24 pb-6 sm:pb-8"
         >
             {/* Subtle decorative blobs */}
             <div className="absolute top-20 right-1/4 w-[500px] h-[500px] bg-blue-100/20 rounded-full blur-3xl pointer-events-none" />
@@ -119,7 +119,7 @@ export default function HeroSection() {
 
                 {/* ── Social proof — bottom center ── */}
                 <div
-                    className="flex justify-center pb-12 pt-4"
+                    className="flex justify-center pt-2 pb-0 sm:pt-4"
                     style={{
                         opacity: visible ? 1 : 0,
                         transform: visible ? 'translateY(0)' : 'translateY(16px)',

@@ -6,8 +6,8 @@ import { Quote } from 'lucide-react';
 /* ─── Testimonial data — swap in real messages when they arrive ─── */
 const TESTIMONIALS = [
     {
-        quote: 'I found a 600-calorie, 50g protein meal in 30 seconds. I was blow away.',
-        name: 'Beta Tester',
+        quote: 'SeekEatz helped me discover meals before I even got to the restaurant, to stay on track!',
+        name: 'Gael Rios',
         handle: '@earlyaccess',
         avatar: '🥗',
         color: '#06b6d4',

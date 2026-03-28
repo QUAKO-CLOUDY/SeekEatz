@@ -209,7 +209,7 @@ function MockSettings() {
                     </div>
                     <div>
                         <p className="text-sm font-semibold text-gray-900">Sarah Johnson</p>
-                        <p className="text-xs text-gray-400">sarah@email.com</p>
+                        <p className="text-xs text-gray-400">Sarahj@gmail.com</p>
                     </div>
                 </div>
 
@@ -387,9 +387,9 @@ export default function AppPreviewSection() {
     }, [attachObserver]);
 
     return (
-        <section ref={sectionRef} className="relative py-24 px-6 bg-[#f0f4f8]">
+        <section ref={sectionRef} className="relative pt-8 sm:pt-10 pb-24 px-6 bg-[#f0f4f8]">
             {/* Seamless top gradient from hero */}
-            <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#f0f4f8] to-transparent pointer-events-none" />
+            <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#f0f4f8] to-transparent pointer-events-none" />
 
             <div className="max-w-5xl mx-auto">
                 {/* Section heading */}

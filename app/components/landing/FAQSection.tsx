@@ -15,23 +15,23 @@ const FAQS = [
     },
     {
         q: 'How does the AI search work?',
-        a: "Just type what you're looking for — like \"low carb meal under 500 calories\" — and our AI searches verified restaurant nutrition data to find matching meals near you, ranked by macro fit.",
+        a: 'Share your calories, macros, cravings or preferences with the AI concierge, and get matching meal cards in your area that fit those parameters.',
     },
     {
         q: 'How do we get our data?',
-        a: 'We pull nutrition data from directly from official restaurant PDFs, verefied nutrition menues, and a wide range of vetted databases.',
+        a: 'We pull nutrition data directly from official restaurant PDFs, verified nutrition menus, and a wide range of vetted databases.',
     },
     {
         q: 'How many restaurants are available?',
-        a: 'We currently have over a couple hundred restaurants available with over 10,000 menue items to choose from.',
+        a: 'We currently have over a couple hundred restaurants available with over 10,000 menu items to choose from.',
     },
     {
         q: 'Is SeekEatz free?',
-        a: 'Free — Access AI chat search with up to 3 chats per day. Monthly subscription — Unlock all features, including unlimited chat, filters, and tracking. Lifetime — One-time payment for full access to all features and future updates.',
+        a: 'Free — Access AI chat search with up to 3 chats per day.\n\nMonthly subscription — Unlock all features, including unlimited chat, filters, and tracking.\n\nLifetime — One-time payment for full access to all features and future updates.',
     },
     {
         q: 'What diet types are supported?',
-        a: 'We support High-protein, low-carb, keto, vegetarian, vegan, pescatarian or a fully custom one tailored specific to you. Set your own macro targets and find meals that fit.',
+        a: 'We support high-protein, low-carb, keto, vegetarian, vegan, pescatarian or a fully custom one tailored specific to you. Set your own macro targets and find meals that fit.',
     },
 ];
 
@@ -103,7 +103,7 @@ export default function FAQSection() {
                                 <AccordionTrigger className="text-left text-base sm:text-lg font-semibold text-gray-800 hover:text-cyan-600 hover:no-underline py-5">
                                     {faq.q}
                                 </AccordionTrigger>
-                                <AccordionContent className="text-gray-500 leading-relaxed text-base">
+                                <AccordionContent className="text-gray-500 leading-relaxed text-base whitespace-pre-line">
                                     {faq.a}
                                 </AccordionContent>
                             </AccordionItem>

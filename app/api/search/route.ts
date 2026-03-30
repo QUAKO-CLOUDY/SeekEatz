@@ -1,4 +1,4 @@
-import { searchHandler } from './handler';
+import { searchHandler } from '@/lib/retrieval/retrieval-engine';
 import { buildSearchParams } from '@/lib/search-utils';
 
 export const dynamic = 'force-dynamic';
@@ -8,6 +8,7 @@ const SEARCH_TIMEOUT_MS = 22000; // 22s server timeout (client uses 25s)
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+    const includeDebug = process.env.NODE_ENV === 'development' && body?.debug === true;
     const normalizedInput = {
       ...body,
       query: body.query || body.message || '',
@@ -40,7 +41,7 @@ export async function POST(req: Request) {
     }
 
     const result = await Promise.race([
-      searchHandler(searchParams),
+      searchHandler(searchParams, { includeDebug }),
       new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error('Search timeout')), SEARCH_TIMEOUT_MS)
       ),

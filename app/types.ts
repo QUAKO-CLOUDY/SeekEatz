@@ -42,6 +42,12 @@ export type Meal = {
   tags?: string[];
   dietary_tags?: string[]; // For variable availability warnings
   matchScore?: number;
+  matchReasons?: string[];
+  searchMetadata?: {
+    score?: number;
+    confidence?: number;
+    fallbackSource?: 'deterministic' | 'semantic';
+  };
   // Restaurant location coordinates for distance calculation
   latitude?: number;
   longitude?: number;

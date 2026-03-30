@@ -6,7 +6,7 @@ import { detectRestaurantIntent, normalizeRestaurantName, resolveRestaurantFromT
 
 // Mock getRestaurantCandidates for testing
 jest.mock('../restaurant-resolver', () => {
-  const actual = jest.requireActual('../restaurant-resolver');
+  const actual = jest.requireActual<Record<string, unknown>>('../restaurant-resolver');
   const normalizedIndex = new Map([
     ['jimmy johns', { canonicalName: 'Jimmy John\'s', variants: ['Jimmy John\'s'] }],
     ['subway', { canonicalName: 'Subway', variants: ['Subway'] }],

@@ -11,7 +11,10 @@ import { createClient } from "@/utils/supabase/client";
 import { useTheme } from "../contexts/ThemeContext";
 import { useChat } from "../contexts/ChatContext";
 import { getGuestSessionId, getGuestChatMessages, saveGuestChatMessages, touchGuestActivity, getCurrentSessionId, clearGuestSession, clearGuestSessionFull } from "@/lib/guest-session";
-import { diversifyMealsByRestaurant } from "@/lib/restaurant-diversity";
+import {
+  diversifyMealsByRestaurant,
+  type RestaurantDiversityHistory,
+} from "@/lib/restaurant-diversity";
 
 interface AIChatProps {
   userId?: string;
@@ -35,6 +38,88 @@ interface ChatMessage {
     filters?: { [key: string]: any }; // Store original filters for pagination
   };
   isGateMessage?: boolean; // Flag for gate messages that need buttons
+}
+
+function mapSearchItemToMeal(item: any): Meal {
+  return {
+    id: item.id,
+    name: item.item_name || item.name,
+    restaurant: item.restaurant_name,
+    restaurant_name: item.restaurant_name,
+    calories: item.calories ?? 0,
+    protein: item.protein ?? item.protein_g ?? 0,
+    carbs: item.carbs ?? item.carbs_g ?? 0,
+    fats: item.fats ?? item.fats_g ?? item.fat_g ?? 0,
+    image: item.image_url || '/placeholder-food.jpg',
+    description: item.description || '',
+    category: item.category || '',
+    dietary_tags: item.dietary_tags || [],
+    price: item.price || null,
+    distance: item.distance,
+    latitude: item.latitude,
+    longitude: item.longitude,
+  };
+}
+
+function deduplicateMealsById(meals: Meal[]): Meal[] {
+  const seen = new Set<string>();
+  return meals.filter((meal) => {
+    if (seen.has(meal.id)) {
+      return false;
+    }
+    seen.add(meal.id);
+    return true;
+  });
+}
+
+function buildMealHistory(
+  messages: ChatMessage[],
+  excludeMessageId?: string
+): RestaurantDiversityHistory {
+  const seenMealIds = new Set<string>();
+  const restaurantExposure = new Map<string, number>();
+
+  for (const message of messages) {
+    if (message.id === excludeMessageId || !message.meals?.length) {
+      continue;
+    }
+
+    for (const meal of message.meals) {
+      seenMealIds.add(meal.id);
+      const restaurantKey = (meal.restaurant_name || meal.restaurant || 'unknown')
+        .trim()
+        .toLowerCase();
+      restaurantExposure.set(
+        restaurantKey,
+        (restaurantExposure.get(restaurantKey) ?? 0) + 1
+      );
+    }
+  }
+
+  return { seenMealIds, restaurantExposure };
+}
+
+function findLatestQuickPromptMealMessage(
+  messages: ChatMessage[],
+  promptText: string
+): ChatMessage | null {
+  const normalizedPrompt = promptText.trim().toLowerCase();
+
+  for (let index = messages.length - 1; index >= 1; index -= 1) {
+    const assistantMessage = messages[index];
+    const previousMessage = messages[index - 1];
+
+    if (
+      assistantMessage.role === 'assistant' &&
+      assistantMessage.mealSearchContext &&
+      previousMessage?.role === 'user' &&
+      previousMessage.content.trim().toLowerCase() === normalizedPrompt
+    ) {
+      return assistantMessage;
+    }
+  }
+
+  return null;
 }
 
 const CHAT_SCROLL_POSITION_KEY = 'seekeatz_chat_scroll_position';
@@ -1014,6 +1099,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           // Add debug log: log received keys and meals length
           console.log('[AIChat] Received response keys:', Object.keys(jsonData));
           console.log('[AIChat] Received data.meals?.length:', jsonData.meals?.length);
+          if (process.env.NODE_ENV === 'development' && jsonData.debugInfo) {
+            console.log('[AIChat] Retrieval debug info:', jsonData.debugInfo);
+          }
 
           // Handle meal response format: treat ANY response with meals array (even if empty) as meal results
           // Response shape: { mode?: "meals", meals, hasMore, nextOffset, searchKey, summary?, message? }
@@ -1041,8 +1129,12 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               console.log('[AIChat] First meal from /api/chat:', parsedMeals[0]);
             }
 
-            // Apply restaurant-level diversity to final displayed meals
-            const diversifiedMeals = diversifyMealsByRestaurant(parsedMeals);
+            const diversityHistory = buildMealHistory(messages);
+            const diversifiedMeals = diversifyMealsByRestaurant(
+              deduplicateMealsById(parsedMeals),
+              undefined,
+              diversityHistory
+            );
 
             // Store original query and filters for pagination
             const mealSearchContext = hasMore && responseSearchKey ? {
@@ -1076,7 +1168,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
             // Log to Supabase — fire-and-forget, never block the UI while isLoading=true
             if (isSignedIn) {
-              logChatMessage('assistant', summaryLine, parsedMeals, mealSearchContext).catch(() => { });
+              logChatMessage('assistant', summaryLine, diversifiedMeals, mealSearchContext).catch(() => { });
               logUsageEvent('chat_response', { messageCount: parsedMeals.length, hasMeals: true }).catch(() => { });
             }
 
@@ -1178,8 +1270,147 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   };
 
   // Handle quick prompt
-  const sendQuickPrompt = (promptText: string) => {
-    sendMessage(promptText);
+  const sendQuickPrompt = async (promptText: string) => {
+    if (isLoading) return;
+
+    const latestPromptMessage = findLatestQuickPromptMealMessage(messages, promptText);
+    const latestContext = latestPromptMessage?.mealSearchContext;
+
+    if (!latestContext) {
+      sendMessage(promptText);
+      return;
+    }
+
+    if (!latestContext.hasMore) {
+      const userMessage: ChatMessage = {
+        id: `user-${Date.now()}`,
+        role: 'user',
+        content: promptText,
+      };
+      const assistantMessage: ChatMessage = {
+        id: `assistant-${Date.now()}-no-more`,
+        role: 'assistant',
+        content: 'There are no more new meals for this quick search. Try a different prompt or change your filters.',
+      };
+      setMessages((prev) => [...prev, userMessage, assistantMessage]);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    const userMessage: ChatMessage = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: promptText,
+    };
+
+    if (isSignedIn) {
+      logChatMessage('user', promptText).catch(() => {});
+      logUsageEvent('chat_submit', { message: promptText, repeatedQuickPrompt: true }).catch(() => {});
+    }
+
+    setMessages((prev) => [...prev, userMessage]);
+
+    try {
+      const TARGET_QUICK_PROMPT_BATCH = 5;
+      let workingContext = { ...latestContext };
+      let unseenMeals: Meal[] = [];
+      let workingResponseSearchKey = workingContext.searchKey;
+      const diversityHistory = buildMealHistory(messages);
+      const seenMealIds = new Set(diversityHistory.seenMealIds ?? []);
+
+      for (let attempt = 0; attempt < 6; attempt += 1) {
+        const response = await fetch('/api/search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            searchKey: workingContext.searchKey,
+            offset: workingContext.nextOffset,
+            limit: 5,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || 'Failed to load more meals');
+        }
+
+        const searchData = await response.json();
+        const fetchedMeals: Meal[] = Array.isArray(searchData.meals)
+          ? searchData.meals.map(mapSearchItemToMeal)
+          : [];
+
+        const diversified = diversifyMealsByRestaurant(
+          deduplicateMealsById(fetchedMeals),
+          undefined,
+          diversityHistory
+        );
+
+        for (const meal of diversified) {
+          if (!seenMealIds.has(meal.id)) {
+            unseenMeals.push(meal);
+            seenMealIds.add(meal.id);
+          }
+        }
+
+        unseenMeals = deduplicateMealsById(unseenMeals);
+
+        workingContext = {
+          searchKey: searchData.searchKey || workingContext.searchKey,
+          nextOffset: searchData.nextOffset ?? workingContext.nextOffset,
+          hasMore: searchData.hasMore ?? false,
+          originalQuery: latestContext.originalQuery,
+          filters: latestContext.filters,
+        };
+        workingResponseSearchKey = searchData.searchKey || workingResponseSearchKey;
+
+        if (unseenMeals.length >= TARGET_QUICK_PROMPT_BATCH || !workingContext.hasMore) {
+          break;
+        }
+      }
+
+      unseenMeals = unseenMeals.slice(0, TARGET_QUICK_PROMPT_BATCH);
+
+      const assistantMessage: ChatMessage = unseenMeals.length > 0
+        ? {
+            id: `assistant-${Date.now()}`,
+            role: 'assistant',
+            content: generateSummaryLine(promptText, unseenMeals.length),
+            meals: unseenMeals,
+            mealSearchContext: {
+              searchKey: workingResponseSearchKey,
+              nextOffset: workingContext.nextOffset,
+              hasMore: workingContext.hasMore,
+              originalQuery: latestContext.originalQuery ?? promptText,
+              filters: latestContext.filters,
+            },
+          }
+        : {
+            id: `assistant-${Date.now()}-exhausted`,
+            role: 'assistant',
+            content: 'There are no more new meals for this quick search. Try a different prompt or change your filters.',
+          };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+
+      if (isSignedIn) {
+        logChatMessage(
+          'assistant',
+          assistantMessage.content,
+          assistantMessage.meals,
+          assistantMessage.mealSearchContext
+        ).catch(() => {});
+      }
+    } catch (err) {
+      console.error('Error advancing quick prompt search:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load more meals');
+      setMessages((prev) => prev.filter((msg) => msg.id !== userMessage.id));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Load more meals for pagination
@@ -1230,25 +1461,17 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       }
 
       // Convert search results to Meal format
-      const newMeals: Meal[] = searchData.meals.map((item: any) => ({
-        id: item.id,
-        name: item.item_name || item.name,
-        restaurant: item.restaurant_name,
-        calories: item.calories ?? 0,
-        protein: item.protein ?? item.protein_g ?? 0,
-        carbs: item.carbs ?? item.carbs_g ?? 0,
-        fats: item.fats ?? item.fats_g ?? item.fat_g ?? 0,
-        image: item.image_url || '/placeholder-food.jpg',
-        description: item.description || '',
-        category: item.category || '',
-        dietary_tags: item.dietary_tags || [],
-        price: item.price || null,
-      }));
+      const newMeals: Meal[] = searchData.meals.map(mapSearchItemToMeal);
 
       // Append new meals to existing ones
       setMessages(prev => prev.map(msg => {
         if (msg.id === messageId && msg.meals) {
-          const updatedMeals = [...msg.meals, ...newMeals];
+          const diversityHistory = buildMealHistory(prev, messageId);
+          const updatedMeals = diversifyMealsByRestaurant(
+            deduplicateMealsById([...msg.meals, ...newMeals]),
+            undefined,
+            diversityHistory
+          );
 
           // Update visible count to show all meals (including newly loaded ones)
           setVisibleMealsCount(prevCount => ({
@@ -1295,8 +1518,8 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
   // Quick prompt chips with display text and actual prompt text
   const quickPrompts = [
-    { display: "🔥 Meal under 1000 calories", prompt: "Find me a meal under 1000 calories" },
-    { display: "🌅 Breakfast", prompt: "Find me breakfast" },
+    { display: "🔥 Meal under 1000 calories", prompt: "Find me a meal under 1000 calories and over 650 calories" },
+    { display: "🌅 Breakfast", prompt: "Find me breakfast foods like breakfast sandwiches, burritos, omelets, bagels, pancakes, waffles, oatmeal, and toast" },
     { display: "🥗 Low carb meal", prompt: "Find me a low carb meal" },
     { display: "🫒 Low fat meal", prompt: "Find me a low fat meal" },
     { display: "🍽️ Find me lunch", prompt: "Find me lunch" },

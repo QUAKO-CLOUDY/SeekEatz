@@ -4,7 +4,7 @@ import { openai } from '@ai-sdk/openai';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { ROUTER_SYSTEM_PROMPT } from '@/lib/chat-prompts';
-import { searchHandler } from '@/app/api/search/handler';
+import { searchHandler } from '@/lib/retrieval/retrieval-engine';
 import { buildSearchParams } from '@/lib/search-utils';
 import { resolveRestaurantFromText, extractRestaurantPhrase, resolveRestaurantUniversal } from '@/lib/restaurant-resolver';
 import { extractMacroConstraintsFromText, hasConstraints } from '@/lib/extractMacroConstraintsFromText';
@@ -236,6 +236,13 @@ function hasFoodIntent(message: string): boolean {
     'wrap', 'wraps', 'pizza', 'pizzas', 'sushi', 'pasta', 'noodles'
   ];
 
+  // Cuisine/style keywords
+  const cuisineKeywords = [
+    'italian', 'mexican', 'chinese', 'japanese', 'asian', 'indian', 'thai',
+    'greek', 'mediterranean', 'bbq', 'barbecue', 'american', 'southern',
+    'seafood', 'sushi'
+  ];
+
   // Macro keywords
   const macroKeywords = [
     'calories', 'calorie', 'cal', 'protein', 'carbs', 'carb',
@@ -257,6 +264,10 @@ function hasFoodIntent(message: string): boolean {
   const hasFoodVerb = foodVerbs.some(verb => lowerMessage.includes(verb));
   const hasMealTime = mealTimeKeywords.some(keyword => lowerMessage.includes(keyword));
   const hasDishType = dishKeywords.some(keyword => lowerMessage.includes(keyword));
+  const hasCuisine = cuisineKeywords.some(keyword => {
+    const regex = new RegExp(`\\b${keyword}\\b`, 'i');
+    return regex.test(lowerMessage);
+  });
   const hasMacro = macroKeywords.some(keyword => lowerMessage.includes(keyword));
   const hasFoodItem = foodItemKeywords.some(keyword => {
     // Use word boundary check to avoid partial matches (e.g., "protein" in "protien")
@@ -264,7 +275,7 @@ function hasFoodIntent(message: string): boolean {
     return regex.test(lowerMessage);
   });
 
-  return hasFoodVerb || hasMealTime || hasDishType || hasMacro || hasFoodItem;
+  return hasFoodVerb || hasMealTime || hasDishType || hasCuisine || hasMacro || hasFoodItem;
 }
 
 /**
@@ -830,6 +841,7 @@ export async function POST(req: Request) {
     }
 
     const { message, userContext, history } = body;
+    const includeDebug = process.env.NODE_ENV === 'development' && body?.debug === true;
 
     // Validate required fields
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
@@ -1361,10 +1373,8 @@ export async function POST(req: Request) {
         });
       }
 
-      // Enforce exact behavior: use sanitized message for search, fixed limit/offset, no searchKey
-      // This ensures typed chat uses the same logic as quick-picks
-      // MVP v1: Do NOT pass location or distance params to searchHandler
-      // Note: routerResult.constraints?.nearMe is ignored - we detect location from message text only
+      // Enforce exact behavior: use sanitized message for search and fixed limit/offset.
+      // Typed chat should use the same canonical retrieval path as other search entry points.
 
       // Parse constraints from message text (deterministic, regex-based, no LLM)
       const parsedConstraints = parseMealConstraintsFromText(message);
@@ -1476,14 +1486,11 @@ export async function POST(req: Request) {
           restaurantId: restaurantId, // Pass restaurant_id when available
           restaurant: validatedConstraints.restaurant,
           restaurantVariants: restaurantVariants, // Pass variants for filtering
-          // MVP v1: Location filtering disabled - explicitly do NOT pass location
-          // location is undefined (not passed) - this ensures no location filtering
+          userContext: body?.userContext,
           limit: detectSuperlativeIntent(message) ? 50 : 5, // 50 for superlative (sort+slice to 1 later), 5 otherwise
           offset: 0,
           searchKey: undefined, // Let searchHandler generate it
           isPagination: false,
-          // MVP v1: userContext explicitly not passed - contains location fields
-          // userContext is undefined (not passed) - this ensures no location-based filtering
         });
 
         // Debug log: Log final constraints being passed to searchHandler
@@ -1505,7 +1512,10 @@ export async function POST(req: Request) {
         const searchTimeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('SEARCH_TIMEOUT: DB query exceeded 25 seconds')), SEARCH_TIMEOUT_MS)
         );
-        const result = await Promise.race([searchHandler(searchParams), searchTimeoutPromise]);
+        const result = await Promise.race([
+          searchHandler(searchParams, { includeDebug }),
+          searchTimeoutPromise
+        ]);
 
         // SUPERLATIVE POST-PROCESSING: Sort by the correct macro and take top 1
         const superlativeSort = detectSuperlativeSort(message);
@@ -1542,7 +1552,7 @@ export async function POST(req: Request) {
           result.hasMore = false;
           if (isDev) {
             const top = result.meals[0];
-            console.log(`[api/chat] Superlative sort=${superlativeSort}: top result = ${top?.name || top?.item_name} (protein=${getMacro(top, 'protein')}, cal=${getMacro(top, 'calories')})`);
+            console.log(`[api/chat] Superlative sort=${superlativeSort}: top result = ${top?.name} (protein=${getMacro(top, 'protein')}, cal=${getMacro(top, 'calories')})`);
           }
         }
 
@@ -1555,6 +1565,10 @@ export async function POST(req: Request) {
             queryForSearch,
             canonicalRestaurant: restaurantMatch.status === 'MATCH' ? restaurantMatch.canonicalName : undefined,
           });
+
+          if (result.debugInfo) {
+            console.log('[api/chat] Retrieval debug info:', result.debugInfo);
+          }
         }
 
 
@@ -1585,6 +1599,10 @@ export async function POST(req: Request) {
           // Prepend location message if present (MVP v1 behavior)
           ...(locationMessage && { message: locationMessage })
         };
+
+        if (!includeDebug) {
+          delete responseData.debugInfo;
+        }
 
         // Add restaurant metadata for UI display
         if (restaurantMatch.status === 'MATCH') {

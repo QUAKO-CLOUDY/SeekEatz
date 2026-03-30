@@ -1,53 +1,75 @@
 import type { Meal } from '@/app/types';
 
+export interface RestaurantDiversityHistory {
+  seenMealIds?: Set<string>;
+  restaurantExposure?: Map<string, number>;
+}
+
 /**
- * Diversifies a list of meals by restaurant while preserving all nutrition constraints.
- *
- * Algorithm:
- * - Group meals by restaurant (restaurant_name or restaurant).
- * - Shuffle restaurant order on each call.
- * - Shuffle meals within each restaurant.
- * - Take one meal per restaurant in round‑robin passes until:
- *   - all meals are exhausted, or
- *   - the optional limit is reached.
+ * Diversify a list of meals by restaurant while preserving already-filtered results.
+ * Preference order:
+ * 1. restaurants shown less often in the current chat session
+ * 2. unseen meal cards before previously shown cards
+ * 3. one meal per restaurant per pass before repeating a restaurant
  */
-export function diversifyMealsByRestaurant(meals: Meal[], limit?: number): Meal[] {
+export function diversifyMealsByRestaurant(
+  meals: Meal[],
+  limit?: number,
+  history?: RestaurantDiversityHistory
+): Meal[] {
   if (!meals || meals.length === 0) return [];
 
   const targetLimit = typeof limit === 'number' && limit > 0 ? limit : meals.length;
+  const seenMealIds = history?.seenMealIds ?? new Set<string>();
+  const restaurantExposure = history?.restaurantExposure ?? new Map<string, number>();
 
-  // Group meals by restaurant identifier
   const groups = new Map<string, Meal[]>();
   for (const meal of meals) {
-    const key = (meal.restaurant_name || meal.restaurant || 'unknown').trim() || 'unknown';
+    const key = getRestaurantKey(meal);
     if (!groups.has(key)) {
       groups.set(key, []);
     }
     groups.get(key)!.push(meal);
   }
 
-  const restaurantKeys = Array.from(groups.keys());
+  const prioritizedRestaurants = Array.from(groups.keys()).sort((a, b) => {
+    const exposureDiff = (restaurantExposure.get(a) ?? 0) - (restaurantExposure.get(b) ?? 0);
+    if (exposureDiff !== 0) {
+      return exposureDiff;
+    }
+    return a.localeCompare(b);
+  });
 
-  // Edge case: only one restaurant – still return meals from that restaurant,
-  // but shuffle within the restaurant for some variety.
-  if (restaurantKeys.length === 1) {
-    const onlyKey = restaurantKeys[0];
-    const onlyMeals = shuffleArray(groups.get(onlyKey) || []);
+  const prioritizedGroups = new Map<string, Meal[]>();
+  for (const key of prioritizedRestaurants) {
+    const mealsForRestaurant = groups.get(key) ?? [];
+    prioritizedGroups.set(
+      key,
+      mealsForRestaurant.slice().sort((left, right) => {
+        const seenDiff =
+          Number(seenMealIds.has(left.id)) - Number(seenMealIds.has(right.id));
+        if (seenDiff !== 0) {
+          return seenDiff;
+        }
+
+        const calorieDiff = left.calories - right.calories;
+        if (calorieDiff !== 0) {
+          return calorieDiff;
+        }
+
+        return left.name.localeCompare(right.name);
+      })
+    );
+  }
+
+  if (prioritizedRestaurants.length === 1) {
+    const onlyMeals = prioritizedGroups.get(prioritizedRestaurants[0]) ?? [];
     return onlyMeals.slice(0, targetLimit);
   }
 
-  // Shuffle restaurant order and meals within each restaurant
-  const shuffledRestaurants = shuffleArray(restaurantKeys.slice());
-  const shuffledGroups = new Map<string, Meal[]>();
-  for (const key of shuffledRestaurants) {
-    const mealsForRestaurant = groups.get(key) || [];
-    shuffledGroups.set(key, shuffleArray(mealsForRestaurant.slice()));
-  }
-
-  // Round‑robin selection: take one meal per restaurant per pass
   const result: Meal[] = [];
   const indices = new Map<string, number>();
-  for (const key of shuffledRestaurants) {
+  for (const key of prioritizedRestaurants) {
     indices.set(key, 0);
   }
 
@@ -55,10 +77,10 @@ export function diversifyMealsByRestaurant(meals: Meal[], limit?: number): Meal[
   while (!exhausted && result.length < targetLimit) {
     exhausted = true;
 
-    for (const key of shuffledRestaurants) {
+    for (const key of prioritizedRestaurants) {
       if (result.length >= targetLimit) break;
 
-      const groupMeals = shuffledGroups.get(key) || [];
+      const groupMeals = prioritizedGroups.get(key) ?? [];
       const idx = indices.get(key) ?? 0;
 
       if (idx < groupMeals.length) {
@@ -69,20 +91,9 @@ export function diversifyMealsByRestaurant(meals: Meal[], limit?: number): Meal[
     }
   }
 
-  // If the result set is still smaller than limit and we exhausted all groups,
-  // just return everything we have; do NOT relax nutrition constraints.
   return result;
 }
 
-/**
- * Simple in‑place Fisher‑Yates shuffle using Math.random().
- * Used only after strict filtering has already been applied.
- */
-function shuffleArray<T>(arr: T[]): T[] {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
+function getRestaurantKey(meal: Meal): string {
+  return (meal.restaurant_name || meal.restaurant || 'unknown').trim().toLowerCase() || 'unknown';
 }
-

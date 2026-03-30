@@ -64,6 +64,16 @@ type Props = {
   loggedMeals?: LoggedMeal[];
 };
 
+type SearchMealsResponse = {
+  meals: Meal[];
+  searchKey?: string;
+  hasMore?: boolean;
+  nextOffset?: number;
+};
+
+const NO_MORE_MEALS_MESSAGE =
+  "There are no more meals that fit these constraints in our database. Please change the restrictions to get access to more mealcards.";
+
 export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite, loggedMeals = [] }: Props) {
   const { updateActivity } = useSessionActivity();
   const router = useRouter();
@@ -245,6 +255,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     selectedCuisine: string | null;
     distance?: number;
     searchKey?: string; // For pagination
+    nextOffset?: number;
+    hasMore?: boolean;
   } | null>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('seekeatz_last_search_params');
@@ -258,6 +270,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     }
     return null;
   });
+  const [loadMoreNotice, setLoadMoreNotice] = useState<string | null>(null);
 
   // Persist selected cuisine
   useEffect(() => {
@@ -387,6 +400,17 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     };
   };
 
+  const deduplicateHomeMeals = (meals: Meal[]): Meal[] => {
+    const seen = new Set<string>();
+    return meals.filter((meal) => {
+      if (seen.has(meal.id)) {
+        return false;
+      }
+      seen.add(meal.id);
+      return true;
+    });
+  };
+
   const mealMatchesCuisine = (_meal: Meal, cuisineId: string | null): boolean => !cuisineId;
 
   // Diet filtering removed - all diet logic disabled
@@ -423,6 +447,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     append = false,
     constraints: any = undefined, // Legacy parameter (deprecated)
     searchKey?: string,
+    nextOffset?: number,
     filters?: {
       calories?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
       protein?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
@@ -440,7 +465,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       caloriesMin?: number;
     },
     calorieMode?: "UNDER" | "OVER"
-  ): Promise<Meal[] | { meals: Meal[]; searchKey?: string; hasMore?: boolean }> => {
+  ): Promise<SearchMealsResponse> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout so loading doesn't hang
 
@@ -454,19 +479,21 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query,
-          radius_miles: distance,
           filters: filters,
           macroFilters: macroFilters || undefined,
           calorieMode: calorieMode || undefined,
           isHomepage: true,
-          // Request a large result set so we get meals from many restaurants
-          // and can paginate on the client (8 at a time).
-          limit: 500,
-          ...(searchKey ? { searchKey, isPagination: true } : {}),
-          ...(userLocation ? {
-            user_location_lat: userLocation.latitude,
-            user_location_lng: userLocation.longitude,
-          } : {}),
+          limit: 20,
+          ...(searchKey ? { searchKey, isPagination: true, offset: nextOffset ?? 0 } : {}),
+          userContext: {
+            ...(distance ? { search_distance_miles: distance } : {}),
+            ...(userProfile?.diet_type ? { diet_type: userProfile.diet_type } : {}),
+            ...(userProfile?.dietary_options ? { dietary_options: userProfile.dietary_options } : {}),
+            ...(userLocation ? {
+              user_location_lat: userLocation.latitude,
+              user_location_lng: userLocation.longitude,
+            } : {}),
+          },
         }),
         signal: controller.signal,
       });
@@ -511,17 +538,12 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         return true;
       });
       
-      // Return full response object if searchKey is present (for pagination)
-      if (responseSearchKey || hasMore) {
-        return {
-          meals: fullMeals,
-          searchKey: responseSearchKey,
-          hasMore,
-        };
-      }
-      
-      // Return array for backward compatibility
-      return fullMeals;
+      return {
+        meals: fullMeals,
+        searchKey: responseSearchKey,
+        hasMore,
+        nextOffset: typeof data?.nextOffset === 'number' ? data.nextOffset : undefined,
+      };
     } catch (error) {
       clearTimeout(timeoutId);
       if (error instanceof Error && error.name === 'AbortError') {
@@ -535,6 +557,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     setIsLoadingMeals(true);
     setHasSearched(true);
     setSearchError(null);
+    setLoadMoreNotice(null);
 
     try {
       // Check if user can use the feature (gate check BEFORE searching)
@@ -628,8 +651,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         new Promise<void>((resolve) => setTimeout(resolve, 3000)),
       ]).catch(() => {});
 
-      const mealsResult = await searchMeals(query, activeDistance, false, undefined, undefined, filters, macroFilters, calorieMode);
-      const meals = Array.isArray(mealsResult) ? mealsResult : mealsResult.meals || [];
+      const mealsResult = await searchMeals(query, activeDistance, false, undefined, undefined, undefined, filters, macroFilters, calorieMode);
+      const meals = mealsResult.meals || [];
 
       let filteredMeals = selectedCuisine
         ? meals.filter(meal => mealMatchesCuisine(meal, selectedCuisine))
@@ -650,7 +673,9 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         macroDirections: { ...macroDirections },
         selectedCuisine,
         distance: activeDistance,
-        searchKey: undefined,
+        searchKey: mealsResult.searchKey,
+        nextOffset: mealsResult.nextOffset,
+        hasMore: mealsResult.hasMore ?? false,
       };
       setLastSearchParams(searchParams);
       if (typeof window !== 'undefined') {
@@ -677,25 +702,137 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   const handleFindMoreMeals = async () => {
     updateActivity(); // Update activity on button click
     setIsLoadingMeals(true);
+    setLoadMoreNotice(null);
 
     try {
-      // If we don't have a cached pool (edge case), nothing to do.
-      if (!allSearchMeals || allSearchMeals.length === 0) {
-        setIsLoadingMeals(false);
-        return;
+      const PAGE_SIZE = 8;
+      let workingPool = allSearchMeals;
+      let searchState = lastSearchParams;
+      let start = recommendedMeals.length;
+      let next = workingPool.slice(start, start + PAGE_SIZE);
+
+      if (next.length === 0 && searchState?.hasMore && searchState.searchKey) {
+        const calorieMode = macroDirections.calories === "below" ? "UNDER" : "OVER";
+        const filters: {
+          calories?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
+          protein?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
+          carbs?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
+          fats?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
+        } = {};
+
+        if (macroEnabled.calories) {
+          filters.calories = {
+            enabled: true,
+            mode: calorieMode === "UNDER" ? "BELOW" : "ABOVE",
+            value: macroValues.calories,
+          };
+        }
+        if (macroEnabled.protein) {
+          filters.protein = {
+            enabled: true,
+            mode: macroDirections.protein === "below" ? "BELOW" : "ABOVE",
+            value: macroValues.protein,
+          };
+        }
+        if (macroEnabled.carbs) {
+          filters.carbs = {
+            enabled: true,
+            mode: macroDirections.carbs === "below" ? "BELOW" : "ABOVE",
+            value: macroValues.carbs,
+          };
+        }
+        if (macroEnabled.fats) {
+          filters.fats = {
+            enabled: true,
+            mode: macroDirections.fats === "below" ? "BELOW" : "ABOVE",
+            value: macroValues.fats,
+          };
+        }
+
+        const macroFilters: {
+          proteinMin?: number;
+          proteinMax?: number;
+          carbsMin?: number;
+          carbsMax?: number;
+          fatsMin?: number;
+          fatsMax?: number;
+          caloriesMax?: number;
+          caloriesMin?: number;
+        } = {};
+
+        if (filters.calories?.enabled) {
+          if (filters.calories.mode === "BELOW") macroFilters.caloriesMax = filters.calories.value;
+          else macroFilters.caloriesMin = filters.calories.value;
+        }
+        if (filters.protein?.enabled) {
+          if (filters.protein.mode === "BELOW") macroFilters.proteinMax = filters.protein.value;
+          else macroFilters.proteinMin = filters.protein.value;
+        }
+        if (filters.carbs?.enabled) {
+          if (filters.carbs.mode === "BELOW") macroFilters.carbsMax = filters.carbs.value;
+          else macroFilters.carbsMin = filters.carbs.value;
+        }
+        if (filters.fats?.enabled) {
+          if (filters.fats.mode === "BELOW") macroFilters.fatsMax = filters.fats.value;
+          else macroFilters.fatsMin = filters.fats.value;
+        }
+
+        const moreResult = await searchMeals(
+          "find meals",
+          searchState.distance ?? activeDistance,
+          true,
+          undefined,
+          searchState.searchKey,
+          searchState.nextOffset,
+          filters,
+          macroFilters,
+          calorieMode
+        );
+
+        const appendedPool = diversifyMealsByRestaurant(
+          deduplicateHomeMeals([
+            ...workingPool,
+            ...moreResult.meals,
+          ])
+        );
+
+        workingPool = appendedPool;
+        setAllSearchMeals(appendedPool);
+
+        const updatedSearchState = {
+          ...searchState,
+          searchKey: moreResult.searchKey ?? searchState.searchKey,
+          nextOffset: moreResult.nextOffset ?? searchState.nextOffset,
+          hasMore: moreResult.hasMore ?? false,
+        };
+        setLastSearchParams(updatedSearchState);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('seekeatz_last_search_params', JSON.stringify(updatedSearchState));
+        }
+
+        start = recommendedMeals.length;
+        next = workingPool.slice(start, start + PAGE_SIZE);
       }
 
-      const PAGE_SIZE = 8;
-      const start = recommendedMeals.length;
-      const next = allSearchMeals.slice(start, start + PAGE_SIZE);
-
       if (next.length > 0) {
-        setRecommendedMeals(prev => [...prev, ...next]);
+        const updatedMeals = [...recommendedMeals, ...next];
+        setRecommendedMeals(updatedMeals);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('seekeatz_recommended_meals', JSON.stringify(updatedMeals));
+        }
+      } else if (!searchState?.hasMore) {
+        setLoadMoreNotice(NO_MORE_MEALS_MESSAGE);
+        if (typeof window !== 'undefined') {
+          window.alert(NO_MORE_MEALS_MESSAGE);
+        }
       }
     } finally {
       setIsLoadingMeals(false);
     }
   };
+
+  const canLoadMoreMeals =
+    recommendedMeals.length < allSearchMeals.length || Boolean(lastSearchParams?.hasMore);
 
   // Restore scroll position to specific meal card or saved position
   useEffect(() => {
@@ -1012,7 +1149,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
               <div className="mt-6 px-4 pb-24" style={{ paddingBottom: `calc(2rem + env(safe-area-inset-bottom, 0px))` }}>
                 <button
                   onClick={handleFindMoreMeals}
-                  disabled={isLoadingMeals}
+                  disabled={isLoadingMeals || !canLoadMoreMeals}
                   className="w-full max-w-md mx-auto h-12 sm:h-14 rounded-2xl bg-muted border border-border text-sm sm:text-[15px] font-medium text-foreground flex items-center justify-center gap-2 hover:bg-muted/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoadingMeals ? (
@@ -1020,6 +1157,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
                       <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                       Finding More Meals...
                     </>
+                  ) : !canLoadMoreMeals ? (
+                    <>All matching meals shown</>
                   ) : (
                     <>
                       <Search className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -1027,6 +1166,11 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
                     </>
                   )}
                 </button>
+                {loadMoreNotice && (
+                  <p className="mt-3 text-sm text-muted-foreground text-center max-w-md mx-auto">
+                    {loadMoreNotice}
+                  </p>
+                )}
               </div>
             </>
           ) : (

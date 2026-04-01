@@ -4,8 +4,9 @@ import { useMemo, useState, useId } from "react";
 import {
   Calendar,
   Flame,
-  Zap,
-  TrendingUp,
+  Beef,
+  Wheat,
+  Droplets,
   Apple,
   Trash2,
   ChevronDown,
@@ -20,6 +21,7 @@ import { CircularProgress } from "./CircularProgress";
 import { ManualMealEntry } from "./ManualMealEntry";
 import { Spinner } from "./ui/spinner-1";
 import { useTheme } from "../contexts/ThemeContext";
+import { useNutrition } from "../contexts/NutritionContext";
 import type { UserProfile, Meal } from "../types";
 import { useCalorieTracking } from "../hooks/useCalorieTracking";
 
@@ -41,6 +43,8 @@ type Props = {
   onRemoveMeal: (id: string) => void;
   onAddMeal?: (meal: Meal) => void;
   onUpdateMeal?: (logId: string, meal: Meal) => void;
+  isReadOnly?: boolean;
+  onLockedAction?: () => void;
 };
 
 function formatDate(dateStr: string): string {
@@ -134,8 +138,17 @@ type Recommendation = {
   message: string;
 };
 
-export function LogScreen({ userProfile, loggedMeals, onRemoveMeal, onAddMeal, onUpdateMeal }: Props) {
+export function LogScreen({
+  userProfile,
+  loggedMeals,
+  onRemoveMeal,
+  onAddMeal,
+  onUpdateMeal,
+  isReadOnly = false,
+  onLockedAction,
+}: Props) {
   const { resolvedTheme } = useTheme();
+  const { targets } = useNutrition();
   const todayStr = new Date().toISOString().slice(0, 10);
 
   const [showManualEntry, setShowManualEntry] = useState(false);
@@ -185,12 +198,16 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal, onAddMeal, o
   const caloriesPct =
     targetCalories > 0 ? (totals.calories / targetCalories) * 100 : 0;
 
+  const targetProtein = safeGet(targets?.targetProtein, safeGet(userProfile.target_protein_g, 0));
+  const targetCarbs = safeGet(targets?.targetCarbs, safeGet(userProfile.target_carbs_g, 0));
+  const targetFats = safeGet(targets?.targetFats, safeGet(userProfile.target_fats_g, 0));
+
   // Use remaining from hook for calories, compute others from totals
   const remaining = {
     calories: todaysRemainingCalories,
-    protein: safeGet(userProfile.target_protein_g, 0) - totals.protein,
-    carbs: safeGet(userProfile.target_carbs_g, 0) - totals.carbs,
-    fats: safeGet(userProfile.target_fats_g, 0) - totals.fats,
+    protein: targetProtein - totals.protein,
+    carbs: targetCarbs - totals.carbs,
+    fats: targetFats - totals.fats,
   };
 
   const isTodaySelected = selectedDate === todayStr;
@@ -254,16 +271,13 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal, onAddMeal, o
         }}
       >
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <MiniProgressRing percentage={caloriesPct} isSpinning={isMiniRingSpinning} />
-            <div>
-              <p className="text-muted-foreground mb-1">Daily Tracking</p>
-              <h1 className="text-foreground">Your Progress</h1>
-              <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1">
-                Showing totals for <span className="text-cyan-500 dark:text-cyan-400 font-medium">{selectedLabel}</span>. Rings
-                update based on the day you pick.
-              </p>
-            </div>
+          <div className="pr-4">
+            <p className="text-muted-foreground mb-1">Daily Tracking</p>
+            <h1 className="text-foreground">Your Progress</h1>
+            <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-1">
+              Showing totals for <span className="text-cyan-500 dark:text-cyan-400 font-medium">{selectedLabel}</span>. Rings
+              update based on the day you pick.
+            </p>
           </div>
 
           {/* Calendar + Date Picker */}
@@ -360,8 +374,8 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal, onAddMeal, o
             {/* Protein - Second Ring - Cyan/Blue (matching macro box: cyan-400/blue-500) */}
             <CircularProgress
               percentage={
-                safeGet(userProfile.target_protein_g, 1) > 0
-                  ? (totals.protein / safeGet(userProfile.target_protein_g, 1)) * 100
+                targetProtein > 0
+                  ? (totals.protein / targetProtein) * 100
                   : 0
               }
               colorStart="#22d3ee"
@@ -372,8 +386,8 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal, onAddMeal, o
             {/* Carbs - Third Ring - Green (matching macro box: green-400/emerald-500) */}
             <CircularProgress
               percentage={
-                safeGet(userProfile.target_carbs_g, 1) > 0
-                  ? (totals.carbs / safeGet(userProfile.target_carbs_g, 1)) * 100
+                targetCarbs > 0
+                  ? (totals.carbs / targetCarbs) * 100
                   : 0
               }
               colorStart="#4ade80"
@@ -384,8 +398,8 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal, onAddMeal, o
             {/* Fats - Innermost Ring - Amber/Orange (matching macro box: amber-400/orange-500) */}
             <CircularProgress
               percentage={
-                safeGet(userProfile.target_fats_g, 1) > 0
-                  ? (totals.fats / safeGet(userProfile.target_fats_g, 1)) * 100
+                targetFats > 0
+                  ? (totals.fats / targetFats) * 100
                   : 0
               }
               colorStart="#fbbf24"
@@ -410,31 +424,37 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal, onAddMeal, o
 
         {/* Macro Grid */}
         <div className="grid grid-cols-4 gap-2">
-            <div className="bg-gradient-to-br from-pink-500/20 to-rose-500/20 backdrop-blur-sm rounded-2xl p-3 border border-pink-500/30 text-center [&>p]:!text-black dark:[&>p]:!text-white">
+          <div className="bg-gradient-to-br from-pink-500/20 to-rose-500/20 backdrop-blur-sm rounded-2xl p-3 border border-pink-500/30 text-center">
             <Flame className="w-4 h-4 text-pink-400 mx-auto mb-1" />
-            <p className="font-semibold" style={{ color: resolvedTheme === 'dark' ? '#ffffff' : '#000000' }}>{totals.calories}</p>
-            <p className="text-pink-400/70 dark:text-pink-300/70 text-sm">/{targetCalories}</p>
+            <div className="flex items-baseline justify-center gap-1">
+              <p className="text-pink-100/80 text-sm">{totals.calories}</p>
+              <p className="font-semibold text-white">/ {targetCalories}</p>
+            </div>
+            <p className="text-white text-xs font-medium mt-1">Calories</p>
           </div>
-          <div className="bg-gradient-to-br from-cyan-400/20 to-blue-500/20 backdrop-blur-sm rounded-2xl p-3 border border-cyan-400/30 text-center [&>p]:!text-black dark:[&>p]:!text-white">
-            <Zap className="w-4 h-4 text-cyan-400 mx-auto mb-1" />
-            <p className="font-semibold" style={{ color: resolvedTheme === 'dark' ? '#ffffff' : '#000000' }}>{totals.protein}g</p>
-            <p className="text-cyan-400/70 dark:text-cyan-300/70 text-sm">
-              /{safeGet(userProfile.target_protein_g, 0)}g
-            </p>
+          <div className="bg-gradient-to-br from-cyan-400/20 to-blue-500/20 backdrop-blur-sm rounded-2xl p-3 border border-cyan-400/30 text-center">
+            <Beef className="w-4 h-4 text-cyan-400 mx-auto mb-1" />
+            <div className="flex items-baseline justify-center gap-1">
+              <p className="text-cyan-100/80 text-sm">{totals.protein}g</p>
+              <p className="font-semibold text-white">/ {targetProtein}g</p>
+            </div>
+            <p className="text-white text-xs font-medium mt-1">Protein</p>
           </div>
-          <div className="bg-gradient-to-br from-green-400/20 to-emerald-500/20 backdrop-blur-sm rounded-2xl p-3 border border-green-400/30 text-center [&>p]:!text-black dark:[&>p]:!text-white">
-            <TrendingUp className="w-4 h-4 text-green-400 mx-auto mb-1" />
-            <p className="font-semibold" style={{ color: resolvedTheme === 'dark' ? '#ffffff' : '#000000' }}>{totals.carbs}g</p>
-            <p className="text-green-400/70 dark:text-green-300/70 text-sm">
-              /{safeGet(userProfile.target_carbs_g, 0)}g
-            </p>
+          <div className="bg-gradient-to-br from-green-400/20 to-emerald-500/20 backdrop-blur-sm rounded-2xl p-3 border border-green-400/30 text-center">
+            <Wheat className="w-4 h-4 text-green-400 mx-auto mb-1" />
+            <div className="flex items-baseline justify-center gap-1">
+              <p className="text-green-100/80 text-sm">{totals.carbs}g</p>
+              <p className="font-semibold text-white">/ {targetCarbs}g</p>
+            </div>
+            <p className="text-white text-xs font-medium mt-1">Carbs</p>
           </div>
-          <div className="bg-gradient-to-br from-amber-400/20 to-orange-500/20 backdrop-blur-sm rounded-2xl p-3 border border-amber-400/30 text-center [&>p]:!text-black dark:[&>p]:!text-white">
-            <div className="w-4 h-4 rounded-full bg-amber-400 mx-auto mb-1" />
-            <p className="font-semibold" style={{ color: resolvedTheme === 'dark' ? '#ffffff' : '#000000' }}>{totals.fats}g</p>
-            <p className="text-amber-400/70 dark:text-amber-300/70 text-sm">
-              /{safeGet(userProfile.target_fats_g, 0)}g
-            </p>
+          <div className="bg-gradient-to-br from-amber-400/20 to-orange-500/20 backdrop-blur-sm rounded-2xl p-3 border border-amber-400/30 text-center">
+            <Droplets className="w-4 h-4 text-amber-400 mx-auto mb-1" />
+            <div className="flex items-baseline justify-center gap-1">
+              <p className="text-amber-100/80 text-sm">{totals.fats}g</p>
+              <p className="font-semibold text-white">/ {targetFats}g</p>
+            </div>
+            <p className="text-white text-xs font-medium mt-1">Fats</p>
           </div>
         </div>
       </div>
@@ -455,11 +475,18 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal, onAddMeal, o
                 </div>
               </div>
               <Button
-                onClick={() => { setEditingLogId(null); setShowManualEntry(true); }}
+                onClick={() => {
+                  if (isReadOnly) {
+                    onLockedAction?.();
+                    return;
+                  }
+                  setEditingLogId(null);
+                  setShowManualEntry(true);
+                }}
                 className="shrink-0 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white rounded-xl shadow-lg shadow-cyan-500/20"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                Add entry
+                {isReadOnly ? "Premium only" : "Add entry"}
               </Button>
             </div>
           </div>
@@ -578,7 +605,14 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal, onAddMeal, o
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => { setEditingLogId(log.id); setShowManualEntry(true); }}
+                              onClick={() => {
+                                if (isReadOnly) {
+                                  onLockedAction?.();
+                                  return;
+                                }
+                                setEditingLogId(log.id);
+                                setShowManualEntry(true);
+                              }}
                               className="text-muted-foreground hover:text-cyan-500"
                             >
                               <Pencil className="w-4 h-4" />
@@ -587,7 +621,13 @@ export function LogScreen({ userProfile, loggedMeals, onRemoveMeal, onAddMeal, o
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => onRemoveMeal(log.id)}
+                            onClick={() => {
+                              if (isReadOnly) {
+                                onLockedAction?.();
+                                return;
+                              }
+                              onRemoveMeal(log.id);
+                            }}
                             className="text-muted-foreground hover:text-red-400"
                           >
                             <Trash2 className="w-4 h-4" />

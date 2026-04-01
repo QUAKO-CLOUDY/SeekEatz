@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, FormEvent, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 import { createClient } from "@/utils/supabase/client";
@@ -10,12 +10,17 @@ import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
 import { getGuestChatForMigration, getCurrentSessionId, clearGuestSessionFull } from "@/lib/guest-session";
 import { claimAnonymousData } from "@/lib/claim-anon-data";
+import { AuthProviders } from "@/app/components/AuthProviders";
 
 const THIRTY_MINUTES = 30 * 60 * 1000;
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
+  const redirectTo = searchParams.get("redirectTo") || "/chat";
+  const isMasterMode = searchParams.get("master") === "1";
+  const isSwitchAccountMode = searchParams.get("switch") === "1";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,7 +45,12 @@ export default function SignupPage() {
         data: { user },
       } = await supabase.auth.getUser();
 
-      if (!user || typeof window === "undefined") return;
+      if (!user || typeof window === "undefined" || isMasterMode) return;
+
+      if (isSwitchAccountMode) {
+        await supabase.auth.signOut();
+        return;
+      }
 
       const completed = localStorage.getItem("hasCompletedOnboarding") === "true" ||
         localStorage.getItem("onboarded") === "true";
@@ -52,12 +62,12 @@ export default function SignupPage() {
         lastLogin &&
         Date.now() - lastLogin < THIRTY_MINUTES
       ) {
-        router.replace("/home"); // TODO: change to your real main app route
+        router.replace(redirectTo);
       }
     };
 
     checkExistingSession();
-  }, [router, supabase]);
+  }, [isMasterMode, isSwitchAccountMode, redirectTo, router, supabase]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -315,7 +325,7 @@ export default function SignupPage() {
       await new Promise(resolve => setTimeout(resolve, 300));
 
       // Redirect to chat with full access
-      window.location.href = "/chat";
+      window.location.href = redirectTo;
     } catch (err: any) {
       setOtpError(err?.message || "Verification failed. Please try again.");
       setIsLoading(false);
@@ -447,6 +457,8 @@ export default function SignupPage() {
           </p>
         </div>
 
+        <AuthProviders mode="signup" oauthRedirectPath={redirectTo} className="mb-6" />
+
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <Label className="text-black mb-2 block">Email</Label>
@@ -527,7 +539,7 @@ export default function SignupPage() {
               <div className="mb-2">{error}</div>
               {(error.includes("already exists") || error.includes("already registered")) && (
                 <button
-                  onClick={() => router.push("/auth/signin")}
+                  onClick={() => router.push(`/auth/signin?redirectTo=${encodeURIComponent(redirectTo)}&switch=1${isMasterMode ? "&master=1" : ""}`)}
                   className="text-cyan-600 hover:text-cyan-700 font-medium underline mt-2"
                 >
                   Go to Sign In →
@@ -548,7 +560,7 @@ export default function SignupPage() {
         <p className="text-black text-sm text-center mt-6">
           Already have an account?{" "}
           <button
-            onClick={() => router.push("/auth/signin")}
+            onClick={() => router.push(`/auth/signin?redirectTo=${encodeURIComponent(redirectTo)}&switch=1${isMasterMode ? "&master=1" : ""}`)}
             className="text-cyan-600 hover:text-cyan-700 font-medium"
           >
             Sign in

@@ -77,7 +77,7 @@ export default function HeroSection() {
                                 size="lg"
                                 className="rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white px-10 py-6 text-lg font-bold shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all hover:-translate-y-0.5"
                             >
-                                Get Started Free
+                                Find meals near you
                                 <ArrowRight className="w-5 h-5 ml-2" />
                             </Button>
                         </Link>

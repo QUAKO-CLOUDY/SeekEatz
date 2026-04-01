@@ -25,6 +25,8 @@ const CUISINE_DISCOVERY_LIMIT = 80;
 const CUISINE_DISCOVERY_TARGET = 40;
 const BROAD_CALORIE_DISCOVERY_LIMIT = 120;
 const BROAD_CALORIE_DISCOVERY_TARGET = 60;
+const BROAD_DISCOVERY_LIMIT = 180;
+const BROAD_DISCOVERY_TARGET = 120;
 const MODIFIER_NAME_PATTERNS = [
   /\badd\b/,
   /\bextra\b/,
@@ -419,6 +421,13 @@ export async function retrieveMealsWithClient(
   if (!isSingleRestaurantQuery) {
     ranked = interleaveByRestaurant(ranked);
   }
+
+  ranked = rotateBroadDiscoveryResults(
+    ranked,
+    parsed,
+    searchParams.userContext?.userId || prepared.searchKey,
+    restaurantVariants
+  );
 
   ranked = ranked.slice(0, getTargetResultWindow(parsed, offset, limit));
 
@@ -1228,6 +1237,19 @@ function isBroadCalorieCapDiscoveryQuery(parsed: ParsedQuery): boolean {
   );
 }
 
+function isBroadDiscoveryQuery(
+  parsed: ParsedQuery,
+  restaurantVariants?: string[]
+): boolean {
+  return Boolean(
+    !parsed.restaurantQuery &&
+    !(restaurantVariants?.length) &&
+    parsed.categories.length === 0 &&
+    parsed.cuisineOrStyle.length === 0 &&
+    parsed.proteinPreference.length === 0
+  );
+}
+
 function getCandidateLimit(
   parsed: ParsedQuery,
   limit: number,
@@ -1239,6 +1261,10 @@ function getCandidateLimit(
 
   if (isBroadCalorieCapDiscoveryQuery(parsed)) {
     return Math.max(limit * 12, BROAD_CALORIE_DISCOVERY_LIMIT);
+  }
+
+  if (isBroadDiscoveryQuery(parsed, restaurantVariants)) {
+    return Math.max(limit * 18, BROAD_DISCOVERY_LIMIT);
   }
 
   return Math.max(limit * 3, 24);
@@ -1257,7 +1283,39 @@ function getTargetResultWindow(
     return Math.max(offset + limit + 30, BROAD_CALORIE_DISCOVERY_TARGET);
   }
 
+  if (isBroadDiscoveryQuery(parsed)) {
+    return Math.max(offset + limit + 40, BROAD_DISCOVERY_TARGET);
+  }
+
   return Math.max(offset + limit + 8, 20);
+}
+
+function stableHash(input: string): number {
+  let hash = 0;
+  for (let index = 0; index < input.length; index += 1) {
+    hash = (hash * 31 + input.charCodeAt(index)) >>> 0;
+  }
+  return hash;
+}
+
+function rotateBroadDiscoveryResults(
+  items: RawResult[],
+  parsed: ParsedQuery,
+  seed: string,
+  restaurantVariants?: string[]
+): RawResult[] {
+  if (!isBroadDiscoveryQuery(parsed, restaurantVariants) || items.length <= 1) {
+    return items;
+  }
+
+  const maxShiftWindow = Math.min(items.length, 24);
+  const shift = stableHash(seed) % maxShiftWindow;
+
+  if (shift === 0) {
+    return items;
+  }
+
+  return [...items.slice(shift), ...items.slice(0, shift)];
 }
 
 function shouldShortCircuitUnsupportedQuery(parsed: ParsedQuery): boolean {

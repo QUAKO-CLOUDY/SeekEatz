@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChevronRight, MapPin, Sparkles, Map, ShieldCheck } from "lucide-react";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/client";
+import { storeLocation } from "@/lib/location";
 
 type Props = {
   onComplete: () => void;
@@ -16,6 +17,8 @@ export function OnboardingFlow({ onComplete }: Props) {
   const router = useRouter();
   const supabase = createClient();
   const [step, setStep] = useState(0); // Step 0 = Eat Anywhere, Step 1 = AI Menu Scraper, Step 2 = No Guesswork, Step 3 = Location
+  const [isRequestingLocation, setIsRequestingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   // Progress dots component
   const ProgressDots = () => {
@@ -163,27 +166,41 @@ export function OnboardingFlow({ onComplete }: Props) {
   // STEP 3: Location Permission (Last step before app access)
   // For a frictionless experience, we send the user straight to AI chat on "Allow Location"
   // and set the minimal onboarding flags synchronously so the app treats them as onboarded.
-  const handleLocationRequest = () => {
-    try {
-      if (typeof window !== "undefined") {
-        const now = Date.now();
-        localStorage.setItem("hasCompletedOnboarding", "true");
-        localStorage.setItem("onboarded", "true");
-        localStorage.setItem("onboardingCompletedTimestamp", now.toString());
-        localStorage.removeItem("seekEatz_onboardingQuestionsComplete");
-        localStorage.removeItem("seekeatz_current_screen");
-        localStorage.removeItem("seekeatz_nav_history");
-      }
-    } catch (e) {
-      console.error("Error setting onboarding flags on Allow Location:", e);
+  const handleLocationRequest = async () => {
+    setLocationError(null);
+
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      setLocationError("Location is not available on this device.");
+      await completeOnboarding();
+      return;
     }
 
-    // Hard navigation to chat so we can't get stuck on this screen
-    if (typeof window !== "undefined") {
-      window.location.href = "/chat";
-    } else {
-      router.push("/chat");
-    }
+    setIsRequestingLocation(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          storeLocation(position.coords.latitude, position.coords.longitude);
+          localStorage.setItem("seekeatz_location_enabled", "true");
+        } catch (e) {
+          console.error("Error storing granted location:", e);
+        } finally {
+          setIsRequestingLocation(false);
+          await completeOnboarding();
+        }
+      },
+      async (error) => {
+        console.error("Location permission error:", error);
+        setLocationError("We couldn’t access your location. You can allow it later in your browser settings.");
+        setIsRequestingLocation(false);
+        await completeOnboarding();
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 10000,
+        maximumAge: 300000,
+      }
+    );
   };
 
   const handleSkipLocation = async () => {
@@ -318,14 +335,21 @@ export function OnboardingFlow({ onComplete }: Props) {
             Allow SeekEatz to use your location to find resaurants and menu items nearby.
           </p>
 
+          {locationError ? (
+            <p className="mb-6 rounded-2xl bg-amber-100 px-4 py-3 text-sm text-amber-800">
+              {locationError}
+            </p>
+          ) : null}
+
           <ProgressDots />
 
           <div className="space-y-3">
             <Button
               onClick={handleLocationRequest}
+              disabled={isRequestingLocation}
               className="h-14 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg shadow-green-500/20 w-full text-lg"
             >
-              Allow Location
+              {isRequestingLocation ? "Enabling location..." : "Allow Location"}
             </Button>
 
             <div className="flex gap-3">

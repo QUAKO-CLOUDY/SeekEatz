@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FormEvent, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { Label } from "@/app/components/ui/label";
@@ -9,14 +9,30 @@ import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
 import { clearGuestSessionFull } from "@/lib/guest-session";
 import { claimAnonymousData } from "@/lib/claim-anon-data";
+import { AuthProviders } from "@/app/components/AuthProviders";
+import { setDevFullAccess, setSubscriptionTier } from "@/lib/onboarding-flow";
 
 export default function SignInPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const redirectTo = searchParams.get("redirectTo") || "/chat";
+  const isMasterMode = searchParams.get("master") === "1";
+  const isSwitchAccountMode = searchParams.get("switch") === "1";
+  const devMasterEmail =
+    process.env.NEXT_PUBLIC_ENABLE_MASTER_LOGIN === "true"
+      ? process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL ?? ""
+      : "";
+
+  useEffect(() => {
+    if (!email && devMasterEmail) {
+      setEmail(devMasterEmail);
+    }
+  }, [devMasterEmail, email]);
 
   // Check if user is already authenticated - if so, redirect to chat
   // Also listen for auth state changes to redirect immediately on sign-in
@@ -25,10 +41,15 @@ export default function SignInPage() {
     
     const checkAuth = async () => {
       const { data: { user } } = await supabase.auth.getUser();
+
+      if (user && isSwitchAccountMode) {
+        await supabase.auth.signOut();
+        return;
+      }
       
-      if (user) {
+      if (user && !isMasterMode && !isSwitchAccountMode) {
         // User is already signed in, redirect to chat
-        router.replace("/chat");
+        router.replace(redirectTo);
       }
     };
     
@@ -39,14 +60,14 @@ export default function SignInPage() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         // Sign-in successful - redirect to chat
-        router.replace("/chat");
+        router.replace(redirectTo);
       }
     });
     
     return () => {
       subscription.unsubscribe();
     };
-  }, [router]);
+  }, [isMasterMode, isSwitchAccountMode, redirectTo, router]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -70,6 +91,8 @@ export default function SignInPage() {
         // Sign-in successful - update profile and navigate to chat
         const now = Date.now();
         const userId = data.user.id;
+        const normalizedSignedInEmail = data.user.email?.trim().toLowerCase();
+        const normalizedMasterEmail = process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL?.trim().toLowerCase();
         
         // Clear session-based UI state on login
         if (typeof window !== 'undefined') {
@@ -179,6 +202,10 @@ export default function SignInPage() {
         // Update localStorage
         localStorage.setItem(`seekEatz_lastLogin_${userId}`, now.toString());
         localStorage.setItem("seekEatz_lastLogin", now.toString());
+        if (normalizedSignedInEmail && normalizedSignedInEmail === normalizedMasterEmail) {
+          setSubscriptionTier("premium");
+          setDevFullAccess(true);
+        }
         
         // Set onboarding flags if user has completed onboarding
         if (profile || hasCompletedOnboarding) {
@@ -199,7 +226,7 @@ export default function SignInPage() {
         router.refresh();
         
         // Navigate to chat - the auth state change listener will unlock the chat immediately
-        router.push("/chat");
+        router.push(redirectTo);
       }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
@@ -214,6 +241,8 @@ export default function SignInPage() {
           <h1 className="text-3xl font-bold text-black mb-2">Welcome Back</h1>
           <p className="text-black">Sign in to continue to SeekEatz</p>
         </div>
+
+        <AuthProviders mode="signin" oauthRedirectPath={redirectTo} className="mb-6" />
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -273,7 +302,7 @@ export default function SignInPage() {
         <p className="text-black text-sm text-center mt-6">
           Don't have an account?{" "}
           <button
-            onClick={() => router.push("/auth/signup")}
+            onClick={() => router.push(`/auth/signup?redirectTo=${encodeURIComponent(redirectTo)}&switch=1${isMasterMode ? "&master=1" : ""}`)}
             className="text-cyan-600 hover:text-cyan-700 font-medium"
           >
             Sign up

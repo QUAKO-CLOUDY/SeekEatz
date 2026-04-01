@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Star, Heart, Flame, Zap, TrendingUp, AlertCircle, UtensilsCrossed } from "lucide-react";
+import { Star, Heart, Flame, Zap, TrendingUp, UtensilsCrossed } from "lucide-react";
 import type { Meal, UserProfile } from "../types"; // Use shared types
 import type { LoggedMeal } from "./LogScreen";
 import { getLogo } from "@/utils/logos";
+import { useNutrition } from "../contexts/NutritionContext";
 
 type Props = {
   meal: Meal;
@@ -19,42 +20,54 @@ type Props = {
 
 export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact = false, userProfile, loggedMeals = [] }: Props) {
   const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const { targets, todaysTotals, isLoading: isNutritionLoading } = useNutrition();
+  const shouldShowRemaining = userProfile !== undefined || loggedMeals.length > 0;
 
-  // Determine if log data is ready (userProfile must exist)
-  const logReady = userProfile !== undefined && userProfile !== null;
+  const targetCalories = useMemo(() => {
+    if (!shouldShowRemaining) return null;
 
-  // Calculate stable dependency key for today's meals (outside useMemo dependency array)
-  const todaysMealsKey = useMemo(() => {
-    if (!logReady) return '0-0';
-    const todaysMeals = loggedMeals.filter(m => m.date === todayStr);
-    const count = todaysMeals.length;
-    const total = todaysMeals.reduce((sum, m) => {
-      const cals = typeof m.meal.calories === 'number' ? m.meal.calories : parseFloat(m.meal.calories) || 0;
-      return sum + (isNaN(cals) ? 0 : Math.round(cals));
+    if (typeof targets?.targetCalories === 'number') {
+      return targets.targetCalories;
+    }
+
+    if (targets?.targetCalories) {
+      const parsedTargets = Number(targets.targetCalories);
+      if (!Number.isNaN(parsedTargets)) {
+        return parsedTargets;
+      }
+    }
+
+    if (typeof userProfile?.target_calories === 'number') {
+      return userProfile.target_calories;
+    }
+
+    const parsedProfile = Number(userProfile?.target_calories);
+    return Number.isNaN(parsedProfile) ? null : parsedProfile;
+  }, [shouldShowRemaining, targets?.targetCalories, userProfile?.target_calories]);
+
+  const consumedCalories = useMemo(() => {
+    if (!shouldShowRemaining) return null;
+
+    if (typeof todaysTotals?.consumedCalories === 'number') {
+      return Math.round(todaysTotals.consumedCalories);
+    }
+
+    const todaysMeals = loggedMeals.filter((loggedMeal) => loggedMeal.date === todayStr);
+    return todaysMeals.reduce((sum, loggedMeal) => {
+      const calories = Number(loggedMeal.meal.calories ?? 0);
+      return sum + (Number.isNaN(calories) ? 0 : Math.round(calories));
     }, 0);
-    return `${count}-${total}`;
-  }, [loggedMeals, todayStr, logReady]);
+  }, [shouldShowRemaining, todaysTotals?.consumedCalories, loggedMeals, todayStr]);
 
-  // Compute caloriesRemainingFromLog once (memoized) - base remaining from log data
+  const logReady = shouldShowRemaining && !isNutritionLoading && targetCalories !== null && consumedCalories !== null;
+
   const caloriesRemainingFromLog = useMemo(() => {
-    if (!logReady || !userProfile) return null;
+    if (!logReady || targetCalories === null || consumedCalories === null) {
+      return null;
+    }
 
-    const targetCalories = typeof userProfile.target_calories === 'number'
-      ? userProfile.target_calories
-      : parseFloat(userProfile.target_calories as any) || 0;
-
-    // Calculate today's consumed calories from log
-    const todaysMeals = loggedMeals.filter(loggedMeal => loggedMeal.date === todayStr);
-    const todaysConsumedCalories = todaysMeals.reduce((sum, loggedMeal) => {
-      const calories = typeof loggedMeal.meal.calories === 'number'
-        ? loggedMeal.meal.calories
-        : (typeof loggedMeal.meal.calories === 'string' ? parseFloat(loggedMeal.meal.calories) : 0);
-      return sum + (isNaN(calories) ? 0 : Math.round(calories));
-    }, 0);
-
-    // Base remaining: target - consumed
-    return Math.round(targetCalories - todaysConsumedCalories);
-  }, [logReady, userProfile?.target_calories, todaysMealsKey, todayStr]);
+    return Math.round(targetCalories - consumedCalories);
+  }, [logReady, targetCalories, consumedCalories]);
 
   // Per meal card: remainingIfEat = caloriesRemainingFromLog - meal.calories
   const remainingCalories = useMemo(() => {
@@ -98,11 +111,6 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
 
   // Add cache-busting query parameter to force browser to reload updated logos
   const logoSrcWithCacheBust = `${logoSrc}?v=${logoVersion}`;
-
-  // Check for variable availability
-  const hasVariableAvailability = meal.dietary_tags?.some(
-    (tag: string) => tag === 'Location Varies' || tag === 'Seasonal'
-  ) || false;
 
   // Check if it's a grocery/hot bar item
   const category = meal.category as string | undefined;
@@ -220,14 +228,6 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             </button>
           )}
 
-          {/* Match Score Badge - Top Left */}
-          {meal.matchScore && (
-            <div className="absolute top-1 left-1 z-10">
-              <div className="bg-emerald-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full shadow-lg">
-                {meal.matchScore}%
-              </div>
-            </div>
-          )}
         </div>
       </div>
     );
@@ -280,15 +280,6 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-background dark:from-gray-950 via-background/20 dark:via-gray-950/20 to-transparent pointer-events-none" />
 
-        {/* Match Badge */}
-        {meal.matchScore && (
-          <div className="absolute top-3 left-3 z-10">
-            <div className="bg-emerald-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-lg flex items-center gap-1 animate-in fade-in zoom-in">
-              <span>{meal.matchScore}% Match</span>
-            </div>
-          </div>
-        )}
-
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -301,16 +292,6 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
               }`}
           />
         </button>
-
-        {/* Grocery Badge */}
-        {isGrocery && (
-          <div className="absolute top-3 left-3 z-10">
-            <div className="bg-green-500/90 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
-              <span className="text-white text-[10px] font-medium">Buy & Assemble</span>
-            </div>
-          </div>
-        )}
 
         {meal.rating && (
           <div className="absolute bottom-3 left-3 flex items-center gap-2 z-10">
@@ -325,23 +306,9 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
       <div className="p-3 sm:p-4 flex flex-col flex-1">
         <div className="flex items-start mb-3 gap-3">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5 min-w-0 mb-1">
-              <p className="text-muted-foreground text-sm sm:text-base truncate">
-                {restaurantName}
-              </p>
-              {hasVariableAvailability && (
-                <div
-                  className="group/alert relative flex-shrink-0"
-                  title="Availability depends on store location"
-                >
-                  <AlertCircle className="w-3.5 h-3.5 text-yellow-400" />
-                  <div className="hidden group-hover/alert:block absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-popover text-xs text-popover-foreground rounded whitespace-nowrap z-10 border border-border">
-                    Availability depends on store location
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-popover"></div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <p className="text-muted-foreground text-sm sm:text-base truncate mb-1">
+              {restaurantName}
+            </p>
             <h3 className="text-foreground mt-0.5 font-semibold line-clamp-2 break-words text-base sm:text-lg">
               {meal.name}
             </h3>

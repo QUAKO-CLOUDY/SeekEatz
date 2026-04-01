@@ -803,6 +803,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   const handleSaveProfile = async () => {
     setIsSaving(true);
     setEditError(null);
+    setUpdateError(null);
 
     try {
       // Convert string inputs to numbers (null if empty/invalid)
@@ -854,33 +855,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
         target_fats_g: target_fats_g ?? undefined,
       };
 
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setEditError('You must be logged in to save changes');
-        setIsSaving(false);
-        return;
-      }
-
-      // Convert to flat database columns
-      const dbColumns = profileToDbColumns(updatedProfile);
-
-      // Update Supabase using flat columns with .update()
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          ...dbColumns,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user.id);
-
-      if (updateError) {
-        console.error('Error updating profile:', updateError);
-        setEditError(`Failed to save changes: ${updateError.message}`);
-        setIsSaving(false);
-        return;
-      }
-
-      // Update local state
+      // Update local state first so the app reflects the new goals immediately.
       onUpdateProfile(updatedProfile);
       setEditedProfile(updatedProfile);
       
@@ -895,6 +870,51 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
       }
 
       setIsEditing(false);
+
+      // Sync to Supabase in the background so a slow network never traps the UI in "Saving...".
+      void (async () => {
+        try {
+          const authResult = await Promise.race([
+            supabase.auth.getUser(),
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error('Timed out while verifying your account.')), 8000)
+            ),
+          ]);
+
+          const user = authResult.data.user;
+          if (!user) {
+            return;
+          }
+
+          const dbColumns = profileToDbColumns(updatedProfile);
+          const saveResult = await Promise.race([
+            supabase
+              .from('profiles')
+              .upsert({
+                id: user.id,
+                ...dbColumns,
+                updated_at: new Date().toISOString(),
+              }, {
+                onConflict: 'id',
+              }),
+            new Promise<never>((_, reject) =>
+              setTimeout(() => reject(new Error('Timed out while syncing your profile.')), 8000)
+            ),
+          ]);
+
+          if (saveResult.error) {
+            console.error('Error syncing profile:', saveResult.error);
+            setUpdateError(`Saved locally. Cloud sync may be delayed: ${saveResult.error.message}`);
+          }
+        } catch (syncError) {
+          console.error('Error syncing profile in background:', syncError);
+          setUpdateError(
+            `Saved locally. Cloud sync may be delayed: ${
+              syncError instanceof Error ? syncError.message : 'Unknown sync error'
+            }`
+          );
+        }
+      })();
     } catch (err) {
       console.error('Error saving profile:', err);
       setEditError('An unexpected error occurred. Please try again.');
@@ -1217,9 +1237,9 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
             </div>
           </div>
           <Button
-            onClick={() => router.push('/settings/subscription')}
+            onClick={() => router.push('/upgrade')}
             variant="outline"
-            className="w-full text-black dark:text-black hover:text-white"
+            className="w-full text-black dark:text-white hover:text-white"
           >
             Manage Subscription
           </Button>

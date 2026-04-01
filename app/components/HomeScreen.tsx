@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { AnimatedNumber } from "./AnimatedNumber";
 import { diversifyMealsByRestaurant } from "@/lib/restaurant-diversity";
+import { getStoredLocation, storeLocation } from "@/lib/location";
 import {
   Select,
   SelectContent,
@@ -73,12 +74,13 @@ type SearchMealsResponse = {
 
 const NO_MORE_MEALS_MESSAGE =
   "There are no more meals that fit these constraints in our database. Please change the restrictions to get access to more mealcards.";
+const HOME_MEALS_PAGE_SIZE = 4;
 
 export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite, loggedMeals = [] }: Props) {
   const { updateActivity } = useSessionActivity();
   const router = useRouter();
   
-  // Display name: profile first, then auth (login/signup) fallback
+  // Display name fallback from auth metadata/email when profile name is empty
   const [authDisplayName, setAuthDisplayName] = useState<string | null>(null);
   useEffect(() => {
     createClient()
@@ -93,14 +95,14 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       .catch(() => {});
   }, []);
 
-  // Prefer name from login/signup (auth), then profile, so "when they create an account" name shows
+  // Prefer the saved profile name so Settings updates reflect immediately.
   const userName = (() => {
-    if (authDisplayName) return authDisplayName;
     const fromProfile = userProfile?.full_name?.trim();
     if (fromProfile) {
       const first = fromProfile.split(/\s+/)[0];
       return first || fromProfile;
     }
+    if (authDisplayName) return authDisplayName;
     return "Friend";
   })();
   const [selectedCuisine] = useState<string | null>(null);
@@ -421,13 +423,19 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   };
 
   // Get user location (if available)
-  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(() => {
+    const stored = getStoredLocation();
+    return stored
+      ? { latitude: stored.latitude, longitude: stored.longitude }
+      : null;
+  });
 
   // Request user location on mount
   useEffect(() => {
     if (typeof window !== 'undefined' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          storeLocation(position.coords.latitude, position.coords.longitude);
           setUserLocation({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
@@ -663,9 +671,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       const diversifiedAll = diversifyMealsByRestaurant(filteredMeals);
       setAllSearchMeals(diversifiedAll);
 
-      // Show the first page (8 cards) from the diversified list.
-      const PAGE_SIZE = 8;
-      const newMeals = diversifiedAll.slice(0, PAGE_SIZE);
+      // Show the first page (4 cards) from the diversified list.
+      const newMeals = diversifiedAll.slice(0, HOME_MEALS_PAGE_SIZE);
       setRecommendedMeals(newMeals);
 
       const searchParams = {
@@ -705,11 +712,10 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     setLoadMoreNotice(null);
 
     try {
-      const PAGE_SIZE = 8;
       let workingPool = allSearchMeals;
       let searchState = lastSearchParams;
       let start = recommendedMeals.length;
-      let next = workingPool.slice(start, start + PAGE_SIZE);
+      let next = workingPool.slice(start, start + HOME_MEALS_PAGE_SIZE);
 
       if (next.length === 0 && searchState?.hasMore && searchState.searchKey) {
         const calorieMode = macroDirections.calories === "below" ? "UNDER" : "OVER";
@@ -811,7 +817,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         }
 
         start = recommendedMeals.length;
-        next = workingPool.slice(start, start + PAGE_SIZE);
+        next = workingPool.slice(start, start + HOME_MEALS_PAGE_SIZE);
       }
 
       if (next.length > 0) {

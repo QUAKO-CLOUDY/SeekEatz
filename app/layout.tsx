@@ -57,7 +57,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} bg-slate-100`}>
+      <body className={`${inter.className} bg-background text-foreground transition-colors`}>
         <ThemeProvider> {/* Theme provider - wraps everything */}
           <NutritionProvider> {/* Nutrition provider - available to all components */}
             <ChatProvider> {/* Chat provider - persists chat state across navigation */}

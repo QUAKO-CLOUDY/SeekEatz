@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { getUserTargets, type UserTargets } from '@/utils/user-targets';
 import { getTodaysTotals, type DailyTotals } from '@/utils/daily-totals';
 import type { LoggedMeal } from '@/app/components/LogScreen';
@@ -31,7 +31,7 @@ export function NutritionProvider({ children, userId: propUserId, loggedMeals: p
   const [isLoading, setIsLoading] = useState(true);
 
   // Load targets on mount and when userId changes
-  const refreshTargets = async (targetUserId?: string) => {
+  const refreshTargets = useCallback(async (targetUserId?: string) => {
     try {
       const userTargets = await getUserTargets(targetUserId || userId);
       setTargets(userTargets);
@@ -45,13 +45,13 @@ export function NutritionProvider({ children, userId: propUserId, loggedMeals: p
         targetFats: 70,
       });
     }
-  };
+  }, [userId]);
 
   // Calculate today's totals from logged meals
-  const refreshTotals = (meals: LoggedMeal[]) => {
+  const refreshTotals = useCallback((meals: LoggedMeal[]) => {
     const totals = getTodaysTotals(meals);
     setTodaysTotals(totals);
-  };
+  }, []);
 
   // Load loggedMeals from localStorage if not provided as prop
   useEffect(() => {
@@ -115,7 +115,7 @@ export function NutritionProvider({ children, userId: propUserId, loggedMeals: p
   }, [loggedMeals]);
 
   // Method to update loggedMeals from parent components (like MainApp)
-  const updateLoggedMeals = (meals: LoggedMeal[]) => {
+  const updateLoggedMeals = useCallback((meals: LoggedMeal[]) => {
     setLoggedMeals(meals);
     // Also save to localStorage
     if (typeof window !== 'undefined') {
@@ -125,7 +125,7 @@ export function NutritionProvider({ children, userId: propUserId, loggedMeals: p
         console.error('Failed to save loggedMeals to localStorage:', e);
       }
     }
-  };
+  }, []);
 
   // Listen for localStorage changes (in case loggedMeals are updated elsewhere)
   useEffect(() => {

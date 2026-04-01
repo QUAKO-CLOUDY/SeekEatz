@@ -11,8 +11,8 @@ import {
   Share,
   Clock,
   MapPin,
-  Info,
   Sparkles,
+  ChevronDown,
   X,
   Check,
   UtensilsCrossed,
@@ -24,12 +24,13 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AnimatedNumber } from './AnimatedNumber';
-import type { Meal } from '../types';
+import type { Meal, UserProfile } from '../types';
+import type { LoggedMeal } from './LogScreen';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { copyToClipboard } from '@/lib/clipboard-utils';
 import { useTheme } from '../contexts/ThemeContext';
 import { useNutrition } from '../contexts/NutritionContext';
 import { calculateCalorieRemaining } from '@/utils/calorie-calculator';
-import type { UserProfile } from '../types';
 import { getLogo } from '@/utils/logos';
 
 // --- TYPES ---
@@ -39,6 +40,10 @@ type Props = {
   onToggleFavorite: () => void;
   onBack: () => void;
   onLogMeal: (meal: Meal) => void;
+  userProfile?: UserProfile;
+  loggedMeals?: LoggedMeal[];
+  isPremium?: boolean;
+  onPremiumFeatureAttempt?: () => void;
 };
 
 type SwapOption = {
@@ -60,126 +65,15 @@ type SauceItem = {
   macros: { calories: number; protein: number; carbs: number; fat: number };
 };
 
-// --- HELPER LOGIC ---
-// Helper to calculate protein density
-function getProteinDensity(meal: Meal): { ratio: number; badge: { text: string; bg: string; emoji: string } | null } {
-  if (meal.calories === 0) return { ratio: 0, badge: null };
-  const ratio = meal.protein / meal.calories;
-
-  if (ratio >= 0.15) {
-    return {
-      ratio,
-      badge: { text: "Elite Protein", bg: "bg-yellow-500/20 border-yellow-500/40 text-yellow-600", emoji: "🏆" }
-    };
-  }
-  if (ratio >= 0.08) {
-    return {
-      ratio,
-      badge: { text: "Good Source", bg: "bg-blue-500/20 border-blue-500/40 text-blue-600", emoji: "💪" }
-    };
-  }
-  return { ratio, badge: null };
-}
-
-const TAG_STYLES: Record<string, { light: string; dark: string }> = {
-  'high-protein': { light: 'bg-cyan-100 border-cyan-300 text-cyan-700', dark: 'bg-cyan-900/30 border-cyan-700 text-cyan-300' },
-  'low-calorie': { light: 'bg-green-100 border-green-300 text-green-700', dark: 'bg-green-900/30 border-green-700 text-green-300' },
-  'low-carb': { light: 'bg-purple-100 border-purple-300 text-purple-700', dark: 'bg-purple-900/30 border-purple-700 text-purple-300' },
-  'keto': { light: 'bg-purple-100 border-purple-300 text-purple-700', dark: 'bg-purple-900/30 border-purple-700 text-purple-300' },
-  'default': { light: 'bg-gray-100 border-gray-300 text-gray-700', dark: 'bg-gray-800 border-gray-700 text-gray-300' },
+type SauceSelectorProps = {
+  sauces: SauceItem[];
+  selectedSauceIds: string[];
+  onToggleSauce: (id: string) => void;
+  isLoading: boolean;
+  disabled?: boolean;
 };
 
-function normalizeTagForDisplay(raw: string): string {
-  const t = (raw || '').trim();
-  if (!t) return '';
-  // Title-case and clean common variants
-  const lower = t.toLowerCase();
-  if (lower === 'high protein' || lower === 'high-protein') return 'High Protein';
-  if (lower === 'low calorie' || lower === 'low-calorie' || lower === 'low calories') return 'Low Calorie';
-  if (lower === 'low carb' || lower === 'low-carb' || lower === 'low carbs') return 'Low Carb';
-  if (lower === 'keto-friendly' || lower === 'keto') return 'Keto-Friendly';
-  if (lower === 'italian') return 'Italian';
-  if (lower === 'thai') return 'Thai';
-  if (lower === 'bowl' || lower === 'bowls') return 'Bowl';
-  if (lower === 'pizza' || lower === 'pizzas') return 'Pizza';
-  if (lower === 'sandwich' || lower === 'sandwiches') return 'Sandwich';
-  if (lower === 'salad' || lower === 'salads') return 'Salad';
-  if (lower === 'burger' || lower === 'burgers') return 'Burger';
-  if (lower === 'burrito' || lower === 'burritos') return 'Burrito';
-  if (lower === 'taco' || lower === 'tacos') return 'Tacos';
-  if (lower === 'grocery') return 'Grocery';
-  if (lower === 'restaurant') return 'Restaurant';
-  return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase();
-}
-
-function getTagStyle(key: string, isDark: boolean): string {
-  const style = TAG_STYLES[key] || TAG_STYLES.default;
-  return isDark ? style.dark : style.light;
-}
-
-/** Highlights from meal/restaurant tags + macros + dish type. Max 3. */
-function generateSmartTags(meal: Meal, isDark: boolean = false): Array<{ text: string; bg: string }> {
-  const out: Array<{ text: string; bg: string }> = [];
-  const seen = new Set<string>();
-
-  const add = (text: string, styleKey: string = 'default') => {
-    const key = text.toLowerCase().replace(/\s+/g, '-');
-    if (seen.has(key) || out.length >= 3) return;
-    seen.add(key);
-    out.push({ text, bg: getTagStyle(styleKey, isDark) });
-  };
-
-  // 1) Meal/restaurant tags (dietary_tags, tags)
-  const tagSources = [
-    ...(meal.dietary_tags || []),
-    ...(meal.tags || []),
-  ];
-  for (const raw of tagSources) {
-    const text = normalizeTagForDisplay(raw);
-    if (!text) continue;
-    const lower = text.toLowerCase();
-    let styleKey = 'default';
-    if (lower.includes('protein')) styleKey = 'high-protein';
-    else if (lower.includes('calorie') || lower.includes('calories')) styleKey = 'low-calorie';
-    else if (lower.includes('carb') || lower.includes('keto')) styleKey = 'low-carb';
-    add(text, styleKey);
-    if (out.length >= 3) return out;
-  }
-
-  // 2) Macro-based (only if we have room and not already covered)
-  if (out.length < 3 && meal.protein > 30 && !seen.has('high-protein')) add('High Protein', 'high-protein');
-  if (out.length < 3 && meal.calories < 500 && !seen.has('low-calorie')) add('Low Calorie', 'low-calorie');
-  if (out.length < 3 && meal.carbs < 15 && !seen.has('low-carb')) add('Low Carb', 'low-carb');
-  if (out.length < 3 && meal.carbs < 20 && !seen.has('keto')) add('Keto-Friendly', 'keto');
-
-  // 3) Infer from dish name (Italian, Thai, Bowl, Pizza, Sandwich, etc.)
-  const name = (meal.name || '').toLowerCase();
-  const dishPatterns: Array<{ pattern: RegExp | string; tag: string }> = [
-    { pattern: /\bitalian\b/, tag: 'Italian' },
-    { pattern: /\bthai\b/, tag: 'Thai' },
-    { pattern: /\bbowl(s)?\b/, tag: 'Bowl' },
-    { pattern: /\bpizza(s)?\b/, tag: 'Pizza' },
-    { pattern: /\bsandwich(es)?\b/, tag: 'Sandwich' },
-    { pattern: /\bsalad(s)?\b/, tag: 'Salad' },
-    { pattern: /\bburger(s)?\b/, tag: 'Burger' },
-    { pattern: /\bburrito(s)?\b/, tag: 'Burrito' },
-    { pattern: /\btaco(s)?\b/, tag: 'Tacos' },
-    { pattern: /\bwrap(s)?\b/, tag: 'Wrap' },
-    { pattern: /\bgrill(ed)?\b/, tag: 'Grilled' },
-  ];
-  for (const { pattern, tag } of dishPatterns) {
-    if (out.length >= 3) break;
-    const match = typeof pattern === 'string' ? name.includes(pattern) : pattern.test(name);
-    if (match && !seen.has(tag.toLowerCase())) add(tag, 'default');
-  }
-
-  // 4) Category as fallback (only if still under 3)
-  if (out.length < 3 && meal.category === 'grocery' && !seen.has('grocery')) add('Grocery', 'default');
-  if (out.length < 3 && meal.category === 'restaurant' && out.length === 0) add('Restaurant', 'default');
-
-  return out;
-}
-
+// --- HELPER LOGIC ---
 /** Converts delta macros into descriptive text (e.g., "more protein", "reduce calories") */
 function getSwapDescription(delta: { calories: number; protein: number; carbs: number; fats: number }): string {
   const descriptions: string[] = [];
@@ -225,7 +119,109 @@ function getSwapDescription(delta: { calories: number; protein: number; carbs: n
   }
 }
 
-export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMeal }: Props) {
+function SauceSelector({
+  sauces,
+  selectedSauceIds,
+  onToggleSauce,
+  isLoading,
+  disabled = false,
+}: SauceSelectorProps) {
+  const selectedSauces = sauces.filter((sauce) => selectedSauceIds.includes(sauce.id));
+  const triggerLabel = selectedSauces.length === 0
+    ? 'Select sauces'
+    : `${selectedSauces.length} sauce${selectedSauces.length === 1 ? '' : 's'} selected`;
+
+  if (isLoading) {
+    return <div className="text-center py-3 text-muted-foreground text-sm">Loading sauces...</div>;
+  }
+
+  if (sauces.length === 0) {
+    return null;
+  }
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          disabled={disabled}
+          className="w-full flex items-center justify-between rounded-2xl border border-border bg-muted/40 px-4 py-3 text-left text-sm text-foreground transition-colors hover:bg-muted/60 disabled:cursor-not-allowed"
+        >
+          <div>
+            <p className="font-medium">Sauces</p>
+            <p className="text-xs text-muted-foreground">
+              {triggerLabel}
+            </p>
+          </div>
+          <div className="text-right">
+            {selectedSauces.length > 0 && (
+              <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                +{selectedSauces.reduce((sum, sauce) => sum + (sauce.macros.calories || 0), 0)} cal
+              </p>
+            )}
+            <ChevronDown className="w-4 h-4 text-muted-foreground ml-auto" />
+          </div>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-[min(22rem,calc(100vw-2rem))] rounded-2xl border-border bg-card p-3">
+        <div className="space-y-2">
+          <div className="px-1 pb-1">
+            <p className="text-sm font-semibold text-card-foreground">Sauces</p>
+            <p className="text-xs text-muted-foreground">Select any sauces to add their macros to this meal.</p>
+          </div>
+          <div className="max-h-64 overflow-y-auto space-y-2 pr-1">
+            {sauces.map((sauce) => {
+              const isSelected = selectedSauceIds.includes(sauce.id);
+              return (
+                <button
+                  key={sauce.id}
+                  type="button"
+                  onClick={() => onToggleSauce(sauce.id)}
+                  className={`w-full rounded-xl border px-3 py-2 text-left transition-all ${
+                    isSelected
+                      ? 'border-amber-500/60 bg-amber-500/15'
+                      : 'border-border bg-muted/30 hover:bg-muted/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-card-foreground">{sauce.name}</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        {sauce.macros.protein || 0}g protein, {sauce.macros.carbs || 0}g carbs, {sauce.macros.fat || 0}g fat
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                        {sauce.macros.calories || 0} cal
+                      </span>
+                      <span className={`flex h-5 w-5 items-center justify-center rounded-full border ${
+                        isSelected ? 'border-amber-500 bg-amber-500 text-white' : 'border-border text-transparent'
+                      }`}>
+                        <Check className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+export function MealDetail({
+  meal,
+  isFavorite,
+  onToggleFavorite,
+  onBack,
+  onLogMeal,
+  userProfile,
+  loggedMeals = [],
+  isPremium = false,
+  onPremiumFeatureAttempt,
+}: Props) {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
   // Modal States
@@ -264,57 +260,63 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
   // Only show prepTime if we have real data, otherwise show nothing or "Nearby"
   const prepTime = meal.prepTime ? `${meal.prepTime} min` : null;
   const locationLabel = distance ? null : (meal.latitude && meal.longitude ? "Nearby" : null);
-  const smartTags = generateSmartTags(meal, isDark);
-  const proteinDensity = getProteinDensity(meal);
+  // Get user goals and today's consumed totals from the shared nutrition context.
+  const { targets, todaysTotals, isLoading: isLogLoading } = useNutrition();
 
-  // Get user goals and loggedMeals from nutrition context (must be called at top level)
-  const { targets, todaysTotals, loggedMeals, isLoading: isLogLoading } = useNutrition();
-
-  // Determine if log data is ready (not loading and targets are available)
-  const logReady = !isLogLoading && targets !== null;
+  const hasMealDetailTargets =
+    userProfile !== undefined ||
+    (!isLogLoading && targets !== null);
+  const logReady = hasMealDetailTargets;
+  const todayStr = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
   // Extract stable primitives for memoization (not objects/arrays)
   const dailyTargetCalories = useMemo(() => {
+    if (typeof userProfile?.target_calories === 'number') {
+      return userProfile.target_calories;
+    }
+
+    if (userProfile?.target_calories) {
+      const parsedUserTargetCalories = Number(userProfile.target_calories);
+      if (!Number.isNaN(parsedUserTargetCalories)) {
+        return parsedUserTargetCalories;
+      }
+    }
+
     return typeof targets?.targetCalories === 'number'
       ? targets.targetCalories
       : (typeof targets?.targetCalories === 'string' ? parseFloat(targets.targetCalories) : 0) || 2000;
-  }, [targets?.targetCalories]);
+  }, [targets?.targetCalories, userProfile?.target_calories]);
 
-  // Calculate stable dependency key for today's meals
-  const todaysMealsKey = useMemo(() => {
-    const todayStr = new Date().toISOString().slice(0, 10);
-    const todaysMeals = (loggedMeals || []).filter(m => m.date === todayStr);
-    const count = todaysMeals.length;
-    const total = todaysMeals.reduce((sum, m) => {
-      const cals = typeof m.meal.calories === 'number' ? m.meal.calories : parseFloat(m.meal.calories) || 0;
-      return sum + (isNaN(cals) ? 0 : Math.round(cals));
-    }, 0);
-    return `${count}-${total}`;
-  }, [loggedMeals]);
+  const todaysConsumedTotals = useMemo(() => {
+    if (loggedMeals.length > 0) {
+      return loggedMeals.reduce((totals, loggedMeal) => {
+        if (loggedMeal.date !== todayStr) {
+          return totals;
+        }
 
-  // Calculate todaysLoggedCalories as stable number
-  const todaysLoggedCalories = useMemo(() => {
-    const todayStr = new Date().toISOString().slice(0, 10);
-    const todaysMeals = (loggedMeals || []).filter(m => m.date === todayStr);
-    return todaysMeals.reduce((sum, m) => {
-      const cals = typeof m.meal.calories === 'number' ? m.meal.calories : parseFloat(m.meal.calories) || 0;
-      return sum + (isNaN(cals) ? 0 : Math.round(cals));
-    }, 0);
-  }, [todaysMealsKey]);
+        return {
+          calories: totals.calories + Math.round(Number(loggedMeal.meal.calories) || 0),
+          protein: totals.protein + (Number(loggedMeal.meal.protein) || 0),
+          carbs: totals.carbs + (Number(loggedMeal.meal.carbs) || 0),
+          fats: totals.fats + (Number(loggedMeal.meal.fats) || 0),
+        };
+      }, { calories: 0, protein: 0, carbs: 0, fats: 0 });
+    }
 
-  // Today's logged protein, carbs, fats (for "left after this meal")
-  const todaysLoggedMacros = useMemo(() => {
-    const todayStr = new Date().toISOString().slice(0, 10);
-    const todaysMeals = (loggedMeals || []).filter(m => m.date === todayStr);
-    return todaysMeals.reduce(
-      (acc, m) => ({
-        protein: acc.protein + (Number(m.meal.protein) || 0),
-        carbs: acc.carbs + (Number(m.meal.carbs) || 0),
-        fats: acc.fats + (Number(m.meal.fats) || 0),
-      }),
-      { protein: 0, carbs: 0, fats: 0 }
-    );
-  }, [todaysMealsKey]);
+    return {
+      calories: Math.round(Number(todaysTotals?.consumedCalories) || 0),
+      protein: Number(todaysTotals?.consumedProtein) || 0,
+      carbs: Number(todaysTotals?.consumedCarbs) || 0,
+      fats: Number(todaysTotals?.consumedFats) || 0,
+    };
+  }, [
+    loggedMeals,
+    todayStr,
+    todaysTotals?.consumedCalories,
+    todaysTotals?.consumedProtein,
+    todaysTotals?.consumedCarbs,
+    todaysTotals?.consumedFats,
+  ]);
 
   // Memoize calorieCalc with stable primitives only (not objects/arrays)
   const calorieCalc = useMemo(() => {
@@ -326,14 +328,14 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
       search_distance_miles: 10, // Default value, not used in calculator
     };
     // Calculate todaysRemainingCalories directly from primitives
-    const todaysRemainingCalories = dailyTargetCalories - todaysLoggedCalories;
+    const todaysRemainingCalories = dailyTargetCalories - todaysConsumedTotals.calories;
     return {
       targetCalories: dailyTargetCalories,
-      todaysConsumedCalories: todaysLoggedCalories,
+      todaysConsumedCalories: todaysConsumedTotals.calories,
       todaysRemainingCalories,
-      remainingIfEatMeal: (mealCalories: number) => dailyTargetCalories - (todaysLoggedCalories + mealCalories),
+      remainingIfEatMeal: (mealCalories: number) => dailyTargetCalories - (todaysConsumedTotals.calories + mealCalories),
     };
-  }, [dailyTargetCalories, todaysLoggedCalories]);
+  }, [dailyTargetCalories, todaysConsumedTotals.calories]);
 
   // Fetch swaps ONCE when meal is selected - Single source of truth
   useEffect(() => {
@@ -552,16 +554,16 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
   // "Left after this meal" = target - logged today - effective meal (updates with sauces/swaps)
   const leftAfterThisMeal = useMemo(() => {
     const targetCal = dailyTargetCalories;
-    const targetPro = targets?.targetProtein ?? 150;
-    const targetCarb = targets?.targetCarbs ?? 200;
-    const targetFat = targets?.targetFats ?? 70;
+    const targetPro = userProfile?.target_protein_g ?? targets?.targetProtein ?? 150;
+    const targetCarb = userProfile?.target_carbs_g ?? targets?.targetCarbs ?? 200;
+    const targetFat = userProfile?.target_fats_g ?? targets?.targetFats ?? 70;
     return {
-      calories: Math.round(targetCal - todaysLoggedCalories - effectiveMacros.calories),
-      protein: Math.round(targetPro - todaysLoggedMacros.protein - effectiveMacros.protein),
-      carbs: Math.round(targetCarb - todaysLoggedMacros.carbs - effectiveMacros.carbs),
-      fats: Math.round(targetFat - todaysLoggedMacros.fats - effectiveMacros.fats),
+      calories: Math.round(targetCal - todaysConsumedTotals.calories - effectiveMacros.calories),
+      protein: Math.round(targetPro - todaysConsumedTotals.protein - effectiveMacros.protein),
+      carbs: Math.round(targetCarb - todaysConsumedTotals.carbs - effectiveMacros.carbs),
+      fats: Math.round(targetFat - todaysConsumedTotals.fats - effectiveMacros.fats),
     };
-  }, [dailyTargetCalories, todaysLoggedCalories, todaysLoggedMacros, targets, effectiveMacros]);
+  }, [dailyTargetCalories, todaysConsumedTotals, targets, effectiveMacros]);
 
   const totalMacros = effectiveMacros.protein + effectiveMacros.carbs + effectiveMacros.fats;
   const pPercent = totalMacros > 0 ? Math.round((effectiveMacros.protein / totalMacros) * 100) : 0;
@@ -574,6 +576,14 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
   const calsAfter = logReady ? Math.round(todaysRemainingNum - mealCaloriesNum) : null;
   const calsRemaining = logReady ? todaysRemainingNum : null;
 
+  const toggleSauceSelection = (sauceId: string) => {
+    setSelectedSauceIds((prev) => (
+      prev.includes(sauceId)
+        ? prev.filter((id) => id !== sauceId)
+        : [...prev, sauceId]
+    ));
+  };
+
   // Dev log
   if (process.env.NODE_ENV === 'development' && logReady) {
     console.log('[calorieCalc]', { todaysRemainingNum, mealCaloriesNum, calsAfter });
@@ -585,6 +595,11 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
 
   // --- HANDLERS ---
   const toggleSwap = (id: string) => {
+    if (!isPremium) {
+      onPremiumFeatureAttempt?.();
+      return;
+    }
+
     // Only allow toggling swaps that exist in selectedMealSwaps
     const swapExists = selectedMealSwaps.some(s => s.id === id);
     if (!swapExists) return;
@@ -595,6 +610,11 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
   };
 
   const handleConfirmLog = () => {
+    if (!isPremium) {
+      onPremiumFeatureAttempt?.();
+      return;
+    }
+
     // Final macros = base meal + selected swaps + selected sauces (use effectiveMacros)
     const finalMacros = { ...effectiveMacros };
 
@@ -705,12 +725,6 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                 <h1 className="text-foreground text-2xl font-bold leading-tight">{meal.restaurant_name || meal.restaurant}</h1>
                 <div className="flex items-center gap-2 flex-wrap mt-1">
                   <p className="text-muted-foreground text-base font-medium leading-tight">{meal.name}</p>
-                  {proteinDensity.badge && (
-                    <span className={`${proteinDensity.badge.bg} border px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shrink-0`}>
-                      <span>{proteinDensity.badge.emoji}</span>
-                      <span>{proteinDensity.badge.text}</span>
-                    </span>
-                  )}
                 </div>
                 <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
                   {distance && (
@@ -753,25 +767,12 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
               </div>
             </div>
 
-            {/* SMART TAGS */}
-            <div>
-              <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest mb-2.5">Highlights</p>
-              <div className="flex flex-wrap gap-2">
-                {smartTags.map((tag, i) => (
-                  <span key={i} className={`${tag.bg} border px-3.5 py-1.5 rounded-full text-xs font-semibold`}>
-                    {tag.text}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* MACROS CARD - Calories, carbs, fats more visible */}
+            {/* MACROS CARD */}
             <div className="bg-card border border-border p-5 rounded-3xl shadow-lg relative overflow-hidden">
               <div className="absolute -top-10 -right-10 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full pointer-events-none"></div>
 
-              <div className="flex items-center justify-between mb-4">
+              <div className="mb-4">
                 <p className="text-card-foreground text-sm font-semibold">Nutritional Information</p>
-                <Info className="w-4 h-4 text-muted-foreground" />
               </div>
 
               {/* Calories - larger, more visible */}
@@ -789,6 +790,20 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
               </div>
 
               <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border/50">
+                <div className="text-center">
+                  <div className="h-3 w-full bg-muted rounded-full mb-2.5 overflow-hidden">
+                    <motion.div
+                      layout
+                      style={{ width: `${pPercent}%` }}
+                      className="h-full bg-cyan-500 rounded-full"
+                      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                    />
+                  </div>
+                  <p className="text-cyan-600 dark:text-cyan-400 font-bold text-lg">
+                    <AnimatedNumber value={effectiveMacros.protein} suffix="g" />
+                  </p>
+                  <p className="text-muted-foreground text-xs font-medium">Protein ({pPercent}%)</p>
+                </div>
                 <div className="text-center">
                   <div className="h-3 w-full bg-muted rounded-full mb-2.5 overflow-hidden">
                     <motion.div
@@ -816,20 +831,6 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                     <AnimatedNumber value={effectiveMacros.fats} suffix="g" />
                   </p>
                   <p className="text-muted-foreground text-xs font-medium">Fats ({fPercent}%)</p>
-                </div>
-                <div className="text-center">
-                  <div className="h-3 w-full bg-muted rounded-full mb-2.5 overflow-hidden">
-                    <motion.div
-                      layout
-                      style={{ width: `${pPercent}%` }}
-                      className="h-full bg-cyan-500 rounded-full"
-                      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                    />
-                  </div>
-                  <p className="text-cyan-600 dark:text-cyan-400 font-bold text-lg">
-                    <AnimatedNumber value={effectiveMacros.protein} suffix="g" />
-                  </p>
-                  <p className="text-muted-foreground text-xs font-medium">Protein ({pPercent}%)</p>
                 </div>
               </div>
             </div>
@@ -907,30 +908,12 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
                   <p className="text-foreground font-medium">Sauces</p>
                 </div>
                 <p className="text-muted-foreground text-xs mb-2">Add sauces to include their calories and macros in your log.</p>
-                {isLoadingSauces ? (
-                  <div className="text-center py-3 text-muted-foreground text-sm">Loading sauces...</div>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {restaurantSauces.map((sauce) => {
-                      const isSelected = selectedSauceIds.includes(sauce.id);
-                      return (
-                        <button
-                          key={sauce.id}
-                          onClick={() => setSelectedSauceIds((prev) => (prev.includes(sauce.id) ? prev.filter((x) => x !== sauce.id) : [...prev, sauce.id]))}
-                          className={`rounded-xl border px-3 py-2 text-left text-sm transition-all flex flex-col ${isSelected
-                            ? 'bg-amber-500/20 border-amber-500/60 text-foreground'
-                            : 'bg-muted/60 border-border text-muted-foreground hover:border-amber-500/40'
-                            }`}
-                        >
-                          <span className="font-semibold text-xs">{sauce.name}</span>
-                          <span className="block text-[11px] font-bold text-amber-700 dark:text-amber-300">
-                            {sauce.macros.calories} cal
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
+                <SauceSelector
+                  sauces={restaurantSauces}
+                  selectedSauceIds={selectedSauceIds}
+                  onToggleSauce={toggleSauceSelection}
+                  isLoading={isLoadingSauces}
+                />
                 {selectedSauceIds.length > 0 && (
                   <p className="text-amber-600 dark:text-amber-400 text-xs mt-2">
                     +{sauceMacrosSum.calories} Calories from sauces. Log to tracker to reflect the updated total.
@@ -1096,7 +1079,13 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
             {/* --- ACTION BUTTONS (Inside scrollable content, only visible when scrolled to bottom) --- */}
             <div className="mt-4 mb-8 space-y-3" style={{ height: '96px' }}>
               <button
-                onClick={() => setShowLogModal(true)}
+                onClick={() => {
+                  if (!isPremium) {
+                    onPremiumFeatureAttempt?.();
+                    return;
+                  }
+                  setShowLogModal(true);
+                }}
                 className="w-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-[#020617] font-bold text-sm py-4 rounded-2xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -1139,65 +1128,81 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
             </p>
 
             {/* Sauces in modal - same as on card */}
-            {restaurantSauces.length > 0 && (
-              <div className="mb-4">
-                <p className="text-card-foreground text-xs font-medium mb-2">Sauces</p>
-                <div className="flex flex-wrap gap-2">
-                  {restaurantSauces.map((sauce) => {
-                    const isSelected = selectedSauceIds.includes(sauce.id);
+            <div className="relative mb-4">
+              {!isPremium && restaurantSauces.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => onPremiumFeatureAttempt?.()}
+                  className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-background/70 backdrop-blur-sm"
+                >
+                  <div className="rounded-full bg-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25">
+                    Unlock premium tools
+                  </div>
+                </button>
+              )}
+
+              {restaurantSauces.length > 0 && (
+                <div className={isPremium ? '' : 'pointer-events-none blur-[2px] opacity-60'}>
+                  <SauceSelector
+                    sauces={restaurantSauces}
+                    selectedSauceIds={selectedSauceIds}
+                    onToggleSauce={toggleSauceSelection}
+                    isLoading={isLoadingSauces}
+                    disabled={!isPremium}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="relative space-y-2 mb-6">
+              {!isPremium && (
+                <button
+                  type="button"
+                  onClick={() => onPremiumFeatureAttempt?.()}
+                  className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-background/70 backdrop-blur-sm"
+                >
+                  <div className="rounded-full bg-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25">
+                    Unlock premium tools
+                  </div>
+                </button>
+              )}
+
+              <div className={isPremium ? '' : 'pointer-events-none blur-[2px] opacity-60'}>
+                {isLoadingSwaps ? (
+                  <div className="text-center py-4 text-muted-foreground text-sm">Loading swaps...</div>
+                ) : selectedMealSwaps.length === 0 ? (
+                  <div className="text-center py-4 text-muted-foreground text-sm">
+                    No swaps available for this restaurant item.
+                  </div>
+                ) : (
+                  selectedMealSwaps.map(swap => {
+                    const isSelected = selectedSwapIds.includes(swap.id);
+                    const delta = swap.deltaMacros;
                     return (
                       <button
-                        key={sauce.id}
-                        onClick={() => setSelectedSauceIds((prev) => (prev.includes(sauce.id) ? prev.filter((x) => x !== sauce.id) : [...prev, sauce.id]))}
-                        className={`rounded-xl border px-2.5 py-1.5 text-xs transition-all flex items-center gap-1 ${isSelected ? 'bg-amber-500/20 border-amber-500/60' : 'bg-muted border-border'
+                        key={swap.id}
+                        onClick={() => toggleSwap(swap.id)}
+                        className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${isSelected
+                          ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-cyan-500 shadow-lg shadow-cyan-500/20'
+                          : 'bg-muted border-border hover:border-border/80'
                           }`}
                       >
-                        <span className="font-medium">{sauce.name}</span>
-                        <span className="font-bold text-amber-700 dark:text-amber-300">
-                          {sauce.macros.calories} cal
-                        </span>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-cyan-400 bg-cyan-500' : 'border-border'}`}>
+                            {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                          </div>
+                          <div className="text-left">
+                            <p className="text-card-foreground text-sm font-medium">{swap.label}</p>
+                            <p className="text-muted-foreground text-xs capitalize">
+                              {getSwapDescription(delta)}
+                            </p>
+                          </div>
+                        </div>
                       </button>
-                    );
-                  })}
-                </div>
+                    )
+                  })
+                )}
               </div>
-            )}
-
-            <div className="space-y-2 mb-6">
-              {isLoadingSwaps ? (
-                <div className="text-center py-4 text-muted-foreground text-sm">Loading swaps...</div>
-              ) : selectedMealSwaps.length === 0 ? (
-                <div className="text-center py-4 text-muted-foreground text-sm">
-                  No swaps available for this restaurant item.
-                </div>
-              ) : (
-                selectedMealSwaps.map(swap => {
-                  const isSelected = selectedSwapIds.includes(swap.id);
-                  const delta = swap.deltaMacros;
-                  return (
-                    <button
-                      key={swap.id}
-                      onClick={() => toggleSwap(swap.id)}
-                      className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${isSelected
-                        ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-cyan-500 shadow-lg shadow-cyan-500/20'
-                        : 'bg-muted border-border hover:border-border/80'
-                        }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-cyan-400 bg-cyan-500' : 'border-border'}`}>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
-                        </div>
-                        <div className="text-left">
-                          <p className="text-card-foreground text-sm font-medium">{swap.label}</p>
-                          <p className="text-muted-foreground text-xs capitalize">
-                            {getSwapDescription(delta)}
-                          </p>
-                        </div>
-                      </div>
-                    </button>
-                  )
-                })
-              )}
             </div>
 
             {/* Live Macro Preview (meal + swaps + sauces) */}
@@ -1233,9 +1238,9 @@ export function MealDetail({ meal, isFavorite, onToggleFavorite, onBack, onLogMe
               }} className="flex-1 h-12 rounded-full bg-muted border border-border text-foreground font-medium hover:bg-muted/80">
                 Cancel
               </button>
-              <button onClick={handleConfirmLog} className="flex-1 h-12 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium shadow-lg shadow-green-500/30 flex items-center justify-center">
+              <button onClick={isPremium ? handleConfirmLog : () => onPremiumFeatureAttempt?.()} className="flex-1 h-12 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium shadow-lg shadow-green-500/30 flex items-center justify-center">
                 <Plus className="mr-2 w-5 h-5" />
-                Log Meal
+                {isPremium ? 'Log Meal' : 'Unlock to log'}
               </button>
             </div>
           </div>

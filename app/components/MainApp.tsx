@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { Navigation, type Screen } from './Navigation';
@@ -13,10 +13,12 @@ import { MealDetail } from './MealDetail';
 import { SearchScreen } from './SearchScreen';
 import { OnboardingFlow } from './OnboardingFlow';
 import { AuthScreen } from './AuthScreen';
+import { UpgradeModal } from './UpgradeModal';
 import type { UserProfile, Meal } from '../types';
 import type { LoggedMeal } from './LogScreen';
 import { useSessionActivity } from '../hooks/useSessionActivity';
 import { useNutrition } from '../contexts/NutritionContext'; // Import to sync loggedMeals with context
+import { getSubscriptionTier, hasDevFullAccess, setDevFullAccess, setSubscriptionTier } from '@/lib/onboarding-flow';
 
 type View = 'main' | 'meal-detail';
 
@@ -36,12 +38,8 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // Client ready check (stable boolean) - must be defined before isChatRoute
   const isClient = typeof window !== 'undefined';
 
-  // Create stable Supabase client reference (not recreated every render)
-  const supabaseRef = useRef<ReturnType<typeof createClient> | null>(null);
-  if (!supabaseRef.current) {
-    supabaseRef.current = createClient();
-  }
-  const supabase = supabaseRef.current;
+  // Create stable Supabase client instance
+  const supabase = useMemo(() => createClient(), []);
 
   // Check if we're on the /chat route (robust pathname check)
   // Normalize pathname: remove trailing slashes and query strings for comparison
@@ -84,10 +82,28 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
   // Track current user ID
   const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | undefined>(undefined);
+  const [subscriptionTier, setSubscriptionTier] = useState<'free' | 'premium'>('free');
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [devFullAccess, setDevFullAccessState] = useState(false);
 
   // Get updateLoggedMeals from NutritionContext to sync state
   // NutritionProvider is now at root layout level, so this should always work
-  const { updateLoggedMeals } = useNutrition();
+  const { updateLoggedMeals, refreshTargets } = useNutrition();
+
+  const applyLoggedMeals = useCallback((nextMeals: LoggedMeal[]) => {
+    setLoggedMeals(nextMeals);
+
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('seekeatz_logged_meals', JSON.stringify(nextMeals));
+      } catch (e) {
+        console.error('Failed to save loggedMeals:', e);
+      }
+    }
+
+    updateLoggedMeals(nextMeals);
+  }, [updateLoggedMeals]);
 
   // Session timeout handler - redirects to login on timeout
   const handleSessionTimeout = () => {
@@ -101,6 +117,44 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
+    setSubscriptionTier(getSubscriptionTier());
+    setDevFullAccessState(hasDevFullAccess());
+  }, [isMounted, currentUserId]);
+
+  useEffect(() => {
+    if (!isMounted) return;
+
+    const hydrateCurrentUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setCurrentUserId(user?.id);
+        setCurrentUserEmail(user?.email);
+      } catch {
+        setCurrentUserId(undefined);
+        setCurrentUserEmail(undefined);
+      }
+    };
+
+    hydrateCurrentUser();
+  }, [isMounted, supabase]);
+
+  const normalizedCurrentUserEmail = currentUserEmail?.trim().toLowerCase();
+  const normalizedMasterEmail = process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL?.trim().toLowerCase();
+  const isMasterAccount =
+    !!normalizedCurrentUserEmail &&
+    normalizedCurrentUserEmail === normalizedMasterEmail;
+
+  useEffect(() => {
+    if (!isMounted) return;
+    if (isMasterAccount && subscriptionTier !== 'premium') {
+      setSubscriptionTier('premium');
+      setDevFullAccess(true);
+      setDevFullAccessState(true);
+    }
+  }, [isMasterAccount, isMounted, subscriptionTier]);
 
   // Load all localStorage state on mount (only after component is mounted on client)
   // Consolidated into single effect for better performance
@@ -192,12 +246,12 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
               // Keep meals from dates before today (historical)
               return log.date < todayStr;
             });
-            setLoggedMeals(filteredMeals);
+            applyLoggedMeals(filteredMeals);
             // Update last reset date to today
             localStorage.setItem('seekeatz_last_reset_date', todayStr);
           } else {
             // Same day or first time - keep all meals including today's
-            setLoggedMeals(parsed);
+            applyLoggedMeals(parsed);
             // Set last reset date if not set
             if (!lastResetDate) {
               localStorage.setItem('seekeatz_last_reset_date', todayStr);
@@ -211,7 +265,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     } catch (e) {
       console.error('Failed to parse loggedMeals:', e);
     }
-  }, [isMounted]);
+  }, [applyLoggedMeals, isMounted]);
 
   // Initialize app state: Check localStorage for 'onboarded' and Supabase session
   useEffect(() => {
@@ -297,8 +351,10 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       // Track user ID if user exists
       if (user) {
         setCurrentUserId(user.id);
+        setCurrentUserEmail(user.email);
       } else {
         setCurrentUserId(undefined);
+        setCurrentUserEmail(undefined);
       }
 
       // Only set state if we haven't already been set by auth state change listener
@@ -390,6 +446,15 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
       if (event === 'SIGNED_IN' && session?.user) {
         setCurrentUserId(session.user.id);
+        setCurrentUserEmail(session.user.email);
+        const normalizedEmail = session.user.email?.trim().toLowerCase();
+        const normalizedMaster = process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL?.trim().toLowerCase();
+        const isMasterSession = !!normalizedEmail && normalizedEmail === normalizedMaster;
+        if (isMasterSession) {
+          setSubscriptionTier('premium');
+          setDevFullAccess(true);
+          setDevFullAccessState(true);
+        }
         // User just signed in - reload profile
         const { data: profileData } = await supabase
           .from('profiles')
@@ -409,6 +474,9 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       } else if (event === 'SIGNED_OUT') {
         // User signed out - reset to default profile
         setCurrentUserId(undefined);
+        setCurrentUserEmail(undefined);
+        setDevFullAccess(false);
+        setDevFullAccessState(false);
         setUserProfile({
           target_calories: 2000,
           target_protein_g: 150,
@@ -498,18 +566,6 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     }
   }, [userProfile, isMounted]);
 
-  // Save logged meals to localStorage and sync with NutritionContext when they change (only after mounted)
-  useEffect(() => {
-    if (!isMounted) return;
-    try {
-      localStorage.setItem('seekeatz_logged_meals', JSON.stringify(loggedMeals));
-      // Sync with NutritionContext
-      updateLoggedMeals(loggedMeals);
-    } catch (e) {
-      console.error('Failed to save loggedMeals:', e);
-    }
-  }, [loggedMeals, isMounted, updateLoggedMeals]);
-
   // ========== ALL HOOKS END HERE - NOW HANDLERS AND CONDITIONAL RENDERS ==========
 
   // Handle onboarding completion
@@ -576,6 +632,8 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   }
 
   // If we reach here, appState is 'app' - render the main app UI
+  const isPremium = subscriptionTier === 'premium';
+  const hasFullAccess = isPremium || isMasterAccount || devFullAccess;
 
   const handleNavigate = (screen: Screen) => {
     // Update activity on navigation
@@ -639,6 +697,11 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   };
 
   const handleToggleFavorite = (mealId: string, meal?: Meal) => {
+    if (currentUserId && !hasFullAccess) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     updateActivity(); // Update activity on favorite toggle
     setFavoriteMeals((prev) => {
       const isCurrentlyFavorite = prev.includes(mealId);
@@ -669,6 +732,11 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   };
 
   const handleLogMeal = (meal: Meal) => {
+    if (currentUserId && !hasFullAccess) {
+      setShowUpgradeModal(true);
+      return;
+    }
+
     updateActivity(); // Update activity on meal logging
 
     // Debug log
@@ -691,24 +759,35 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       timestamp: new Date().toISOString(),
       date: todayStr,
     };
-    setLoggedMeals((prev) => [...prev, loggedMeal]);
+    applyLoggedMeals([...loggedMeals, loggedMeal]);
     setCurrentView('main');
     setSelectedMeal(null);
     handleNavigate('log');
   };
 
   const handleRemoveMeal = (id: string) => {
-    setLoggedMeals((prev) => prev.filter((meal) => meal.id !== id));
+    applyLoggedMeals(loggedMeals.filter((meal) => meal.id !== id));
   };
 
   const handleUpdateLoggedMeal = (logId: string, meal: Meal) => {
-    setLoggedMeals((prev) =>
-      prev.map((log) => (log.id === logId ? { ...log, meal } : log))
+    applyLoggedMeals(
+      loggedMeals.map((log) => (log.id === logId ? { ...log, meal } : log))
     );
   };
 
   const handleUpdateProfile = (updates: Partial<UserProfile>) => {
-    setUserProfile((prev) => ({ ...prev, ...updates }));
+    const nextProfile = { ...userProfile, ...updates };
+    setUserProfile(nextProfile);
+
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('userProfile', JSON.stringify(nextProfile));
+      } catch (e) {
+        console.error('Failed to save userProfile:', e);
+      }
+    }
+
+    void refreshTargets(currentUserId);
   };
 
   // Show meal detail if a meal is selected
@@ -721,6 +800,8 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           onToggleFavorite={() => handleToggleFavorite(selectedMeal.id, selectedMeal)}
           onBack={handleBack}
           onLogMeal={handleLogMeal}
+          isPremium={hasFullAccess}
+          onPremiumFeatureAttempt={() => setShowUpgradeModal(true)}
         />
       </div>
     );
@@ -769,6 +850,10 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
             onToggleFavorite={() => handleToggleFavorite(selectedMeal.id, selectedMeal)}
             onBack={() => setCurrentView('main')}
             onLogMeal={handleLogMeal}
+            userProfile={userProfile}
+            loggedMeals={loggedMeals}
+            isPremium={hasFullAccess}
+            onPremiumFeatureAttempt={() => setShowUpgradeModal(true)}
           />
         )}
         {currentScreen === 'log' && (
@@ -778,6 +863,8 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
             onRemoveMeal={handleRemoveMeal}
             onAddMeal={handleLogMeal}
             onUpdateMeal={handleUpdateLoggedMeal}
+            isReadOnly={!!currentUserId && !hasFullAccess}
+            onLockedAction={() => setShowUpgradeModal(true)}
           />
         )}
         {currentScreen === 'chat' && (
@@ -810,6 +897,12 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       <Navigation
         currentScreen={currentScreen}
         onNavigate={handleNavigate}
+      />
+
+      <UpgradeModal
+        open={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        subtitle="Premium is where SeekEatz becomes your decision system: unlimited searches, AI swaps, meal logging, and saved meals."
       />
     </div>
   );

@@ -11,6 +11,16 @@ import { createClient } from "@/utils/supabase/client";
 import { useTheme } from "../contexts/ThemeContext";
 import { useChat } from "../contexts/ChatContext";
 import { getGuestSessionId, getGuestChatMessages, saveGuestChatMessages, touchGuestActivity, getCurrentSessionId, clearGuestSession, clearGuestSessionFull } from "@/lib/guest-session";
+import { getStoredLocation, storeLocation } from "@/lib/location";
+import {
+  GUEST_QUERY_LIMIT,
+  getGuestQueryCount,
+  hasCompletedPostValueOnboarding,
+  incrementGuestQueryCount,
+  markPostValueOnboardingComplete,
+} from "@/lib/onboarding-flow";
+import { PostValueOnboarding } from "./PostValueOnboarding";
+import { AuthProviders } from "./AuthProviders";
 import {
   diversifyMealsByRestaurant,
   type RestaurantDiversityHistory,
@@ -38,6 +48,14 @@ interface ChatMessage {
     filters?: { [key: string]: any }; // Store original filters for pagination
   };
   isGateMessage?: boolean; // Flag for gate messages that need buttons
+}
+
+type QuickPromptSearchContext = NonNullable<ChatMessage['mealSearchContext']>;
+
+interface ActiveQuickPromptState {
+  promptText: string;
+  startIndex: number;
+  context?: QuickPromptSearchContext;
 }
 
 function mapSearchItemToMeal(item: any): Meal {
@@ -102,7 +120,7 @@ function buildMealHistory(
 function findLatestQuickPromptMealMessage(
   messages: ChatMessage[],
   promptText: string
-): ChatMessage | null {
+): { message: ChatMessage; index: number } | null {
   const normalizedPrompt = promptText.trim().toLowerCase();
 
   for (let index = messages.length - 1; index >= 1; index -= 1) {
@@ -115,11 +133,48 @@ function findLatestQuickPromptMealMessage(
       previousMessage?.role === 'user' &&
       previousMessage.content.trim().toLowerCase() === normalizedPrompt
     ) {
-      return assistantMessage;
+      return { message: assistantMessage, index };
     }
   }
 
   return null;
+}
+
+function buildQuickPromptMealHistory(
+  messages: ChatMessage[],
+  promptText: string,
+  startIndex = 0
+): RestaurantDiversityHistory {
+  const normalizedPrompt = promptText.trim().toLowerCase();
+  const seenMealIds = new Set<string>();
+  const restaurantExposure = new Map<string, number>();
+
+  for (let index = Math.max(1, startIndex + 1); index < messages.length; index += 1) {
+    const assistantMessage = messages[index];
+    const previousMessage = messages[index - 1];
+
+    if (
+      assistantMessage.role !== 'assistant' ||
+      previousMessage?.role !== 'user' ||
+      previousMessage.content.trim().toLowerCase() !== normalizedPrompt ||
+      !assistantMessage.meals?.length
+    ) {
+      continue;
+    }
+
+    for (const meal of assistantMessage.meals) {
+      seenMealIds.add(meal.id);
+      const restaurantKey = (meal.restaurant_name || meal.restaurant || 'unknown')
+        .trim()
+        .toLowerCase();
+      restaurantExposure.set(
+        restaurantKey,
+        (restaurantExposure.get(restaurantKey) ?? 0) + 1
+      );
+    }
+  }
+
+  return { seenMealIds, restaurantExposure };
 }
 
 const CHAT_SCROLL_POSITION_KEY = 'seekeatz_chat_scroll_position';
@@ -132,6 +187,10 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   // Check if user is signed in (userId prop or check session)
   const [isSignedIn, setIsSignedIn] = useState(!!userId);
   const [isLimitReached, setIsLimitReached] = useState(false); // kept for compatibility, but no longer used for gating
+  const [guestQueryCount, setGuestQueryCount] = useState(0);
+  const [showPostValueOnboarding, setShowPostValueOnboarding] = useState(false);
+  const [showAccountGate, setShowAccountGate] = useState(false);
+  const activeQuickPromptRef = useRef<ActiveQuickPromptState | null>(null);
 
   // Current session ID (stable per tab)
   const [currentSessionId, setCurrentSessionId] = useState<string>(() => {
@@ -143,6 +202,31 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   useEffect(() => {
     setIsSignedIn(!!userId);
   }, [userId]);
+
+  useEffect(() => {
+    setGuestQueryCount(getGuestQueryCount());
+  }, [userId, isSignedIn]);
+
+  useEffect(() => {
+    if (isSignedIn) {
+      setShowPostValueOnboarding(false);
+      setShowAccountGate(false);
+      return;
+    }
+
+    const reachedGuestGate = getGuestQueryCount() >= GUEST_QUERY_LIMIT;
+    if (!reachedGuestGate) {
+      setShowPostValueOnboarding(false);
+      setShowAccountGate(false);
+      return;
+    }
+
+    if (hasCompletedPostValueOnboarding()) {
+      setShowAccountGate(true);
+    } else {
+      setShowPostValueOnboarding(true);
+    }
+  }, [isSignedIn]);
 
   useEffect(() => {
     // Network change detection: reset stuck loading state when going online/offline
@@ -275,13 +359,19 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   }, []);
 
   // User location state (for nearby meal filtering)
-  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(() => {
+    const stored = getStoredLocation();
+    return stored
+      ? { latitude: stored.latitude, longitude: stored.longitude }
+      : null;
+  });
 
   // Get user location on mount (if permission granted)
   useEffect(() => {
     if (typeof window !== 'undefined' && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          storeLocation(position.coords.latitude, position.coords.longitude);
           setUserLocation({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
@@ -649,11 +739,17 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       const initialMessage: ChatMessage = {
         id: `assistant-initial-${Date.now()}`,
         role: 'assistant',
-        content: 'What can I help you find today?'
+        content: 'Welcome to SeekEatz! Search meals by calories, macros, cuisine, resrtaurants or cravings.'
       };
       setMessages([initialMessage]);
     }
   }, [isMounted, messages.length]);
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      activeQuickPromptRef.current = null;
+    }
+  }, [messages.length]);
 
   // Persist messages to guest session (only for guests, authenticated users use Supabase)
   useEffect(() => {
@@ -872,12 +968,74 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     return summary;
   };
 
+  const maybeHandleQueryGate = () => {
+    if (!isSignedIn) {
+      const currentGuestCount = getGuestQueryCount();
+      setGuestQueryCount(currentGuestCount);
+
+      if (showPostValueOnboarding || showAccountGate) {
+        return true;
+      }
+
+      if (currentGuestCount >= GUEST_QUERY_LIMIT) {
+        if (hasCompletedPostValueOnboarding()) {
+          setShowAccountGate(true);
+        } else {
+          setShowPostValueOnboarding(true);
+        }
+        return true;
+      }
+
+      return false;
+    }
+
+    return false;
+  };
+
+  const handleSuccessfulQuery = () => {
+    if (!isSignedIn) {
+      const nextGuestCount = incrementGuestQueryCount();
+      setGuestQueryCount(nextGuestCount);
+
+      if (nextGuestCount >= GUEST_QUERY_LIMIT && !hasCompletedPostValueOnboarding()) {
+        setShowPostValueOnboarding(true);
+      }
+
+      return;
+    }
+
+  };
+
 
   // Send message function
-  const sendMessage = async (messageText: string) => {
+  const sendMessage = async (
+    messageText: string,
+    options?: {
+      quickPromptText?: string;
+      quickPromptStartIndex?: number;
+      userVisibleText?: string;
+    }
+  ) => {
     const trimmedText = messageText.trim();
     if (!trimmedText) {
       return;
+    }
+
+    const quickPromptText = options?.quickPromptText?.trim();
+    const quickPromptStartIndex = options?.quickPromptStartIndex ?? messages.length;
+    const userVisibleText = options?.userVisibleText?.trim() || trimmedText;
+
+    if (maybeHandleQueryGate()) {
+      return;
+    }
+
+    if (quickPromptText) {
+      activeQuickPromptRef.current = {
+        promptText: quickPromptText,
+        startIndex: quickPromptStartIndex,
+      };
+    } else {
+      activeQuickPromptRef.current = null;
     }
 
     // Touch activity when user sends a message
@@ -913,7 +1071,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
-      content: trimmedText
+      content: userVisibleText
     };
 
     // Log user message to Supabase (fire-and-forget — never block the send flow)
@@ -949,6 +1107,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               search_distance_miles: userProfile?.search_distance_miles,
               diet_type: userProfile?.diet_type,
               dietary_options: userProfile?.dietary_options,
+              userId: userId || currentSessionId,
               // Include location if available
               ...(userLocation ? {
                 user_location_lat: userLocation.latitude,
@@ -1164,7 +1323,22 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               mealSearchContext
             };
 
+            if (quickPromptText) {
+              activeQuickPromptRef.current = {
+                promptText: quickPromptText,
+                startIndex: quickPromptStartIndex,
+                context: mealSearchContext ?? {
+                  searchKey: '',
+                  nextOffset: 0,
+                  hasMore: false,
+                  originalQuery: trimmedText,
+                  filters: undefined,
+                },
+              };
+            }
+
             setMessages(prev => [...prev, assistantMessage]);
+            handleSuccessfulQuery();
 
             // Log to Supabase — fire-and-forget, never block the UI while isLoading=true
             if (isSignedIn) {
@@ -1185,7 +1359,12 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               content: textContent
             };
 
+            if (quickPromptText) {
+              activeQuickPromptRef.current = null;
+            }
+
             setMessages(prev => [...prev, assistantMessage]);
+            handleSuccessfulQuery();
 
             // Log to Supabase — fire-and-forget, never block the UI while isLoading=true
             if (isSignedIn) {
@@ -1200,6 +1379,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           console.error('[AIChat] Unknown JSON response format:', jsonData);
           console.error('[AIChat] Raw response text was:', rawResponseText.substring(0, 500));
           setError('Unexpected response format from server');
+          if (quickPromptText) {
+            activeQuickPromptRef.current = null;
+          }
           setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
           return;
         } catch (jsonError) {
@@ -1212,6 +1394,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             stack: jsonError instanceof Error ? jsonError.stack : undefined
           });
           setError('Invalid response format from server');
+          if (quickPromptText) {
+            activeQuickPromptRef.current = null;
+          }
           setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
           return;
         }
@@ -1229,6 +1414,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         console.error('[AIChat] Could not read non-JSON response body:', readError);
       }
       setError('Unexpected response format from server');
+      if (quickPromptText) {
+        activeQuickPromptRef.current = null;
+      }
       setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
       return;
 
@@ -1248,6 +1436,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
       const errorMessage = err instanceof Error ? err.message : 'Failed to send message';
       setError(errorMessage || 'An unexpected error occurred');
+      if (quickPromptText) {
+        activeQuickPromptRef.current = null;
+      }
 
       // Remove user message on error
       setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
@@ -1270,14 +1461,24 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   };
 
   // Handle quick prompt
-  const sendQuickPrompt = async (promptText: string) => {
+  const sendQuickPrompt = async (promptText: string, visibleText?: string) => {
     if (isLoading) return;
 
-    const latestPromptMessage = findLatestQuickPromptMealMessage(messages, promptText);
-    const latestContext = latestPromptMessage?.mealSearchContext;
+    const activeQuickPrompt = activeQuickPromptRef.current;
+    const normalizedPrompt = promptText.trim().toLowerCase();
+    const userFacingText = visibleText?.trim() || promptText;
+    const latestContext =
+      activeQuickPrompt?.promptText.trim().toLowerCase() === normalizedPrompt
+        ? activeQuickPrompt.context
+        : undefined;
 
     if (!latestContext) {
-      sendMessage(promptText);
+      if (maybeHandleQueryGate()) return;
+      sendMessage(promptText, {
+        quickPromptText: promptText,
+        quickPromptStartIndex: messages.length,
+        userVisibleText: userFacingText,
+      });
       return;
     }
 
@@ -1285,7 +1486,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       const userMessage: ChatMessage = {
         id: `user-${Date.now()}`,
         role: 'user',
-        content: promptText,
+        content: userFacingText,
       };
       const assistantMessage: ChatMessage = {
         id: `assistant-${Date.now()}-no-more`,
@@ -1302,7 +1503,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
-      content: promptText,
+      content: userFacingText,
     };
 
     if (isSignedIn) {
@@ -1317,7 +1518,11 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       let workingContext = { ...latestContext };
       let unseenMeals: Meal[] = [];
       let workingResponseSearchKey = workingContext.searchKey;
-      const diversityHistory = buildMealHistory(messages);
+      const diversityHistory = buildQuickPromptMealHistory(
+        messages,
+        promptText,
+        activeQuickPrompt?.startIndex ?? 0
+      );
       const seenMealIds = new Set(diversityHistory.seenMealIds ?? []);
 
       for (let attempt = 0; attempt < 6; attempt += 1) {
@@ -1393,6 +1598,18 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             role: 'assistant',
             content: 'There are no more new meals for this quick search. Try a different prompt or change your filters.',
           };
+
+      activeQuickPromptRef.current = {
+        promptText,
+        startIndex: activeQuickPrompt?.startIndex ?? messages.length,
+        context: assistantMessage.mealSearchContext ?? {
+          searchKey: '',
+          nextOffset: 0,
+          hasMore: false,
+          originalQuery: latestContext.originalQuery ?? promptText,
+          filters: latestContext.filters,
+        },
+      };
 
       setMessages((prev) => [...prev, assistantMessage]);
 
@@ -1517,14 +1734,22 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   };
 
   // Quick prompt chips with display text and actual prompt text
-  const quickPrompts = [
-    { display: "🔥 Meal under 1000 calories", prompt: "Find me a meal under 1000 calories and over 650 calories" },
+  const quickPromptSeed = [
+    {
+      display: "🔥 Meal under 1000 calories",
+      prompt: "Find me a meal under 1000 calories and over 650 calories",
+      userVisibleText: "Finding meals under 1000 calories."
+    },
     { display: "🌅 Breakfast", prompt: "Find me breakfast foods like breakfast sandwiches, burritos, omelets, bagels, pancakes, waffles, oatmeal, and toast" },
     { display: "🥗 Low carb meal", prompt: "Find me a low carb meal" },
     { display: "🫒 Low fat meal", prompt: "Find me a low fat meal" },
     { display: "🍽️ Find me lunch", prompt: "Find me lunch" },
     { display: "🍴 Find me dinner", prompt: "Find me dinner" }
   ];
+  const quickPrompts = quickPromptSeed.map((item) => ({
+    ...item,
+    display: item.display.replace(/^[^\p{L}\p{N}]+/u, '').trim(),
+  }));
 
   return (
     <div className={`flex flex-col h-full relative ${isDark ? 'bg-gray-950' : 'bg-gray-50'}`}>
@@ -1634,7 +1859,14 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                       if (typeof window !== 'undefined') {
                         localStorage.setItem('seekeatz_signup_from_chat_gate', 'true');
                       }
-                      router.push('/auth/signup');
+                      {
+                        const masterQuery =
+                          typeof window !== 'undefined' &&
+                          new URLSearchParams(window.location.search).get('master') === '1'
+                            ? '&master=1'
+                            : '';
+                        router.push(`/auth/signup?redirectTo=%2Fupgrade&switch=1${masterQuery}`);
+                      }
                     }}
                     className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm text-center"
                   >
@@ -1647,7 +1879,14 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                         clearTimeout((window as any).__seekeatz_redirectTimer);
                         delete (window as any).__seekeatz_redirectTimer;
                       }
-                      router.push('/auth/signin');
+                      {
+                        const masterQuery =
+                          typeof window !== 'undefined' &&
+                          new URLSearchParams(window.location.search).get('master') === '1'
+                            ? '&master=1'
+                            : '';
+                        router.push(`/auth/signin?redirectTo=%2Fupgrade&switch=1${masterQuery}`);
+                      }
                     }}
                     className={`px-4 py-2 border rounded-lg text-sm font-medium transition-all text-center ${isDark ? 'bg-gray-800 border-gray-700 hover:bg-gray-700 text-gray-200' : 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700'}`}
                   >
@@ -1718,7 +1957,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               {quickPrompts.map((item, index) => (
                 <button
                   key={index}
-                  onClick={() => sendQuickPrompt(item.prompt)}
+                  onClick={() => sendQuickPrompt(item.prompt, item.userVisibleText)}
                   disabled={isLimitReached && !isSignedIn}
                   className={`flex-shrink-0 px-[6px] py-[6px] h-[18px] leading-[1px] md:px-[10px] md:py-[10px] md:h-[30px] md:leading-[2px] border rounded-full text-xs md:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap ${isDark ? 'bg-gray-800 hover:bg-gray-700 active:bg-gray-600 border-gray-700 text-gray-200' : 'bg-gray-50 hover:bg-gray-100 active:bg-gray-200 border-gray-200 text-gray-700'}`}
                 >
@@ -1734,22 +1973,6 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       <div className={`border-t fixed bottom-0 left-0 right-0 w-full mb-[60px] z-30 flex items-center justify-center transition-all duration-300 ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
         <div className="w-full max-w-2xl p-2 md:p-4">
           <form onSubmit={onSubmit} className="flex items-center gap-2">
-            <input
-              type="text"
-              className={`flex-1 py-2 px-3 md:p-4 rounded-xl focus:outline-none focus:ring-2 text-base ${isDark ? 'bg-gray-800 text-gray-100 placeholder:text-gray-500 focus:ring-blue-500' : 'bg-gray-100 text-gray-800 placeholder:text-gray-500 focus:ring-blue-600'} ${isLimitReached && !isSignedIn ? 'opacity-60 cursor-not-allowed' : ''}`}
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              placeholder={isLimitReached && !isSignedIn ? "You've used your 3 free chats. Create an account to continue." : "Ask AI to find meals, macros, or cravings..."}
-              disabled={isLimitReached && !isSignedIn}
-              autoComplete="off"
-            />
-            <button
-              type="submit"
-              disabled={!inputText.trim() || (isLimitReached && !isSignedIn)}
-              className={`flex-shrink-0 p-1.5 md:p-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all ${isLimitReached && !isSignedIn ? 'cursor-not-allowed' : ''}`}
-            >
-              <Send size={16} className="md:w-[18px] md:h-[18px]" />
-            </button>
             <button
               type="button"
               onClick={() => {
@@ -1765,9 +1988,81 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             >
               <Trash2 size={16} className="md:w-[18px] md:h-[18px]" />
             </button>
+            <input
+              type="text"
+              className={`flex-1 py-2 px-3 md:p-4 rounded-xl focus:outline-none focus:ring-2 text-base ${isDark ? 'bg-gray-800 text-gray-100 placeholder:text-gray-500 focus:ring-blue-500' : 'bg-gray-100 text-gray-800 placeholder:text-gray-500 focus:ring-blue-600'} ${(isLimitReached && !isSignedIn) || showAccountGate || showPostValueOnboarding ? 'opacity-60 cursor-not-allowed' : ''}`}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder={showAccountGate
+                ? "Create a free account to keep going."
+                : showPostValueOnboarding
+                  ? "Finish onboarding to keep going."
+                  : "High protein lunch under 700 calories"}
+              disabled={(isLimitReached && !isSignedIn) || showAccountGate || showPostValueOnboarding}
+              autoComplete="off"
+            />
+            <button
+              type="submit"
+              disabled={!inputText.trim() || (isLimitReached && !isSignedIn) || showAccountGate || showPostValueOnboarding}
+              className={`flex-shrink-0 p-1.5 md:p-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all ${(isLimitReached && !isSignedIn) || showAccountGate || showPostValueOnboarding ? 'cursor-not-allowed' : ''}`}
+            >
+              <Send size={16} className="md:w-[18px] md:h-[18px]" />
+            </button>
           </form>
         </div>
       </div>
+
+      {showPostValueOnboarding && !isSignedIn && (
+        <PostValueOnboarding
+          onSkip={() => {
+            markPostValueOnboardingComplete();
+            setShowPostValueOnboarding(false);
+            setShowAccountGate(true);
+          }}
+          onComplete={() => {
+            markPostValueOnboardingComplete();
+            setShowPostValueOnboarding(false);
+            setShowAccountGate(true);
+          }}
+        />
+      )}
+
+      {showAccountGate && !isSignedIn && (
+        <div className="fixed inset-0 z-[120] flex items-end justify-center bg-slate-950/75 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-t-[2rem] bg-white p-6 pb-8 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-600">
+                  Free account
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold leading-tight text-slate-900">
+                  Create a free account to keep going
+                </h2>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  You’ve already seen the meal search work. Create your account to keep searching and unlock your daily free usage.
+                </p>
+              </div>
+            </div>
+
+            <AuthProviders className="mt-6" />
+            <button
+              type="button"
+              onClick={() => {
+                const masterQuery =
+                  typeof window !== 'undefined' &&
+                  new URLSearchParams(window.location.search).get('master') === '1'
+                    ? '&master=1'
+                    : '';
+                router.push(`/auth/signin?redirectTo=%2Fupgrade&switch=1${masterQuery}`);
+              }}
+              className="mt-4 w-full text-sm font-medium text-slate-500"
+            >
+              I already have an account
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

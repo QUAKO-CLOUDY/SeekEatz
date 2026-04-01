@@ -27,7 +27,7 @@ export function AnimatedNumber({
   const text =
     displayValue ??
     (showOverWhenNegative && isNegative
-      ? `${absValue}${suffix ? suffix + ' ' : ''}over`
+      ? `${absValue}${suffix}${suffix ? ' ' : ' '}over`
       : `${isNegative ? '-' : ''}${absValue}${suffix}`);
 
   return (

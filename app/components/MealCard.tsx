@@ -102,21 +102,32 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
       return { firstLine: "Unknown", secondLine: null as string | null };
     }
 
-    if (normalized.length <= 11) {
+    const maxCharsPerLine = 12;
+
+    if (normalized.length <= maxCharsPerLine) {
       return { firstLine: normalized, secondLine: null as string | null };
     }
 
     const words = normalized.split(' ');
     if (words.length === 1) {
-      return { firstLine: normalized.slice(0, 11), secondLine: normalized.slice(11) || null };
+      return { firstLine: normalized, secondLine: null as string | null };
     }
 
-    const midpoint = Math.ceil(words.length / 2);
-    const firstLine = words.slice(0, midpoint).join(' ');
-    const secondLine = words.slice(midpoint).join(' ');
+    let firstLine = "";
+    let secondLine = "";
+
+    for (const word of words) {
+      const nextFirstLine = firstLine ? `${firstLine} ${word}` : word;
+      if (nextFirstLine.length <= maxCharsPerLine || !firstLine) {
+        firstLine = nextFirstLine;
+        continue;
+      }
+
+      secondLine = secondLine ? `${secondLine} ${word}` : word;
+    }
 
     return {
-      firstLine: secondLine ? `${firstLine} -` : firstLine,
+      firstLine,
       secondLine: secondLine || null,
     };
   }, [restaurantName]);
@@ -176,16 +187,16 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
 
             {/* Restaurant */}
             <div className="w-[76px] flex-shrink-0">
-              <p className="text-[9px] font-medium uppercase leading-[1.05] tracking-[0.08em] text-muted-foreground">
-                <span className="block truncate">{compactRestaurantLabel.firstLine}</span>
+              <p className={`text-[9px] font-medium uppercase leading-[1.05] tracking-[0.08em] text-muted-foreground ${compactRestaurantLabel.secondLine ? '' : 'text-center'}`}>
+                <span className="block whitespace-normal break-normal">{compactRestaurantLabel.firstLine}</span>
                 {compactRestaurantLabel.secondLine && (
-                  <span className="mt-0.5 block truncate">{compactRestaurantLabel.secondLine}</span>
+                  <span className="mt-0.5 block whitespace-normal break-normal">{compactRestaurantLabel.secondLine}</span>
                 )}
               </p>
             </div>
 
             {/* Right - Nutritional Boxes */}
-            <div className="flex flex-shrink-0 items-center gap-1 pr-7">
+            <div className="ml-0.5 flex flex-shrink-0 items-center gap-1 pr-7">
             {/* Calories */}
             <div className="min-w-[42px] rounded-lg bg-pink-100 px-1.5 py-1 text-center dark:bg-pink-900/30">
               <p className="text-pink-600 dark:text-pink-400 font-bold text-[10px] leading-tight">
@@ -344,7 +355,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
           </div>
         </div>
 
-        <div className="mt-auto grid grid-cols-4 gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
+        <div className="mt-auto ml-0.5 grid grid-cols-4 gap-1.5 sm:ml-1 sm:gap-2 text-[10px] sm:text-xs">
           <div className="bg-gradient-to-br from-pink-500/20 to-rose-500/20 rounded-md p-2 text-center border border-pink-500/30">
             <div className="flex items-center justify-center mb-1">
               <Flame className="w-3 h-3 text-pink-400" />

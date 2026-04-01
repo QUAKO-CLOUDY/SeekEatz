@@ -1,834 +1,1325 @@
-
 {
     "restaurant_name": "The Original Pancake House",
     "items": [
-    {
-    "name": "Buttermilk Pancakes (6)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 970,
-    "protein": 16,
-    "carbs": 166,
-    "fat": 27
-    }
-    },
-    {
-    "name": "Buttermilk Pancakes (3)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 690,
-    "protein": 8,
-    "carbs": 118,
-    "fat": 21
-    }
-    },
-    {
-    "name": "Bacon Pancakes (6)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1120,
-    "protein": 27,
-    "carbs": 166,
-    "fat": 38
-    }
-    },
-    {
-    "name": "Bacon Pancakes (3)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 770,
-    "protein": 14,
-    "carbs": 118,
-    "fat": 26
-    }
-    },
-    {
-    "name": "Pecan Pancakes (6)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1730,
-    "protein": 26,
-    "carbs": 183,
-    "fat": 105
-    }
-    },
-    {
-    "name": "Pecan Pancakes (3)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1360,
-    "protein": 17,
-    "carbs": 133,
-    "fat": 89
-    }
-    },
-    {
-    "name": "Blueberry Pancakes (6)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1050,
-    "protein": 17,
-    "carbs": 158,
-    "fat": 42
-    }
-    },
-    {
-    "name": "Blueberry Pancakes (3)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 770,
-    "protein": 9,
-    "carbs": 110,
-    "fat": 36
-    }
-    },
-    {
-    "name": "Fresh Banana Pancakes (8)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1220,
-    "protein": 18,
-    "carbs": 213,
-    "fat": 42
-    }
-    },
-    {
-    "name": "Fresh Banana Pancakes (4)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 810,
-    "protein": 9,
-    "carbs": 142,
-    "fat": 28
-    }
-    },
-    {
-    "name": "Chocolate Chip Pancakes (6)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1600,
-    "protein": 21,
-    "carbs": 243,
-    "fat": 66
-    }
-    },
-    {
-    "name": "Chocolate Chip Pancakes (3)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1010,
-    "protein": 11,
-    "carbs": 157,
-    "fat": 40
-    }
-    },
-    {
-    "name": "Fresh Strawberry Pancakes (6)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1170,
-    "protein": 17,
-    "carbs": 192,
-    "fat": 41
-    }
-    },
-    {
-    "name": "Fresh Strawberry Pancakes (3)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 840,
-    "protein": 9,
-    "carbs": 143,
-    "fat": 28
-    }
-    },
-    {
-    "name": "Gluten-Free Ancient Grains Pancakes (6)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 620,
-    "protein": 5,
-    "carbs": 101,
-    "fat": 20
-    }
-    },
-    {
-    "name": "Gluten-Free Ancient Grains Pancakes (3)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 520,
-    "protein": 2,
-    "carbs": 86,
-    "fat": 17
-    }
-    },
-    {
-    "name": "Buckwheat Pancakes (6)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 970,
-    "protein": 16,
-    "carbs": 182,
-    "fat": 23
-    }
-    },
-    {
-    "name": "Buckwheat Pancakes (3)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 690,
-    "protein": 8,
-    "carbs": 126,
-    "fat": 19
-    }
-    },
-    {
-    "name": "Steak & Eggs with Wheat Toast",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 2180,
-    "protein": 80,
-    "carbs": 220,
-    "fat": 108
-    }
-    },
-    {
-    "name": "Steak & Eggs with White Toast",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 2200,
-    "protein": 80,
-    "carbs": 228,
-    "fat": 108
-    }
-    },
-    {
-    "name": "Steak & Eggs with Rye Toast",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 2180,
-    "protein": 80,
-    "carbs": 218,
-    "fat": 108
-    }
-    },
-    {
-    "name": "Steak & Eggs with Sourdough Toast",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 2190,
-    "protein": 80,
-    "carbs": 222,
-    "fat": 108
-    }
-    },
-    {
-    "name": "Sausage & Eggs Scrambled",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1370,
-    "protein": 49,
-    "carbs": 121,
-    "fat": 75
-    }
-    },
-    {
-    "name": "Sausage & Eggs Poached",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1110,
-    "protein": 49,
-    "carbs": 121,
-    "fat": 71
-    }
-    },
-    {
-    "name": "Links & Eggs Scrambled",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1850,
-    "protein": 45,
-    "carbs": 121,
-    "fat": 131
-    }
-    },
-    {
-    "name": "Ham & Eggs Scrambled",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1050,
-    "protein": 41,
-    "carbs": 123,
-    "fat": 42
-    }
-    },
-    {
-    "name": "Canadian Bacon & Eggs Scrambled",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1050,
-    "protein": 39,
-    "carbs": 121,
-    "fat": 44
-    }
-    },
-    {
-    "name": "Bacon Steak & Eggs Basted",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1020,
-    "protein": 33,
-    "carbs": 119,
-    "fat": 44
-    }
-    },
-    {
-    "name": "Classic Eggs Benedict",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 710,
-    "protein": 33,
-    "carbs": 36,
-    "fat": 48
-    }
-    },
-    {
-    "name": "Hacienda Benedict",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1220,
-    "protein": 43,
-    "carbs": 47,
-    "fat": 94
-    }
-    },
-    {
-    "name": "Country Style Benedict",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1500,
-    "protein": 70,
-    "carbs": 71,
-    "fat": 101
-    }
-    },
-    {
-    "name": "Sausage & Cheese Omelette",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 2120,
-    "protein": 69,
-    "carbs": 122,
-    "fat": 149
-    }
-    },
-    {
-    "name": "Chorizo & Cheese Omelette",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1860,
-    "protein": 53,
-    "carbs": 125,
-    "fat": 126
-    }
-    },
-    {
-    "name": "Mediterranean Omelette",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1690,
-    "protein": 41,
-    "carbs": 127,
-    "fat": 111
-    }
-    },
-    {
-    "name": "Fiesta Cheddar Omelette",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 2170,
-    "protein": 76,
-    "carbs": 127,
-    "fat": 148
-    }
-    },
-    {
-    "name": "Spinach, Cheddar and Mushroom Omelette",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1730,
-    "protein": 47,
-    "carbs": 123,
-    "fat": 115
-    }
-    },
-    {
-    "name": "Healthy Lifestyle Omelette",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1090,
-    "protein": 35,
-    "carbs": 133,
-    "fat": 47
-    }
-    },
-    {
-    "name": "Meat Lover's Omelette",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 2130,
-    "protein": 76,
-    "carbs": 125,
-    "fat": 145
-    }
-    },
-    {
-    "name": "Philly Meat Omelette",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 2100,
-    "protein": 85,
-    "carbs": 124,
-    "fat": 137
-    }
-    },
-    {
-    "name": "Ol'Reliable BLT-Sourdough Sandwich",
-    "category": "Sandwich",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 560,
-    "protein": 18,
-    "carbs": 56,
-    "fat": 29
-    }
-    },
-    {
-    "name": "Grilled Ham & Cheese Sourdough",
-    "category": "Sandwich",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 920,
-    "protein": 51,
-    "carbs": 61,
-    "fat": 54
-    }
-    },
-    {
-    "name": "Turkey Avocado Wrap Sandwich",
-    "category": "Sandwich",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 910,
-    "protein": 52,
-    "carbs": 70,
-    "fat": 47
-    }
-    },
-    {
-    "name": "Chicken Salad Sandwich",
-    "category": "Sandwich",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 350,
-    "protein": 14,
-    "carbs": 55,
-    "fat": 9
-    }
-    },
-    {
-    "name": "Create-A-Club Ham Sandwich (Wheat)",
-    "category": "Sandwich",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1090,
-    "protein": 54,
-    "carbs": 86,
-    "fat": 59
-    }
-    },
-    {
-    "name": "Create-A-Club Turkey Sandwich (Wheat)",
-    "category": "Sandwich",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1070,
-    "protein": 54,
-    "carbs": 86,
-    "fat": 57
-    }
-    },
-    {
-    "name": "Grilled Chicken Breast Sandwich",
-    "category": "Sandwich",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1060,
-    "protein": 53,
-    "carbs": 91,
-    "fat": 51
-    }
-    },
-    {
-    "name": "Old-Fashioned Cheeseburger",
-    "category": "Sandwich",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1670,
-    "protein": 62,
-    "carbs": 99,
-    "fat": 112
-    }
-    },
-    {
-    "name": "Classic Patty Melt",
-    "category": "Sandwich",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1580,
-    "protein": 77,
-    "carbs": 66,
-    "fat": 112
-    }
-    },
-    {
-    "name": "New York Reuben",
-    "category": "Sandwich",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 1070,
-    "protein": 65,
-    "carbs": 60,
-    "fat": 66
-    }
-    },
-    {
-    "name": "Philly Cheese Steak Sandwich",
-    "category": "Sandwich",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 870,
-    "protein": 60,
-    "carbs": 40,
-    "fat": 50
-    }
-    },
-    {
-    "name": "Classic Waffle",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 770,
-    "protein": 4,
-    "carbs": 90,
-    "fat": 15
-    }
-    },
-    {
-    "name": "Strawberry Waffle",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 970,
-    "protein": 9,
-    "carbs": 130,
-    "fat": 42
-    }
-    },
-    {
-    "name": "Bacon Waffle",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 890,
-    "protein": 16,
-    "carbs": 118,
-    "fat": 39
-    }
-    },
-    {
-    "name": "French Toast",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 910,
-    "protein": 4,
-    "carbs": 130,
-    "fat": 57
-    }
-    },
-    {
-    "name": "Avocado Toast and Vital Farms Eggs",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 680,
-    "protein": 32,
-    "carbs": 67,
-    "fat": 33
-    }
-    },
-    {
-    "name": "Loaded Oatmeal",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 411,
-    "protein": 8,
-    "carbs": 55,
-    "fat": 19
-    }
-    },
-    {
-    "name": "PH Greek Yogurt",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 533,
-    "protein": 11,
-    "carbs": 81,
-    "fat": 19
-    }
-    },
-    {
-    "name": "PH Chicken Quesadilla",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 840,
-    "protein": 72,
-    "carbs": 80,
-    "fat": 25
-    }
-    },
-    {
-    "name": "PH Breakfast Burrito",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 957,
-    "protein": 80,
-    "carbs": 71,
-    "fat": 38
-    }
-    },
-    {
-    "name": "PH Hash",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 625,
-    "protein": 45,
-    "carbs": 53,
-    "fat": 25
-    }
-    },
-    {
-    "name": "Maplehouse Sandwich 1 Egg",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 860,
-    "protein": 31,
-    "carbs": 92,
-    "fat": 41
-    }
-    },
-    {
-    "name": "Maplehouse Sandwich 2 Eggs",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 940,
-    "protein": 38,
-    "carbs": 93,
-    "fat": 47
-    }
-    },
-    {
-    "name": "Berry Bliss Smoothie (16 oz)",
-    "category": "Smoothie",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 390,
-    "protein": 2,
-    "carbs": 92,
-    "fat": 2
-    }
-    },
-    {
-    "name": "Sunset Paradise Smoothie (16 oz)",
-    "category": "Smoothie",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 400,
-    "protein": 2,
-    "carbs": 93,
-    "fat": 2
-    }
-    },
-    {
-    "name": "Chocolate Banana Smoothie (16 oz)",
-    "category": "Smoothie",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 370,
-    "protein": 12,
-    "carbs": 66,
-    "fat": 7
-    }
-    },
-    {
-    "name": "Strawberry & Banana Smoothie (16 oz)",
-    "category": "Smoothie",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 420,
-    "protein": 3,
-    "carbs": 97,
-    "fat": 2
-    }
-    },
-    {
-    "name": "1000 Island Dressing",
-    "category": "Dressing",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 360,
-    "protein": 0,
-    "carbs": 15,
-    "fat": 33
-    }
-    },
-    {
-    "name": "Golden Italian Dressing",
-    "category": "Dressing",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 270,
-    "protein": 0,
-    "carbs": 9,
-    "fat": 27
-    }
-    },
-    {
-    "name": "Ranch Dressing",
-    "category": "Dressing",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 330,
-    "protein": 1,
-    "carbs": 6,
-    "fat": 33
-    }
-    }
+      {
+        "name": "Buttermilk Pancakes (six 4-inch)",
+        "category": "PANCAKES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 970,
+          "protein": 16,
+          "carbs": 166,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Buttermilk Pancakes (small portion (3))",
+        "category": "PANCAKES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 690,
+          "protein": 8,
+          "carbs": 118,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Bacon Pancakes (six 4-inch)",
+        "category": "PANCAKES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1120,
+          "protein": 27,
+          "carbs": 166,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Bacon Pancakes (small portion (3))",
+        "category": "PANCAKES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 770,
+          "protein": 14,
+          "carbs": 118,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Pecan Pancakes (six 4-inch)",
+        "category": "PANCAKES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1730,
+          "protein": 26,
+          "carbs": 183,
+          "fat": 105
+        }
+      },
+      {
+        "name": "Pecan Pancakes (small portion (3))",
+        "category": "PANCAKES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1360,
+          "protein": 17,
+          "carbs": 133,
+          "fat": 89
+        }
+      },
+      {
+        "name": "Blueberry Pancakes (six 4-inch)",
+        "category": "PANCAKES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1050,
+          "protein": 17,
+          "carbs": 158,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Blueberry Pancakes (small portion (3))",
+        "category": "PANCAKES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 770,
+          "protein": 9,
+          "carbs": 110,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Fresh Banana Pancakes (eight 3-inch)",
+        "category": "PANCAKES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1220,
+          "protein": 18,
+          "carbs": 213,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Fresh Banana Pancakes (small portion (4))",
+        "category": "PANCAKES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 810,
+          "protein": 9,
+          "carbs": 142,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Chocolate Chip Pancakes (six 4-inch)",
+        "category": "PANCAKES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1600,
+          "protein": 21,
+          "carbs": 243,
+          "fat": 66
+        }
+      },
+      {
+        "name": "Chocolate Chip Pancakes (small portion (3))",
+        "category": "PANCAKES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1010,
+          "protein": 11,
+          "carbs": 157,
+          "fat": 40
+        }
+      },
+      {
+        "name": "Fresh Strawberry Pancakes (six 4-inch)",
+        "category": "PANCAKES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1170,
+          "protein": 17,
+          "carbs": 192,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Fresh Strawberry Pancakes (small portion (3))",
+        "category": "PANCAKES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 840,
+          "protein": 9,
+          "carbs": 143,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Gluten-Free Ancient Grains (six 4-inch)",
+        "category": "Specialties",
+        "price_estimate": null,
+        "macros": {
+          "calories": 620,
+          "protein": 5,
+          "carbs": 101,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Gluten-Free Ancient Grains (small portion)",
+        "category": "Specialties",
+        "price_estimate": null,
+        "macros": {
+          "calories": 520,
+          "protein": 2,
+          "carbs": 86,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Buckwheat Pancakes (six 4-inch)",
+        "category": "Specialties",
+        "price_estimate": null,
+        "macros": {
+          "calories": 970,
+          "protein": 16,
+          "carbs": 182,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Buckwheat Pancakes (small portion (3))",
+        "category": "Specialties",
+        "price_estimate": null,
+        "macros": {
+          "calories": 690,
+          "protein": 8,
+          "carbs": 126,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Steak + Eggs (w/white)",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 2200,
+          "protein": 80,
+          "carbs": 228,
+          "fat": 108
+        }
+      },
+      {
+        "name": "Sausage + Eggs (regular portion scrambled)",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1370,
+          "protein": 49,
+          "carbs": 121,
+          "fat": 75
+        }
+      },
+      {
+        "name": "Sausage + Eggs (small portion scrambled)",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 870,
+          "protein": 24,
+          "carbs": 79,
+          "fat": 50
+        }
+      },
+      {
+        "name": "Links + Eggs (regular scrambled)",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1850,
+          "protein": 45,
+          "carbs": 121,
+          "fat": 131
+        }
+      },
+      {
+        "name": "Links + Eggs (small portion scrambled)",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1270,
+          "protein": 26,
+          "carbs": 78,
+          "fat": 90
+        }
+      },
+      {
+        "name": "Ham + Eggs (regular portion scrambled)",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1050,
+          "protein": 41,
+          "carbs": 123,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Ham + Eggs (small portion scrambled)",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1050,
+          "protein": 41,
+          "carbs": 123,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Diced Ham + Eggs (regular scrambled)",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1210,
+          "protein": 53,
+          "carbs": 123,
+          "fat": 53
+        }
+      },
+      {
+        "name": "Diced Ham + Eggs (small portion scrambled)",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 950,
+          "protein": 31,
+          "carbs": 80,
+          "fat": 37
+        }
+      },
+      {
+        "name": "Canadian Bacon + Eggs (regular portion scrambled)",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1050,
+          "protein": 39,
+          "carbs": 121,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Canadian Bacon + Eggs (small portion scrambled)",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 870,
+          "protein": 24,
+          "carbs": 79,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Bacon Steak + Eggs (regular portion scrambled)",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1020,
+          "protein": 33,
+          "carbs": 119,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Ham Steak (4 oz)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 20,
+          "carbs": 4,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Canadian Bacon (2 slices/2 oz)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 9,
+          "carbs": 0,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Canadian Bacon (4 slices)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 18,
+          "carbs": 0,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Bacon (2 slices)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 6,
+          "carbs": 0,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Bacon (3 slices)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 9,
+          "carbs": 0,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Bacon (4 slices)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 12,
+          "carbs": 0,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Turkey Bacon (2 slices)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 12,
+          "carbs": 0,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Turkey Bacon (4 slices)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 24,
+          "carbs": 0,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Chorizo Patty (1 ea)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 230,
+          "protein": 13,
+          "carbs": 0,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Chorizo Patty (2 ea)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 460,
+          "protein": 24,
+          "carbs": 0,
+          "fat": 37
+        }
+      },
+      {
+        "name": "Sausage Patty (1 ea)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 14,
+          "carbs": 0,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Sausage Patty (2 ea)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 490,
+          "protein": 28,
+          "carbs": 0,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Sausage Links (2 ea)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 12,
+          "carbs": 0,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Sausage Links (4 ea)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 490,
+          "protein": 24,
+          "carbs": 0,
+          "fat": 48
+        }
+      },
+      {
+        "name": "Turkey Sausage Links (2 ea)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 10,
+          "carbs": 0,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Turkey Sausage Links (4 ea)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 280,
+          "protein": 20,
+          "carbs": 0,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Hamburger Patty (1 patty)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 590,
+          "protein": 39,
+          "carbs": 1,
+          "fat": 46
+        }
+      },
+      {
+        "name": "Steak (10 oz)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 780,
+          "protein": 50,
+          "carbs": 1,
+          "fat": 63
+        }
+      },
+      {
+        "name": "Grilled Chicken Breast (1 breast)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 220,
+          "protein": 45,
+          "carbs": 1,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Corned Beef Hash (5 oz)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 15,
+          "carbs": 12,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Corned Beef Hash (10 oz)",
+        "category": "SIDES Meats",
+        "price_estimate": null,
+        "macros": {
+          "calories": 260,
+          "protein": 30,
+          "carbs": 24,
+          "fat": 5
+        }
+      },
+      {
+        "name": "English Muffin + Preserves",
+        "category": "SIDES Other",
+        "price_estimate": null,
+        "macros": {
+          "calories": 340,
+          "protein": 4,
+          "carbs": 64,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Biscuit + Preserves",
+        "category": "SIDES Other",
+        "price_estimate": null,
+        "macros": {
+          "calories": 600,
+          "protein": 9,
+          "carbs": 89,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Tortillas, corn (3 ea)",
+        "category": "SIDES Other",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 3,
+          "carbs": 33,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Tortillas, flour (3 ea)",
+        "category": "SIDES Other",
+        "price_estimate": null,
+        "macros": {
+          "calories": 270,
+          "protein": 9,
+          "carbs": 45,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Waffle Classic",
+        "category": "WAFFLES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 770,
+          "protein": 16,
+          "carbs": 90,
+          "fat": 39
+        }
+      },
+      {
+        "name": "Waffle Strawberry",
+        "category": "WAFFLES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 970,
+          "protein": 17,
+          "carbs": 130,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Waffle Blueberry",
+        "category": "WAFFLES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 850,
+          "protein": 16,
+          "carbs": 128,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Waffle Bacon",
+        "category": "WAFFLES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 890,
+          "protein": 16,
+          "carbs": 128,
+          "fat": 39
+        }
+      },
+      {
+        "name": "Waffle Pecan",
+        "category": "WAFFLES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1160,
+          "protein": 22,
+          "carbs": 136,
+          "fat": 69
+        }
+      },
+      {
+        "name": "Coffee Maple Banana Waffle",
+        "category": "WAFFLES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1270,
+          "protein": 15,
+          "carbs": 135,
+          "fat": 78
+        }
+      },
+      {
+        "name": "Liege Waffle-Classic",
+        "category": "WAFFLES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1140,
+          "protein": 9,
+          "carbs": 136,
+          "fat": 51
+        }
+      },
+      {
+        "name": "Strawberry Nutella Liege Waffle",
+        "category": "WAFFLES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1140,
+          "protein": 14,
+          "carbs": 117,
+          "fat": 70
+        }
+      },
+      {
+        "name": "Gluten-Free Classic Waffle",
+        "category": "WAFFLES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 530,
+          "protein": 7,
+          "carbs": 86,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Gluten-Free Strawberry Waffle",
+        "category": "WAFFLES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 720,
+          "protein": 11,
+          "carbs": 113,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Gluten-Free Blueberry Waffle",
+        "category": "WAFFLES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 600,
+          "protein": 7,
+          "carbs": 104,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Gluten-Free Bacon Waffle",
+        "category": "WAFFLES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 640,
+          "protein": 11,
+          "carbs": 87,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Gluten-Free Pecan Waffle",
+        "category": "WAFFLES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 910,
+          "protein": 11,
+          "carbs": 95,
+          "fat": 57
+        }
+      },
+      {
+        "name": "Classic Eggs Benedict",
+        "category": "BENEDICTS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 710,
+          "protein": 33,
+          "carbs": 36,
+          "fat": 48
+        }
+      },
+      {
+        "name": "Hacienda Benedict",
+        "category": "BENEDICTS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1220,
+          "protein": 43,
+          "carbs": 47,
+          "fat": 94
+        }
+      },
+      {
+        "name": "Country Style Benedict",
+        "category": "BENEDICTS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1500,
+          "protein": 70,
+          "carbs": 71,
+          "fat": 101
+        }
+      },
+      {
+        "name": "Sausage + Cheese Omelette",
+        "category": "OMELETTES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 2120,
+          "protein": 69,
+          "carbs": 122,
+          "fat": 149
+        }
+      },
+      {
+        "name": "Chorizo + Cheese Omelette",
+        "category": "OMELETTES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1860,
+          "protein": 69,
+          "carbs": 125,
+          "fat": 126
+        }
+      },
+      {
+        "name": "Mediterranean Omelette",
+        "category": "OMELETTES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1690,
+          "protein": 94,
+          "carbs": 123,
+          "fat": 111
+        }
+      },
+      {
+        "name": "Fiesta Omelette (with bacon)",
+        "category": "OMELETTES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1730,
+          "protein": 81,
+          "carbs": 127,
+          "fat": 115
+        }
+      },
+      {
+        "name": "Spinach, Cheddar and Mushroom Omelette",
+        "category": "OMELETTES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1730,
+          "protein": 81,
+          "carbs": 123,
+          "fat": 115
+        }
+      },
+      {
+        "name": "Healthy Lifestyle Omelette (w/buckwheat pancakes)",
+        "category": "OMELETTES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1690,
+          "protein": 94,
+          "carbs": 123,
+          "fat": 111
+        }
+      },
+      {
+        "name": "Meat Lover's Omelette",
+        "category": "OMELETTES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 2130,
+          "protein": 81,
+          "carbs": 125,
+          "fat": 145
+        }
+      },
+      {
+        "name": "Philly Meat Omelette",
+        "category": "OMELETTES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 2100,
+          "protein": 85,
+          "carbs": 133,
+          "fat": 137
+        }
+      },
+      {
+        "name": "Ol' Reliable BLT-Sourdough Sandwich",
+        "category": "SANDWICHES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 560,
+          "protein": 18,
+          "carbs": 56,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Grilled Ham + Cheese-sourdough Sandwich",
+        "category": "SANDWICHES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 920,
+          "protein": 41,
+          "carbs": 61,
+          "fat": 54
+        }
+      },
+      {
+        "name": "Turkey Avocado Wrap -sandwich",
+        "category": "SANDWICHES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 810,
+          "protein": 35,
+          "carbs": 61,
+          "fat": 47
+        }
+      },
+      {
+        "name": "Chicken Salad Sandwich-sourdough",
+        "category": "SANDWICHES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 350,
+          "protein": 14,
+          "carbs": 55,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Create-A-Club-Ham-Wheat",
+        "category": "Our Really Big Create-A-Club",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1090,
+          "protein": 53,
+          "carbs": 86,
+          "fat": 59
+        }
+      },
+      {
+        "name": "Create-A-Club-Turkey-Wheat",
+        "category": "Our Really Big Create-A-Club",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1070,
+          "protein": 54,
+          "carbs": 86,
+          "fat": 52
+        }
+      },
+      {
+        "name": "Grilled Chicken Breast Sandwich",
+        "category": "Other Sandwiches",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1060,
+          "protein": 53,
+          "carbs": 91,
+          "fat": 51
+        }
+      },
+      {
+        "name": "Old-Fashioned Cheeseburger",
+        "category": "Other Sandwiches",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1070,
+          "protein": 62,
+          "carbs": 99,
+          "fat": 112
+        }
+      },
+      {
+        "name": "Classic Patty Melt",
+        "category": "Other Sandwiches",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1580,
+          "protein": 77,
+          "carbs": 66,
+          "fat": 112
+        }
+      },
+      {
+        "name": "New York Reuben",
+        "category": "Other Sandwiches",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1070,
+          "protein": 65,
+          "carbs": 60,
+          "fat": 66
+        }
+      },
+      {
+        "name": "Philly Cheese Steak Sandwich (no sides)",
+        "category": "Other Sandwiches",
+        "price_estimate": null,
+        "macros": {
+          "calories": 870,
+          "protein": 60,
+          "carbs": 65,
+          "fat": 50
+        }
+      },
+      {
+        "name": "Homestyle Potatoes (3/4 cup)",
+        "category": "Sandwich Sides",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 2,
+          "carbs": 25,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Potato Chips, ridged (1 oz)",
+        "category": "Sandwich Sides",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 2,
+          "carbs": 14,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Kettle Chips (1.5 oz bag)",
+        "category": "Sandwich Sides",
+        "price_estimate": null,
+        "macros": {
+          "calories": 220,
+          "protein": 3,
+          "carbs": 25,
+          "fat": 117
+        }
+      },
+      {
+        "name": "Side Salad (half house salad)",
+        "category": "Sandwich Sides",
+        "price_estimate": null,
+        "macros": {
+          "calories": 200,
+          "protein": 4,
+          "carbs": 18,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Soup-Chicken Tortilla (cup)",
+        "category": "Sandwich Sides",
+        "price_estimate": null,
+        "macros": {
+          "calories": 270,
+          "protein": 24,
+          "carbs": 20,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Soup-Chili (cup)",
+        "category": "Sandwich Sides",
+        "price_estimate": null,
+        "macros": {
+          "calories": 200,
+          "protein": 10,
+          "carbs": 21,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Ol' Reliable BLT-Sourdough (Half portion)",
+        "category": "HALF + HALF",
+        "price_estimate": null,
+        "macros": {
+          "calories": 290,
+          "protein": 9,
+          "carbs": 30,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Chicken Salad Sandwich-sourdough (Half portion)",
+        "category": "HALF + HALF",
+        "price_estimate": null,
+        "macros": {
+          "calories": 180,
+          "protein": 7,
+          "carbs": 29,
+          "fat": 4.5
+        }
+      },
+      {
+        "name": "Create-A-Club-Ham-Wheat (Half portion)",
+        "category": "HALF + HALF",
+        "price_estimate": null,
+        "macros": {
+          "calories": 540,
+          "protein": 27,
+          "carbs": 43,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Create-A-Club-Turkey-Wheat (Half portion)",
+        "category": "HALF + HALF",
+        "price_estimate": null,
+        "macros": {
+          "calories": 540,
+          "protein": 27,
+          "carbs": 43,
+          "fat": 29
+        }
+      },
+      {
+        "name": "ham add-on (3.5 oz)",
+        "category": "RANGE-Add-Ons",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 18,
+          "carbs": 4,
+          "fat": 3.5
+        }
+      },
+      {
+        "name": "turkey add-on (3.5 oz)",
+        "category": "RANGE-Add-Ons",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 18,
+          "carbs": 4,
+          "fat": 2
+        }
+      },
+      {
+        "name": "chicken add-on (1 breast)",
+        "category": "RANGE-Add-Ons",
+        "price_estimate": null,
+        "macros": {
+          "calories": 220,
+          "protein": 45,
+          "carbs": 1,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "1000 Island Dressing (3 fl oz)",
+        "category": "Dressings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 0,
+          "carbs": 15,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Golden Italian Dressing (3 fl oz)",
+        "category": "Dressings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 320,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Light Italian Dressing (3 fl oz)",
+        "category": "Dressings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Ranch Dressing (3 fl oz)",
+        "category": "Dressings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 330,
+          "protein": 1,
+          "carbs": 3,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Honey Mustard Dressing (3 fl oz)",
+        "category": "Dressings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 450,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 42
+        }
+      },
+      {
+        "name": "1 Egg (scrambled)",
+        "category": "OTHER",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 6,
+          "carbs": 0,
+          "fat": 6
+        }
+      },
+      {
+        "name": "2 Eggs (scrambled)",
+        "category": "OTHER",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 13,
+          "carbs": 0,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Avocado Toast and Vital Farms Eggs",
+        "category": "OTHER",
+        "price_estimate": null,
+        "macros": {
+          "calories": 680,
+          "protein": 32,
+          "carbs": 67,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Bacon Lovers (3 eggs, 6 bacon, 3 pancakes) - basted/over easy-med-hard/up",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1170,
+          "protein": 45,
+          "carbs": 119,
+          "fat": 55
+        }
+      },
+      {
+        "name": "Bacon Lovers (3 eggs, 6 bacon, 3 pancakes) - boiled/poached",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1150,
+          "protein": 45,
+          "carbs": 119,
+          "fat": 53
+        }
+      },
+      {
+        "name": "Bacon Lovers (3 eggs, 6 bacon, 3 pancakes) - scrambled",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1190,
+          "protein": 45,
+          "carbs": 119,
+          "fat": 58
+        }
+      },
+      {
+        "name": "Bacon + Eggs (2 eggs, 4 bacon, 3 pancakes) - basted/over easy-med-hard/up",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1020,
+          "protein": 33,
+          "carbs": 119,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Bacon + Eggs (2 eggs, 4 bacon, 3 pancakes) - boiled/poached",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1000,
+          "protein": 33,
+          "carbs": 119,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Bacon + Eggs (2 eggs, 4 bacon, 3 pancakes) - scrambled",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1040,
+          "protein": 33,
+          "carbs": 119,
+          "fat": 47
+        }
+      },
+      {
+        "name": "Bacon + Eggs (small portion) - (1 egg, 2 bacon, 3 pancakes) - basted/over easy-med-hard/up",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 860,
+          "protein": 20,
+          "carbs": 118,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Bacon + Eggs (small portion) - (1 egg, 2 bacon, 3 pancakes) - boiled/poached",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 840,
+          "protein": 20,
+          "carbs": 118,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Bacon + Eggs (small portion) - (1 egg, 2 bacon, 3 pancakes) - scrambled",
+        "category": "TRADITIONAL FAVORITES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 870,
+          "protein": 20,
+          "carbs": 118,
+          "fat": 34
+        }
+      }
     ]
-    }
+}

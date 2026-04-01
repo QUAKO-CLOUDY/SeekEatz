@@ -89,8 +89,11 @@ export function inferDishType(mealName: string): DishType {
     return 'pasta';
   }
 
-  // breakfast: breakfast, pancake, waffle, omelet
-  if (/\b(breakfast|pancake|pancakes|waffle|waffles|omelet|omelette|scrambled eggs)\b/i.test(lowerName)) {
+  // breakfast: breakfast, pancakes, waffles, benedicts, egg plates
+  if (
+    /\b(breakfast|pancake|pancakes|waffle|waffles|french toast|omelet|omelette|scrambled eggs|benedict|frittata)\b/i.test(lowerName) ||
+    /\b[a-z][a-z\s]*\+\s*eggs?\b/i.test(lowerName)
+  ) {
     return 'breakfast';
   }
 

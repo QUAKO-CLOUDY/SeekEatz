@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 import { type MacroGoals } from '@/utils/swap-rule-engine';
-import { getModifierCandidates } from '@/utils/modifier-candidates';
+import { filterModifierCandidatesForMeal, getModifierCandidates } from '@/utils/modifier-candidates';
 import { normalizeMacros } from '@/lib/macro-utils';
 import { generateHybridSwaps } from '@/utils/hybrid-swap-generator';
 /**
@@ -38,13 +38,16 @@ export async function POST(req: Request) {
 
     // ========== PRIMARY: Hybrid Swap Engine v2 ==========
     // Step 1: Fetch modifier candidates from DB (same restaurant only)
-    const modifierCandidates = await getModifierCandidates(supabase, restaurant_name);
+    const restaurantModifierCandidates = await getModifierCandidates(supabase, restaurant_name);
+    const modifierCandidates = filterModifierCandidatesForMeal(meal_name, restaurantModifierCandidates);
 
     // Log in dev
     if (process.env.NODE_ENV === 'development') {
       console.log('[swaps] Modifier candidates:', {
         restaurant_name,
-        count: modifierCandidates.length,
+        meal_name,
+        restaurantWideCount: restaurantModifierCandidates.length,
+        mealScopedCount: modifierCandidates.length,
         sampleNames: modifierCandidates.slice(0, 5).map(c => c.name),
       });
     }

@@ -1,8 +1,8 @@
 'use client';
 
-import { Send, Copy, AlertCircle, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { Send, Copy, AlertCircle, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { MealCard } from "./MealCard";
 import type { Meal } from "../types";
@@ -56,6 +56,82 @@ interface ActiveQuickPromptState {
   promptText: string;
   startIndex: number;
   context?: QuickPromptSearchContext;
+}
+
+const CHAT_MEALS_PAGE_SIZE = 5;
+const APPENDED_MEALS_DIVIDER_LABEL = "More meals";
+
+function getChatGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return "Good morning";
+  if (hour >= 12 && hour < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+function getTimeOfDayBucket(hour: number): "morning" | "afternoon" | "evening" {
+  if (hour >= 5 && hour < 12) return "morning";
+  if (hour >= 12 && hour < 17) return "afternoon";
+  return "evening";
+}
+
+function getFirstName(fullName?: string | null): string | null {
+  const trimmed = fullName?.trim();
+  if (!trimmed) return null;
+  const first = trimmed.split(/\s+/)[0]?.trim();
+  return first || null;
+}
+
+function buildWelcomeMessage(userProfile?: { full_name?: string } | null): string {
+  const firstName = getFirstName(userProfile?.full_name);
+  const intro = firstName
+    ? `${getChatGreeting()}, ${firstName}.`
+    : "Welcome to SeekEatz!";
+  const promptOptions = [
+    "What are you looking for today?",
+    "What do you have in mind?",
+    "What sounds good right now?",
+    "Tell me what you're craving.",
+  ];
+  const rotationSeed = `${new Date().toISOString().slice(0, 10)}:${firstName ?? "guest"}`;
+  const promptIndex = Array.from(rotationSeed).reduce(
+    (sum, char) => sum + char.charCodeAt(0),
+    0
+  ) % promptOptions.length;
+
+  return `${intro} ${promptOptions[promptIndex]}`;
+}
+
+function buildInputPlaceholder(now: Date = new Date()): string {
+  const hour = now.getHours();
+  const bucket = getTimeOfDayBucket(hour);
+  const optionsByBucket: Record<"morning" | "afternoon" | "evening", string[]> = {
+    morning: [
+      "High protein breakfast under 500 calories",
+      "Healthy coffee shop breakfast",
+      "Low carb breakfast near me",
+      "Breakfast with at least 30g protein",
+    ],
+    afternoon: [
+      "High protein lunch under 700 calories",
+      "Healthy lunch near me",
+      "Low carb lunch from Chipotle",
+      "Lunch with at least 40g protein",
+    ],
+    evening: [
+      "High protein dinner under 800 calories",
+      "Healthy dinner near me",
+      "Low calorie takeout for tonight",
+      "Dinner with at least 45g protein",
+    ],
+  };
+  const options = optionsByBucket[bucket];
+  const rotationSeed = `${now.toISOString().slice(0, 13)}:${bucket}`;
+  const promptIndex = Array.from(rotationSeed).reduce(
+    (sum, char) => sum + char.charCodeAt(0),
+    0
+  ) % options.length;
+
+  return options[promptIndex];
 }
 
 function mapSearchItemToMeal(item: any): Meal {
@@ -186,6 +262,15 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const { messages, visibleMealsCount, isLoading, setMessages, setVisibleMealsCount, setIsLoading, clearChat, updateActivity } = useChat();
   // Check if user is signed in (userId prop or check session)
   const [isSignedIn, setIsSignedIn] = useState(!!userId);
+  const [currentHour, setCurrentHour] = useState(() => new Date().getHours());
+  const welcomeMessage = useMemo(
+    () => buildWelcomeMessage(userProfile),
+    [userProfile?.full_name]
+  );
+  const chatPlaceholder = useMemo(
+    () => buildInputPlaceholder(new Date(new Date().setHours(currentHour))),
+    [currentHour]
+  );
   const [isLimitReached, setIsLimitReached] = useState(false); // kept for compatibility, but no longer used for gating
   const [guestQueryCount, setGuestQueryCount] = useState(0);
   const [showPostValueOnboarding, setShowPostValueOnboarding] = useState(false);
@@ -342,9 +427,6 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const [inputText, setInputText] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
-  const chipsContainerRef = useRef<HTMLDivElement>(null);
-  const [showLeftArrow, setShowLeftArrow] = useState(false);
-  const [showRightArrow, setShowRightArrow] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -728,6 +810,15 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     setIsMounted(true);
   }, []);
 
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      const nextHour = new Date().getHours();
+      setCurrentHour((prevHour) => (prevHour === nextHour ? prevHour : nextHour));
+    }, 60_000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
   // Add initial welcome message when chat is first opened (no messages)
   // This will also add it after a chat reset when messages become empty
   useEffect(() => {
@@ -739,11 +830,22 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       const initialMessage: ChatMessage = {
         id: `assistant-initial-${Date.now()}`,
         role: 'assistant',
-        content: 'Welcome to SeekEatz! Search meals by calories, macros, cuisine, resrtaurants or cravings.'
+        content: welcomeMessage
       };
       setMessages([initialMessage]);
     }
-  }, [isMounted, messages.length]);
+  }, [isMounted, messages.length, welcomeMessage]);
+
+  useEffect(() => {
+    if (!isMounted || messages.length !== 1) return;
+
+    const [firstMessage] = messages;
+    if (firstMessage.role !== 'assistant') return;
+    if (!firstMessage.id.startsWith('assistant-initial-')) return;
+    if (firstMessage.content === welcomeMessage) return;
+
+    setMessages([{ ...firstMessage, content: welcomeMessage }]);
+  }, [isMounted, messages, welcomeMessage]);
 
   useEffect(() => {
     if (messages.length === 0) {
@@ -797,35 +899,6 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     }
   }, [isSignedIn]);
 
-  // Check scroll position for arrow visibility
-  const updateArrowVisibility = () => {
-    const container = chipsContainerRef.current;
-    if (!container) return;
-
-    const { scrollLeft, scrollWidth, clientWidth } = container;
-    setShowLeftArrow(scrollLeft > 10);
-    setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10);
-  };
-
-  // Update arrow visibility on mount and resize
-  useEffect(() => {
-    // Initial check after render
-    const timer = setTimeout(() => {
-      updateArrowVisibility();
-    }, 100);
-
-    // Also check on resize
-    const handleResize = () => {
-      setTimeout(() => updateArrowVisibility(), 50);
-    };
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
   // Check if user is at bottom of scroll
   const checkIfAtBottom = () => {
     const container = messagesContainerRef.current;
@@ -853,22 +926,6 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       container.removeEventListener('scroll', checkIfAtBottom);
     };
   }, [messages]);
-
-  // Scroll chips left/right
-  const scrollChips = (direction: 'left' | 'right') => {
-    const container = chipsContainerRef.current;
-    if (!container) return;
-
-    const scrollAmount = 250;
-    const targetScroll = direction === 'left'
-      ? container.scrollLeft - scrollAmount
-      : container.scrollLeft + scrollAmount;
-
-    container.scrollTo({
-      left: targetScroll,
-      behavior: 'smooth'
-    });
-  };
 
   // Check if content contains <MEAL_CARDS> (even partially)
   const hasMealCards = (content: string): boolean => {
@@ -1683,12 +1740,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       // Append new meals to existing ones
       setMessages(prev => prev.map(msg => {
         if (msg.id === messageId && msg.meals) {
-          const diversityHistory = buildMealHistory(prev, messageId);
-          const updatedMeals = diversifyMealsByRestaurant(
-            deduplicateMealsById([...msg.meals, ...newMeals]),
-            undefined,
-            diversityHistory
-          );
+          const updatedMeals = deduplicateMealsById([...msg.meals, ...newMeals]);
 
           // Update visible count to show all meals (including newly loaded ones)
           setVisibleMealsCount(prevCount => ({
@@ -1755,7 +1807,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     <div className={`flex flex-col h-full relative ${isDark ? 'bg-gray-950' : 'bg-gray-50'}`}>
       <div className={`p-4 shadow-sm border-b sticky top-0 z-10 ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
         <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>
-          SeekEatz <span className={`text-xs px-2 py-1 rounded-full align-middle ${isDark ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-600'}`}>Beta</span>
+          SeekEatz <span className={`text-xs px-2 py-1 rounded-full align-middle ${isDark ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-600'}`}>Meal Search Concierge</span>
         </h1>
       </div>
 
@@ -1768,14 +1820,21 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             <div key={m.id} className="mb-4" data-message-id={m.id}>
               {/* Message Bubble */}
               <div className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'} mb-2`}>
-                <div className={`${m.role === 'user' ? 'max-w-[85%]' : 'max-w-[75%]'} rounded-2xl ${m.role === 'user' ? 'p-4' : 'p-3'} shadow-sm ${m.role === 'user'
-                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-br-none'
-                  : isDark
-                    ? 'bg-gray-800 text-gray-100 border border-gray-700 rounded-bl-none'
-                    : 'bg-white text-gray-800 border border-gray-100 rounded-bl-none'
-                  }`}>
-                  <div className={`prose prose-sm max-w-none ${m.role === 'user' ? 'text-white' : isDark ? 'text-gray-100' : 'text-gray-800'}`}>
+                <div className={`${m.role === 'user' ? 'max-w-[85%]' : 'max-w-[78%]'}`}>
+                  {m.role === 'assistant' && (
+                    <div className={`mb-1 px-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${isDark ? 'text-cyan-300/80' : 'text-cyan-700/80'}`}>
+                      SeekEatz AI
+                    </div>
+                  )}
+                  <div className={`rounded-2xl ${m.role === 'user' ? 'p-4' : 'p-3.5'} shadow-sm ${m.role === 'user'
+                    ? 'rounded-br-none border border-cyan-500/20 bg-gradient-to-br from-sky-600 via-cyan-600 to-blue-700 text-white shadow-cyan-900/20'
+                    : isDark
+                      ? 'bg-gradient-to-br from-slate-900 via-gray-900 to-gray-800 text-gray-100 border border-cyan-900/40 rounded-bl-none shadow-black/20'
+                      : 'bg-gradient-to-br from-cyan-50 via-white to-slate-50 text-gray-800 border border-cyan-100 rounded-bl-none shadow-cyan-100/70'
+                    }`}>
+                    <div className={`prose prose-sm max-w-none prose-p:my-0 prose-headings:my-0 prose-ul:my-2 prose-ol:my-2 prose-li:my-0.5 ${m.role === 'user' ? 'text-white prose-strong:text-white prose-li:text-white prose-a:text-white' : isDark ? 'text-gray-100 prose-strong:text-white prose-li:text-gray-100' : 'text-gray-800 prose-strong:text-gray-900 prose-li:text-gray-700'}`}>
                     <ReactMarkdown>{m.content}</ReactMarkdown>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1784,24 +1843,33 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               {/* Enforce 5 meal cards max for initial response */}
               {m.role === 'assistant' && m.meals && m.meals.length > 0 && (() => {
                 // Determine how many meals to show for this message
-                const visibleCount = visibleMealsCount[m.id] ?? 5; // Default to 5, or use stored count
+                const visibleCount = visibleMealsCount[m.id] ?? CHAT_MEALS_PAGE_SIZE;
                 const mealsToShow = m.meals.slice(0, visibleCount);
-                const hasMoreMeals = m.meals.length > visibleCount;
 
                 return (
                   <div className="flex justify-start mb-2">
                     <div className="flex flex-col gap-3 w-full max-w-[95%]">
-                      {mealsToShow.map((meal) => {
+                      {mealsToShow.map((meal, index) => {
                         const isFavorite = favoriteMeals?.includes(meal.id) || false;
                         return (
-                          <MealCard
-                            key={meal.id}
-                            meal={meal}
-                            isFavorite={isFavorite}
-                            onClick={() => onMealSelect?.(meal)}
-                            onToggleFavorite={() => onToggleFavorite?.(meal.id, meal)}
-                            compact={true}
-                          />
+                          <div key={meal.id}>
+                            {index === CHAT_MEALS_PAGE_SIZE && (
+                              <div className="flex items-center gap-3 py-2">
+                                <div className="h-px flex-1 bg-border" />
+                                <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                                  {APPENDED_MEALS_DIVIDER_LABEL}
+                                </span>
+                                <div className="h-px flex-1 bg-border" />
+                              </div>
+                            )}
+                            <MealCard
+                              meal={meal}
+                              isFavorite={isFavorite}
+                              onClick={() => onMealSelect?.(meal)}
+                              onToggleFavorite={() => onToggleFavorite?.(meal.id, meal)}
+                              compact={true}
+                            />
+                          </div>
                         );
                       })}
                     </div>
@@ -1812,7 +1880,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               {/* Load More Meals Button */}
               {/* Show button if there are more meals to show (either in state or from API) */}
               {m.role === 'assistant' && m.meals && (() => {
-                const visibleCount = visibleMealsCount[m.id] ?? 5;
+                const visibleCount = visibleMealsCount[m.id] ?? CHAT_MEALS_PAGE_SIZE;
                 const hasMoreInState = m.meals.length > visibleCount;
                 const hasMoreFromAPI = m.mealSearchContext?.hasMore;
                 return hasMoreInState || hasMoreFromAPI;
@@ -1822,7 +1890,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                       onClick={() => {
                         if (!m.meals) return;
 
-                        const visibleCount = visibleMealsCount[m.id] ?? 5;
+                        const visibleCount = visibleMealsCount[m.id] ?? CHAT_MEALS_PAGE_SIZE;
 
                         // If we have more meals in state, show them all
                         if (m.meals.length > visibleCount) {
@@ -1900,9 +1968,14 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
         {isLoading && (
           <div className="flex justify-start mb-4">
-            <div className={`border rounded-2xl p-4 shadow-sm text-sm flex items-center gap-2 ${isDark ? 'bg-gray-800 border-gray-700 text-gray-300' : 'bg-white border-gray-200 text-gray-500'}`}>
-              <div className={`animate-spin h-4 w-4 border-2 border-t-transparent rounded-full ${isDark ? 'border-blue-400' : 'border-blue-600'}`}></div>
-              Thinking...
+            <div className="max-w-[78%]">
+              <div className={`mb-1 px-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${isDark ? 'text-cyan-300/80' : 'text-cyan-700/80'}`}>
+                SeekEatz AI
+              </div>
+              <div className={`border rounded-2xl rounded-bl-none p-4 shadow-sm text-sm flex items-center gap-2 ${isDark ? 'bg-gradient-to-br from-slate-900 via-gray-900 to-gray-800 border-cyan-900/40 text-gray-300' : 'bg-gradient-to-br from-cyan-50 via-white to-slate-50 border-cyan-100 text-gray-600'}`}>
+                <div className={`animate-spin h-4 w-4 border-2 border-t-transparent rounded-full ${isDark ? 'border-blue-400' : 'border-blue-600'}`}></div>
+                Thinking...
+              </div>
             </div>
           </div>
         )}
@@ -1925,41 +1998,21 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
       {/* Quick Prompt Chips */}
       <div className={`fixed bottom-[125px] md:bottom-[152px] left-0 right-0 w-full z-20 pb-2 md:pb-3 transition-all duration-300 ${isDark ? 'bg-gray-900' : 'bg-white'} ${isAtBottom ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}>
-        <div className="relative w-full px-4 md:px-6">
-          {/* Left Arrow */}
-          {showLeftArrow && (
-            <button
-              onClick={() => scrollChips('left')}
-              className={`hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-30 h-8 w-8 rounded-full shadow-md items-center justify-center transition-colors ${isDark ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
-              aria-label="Scroll left"
-            >
-              <ChevronLeft size={18} className={isDark ? 'text-gray-300' : 'text-gray-600'} />
-            </button>
-          )}
-
-          {/* Right Arrow */}
-          {showRightArrow && (
-            <button
-              onClick={() => scrollChips('right')}
-              className={`hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-30 h-8 w-8 rounded-full shadow-md items-center justify-center transition-colors ${isDark ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
-              aria-label="Scroll right"
-            >
-              <ChevronRight size={18} className={isDark ? 'text-gray-300' : 'text-gray-600'} />
-            </button>
-          )}
-
+        <div className="relative w-full max-w-3xl mx-auto px-3 md:px-4">
+          <div className={`rounded-[1.25rem] border px-3 py-2 shadow-lg backdrop-blur-xl ${isDark ? 'border-gray-800 bg-gray-900/92 shadow-black/20' : 'border-gray-200 bg-white/92 shadow-gray-200/80'}`}>
+            <p className={`mb-1 px-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+              Try a quick search
+            </p>
           <div
-            ref={chipsContainerRef}
-            className="overflow-x-auto scrollbar-hide px-12 md:px-16 pt-2 md:pt-3"
-            onScroll={updateArrowVisibility}
+            className="overflow-x-auto scrollbar-hide px-1"
           >
-            <div className="flex gap-1 md:gap-2 justify-center">
+            <div className="flex w-max min-w-full gap-2 justify-start">
               {quickPrompts.map((item, index) => (
                 <button
                   key={index}
                   onClick={() => sendQuickPrompt(item.prompt, item.userVisibleText)}
                   disabled={isLimitReached && !isSignedIn}
-                  className={`flex-shrink-0 px-[6px] py-[6px] h-[18px] leading-[1px] md:px-[10px] md:py-[10px] md:h-[30px] md:leading-[2px] border rounded-full text-xs md:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap ${isDark ? 'bg-gray-800 hover:bg-gray-700 active:bg-gray-600 border-gray-700 text-gray-200' : 'bg-gray-50 hover:bg-gray-100 active:bg-gray-200 border-gray-200 text-gray-700'}`}
+                  className={`flex-shrink-0 rounded-full border px-3 py-1.5 text-[13px] font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap ${isDark ? 'bg-gray-800 hover:bg-gray-700 active:bg-gray-600 border-gray-700 text-gray-200' : 'bg-gray-50 hover:bg-gray-100 active:bg-gray-200 border-gray-200 text-gray-700'}`}
                 >
                   {item.display}
                 </button>
@@ -1967,12 +2020,19 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             </div>
           </div>
         </div>
+        </div>
       </div>
 
       {/* Input Bar */}
-      <div className={`border-t fixed bottom-0 left-0 right-0 w-full mb-[60px] z-30 flex items-center justify-center transition-all duration-300 ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
-        <div className="w-full max-w-2xl p-2 md:p-4">
-          <form onSubmit={onSubmit} className="flex items-center gap-2">
+      <div className={`fixed bottom-0 left-0 right-0 w-full mb-[60px] z-30 flex items-center justify-center transition-all duration-300 ${isDark ? 'bg-gradient-to-t from-gray-950 via-gray-950/95 to-transparent' : 'bg-gradient-to-t from-white via-white/95 to-transparent'}`}>
+        <div className="w-full max-w-3xl px-3 pb-3 md:px-4 md:pb-4">
+          <form
+            onSubmit={onSubmit}
+            className={`flex items-center gap-2 rounded-[1.75rem] border px-2 py-2 shadow-xl backdrop-blur-xl ${isDark
+              ? 'border-gray-800 bg-gray-900/92 shadow-black/25'
+              : 'border-gray-200 bg-white/92 shadow-gray-200/80'
+              }`}
+          >
             <button
               type="button"
               onClick={() => {
@@ -1983,28 +2043,34 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                   setCurrentSessionId(getGuestSessionId());
                 }
               }}
-              className={`flex-shrink-0 p-1.5 md:p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-all ${isDark ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border transition-all ${isDark
+                ? 'border-gray-700 bg-gray-800/90 text-gray-400 hover:bg-gray-700 hover:text-gray-200'
+                : 'border-gray-200 bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-800'
+                }`}
               title="Clear chat"
             >
               <Trash2 size={16} className="md:w-[18px] md:h-[18px]" />
             </button>
             <input
               type="text"
-              className={`flex-1 py-2 px-3 md:p-4 rounded-xl focus:outline-none focus:ring-2 text-base ${isDark ? 'bg-gray-800 text-gray-100 placeholder:text-gray-500 focus:ring-blue-500' : 'bg-gray-100 text-gray-800 placeholder:text-gray-500 focus:ring-blue-600'} ${(isLimitReached && !isSignedIn) || showAccountGate || showPostValueOnboarding ? 'opacity-60 cursor-not-allowed' : ''}`}
+              className={`flex-1 bg-transparent px-2 py-2 text-[15px] outline-none focus:outline-none ${isDark
+                ? 'text-gray-100 placeholder:text-gray-500'
+                : 'text-gray-800 placeholder:text-gray-400'
+                } ${(isLimitReached && !isSignedIn) || showAccountGate || showPostValueOnboarding ? 'opacity-60 cursor-not-allowed' : ''}`}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder={showAccountGate
                 ? "Create a free account to keep going."
                 : showPostValueOnboarding
                   ? "Finish onboarding to keep going."
-                  : "High protein lunch under 700 calories"}
+                  : chatPlaceholder}
               disabled={(isLimitReached && !isSignedIn) || showAccountGate || showPostValueOnboarding}
               autoComplete="off"
             />
             <button
               type="submit"
               disabled={!inputText.trim() || (isLimitReached && !isSignedIn) || showAccountGate || showPostValueOnboarding}
-              className={`flex-shrink-0 p-1.5 md:p-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all ${(isLimitReached && !isSignedIn) || showAccountGate || showPostValueOnboarding ? 'cursor-not-allowed' : ''}`}
+              className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 transition-all hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed ${(isLimitReached && !isSignedIn) || showAccountGate || showPostValueOnboarding ? 'cursor-not-allowed' : ''}`}
             >
               <Send size={16} className="md:w-[18px] md:h-[18px]" />
             </button>

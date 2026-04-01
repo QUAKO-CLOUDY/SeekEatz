@@ -74,7 +74,8 @@ type SearchMealsResponse = {
 
 const NO_MORE_MEALS_MESSAGE =
   "There are no more meals that fit these constraints in our database. Please change the restrictions to get access to more mealcards.";
-const HOME_MEALS_PAGE_SIZE = 4;
+const HOME_MEALS_PAGE_SIZE = 5;
+const APPENDED_MEALS_DIVIDER_LABEL = "More meals";
 
 export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite, loggedMeals = [] }: Props) {
   const { updateActivity } = useSessionActivity();
@@ -713,7 +714,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
 
     try {
       let workingPool = allSearchMeals;
-      let searchState = lastSearchParams;
+      const searchState = lastSearchParams;
       let start = recommendedMeals.length;
       let next = workingPool.slice(start, start + HOME_MEALS_PAGE_SIZE);
 
@@ -795,12 +796,15 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           calorieMode
         );
 
-        const appendedPool = diversifyMealsByRestaurant(
-          deduplicateHomeMeals([
-            ...workingPool,
-            ...moreResult.meals,
-          ])
-        );
+        let appendedMeals = selectedCuisine
+          ? moreResult.meals.filter((meal) => mealMatchesCuisine(meal, selectedCuisine))
+          : moreResult.meals;
+        appendedMeals = filterMealsByProfile(appendedMeals, userProfile);
+
+        const appendedPool = deduplicateHomeMeals([
+          ...workingPool,
+          ...appendedMeals,
+        ]);
 
         workingPool = appendedPool;
         setAllSearchMeals(appendedPool);
@@ -1130,24 +1134,35 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           ) : recommendedMeals.length > 0 ? (
             <>
               <div className="px-4 grid grid-cols-2 gap-3 sm:gap-4 items-stretch">
-                {recommendedMeals.map((meal) => (
-                  <div key={meal.id} data-meal-id={meal.id} className="h-full">
-                    <MealCard
-                      meal={meal}
-                      isFavorite={favoriteMeals.includes(meal.id)}
-                      userProfile={userProfile}
-                      loggedMeals={loggedMeals}
-                      onClick={() => {
-                        // Save scroll position and meal ID before navigating to meal detail
-                        if (containerRef.current && typeof window !== 'undefined') {
-                          sessionStorage.setItem('seekeatz_home_scroll_position', containerRef.current.scrollTop.toString());
-                          sessionStorage.setItem('seekeatz_last_clicked_meal_id', meal.id);
-                        }
-                        onMealSelect(meal);
-                      }}
-                      onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(meal.id, meal) : undefined}
-                    />
-                  </div>
+                {recommendedMeals.map((meal, index) => (
+                  <React.Fragment key={meal.id}>
+                    {index === HOME_MEALS_PAGE_SIZE && (
+                      <div className="col-span-2 flex items-center gap-3 pt-3 pb-1">
+                        <div className="h-px flex-1 bg-border" />
+                        <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+                          {APPENDED_MEALS_DIVIDER_LABEL}
+                        </span>
+                        <div className="h-px flex-1 bg-border" />
+                      </div>
+                    )}
+                    <div data-meal-id={meal.id} className="h-full">
+                      <MealCard
+                        meal={meal}
+                        isFavorite={favoriteMeals.includes(meal.id)}
+                        userProfile={userProfile}
+                        loggedMeals={loggedMeals}
+                        onClick={() => {
+                          // Save scroll position and meal ID before navigating to meal detail
+                          if (containerRef.current && typeof window !== 'undefined') {
+                            sessionStorage.setItem('seekeatz_home_scroll_position', containerRef.current.scrollTop.toString());
+                            sessionStorage.setItem('seekeatz_last_clicked_meal_id', meal.id);
+                          }
+                          onMealSelect(meal);
+                        }}
+                        onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(meal.id, meal) : undefined}
+                      />
+                    </div>
+                  </React.Fragment>
                 ))}
               </div>
               

@@ -46,11 +46,19 @@ type Props = {
   onPremiumFeatureAttempt?: () => void;
 };
 
+type SwapQuantityConfig = {
+  unitLabel: string;
+  min: number;
+  max: number;
+  defaultQuantity: number;
+};
+
 type SwapOption = {
   id: string;
   label: string;
   modifierItemIds: string[];
   isModification?: boolean; // true = modification (edit this meal), false = alternative (different meal)
+  quantityConfig?: SwapQuantityConfig;
   deltaMacros: {
     calories: number;
     protein: number;
@@ -117,6 +125,84 @@ function getSwapDescription(delta: { calories: number; protein: number; carbs: n
   } else {
     return `${descriptions.slice(0, -1).join(', ')}, and ${descriptions[descriptions.length - 1]}`;
   }
+}
+
+function formatSignedDelta(value: number, suffix: string): string {
+  const roundedValue = Number.isInteger(value) ? value : Number(value.toFixed(1));
+  return `${roundedValue > 0 ? '+' : ''}${roundedValue}${suffix}`;
+}
+
+function scaleSwapDelta(
+  delta: SwapOption['deltaMacros'],
+  quantity: number
+): SwapOption['deltaMacros'] {
+  if (quantity <= 1) {
+    return delta;
+  }
+
+  return {
+    calories: delta.calories * quantity,
+    protein: delta.protein * quantity,
+    carbs: delta.carbs * quantity,
+    fats: delta.fats * quantity,
+  };
+}
+
+function SwapDeltaSummary({ delta }: { delta: SwapOption['deltaMacros'] }) {
+  const entries = [
+    { key: 'calories', label: 'cal', value: delta.calories, tone: 'text-pink-600 dark:text-pink-300' },
+    { key: 'protein', label: 'pro', value: delta.protein, suffix: 'g', tone: 'text-cyan-600 dark:text-cyan-300' },
+    { key: 'carbs', label: 'carbs', value: delta.carbs, suffix: 'g', tone: 'text-green-600 dark:text-green-300' },
+    { key: 'fats', label: 'fat', value: delta.fats, suffix: 'g', tone: 'text-amber-600 dark:text-amber-300' },
+  ].filter((entry) => entry.value !== 0);
+
+  if (entries.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="flex flex-wrap gap-1.5 mt-2">
+      {entries.map((entry) => (
+        <span
+          key={entry.key}
+          className={`rounded-full border border-border bg-background/70 px-2 py-1 text-[10px] font-semibold ${entry.tone}`}
+        >
+          {formatSignedDelta(entry.value, entry.suffix ?? '')} {entry.label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function inferEggSwapMaxQuantity(mealName: string): number {
+  const explicitEggCount = mealName.match(/\b(\d+)\s+eggs?\b/i);
+  if (explicitEggCount) {
+    const parsedCount = Number.parseInt(explicitEggCount[1], 10);
+    return Math.min(Math.max(parsedCount, 1), 6);
+  }
+
+  if (/\bomelet|omelette|frittata\b/i.test(mealName)) {
+    return 3;
+  }
+
+  if (/\+\s*eggs?\b/i.test(mealName) || /\bbenedict\b/i.test(mealName)) {
+    return 2;
+  }
+
+  return 1;
+}
+
+function getSwapQuantityConfig(swapLabel: string, mealName: string): SwapQuantityConfig | undefined {
+  if (/egg whites instead of whole eggs/i.test(swapLabel)) {
+    return {
+      unitLabel: 'egg',
+      min: 1,
+      max: inferEggSwapMaxQuantity(mealName),
+      defaultQuantity: 1,
+    };
+  }
+
+  return undefined;
 }
 
 function SauceSelector({
@@ -232,6 +318,7 @@ export function MealDetail({
   const [selectedMealSwaps, setSelectedMealSwaps] = useState<SwapOption[]>([]);
   const [isLoadingSwaps, setIsLoadingSwaps] = useState(false);
   const [selectedSwapIds, setSelectedSwapIds] = useState<string[]>([]);
+  const [selectedSwapQuantities, setSelectedSwapQuantities] = useState<Record<string, number>>({});
 
   // Restaurant sauces - only for this meal's restaurant
   const [restaurantSauces, setRestaurantSauces] = useState<SauceItem[]>([]);
@@ -348,6 +435,7 @@ export function MealDetail({
       setIsLoadingSwaps(true);
       // Reset selected swap IDs when meal changes
       setSelectedSwapIds([]);
+      setSelectedSwapQuantities({});
 
       try {
         const res = await fetch('/api/swaps', {
@@ -387,6 +475,7 @@ export function MealDetail({
             confidenceLabel: mod.confidenceLabel,
             modifierItemIds: mod.modifierItemIds || [],
             isModification: true, // Mark as modification
+            quantityConfig: getSwapQuantityConfig(mod.label || mod.swapTitle || 'Modification', meal.name),
             deltaMacros: {
               calories: mod.deltaMacros?.calories ?? mod.estimatedDelta?.calories ?? 0,
               protein: mod.deltaMacros?.protein ?? mod.estimatedDelta?.protein ?? 0,
@@ -424,12 +513,28 @@ export function MealDetail({
     };
 
     fetchMealSwaps();
-  }, [meal.id, meal.restaurant_name, meal.restaurant]);
+  }, [
+    meal.id,
+    meal.restaurant_name,
+    meal.restaurant,
+    meal.name,
+    meal.calories,
+    meal.protein,
+    meal.carbs,
+    meal.fats,
+    targets?.targetCalories,
+    targets?.targetProtein,
+  ]);
 
   // Filter selectedSwapIds to only include valid swap IDs when selectedMealSwaps changes
   useEffect(() => {
     const validSwapIds = new Set(selectedMealSwaps.map(s => s.id));
     setSelectedSwapIds(prev => prev.filter(id => validSwapIds.has(id)));
+    setSelectedSwapQuantities(prev =>
+      Object.fromEntries(
+        Object.entries(prev).filter(([id]) => validSwapIds.has(id))
+      )
+    );
   }, [selectedMealSwaps]);
 
   // Fetch similar meals from the same restaurant
@@ -541,17 +646,36 @@ export function MealDetail({
     );
   }, [selectedSauceIds, restaurantSauces]);
 
-  // Effective macros = meal + selected sauces ONLY (swaps do NOT change macros)
+  const selectedSwapDeltaSum = useMemo(() => {
+    return selectedSwapIds.reduce(
+      (acc, id) => {
+        const swap = selectedMealSwaps.find((option) => option.id === id);
+        if (!swap) return acc;
+        const quantity = selectedSwapQuantities[id] ?? swap.quantityConfig?.defaultQuantity ?? 1;
+        const scaledDelta = scaleSwapDelta(swap.deltaMacros, quantity);
+
+        return {
+          calories: acc.calories + (scaledDelta.calories || 0),
+          protein: acc.protein + (scaledDelta.protein || 0),
+          carbs: acc.carbs + (scaledDelta.carbs || 0),
+          fats: acc.fats + (scaledDelta.fats || 0),
+        };
+      },
+      { calories: 0, protein: 0, carbs: 0, fats: 0 }
+    );
+  }, [selectedSwapIds, selectedMealSwaps, selectedSwapQuantities]);
+
+  // Effective macros = base meal + selected swap deltas + selected sauces
   const effectiveMacros = useMemo(() => {
     return {
-      calories: meal.calories + sauceMacrosSum.calories,
-      protein: meal.protein + sauceMacrosSum.protein,
-      carbs: (meal.carbs || 0) + sauceMacrosSum.carbs,
-      fats: (meal.fats || 0) + sauceMacrosSum.fats,
+      calories: Math.max(0, meal.calories + selectedSwapDeltaSum.calories + sauceMacrosSum.calories),
+      protein: Math.max(0, meal.protein + selectedSwapDeltaSum.protein + sauceMacrosSum.protein),
+      carbs: Math.max(0, (meal.carbs || 0) + selectedSwapDeltaSum.carbs + sauceMacrosSum.carbs),
+      fats: Math.max(0, (meal.fats || 0) + selectedSwapDeltaSum.fats + sauceMacrosSum.fats),
     };
-  }, [meal.calories, meal.protein, meal.carbs, meal.fats, sauceMacrosSum]);
+  }, [meal.calories, meal.protein, meal.carbs, meal.fats, selectedSwapDeltaSum, sauceMacrosSum]);
 
-  // "Left after this meal" = target - logged today - effective meal (updates with sauces/swaps)
+  // "Left after this meal" = target - logged today - effective meal (updates with swaps and sauces)
   const leftAfterThisMeal = useMemo(() => {
     const targetCal = dailyTargetCalories;
     const targetPro = userProfile?.target_protein_g ?? targets?.targetProtein ?? 150;
@@ -601,12 +725,46 @@ export function MealDetail({
     }
 
     // Only allow toggling swaps that exist in selectedMealSwaps
-    const swapExists = selectedMealSwaps.some(s => s.id === id);
-    if (!swapExists) return;
+    const swap = selectedMealSwaps.find(s => s.id === id);
+    if (!swap) return;
 
-    setSelectedSwapIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    setSelectedSwapIds(prev => {
+      const isRemoving = prev.includes(id);
+      if (isRemoving) {
+        setSelectedSwapQuantities(current => {
+          const next = { ...current };
+          delete next[id];
+          return next;
+        });
+        return prev.filter(x => x !== id);
+      }
+
+      if (swap.quantityConfig) {
+        setSelectedSwapQuantities(current => ({
+          ...current,
+          [id]: current[id] ?? swap.quantityConfig!.defaultQuantity,
+        }));
+      }
+
+      return [...prev, id];
+    });
+  };
+
+  const updateSwapQuantity = (id: string, quantity: number) => {
+    const swap = selectedMealSwaps.find(option => option.id === id);
+    if (!swap?.quantityConfig) {
+      return;
+    }
+
+    const nextQuantity = Math.min(
+      swap.quantityConfig.max,
+      Math.max(swap.quantityConfig.min, quantity)
     );
+
+    setSelectedSwapQuantities(prev => ({
+      ...prev,
+      [id]: nextQuantity,
+    }));
   };
 
   const handleConfirmLog = () => {
@@ -625,6 +783,7 @@ export function MealDetail({
       .map(swap => ({
         id: swap!.id,
         label: swap!.label,
+        quantity: selectedSwapQuantities[swap!.id] ?? swap!.quantityConfig?.defaultQuantity ?? 1,
         modifierItemIds: swap!.modifierItemIds
       }));
 
@@ -666,6 +825,7 @@ export function MealDetail({
 
     setShowLogModal(false);
     setSelectedSwapIds([]);
+    setSelectedSwapQuantities({});
     setSelectedSauceIds([]);
   };
 
@@ -940,7 +1100,8 @@ export function MealDetail({
                 ) : (
                   selectedMealSwaps.map((swap) => {
                     const isSelected = selectedSwapIds.includes(swap.id);
-                    const delta = swap.deltaMacros;
+                    const quantity = selectedSwapQuantities[swap.id] ?? swap.quantityConfig?.defaultQuantity ?? 1;
+                    const delta = scaleSwapDelta(swap.deltaMacros, quantity);
                     return (
                       <div
                         key={swap.id}
@@ -951,6 +1112,12 @@ export function MealDetail({
                         <p className="text-muted-foreground text-xs mt-1 capitalize">
                           {getSwapDescription(delta)}
                         </p>
+                        {swap.quantityConfig && isSelected && quantity > 1 && (
+                          <p className="text-indigo-600 dark:text-indigo-300 text-[11px] mt-2 font-medium">
+                            Applied to {quantity} {swap.quantityConfig.unitLabel}{quantity === 1 ? '' : 's'}
+                          </p>
+                        )}
+                        <SwapDeltaSummary delta={delta} />
                       </div>
                     );
                   })
@@ -1115,6 +1282,7 @@ export function MealDetail({
               <button onClick={() => {
                 setShowLogModal(false);
                 setSelectedSwapIds([]);
+                setSelectedSwapQuantities({});
                 setSelectedSauceIds([]);
               }} className="text-muted-foreground hover:text-foreground p-2">
                 <X className="w-5 h-5" />
@@ -1177,28 +1345,67 @@ export function MealDetail({
                 ) : (
                   selectedMealSwaps.map(swap => {
                     const isSelected = selectedSwapIds.includes(swap.id);
-                    const delta = swap.deltaMacros;
+                    const quantity = selectedSwapQuantities[swap.id] ?? swap.quantityConfig?.defaultQuantity ?? 1;
+                    const delta = scaleSwapDelta(swap.deltaMacros, quantity);
                     return (
-                      <button
+                      <div
                         key={swap.id}
-                        onClick={() => toggleSwap(swap.id)}
-                        className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${isSelected
+                        className={`rounded-2xl border transition-all ${isSelected
                           ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-cyan-500 shadow-lg shadow-cyan-500/20'
                           : 'bg-muted border-border hover:border-border/80'
                           }`}
                       >
-                        <div className="flex items-center gap-3">
-                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-cyan-400 bg-cyan-500' : 'border-border'}`}>
-                            {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                        <button
+                          type="button"
+                          onClick={() => toggleSwap(swap.id)}
+                          className="w-full flex items-center justify-between p-4"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${isSelected ? 'border-cyan-400 bg-cyan-500' : 'border-border'}`}>
+                              {isSelected && <Check className="w-3.5 h-3.5 text-white" />}
+                            </div>
+                            <div className="text-left">
+                              <p className="text-card-foreground text-sm font-medium">{swap.label}</p>
+                              <p className="text-muted-foreground text-xs capitalize">
+                                {getSwapDescription(delta)}
+                              </p>
+                              <SwapDeltaSummary delta={delta} />
+                            </div>
                           </div>
-                          <div className="text-left">
-                            <p className="text-card-foreground text-sm font-medium">{swap.label}</p>
-                            <p className="text-muted-foreground text-xs capitalize">
-                              {getSwapDescription(delta)}
-                            </p>
+                        </button>
+
+                        {isSelected && swap.quantityConfig && swap.quantityConfig.max > 1 && (
+                          <div className="flex items-center justify-between border-t border-cyan-500/20 px-4 pb-4 pt-3">
+                            <div>
+                              <p className="text-card-foreground text-xs font-medium">Adjust {swap.quantityConfig.unitLabel} count</p>
+                              <p className="text-muted-foreground text-[11px]">
+                                Update the logged macro change for {quantity} {swap.quantityConfig.unitLabel}{quantity === 1 ? '' : 's'}.
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => updateSwapQuantity(swap.id, quantity - 1)}
+                                disabled={quantity <= swap.quantityConfig.min}
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
+                              >
+                                -
+                              </button>
+                              <div className="min-w-[70px] rounded-full border border-border bg-background px-3 py-1 text-center text-xs font-semibold text-foreground">
+                                {quantity} {swap.quantityConfig.unitLabel}{quantity === 1 ? '' : 's'}
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => updateSwapQuantity(swap.id, quantity + 1)}
+                                disabled={quantity >= swap.quantityConfig.max}
+                                className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
+                              >
+                                +
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      </button>
+                        )}
+                      </div>
                     )
                   })
                 )}
@@ -1234,6 +1441,7 @@ export function MealDetail({
               <button onClick={() => {
                 setShowLogModal(false);
                 setSelectedSwapIds([]);
+                setSelectedSwapQuantities({});
                 setSelectedSauceIds([]);
               }} className="flex-1 h-12 rounded-full bg-muted border border-border text-foreground font-medium hover:bg-muted/80">
                 Cancel

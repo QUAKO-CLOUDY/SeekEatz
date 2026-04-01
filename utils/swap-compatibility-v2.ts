@@ -28,6 +28,13 @@ const SWAP_REQUIRES_COMPONENT: Record<string, DishComponent> = {
 
 const FRIED_KEYWORDS = /\b(fried|crispy|battered|breaded|crunchy|deep.?fried|pan.?fried)\b/i;
 
+const BREAKFAST_SWAP_REQUIREMENTS: Record<string, RegExp> = {
+    'breakfast-egg-whites': /\b(egg|eggs|omelet|omelette|benedict|scrambl(?:e|ed)|frittata)\b/i,
+    'breakfast-fruit-side': /\b(egg|eggs|omelet|omelette|benedict|scrambl(?:e|ed)|hash browns?|toast|plate|platter)\b/i,
+    'breakfast-no-syrup': /\b(pancake|pancakes|waffle|waffles|french toast)\b/i,
+    'breakfast-skip-bacon': /\b(bacon|sausage|ham|egg|eggs|omelet|omelette|benedict|scrambl(?:e|ed)|plate|platter)\b/i,
+};
+
 // ---------- Filtering ----------
 
 /**
@@ -67,6 +74,11 @@ export function filterCompatibleSwaps(
         // Rule 3: Structural component requirement
         const requiredComponent = SWAP_REQUIRES_COMPONENT[swap.id];
         if (requiredComponent && !components.includes(requiredComponent)) {
+            return false;
+        }
+
+        const breakfastRequirement = BREAKFAST_SWAP_REQUIREMENTS[swap.id];
+        if (breakfastRequirement && !breakfastRequirement.test(lowerMealName)) {
             return false;
         }
 

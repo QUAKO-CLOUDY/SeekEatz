@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { ROUTER_SYSTEM_PROMPT } from '@/lib/chat-prompts';
 import { searchHandler } from '@/lib/retrieval/retrieval-engine';
 import { buildSearchParams } from '@/lib/search-utils';
-import { resolveRestaurantFromText, extractRestaurantPhrase, resolveRestaurantUniversal } from '@/lib/restaurant-resolver';
+import { resolveRestaurantFromText, extractRestaurantPhrase, resolveRestaurantUniversal, isRestaurantOnlyQuery } from '@/lib/restaurant-resolver';
 import { extractMacroConstraintsFromText, hasConstraints } from '@/lib/extractMacroConstraintsFromText';
 import { hasRemainingUsage, incrementUsageCount } from '@/lib/usage-cookie';
 
@@ -935,8 +935,32 @@ export async function POST(req: Request) {
       }
     }
 
+    let forcedRestaurantMatch:
+      | { status: 'MATCH'; canonicalName: string; restaurantId?: string; variants: string[]; matchType: 'exact' | 'tokenSubset' | 'fuzzy' }
+      | null = null;
+
+    if (!routerResult) {
+      const bareRestaurantMatch = await resolveRestaurantUniversal(message, message);
+      if (
+        bareRestaurantMatch.status === 'MATCH' &&
+        isRestaurantOnlyQuery(message, true)
+      ) {
+        forcedRestaurantMatch = bareRestaurantMatch;
+        routerResult = {
+          mode: 'MEAL_SEARCH',
+          query: message,
+          constraints: {
+            restaurant: bareRestaurantMatch.canonicalName,
+          },
+          structuredIntent: {
+            restaurantName: bareRestaurantMatch.canonicalName,
+          },
+        };
+      }
+    }
+
     // 5. ROUTER LOGIC (Structured Output) - Only if heuristic didn't skip
-    if (!heuristic.skipLLM || !routerResult) {
+    if (!routerResult) {
       // Set usedLLMRouter = true ONLY immediately before generateObject() is called
       usedLLMRouter = true;
 
@@ -1001,6 +1025,27 @@ export async function POST(req: Request) {
       });
     }
 
+    // Bare restaurant names should browse that restaurant's menu instead of clarifying.
+    if (routerResult.mode === 'CLARIFY') {
+      const bareRestaurantMatch = await resolveRestaurantUniversal(message, message);
+      if (
+        bareRestaurantMatch.status === 'MATCH' &&
+        isRestaurantOnlyQuery(message, true)
+      ) {
+        forcedRestaurantMatch = bareRestaurantMatch;
+        routerResult = {
+          mode: 'MEAL_SEARCH',
+          query: message,
+          constraints: {
+            restaurant: bareRestaurantMatch.canonicalName,
+          },
+          structuredIntent: {
+            restaurantName: bareRestaurantMatch.canonicalName,
+          },
+        };
+      }
+    }
+
     // 5. MANUAL BRANCHING
     if (routerResult.mode === 'MEAL_SEARCH') {
       // PATH A: MEAL SEARCH
@@ -1038,8 +1083,8 @@ export async function POST(req: Request) {
 
       // Detect explicit restaurant constraint
       const restaurantIntent = detectExplicitRestaurantConstraint(message);
-      const explicitRestaurantDetected = restaurantIntent.hasRestaurant;
-      const extractedRestaurantQuery = restaurantIntent.restaurantQuery;
+      const explicitRestaurantDetected = restaurantIntent.hasRestaurant || Boolean(forcedRestaurantMatch);
+      const extractedRestaurantQuery = restaurantIntent.restaurantQuery || forcedRestaurantMatch?.canonicalName;
 
       // Extract macro constraints using authoritative extractor
       const extractedConstraints = extractMacroConstraintsFromText(message);
@@ -1067,7 +1112,9 @@ export async function POST(req: Request) {
 
       // STEP 1: Restaurant resolution (ONLY if explicit constraint detected)
       let resolvedCandidates: any[] = [];
-      if (!explicitRestaurantDetected) {
+      if (forcedRestaurantMatch) {
+        restaurantMatch = forcedRestaurantMatch;
+      } else if (!explicitRestaurantDetected) {
         // SKIP restaurant resolver entirely - no explicit restaurant constraint
         restaurantMatch = { status: 'NO_RESTAURANT' };
         restaurantQuery = undefined;
@@ -1105,7 +1152,6 @@ export async function POST(req: Request) {
       // STEP 2.5: Determine if this is a restaurant-only query (should use generic search query)
       let restaurantOnly = false;
       if (explicitRestaurantDetected && restaurantMatch.status === 'MATCH') {
-        const { isRestaurantOnlyQuery } = await import('@/lib/restaurant-resolver');
         restaurantOnly = isRestaurantOnlyQuery(message, true);
       }
 
@@ -1241,7 +1287,14 @@ export async function POST(req: Request) {
 
       // MVP v1: Sanitize message by removing location phrases and meal-time words (except breakfast) before search
       // Keep original message for chat history/display, use sanitized for search
-      function sanitizeMessageForSearch(originalMessage: string): string {
+      function sanitizeMessageForSearch(
+        originalMessage: string,
+        restaurantContext?: {
+          canonicalName?: string;
+          variants?: string[];
+          extractedQuery?: string;
+        }
+      ): string {
         let sanitized = originalMessage;
 
         // Remove location phrases (case-insensitive, with word boundaries where appropriate)
@@ -1261,6 +1314,27 @@ export async function POST(req: Request) {
         for (const phrase of locationPhrases) {
           sanitized = sanitized.replace(phrase, '');
         }
+
+        const restaurantNames = [
+          ...(restaurantContext?.variants ?? []),
+          restaurantContext?.canonicalName,
+          restaurantContext?.extractedQuery,
+        ]
+          .filter((value): value is string => Boolean(value && value.trim()))
+          .sort((a, b) => b.length - a.length);
+
+        for (const restaurantName of restaurantNames) {
+          const escapedName = restaurantName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          sanitized = sanitized
+            .replace(new RegExp(`\\b(?:from|at|in)\\s+the\\s+${escapedName}\\b`, 'gi'), ' ')
+            .replace(new RegExp(`\\b(?:from|at|in)\\s+${escapedName}\\b`, 'gi'), ' ')
+            .replace(new RegExp(`\\b${escapedName}\\b`, 'gi'), ' ');
+        }
+
+        sanitized = sanitized
+          .replace(/\b(?:from|at|in)\b/gi, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
 
         // DO NOT strip meal-time words (lunch, dinner, breakfast) - keep them for search
         // This prevents "find me dinner" from becoming "find me" which triggers restaurant inference
@@ -1358,7 +1432,11 @@ export async function POST(req: Request) {
       // Determine query for search
       // If explicit restaurant constraint exists and restaurant-only, use generic query
       // Otherwise, use sanitized message, then apply semantic normalization
-      const sanitizedMessage = sanitizeMessageForSearch(message);
+      const sanitizedMessage = sanitizeMessageForSearch(message, {
+        canonicalName: restaurantMatch.status === 'MATCH' ? restaurantMatch.canonicalName : undefined,
+        variants: restaurantMatch.status === 'MATCH' ? restaurantMatch.variants : undefined,
+        extractedQuery: extractedRestaurantQuery || undefined,
+      });
       const queryForSearch = (explicitRestaurantDetected && restaurantOnly)
         ? 'find meals'
         : normalizeSemanticQuery(sanitizedMessage);

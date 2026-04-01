@@ -75,7 +75,10 @@ export function inferExtendedDishType(mealName: string): ExtendedDishType {
     if (/\b(smoothie|shake|protein shake|acai bowl|acaí)\b/i.test(lower)) {
         return 'smoothie';
     }
-    if (/\b(breakfast plate|breakfast platter|eggs and|egg plate)\b/i.test(lower)) {
+    if (
+        /\b(breakfast plate|breakfast platter|eggs and|egg plate|benedict|frittata)\b/i.test(lower) ||
+        /\b[a-z][a-z\s]*\+\s*eggs?\b/i.test(lower)
+    ) {
         return 'breakfast_plate';
     }
 

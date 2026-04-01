@@ -383,9 +383,12 @@ export async function retrieveMealsWithClient(
   });
 
   const deterministicSearch = await runDeterministicSearch(supabase, parsed, filterResult.params);
-  const deterministicResults = applyNearbyRestaurantFilter(
-    deterministicSearch.results,
-    nearbyFilter
+  const deterministicResults = applyResolvedRestaurantFilter(
+    applyNearbyRestaurantFilter(deterministicSearch.results, nearbyFilter),
+    {
+      restaurantId: searchParams.restaurantId,
+      restaurantNames: filterResult.resolvedRestaurantNames,
+    }
   );
   const deterministicFiltered = applyPostRetrievalFilters(
     deterministicResults,
@@ -402,7 +405,13 @@ export async function retrieveMealsWithClient(
 
   if (shouldUseSemanticFallback(parsed, deterministicFiltered.length, deterministicThreshold)) {
     vectorResults = await runVectorSearch(supabase, parsed);
-    vectorResults = applyNearbyRestaurantFilter(vectorResults, nearbyFilter);
+    vectorResults = applyResolvedRestaurantFilter(
+      applyNearbyRestaurantFilter(vectorResults, nearbyFilter),
+      {
+        restaurantId: searchParams.restaurantId,
+        restaurantNames: filterResult.resolvedRestaurantNames,
+      }
+    );
     vectorResults = applyPostRetrievalFilters(vectorResults, parsed, filterResult.dietaryKeywords);
     usedVector = vectorResults.length > 0;
   }
@@ -693,6 +702,34 @@ function applyNearbyRestaurantFilter(
 
   nearbyFilter.filteredOutCount += Math.max(0, items.length - filtered.length);
   return filtered;
+}
+
+function applyResolvedRestaurantFilter(
+  items: RawResult[],
+  options: {
+    restaurantId?: string;
+    restaurantNames?: string[];
+  }
+): RawResult[] {
+  const allowedRestaurantId = options.restaurantId?.trim();
+  const allowedRestaurantNames = new Set(
+    (options.restaurantNames ?? [])
+      .map((name) => name.trim().toLowerCase())
+      .filter(Boolean)
+  );
+
+  if (!allowedRestaurantId && allowedRestaurantNames.size === 0) {
+    return items;
+  }
+
+  return items.filter((item) => {
+    if (allowedRestaurantId && item.restaurant_id === allowedRestaurantId) {
+      return true;
+    }
+
+    const restaurantName = item.restaurant_name?.trim().toLowerCase();
+    return Boolean(restaurantName && allowedRestaurantNames.has(restaurantName));
+  });
 }
 
 async function runDeterministicSearch(
@@ -1507,7 +1544,7 @@ function applySearchParamsOverrides(parsed: ParsedQuery, sp: SearchParams): void
     if (macroFilters.fatsMin !== undefined && parsed.minFat === undefined) parsed.minFat = macroFilters.fatsMin;
   }
 
-  if (sp.restaurant && !parsed.restaurantQuery && !(sp.restaurantVariants?.length)) {
+  if (sp.restaurant && !parsed.restaurantQuery) {
     parsed.restaurantQuery = sp.restaurant;
   }
 

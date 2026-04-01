@@ -4,6 +4,7 @@ import { useMemo, useState, useId } from "react";
 import {
   Calendar,
   Flame,
+  Zap,
   Beef,
   Wheat,
   Droplets,
@@ -150,6 +151,7 @@ export function LogScreen({
   const { resolvedTheme } = useTheme();
   const { targets } = useNutrition();
   const todayStr = new Date().toISOString().slice(0, 10);
+  const isDark = resolvedTheme === "dark";
 
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [editingLogId, setEditingLogId] = useState<string | null>(null);
@@ -424,37 +426,49 @@ export function LogScreen({
 
         {/* Macro Grid */}
         <div className="grid grid-cols-4 gap-2">
-          <div className="bg-gradient-to-br from-pink-500/20 to-rose-500/20 backdrop-blur-sm rounded-2xl p-3 border border-pink-500/30 text-center">
-            <Flame className="w-4 h-4 text-pink-400 mx-auto mb-1" />
+          <div className={`rounded-2xl p-3 border text-center ${isDark
+            ? "bg-gradient-to-br from-pink-500/20 to-rose-500/20 backdrop-blur-sm border-pink-500/30"
+            : "bg-gradient-to-br from-pink-300 to-rose-300 border-pink-400/70"
+            }`}>
+            <Flame className={`w-4 h-4 mx-auto mb-1 ${isDark ? "text-pink-400" : "text-black"}`} />
             <div className="flex items-baseline justify-center gap-1">
-              <p className="text-pink-100/80 text-sm">{totals.calories}</p>
-              <p className="font-semibold text-white">/ {targetCalories}</p>
+              <p className={`text-sm ${isDark ? "text-pink-100/80" : "text-black"}`}>{totals.calories}</p>
+              <p className={`font-semibold ${isDark ? "text-white" : "text-black"}`}>/ {targetCalories}</p>
             </div>
-            <p className="text-white text-xs font-medium mt-1">Calories</p>
+            <p className={`text-xs font-medium mt-1 ${isDark ? "text-white" : "text-black"}`}>Calories</p>
           </div>
-          <div className="bg-gradient-to-br from-cyan-400/20 to-blue-500/20 backdrop-blur-sm rounded-2xl p-3 border border-cyan-400/30 text-center">
-            <Beef className="w-4 h-4 text-cyan-400 mx-auto mb-1" />
+          <div className={`rounded-2xl p-3 border text-center ${isDark
+            ? "bg-gradient-to-br from-cyan-400/20 to-blue-500/20 backdrop-blur-sm border-cyan-400/30"
+            : "bg-gradient-to-br from-cyan-300 to-blue-300 border-cyan-400/70"
+            }`}>
+            <Beef className={`w-4 h-4 mx-auto mb-1 ${isDark ? "text-cyan-400" : "text-black"}`} />
             <div className="flex items-baseline justify-center gap-1">
-              <p className="text-cyan-100/80 text-sm">{totals.protein}g</p>
-              <p className="font-semibold text-white">/ {targetProtein}g</p>
+              <p className={`text-sm ${isDark ? "text-cyan-100/80" : "text-black"}`}>{totals.protein}g</p>
+              <p className={`font-semibold ${isDark ? "text-white" : "text-black"}`}>/ {targetProtein}g</p>
             </div>
-            <p className="text-white text-xs font-medium mt-1">Protein</p>
+            <p className={`text-xs font-medium mt-1 ${isDark ? "text-white" : "text-black"}`}>Protein</p>
           </div>
-          <div className="bg-gradient-to-br from-green-400/20 to-emerald-500/20 backdrop-blur-sm rounded-2xl p-3 border border-green-400/30 text-center">
-            <Wheat className="w-4 h-4 text-green-400 mx-auto mb-1" />
+          <div className={`rounded-2xl p-3 border text-center ${isDark
+            ? "bg-gradient-to-br from-green-400/20 to-emerald-500/20 backdrop-blur-sm border-green-400/30"
+            : "bg-gradient-to-br from-green-300 to-emerald-300 border-green-400/70"
+            }`}>
+            <Wheat className={`w-4 h-4 mx-auto mb-1 ${isDark ? "text-green-400" : "text-black"}`} />
             <div className="flex items-baseline justify-center gap-1">
-              <p className="text-green-100/80 text-sm">{totals.carbs}g</p>
-              <p className="font-semibold text-white">/ {targetCarbs}g</p>
+              <p className={`text-sm ${isDark ? "text-green-100/80" : "text-black"}`}>{totals.carbs}g</p>
+              <p className={`font-semibold ${isDark ? "text-white" : "text-black"}`}>/ {targetCarbs}g</p>
             </div>
-            <p className="text-white text-xs font-medium mt-1">Carbs</p>
+            <p className={`text-xs font-medium mt-1 ${isDark ? "text-white" : "text-black"}`}>Carbs</p>
           </div>
-          <div className="bg-gradient-to-br from-amber-400/20 to-orange-500/20 backdrop-blur-sm rounded-2xl p-3 border border-amber-400/30 text-center">
-            <Droplets className="w-4 h-4 text-amber-400 mx-auto mb-1" />
+          <div className={`rounded-2xl p-3 border text-center ${isDark
+            ? "bg-gradient-to-br from-amber-400/20 to-orange-500/20 backdrop-blur-sm border-amber-400/30"
+            : "bg-gradient-to-br from-amber-300 to-orange-300 border-amber-400/70"
+            }`}>
+            <Droplets className={`w-4 h-4 mx-auto mb-1 ${isDark ? "text-amber-400" : "text-black"}`} />
             <div className="flex items-baseline justify-center gap-1">
-              <p className="text-amber-100/80 text-sm">{totals.fats}g</p>
-              <p className="font-semibold text-white">/ {targetFats}g</p>
+              <p className={`text-sm ${isDark ? "text-amber-100/80" : "text-black"}`}>{totals.fats}g</p>
+              <p className={`font-semibold ${isDark ? "text-white" : "text-black"}`}>/ {targetFats}g</p>
             </div>
-            <p className="text-white text-xs font-medium mt-1">Fats</p>
+            <p className={`text-xs font-medium mt-1 ${isDark ? "text-white" : "text-black"}`}>Fats</p>
           </div>
         </div>
       </div>

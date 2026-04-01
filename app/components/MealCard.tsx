@@ -96,6 +96,30 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
   // Removed useEffect - using derived values only (no state updates based on dependencies)
   // Extract restaurant name (handle both restaurant_name from Supabase and restaurant from Meal type)
   const restaurantName = (meal as any).restaurant_name || meal.restaurant || "Unknown";
+  const compactRestaurantLabel = useMemo(() => {
+    const normalized = restaurantName.replace(/\s+/g, ' ').trim();
+    if (!normalized) {
+      return { firstLine: "Unknown", secondLine: null as string | null };
+    }
+
+    if (normalized.length <= 11) {
+      return { firstLine: normalized, secondLine: null as string | null };
+    }
+
+    const words = normalized.split(' ');
+    if (words.length === 1) {
+      return { firstLine: normalized.slice(0, 11), secondLine: normalized.slice(11) || null };
+    }
+
+    const midpoint = Math.ceil(words.length / 2);
+    const firstLine = words.slice(0, midpoint).join(' ');
+    const secondLine = words.slice(midpoint).join(' ');
+
+    return {
+      firstLine: secondLine ? `${firstLine} -` : firstLine,
+      secondLine: secondLine || null,
+    };
+  }, [restaurantName]);
 
   // State to track logo source (with fallback to default.png)
   const [logoSrc, setLogoSrc] = useState(getLogo(restaurantName));
@@ -123,46 +147,47 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
     return (
       <div
         onClick={onClick}
-        className="bg-white dark:bg-gray-800 rounded-xl shadow-xl hover:shadow-2xl transition-all cursor-pointer overflow-hidden hover:border-cyan-500/50 group relative border border-gray-200 dark:border-gray-700"
-        style={{
-          width: '340px',
-          height: '75px',
-        }}
+        className="group relative h-[102px] w-full max-w-[372px] cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-white via-slate-50 to-white shadow-lg transition-all hover:border-cyan-500/40 hover:shadow-xl dark:border-gray-700 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-800"
       >
-        <div className="flex items-center h-full px-2.5 gap-2">
-          {/* Left Logo - Restaurant Logo */}
-          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-700">
-            <img
-              src={logoSrcWithCacheBust}
-              alt={restaurantName}
-              className="w-full h-full object-contain p-1"
-              onError={(e) => {
-                // Fallback to default.png if logo fails to load
-                if (logoSrc !== '/logos/default.png') {
-                  e.currentTarget.onerror = null; // Prevent infinite loop
-                  setLogoSrc('/logos/default.png');
-                } else {
-                  // If default.png also fails, hide the image
-                  e.currentTarget.style.display = 'none';
-                }
-              }}
-            />
-          </div>
+        <div className="flex h-full flex-col px-3 py-2">
+          <h3 className="line-clamp-2 break-words pr-7 text-[14px] font-bold leading-[1.15] text-foreground">
+            {meal.name}
+          </h3>
 
-          {/* Middle - Restaurant and Meal Name */}
-          <div className="flex-1 min-w-0 flex flex-col justify-center pr-1.5">
-            <p className="text-muted-foreground text-[10px] truncate mb-0.5">
-              {restaurantName}
-            </p>
-            <h3 className="text-foreground text-sm font-bold leading-tight line-clamp-2 break-words">
-              {meal.name}
-            </h3>
-          </div>
+          <div className="mt-2 flex min-h-0 flex-1 items-center gap-2.5">
+            {/* Left Logo - Restaurant Logo */}
+            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <img
+                src={logoSrcWithCacheBust}
+                alt={restaurantName}
+                className="h-full w-full object-contain p-1.5"
+                onError={(e) => {
+                  // Fallback to default.png if logo fails to load
+                  if (logoSrc !== '/logos/default.png') {
+                    e.currentTarget.onerror = null; // Prevent infinite loop
+                    setLogoSrc('/logos/default.png');
+                  } else {
+                    // If default.png also fails, hide the image
+                    e.currentTarget.style.display = 'none';
+                  }
+                }}
+              />
+            </div>
 
-          {/* Right - Nutritional Boxes */}
-          <div className="flex-shrink-0 flex items-center gap-0.5 pr-7">
+            {/* Restaurant */}
+            <div className="w-[76px] flex-shrink-0">
+              <p className="text-[9px] font-medium uppercase leading-[1.05] tracking-[0.08em] text-muted-foreground">
+                <span className="block truncate">{compactRestaurantLabel.firstLine}</span>
+                {compactRestaurantLabel.secondLine && (
+                  <span className="mt-0.5 block truncate">{compactRestaurantLabel.secondLine}</span>
+                )}
+              </p>
+            </div>
+
+            {/* Right - Nutritional Boxes */}
+            <div className="flex flex-shrink-0 items-center gap-1 pr-7">
             {/* Calories */}
-            <div className="bg-pink-100 dark:bg-pink-900/30 rounded-md px-1 py-0.5 text-center min-w-[40px]">
+            <div className="min-w-[42px] rounded-lg bg-pink-100 px-1.5 py-1 text-center dark:bg-pink-900/30">
               <p className="text-pink-600 dark:text-pink-400 font-bold text-[10px] leading-tight">
                 {meal.calories}
               </p>
@@ -182,7 +207,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             </div>
 
             {/* Protein */}
-            <div className="bg-blue-100 dark:bg-blue-900/30 rounded-md px-1 py-0.5 text-center min-w-[40px]">
+            <div className="min-w-[42px] rounded-lg bg-blue-100 px-1.5 py-1 text-center dark:bg-blue-900/30">
               <p className="text-blue-600 dark:text-blue-400 font-bold text-[10px] leading-tight">
                 {meal.protein}g
               </p>
@@ -192,7 +217,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             </div>
 
             {/* Carbs */}
-            <div className="bg-green-100 dark:bg-green-900/30 rounded-md px-1 py-0.5 text-center min-w-[40px]">
+            <div className="min-w-[42px] rounded-lg bg-green-100 px-1.5 py-1 text-center dark:bg-green-900/30">
               <p className="text-green-600 dark:text-green-400 font-bold text-[10px] leading-tight">
                 {meal.carbs}g
               </p>
@@ -202,7 +227,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             </div>
 
             {/* Fat */}
-            <div className="bg-orange-100 dark:bg-orange-900/30 rounded-md px-1 py-0.5 text-center min-w-[40px]">
+            <div className="min-w-[42px] rounded-lg bg-orange-100 px-1.5 py-1 text-center dark:bg-orange-900/30">
               <p className="text-orange-600 dark:text-orange-400 font-bold text-[10px] leading-tight">
                 {meal.fats}g
               </p>
@@ -210,6 +235,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
                 fat
               </p>
             </div>
+          </div>
           </div>
 
           {/* Favorite Button - Top Right (with space for nutritional boxes) */}
@@ -219,7 +245,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
                 e.stopPropagation();
                 onToggleFavorite?.();
               }}
-              className="absolute top-1 right-2 bg-background/80 dark:bg-gray-900/80 backdrop-blur-md rounded-full p-1 border border-border z-10 hover:bg-muted/90 dark:hover:bg-gray-800/90 transition-colors"
+              className="absolute right-2 top-2 z-10 rounded-full border border-border bg-background/85 p-1 backdrop-blur-md transition-colors hover:bg-muted/90 dark:bg-gray-900/85 dark:hover:bg-gray-800/90"
             >
               <Heart
                 className={`w-3 h-3 transition-colors ${isFavorite ? "fill-pink-500 text-pink-500" : "text-muted-foreground"

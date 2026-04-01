@@ -90,6 +90,128 @@ function detectDishType(mealName: string): string | null {
 
 // Old dish-type-specific functions removed - now using DB-backed swaps only
 
+const SINGLE_INGREDIENT_NAME_PATTERN =
+  /\b(bacon|sausage|ham|turkey|chicken|steak|egg|eggs|patty|links?|canadian bacon|chorizo|corned beef|protein|cheese)\b/i;
+
+function formatMacroEffect(macros: { calories: number; protein: number; carbs: number; fats: number }): string {
+  const effects: string[] = [];
+
+  if (macros.protein > 0) {
+    effects.push(`+${macros.protein}g protein`);
+  }
+  if (macros.calories > 0) {
+    effects.push(`+${macros.calories} cal`);
+  }
+  if (macros.carbs !== 0) {
+    effects.push(`${macros.carbs > 0 ? '+' : ''}${macros.carbs}g carbs`);
+  }
+  if (macros.fats !== 0) {
+    effects.push(`${macros.fats > 0 ? '+' : ''}${macros.fats}g fat`);
+  }
+
+  return effects.join(', ') || 'Adjust macros';
+}
+
+function mealAlreadyIncludesCandidate(mealName: string, candidateName: string): boolean {
+  const lowerMealName = mealName.toLowerCase();
+  const lowerCandidateName = candidateName.toLowerCase();
+  const overlapTokens = [
+    'bacon',
+    'sausage',
+    'ham',
+    'turkey',
+    'chicken',
+    'steak',
+    'egg',
+    'eggs',
+    'cheese',
+    'chorizo',
+    'corned beef',
+  ];
+
+  return overlapTokens.some((token) => lowerMealName.includes(token) && lowerCandidateName.includes(token));
+}
+
+function generateContextualSingleIngredientSwap(
+  mealName: string,
+  mealMacros: any,
+  modifierCandidates: ModifierCandidate[],
+  usedModifierIds: Set<string>
+): SwapModification | null {
+  const currentProtein = typeof mealMacros?.protein === 'number' ? mealMacros.protein : 0;
+  const shouldSuggestExtraProtein =
+    currentProtein < 30 || /\b(pancake|pancakes|waffle|waffles|french toast|crepe|crepes)\b/i.test(mealName);
+
+  if (!shouldSuggestExtraProtein) {
+    return null;
+  }
+
+  const contextualCandidates = modifierCandidates
+    .filter((candidate) => {
+      if (usedModifierIds.has(candidate.id)) {
+        return false;
+      }
+
+      if (!SINGLE_INGREDIENT_NAME_PATTERN.test(candidate.name)) {
+        return false;
+      }
+
+      if (mealAlreadyIncludesCandidate(mealName, candidate.name)) {
+        return false;
+      }
+
+      if (candidate.macros.calories <= 0 || candidate.macros.calories > 240) {
+        return false;
+      }
+
+      if (candidate.macros.protein <= 0) {
+        return false;
+      }
+
+      return true;
+    })
+    .map((candidate) => {
+      const lowerCategory = candidate.category.toLowerCase();
+      const proteinEfficiency = candidate.macros.protein / Math.max(candidate.macros.calories, 1);
+      let score = proteinEfficiency;
+
+      if (lowerCategory.includes('range-add-ons')) {
+        score += 1.2;
+      }
+      if (lowerCategory.includes('sides meats')) {
+        score += 1;
+      }
+      if (candidate.macros.calories <= 160) {
+        score += 0.35;
+      }
+
+      return { candidate, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  const bestCandidate = contextualCandidates[0]?.candidate;
+  if (!bestCandidate) {
+    return null;
+  }
+
+  return {
+    id: `contextual-add-${bestCandidate.id}`,
+    swapTitle: `Add ${bestCandidate.name}`,
+    expectedEffect: formatMacroEffect(bestCandidate.macros),
+    estimatedDelta: {
+      calories: bestCandidate.macros.calories,
+      protein: bestCandidate.macros.protein,
+      carbs: bestCandidate.macros.carbs,
+      fats: bestCandidate.macros.fats,
+    },
+    confidenceLabel: 'Likely available',
+    type: 'add',
+    swapType: 'neutral',
+    details: `Add ${bestCandidate.name} using the restaurant's real modifier data`,
+    modifierItemIds: [bestCandidate.id],
+  };
+}
+
 /**
  * Generates higher protein swap (single add-on item)
  * Finds best protein add-on candidate from modifierCandidates
@@ -101,7 +223,11 @@ function generateHigherProteinSwap(
   goals: MacroGoals,
   modifierCandidates: ModifierCandidate[]
 ): SwapModification | null {
-  if (!goals.higherProtein && !goals.minProtein) {
+  const currentProtein = typeof mealMacros?.protein === 'number' ? mealMacros.protein : 0;
+  const needsMoreProtein = goals.higherProtein === true ||
+    (typeof goals.minProtein === 'number' && currentProtein < goals.minProtein);
+
+  if (!needsMoreProtein) {
     return null;
   }
 
@@ -221,10 +347,26 @@ function generateHigherProteinSwap(
   };
 }
 
+function isStructureCandidate(name: string): boolean {
+  const lowerName = name.toLowerCase();
+
+  if (!/\b(bun|bread|roll|toast|croissant|bagel|tortilla|wrap)\b/i.test(lowerName)) {
+    return false;
+  }
+
+  // Reject full dishes that merely contain a bread-like keyword.
+  if (/\b(soup|salad|sandwich|burger|burrito|quesadilla|pancake|waffle|omelet|omelette|french toast|smoothie|pizza|pasta)\b/i.test(lowerName)) {
+    return false;
+  }
+
+  return true;
+}
+
 /**
  * Generates lower calories/carbs swap (remove or replace bun-like item)
  */
 function generateLowerCaloriesSwap(
+  mealName: string,
   mealMacros: any,
   goals: MacroGoals,
   modifierCandidates: ModifierCandidate[]
@@ -236,11 +378,14 @@ function generateLowerCaloriesSwap(
     return null;
   }
 
+  const dishType = inferDishType(mealName);
+  const supportsStructureSwap = dishType === 'burger' || dishType === 'sub' || dishType === 'wrap' || dishType === 'taco';
+  if (!supportsStructureSwap) {
+    return null;
+  }
+
   // Find bun/tortilla/wrap candidates
-  const bunPattern = /bun|bread|roll|tortilla|wrap|bagel|croissant/i;
-  const bunCandidates = modifierCandidates.filter(candidate => 
-    bunPattern.test(candidate.name)
-  );
+  const bunCandidates = modifierCandidates.filter(candidate => isStructureCandidate(candidate.name));
 
   // Find lettuce wrap candidate
   const lettucePattern = /lettuce wrap|lettuce|wrap lettuce|greens wrap/i;
@@ -347,9 +492,23 @@ export async function generateSwapModifications(
   }
 
   // Generate lower calories/carbs swap
-  const calorieSwap = generateLowerCaloriesSwap(mealMacros, goals, modifierCandidates);
+  const calorieSwap = generateLowerCaloriesSwap(mealName, mealMacros, goals, modifierCandidates);
   if (calorieSwap) {
     modifications.push(calorieSwap);
+  }
+
+  if (modifications.length < 2) {
+    const usedModifierIds = new Set(modifications.flatMap((mod) => mod.modifierItemIds));
+    const contextualSwap = generateContextualSingleIngredientSwap(
+      mealName,
+      mealMacros,
+      modifierCandidates,
+      usedModifierIds
+    );
+
+    if (contextualSwap) {
+      modifications.push(contextualSwap);
+    }
   }
 
   // Return at most 2 modifications
@@ -388,4 +547,3 @@ export async function generateSwapModifications(
 
   return result;
 }
-

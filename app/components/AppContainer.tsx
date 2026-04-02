@@ -15,7 +15,7 @@ export function AppContainer({ children }: { children: React.ReactNode }) {
 
   // Responsive container: full width on mobile, centered wider container on desktop
   return (
-    <main className="w-full max-w-md md:max-w-2xl lg:max-w-4xl xl:max-w-5xl mx-auto min-h-screen bg-background text-foreground lg:rounded-3xl lg:shadow-xl lg:border lg:border-border overflow-x-hidden overscroll-none transition-colors">
+    <main className="mx-auto min-h-[100dvh] w-full max-w-md overflow-x-hidden bg-background text-foreground overscroll-none transition-colors md:max-w-2xl lg:max-w-4xl lg:rounded-3xl lg:border lg:border-border lg:shadow-xl xl:max-w-5xl">
       {children}
     </main>
   );

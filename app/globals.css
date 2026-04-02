@@ -4,6 +4,10 @@
 
 @layer base {
   :root {
+    --app-nav-height: 4.5rem;
+    --app-nav-safe-offset: calc(var(--app-nav-height) + env(safe-area-inset-bottom, 0px));
+    --app-chat-composer-height: 5.5rem;
+
     --background: 0 0% 100%; /* #ffffff */
     --foreground: 0 0% 3.9%; /* oklch(0.145 0 0) approx */
     

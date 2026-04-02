@@ -112,7 +112,7 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
   return (
     <div className="flex-1 flex flex-col h-full w-full bg-background text-foreground font-sans">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border px-4 py-4 flex justify-between items-center">
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background/80 px-4 py-4 backdrop-blur-md">
         {onBack ? (
           <button
             onClick={onBack}
@@ -134,7 +134,7 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
       </header>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 max-w-md mx-auto w-full space-y-6 pb-24">
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col space-y-6 overflow-y-auto px-4 py-6 pb-[calc(var(--app-nav-safe-offset)+5.75rem)]">
         
         {/* Welcome / Empty State */}
         {!hasSearched && (
@@ -186,7 +186,7 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
       </div>
 
       {/* Search Input Bar (Fixed at bottom) */}
-      <div className="fixed bottom-20 left-0 right-0 px-4 z-40">
+      <div className="fixed bottom-[calc(var(--app-nav-safe-offset)+0.75rem)] left-0 right-0 z-40 px-4">
         <form onSubmit={handleSearch} className="max-w-md mx-auto">
           <div className="bg-card border border-border rounded-2xl p-2 shadow-2xl flex items-center gap-2">
             <div className="flex-1 relative">

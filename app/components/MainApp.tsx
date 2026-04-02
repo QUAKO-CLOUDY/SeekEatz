@@ -793,7 +793,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // Show meal detail if a meal is selected
   if (currentView === 'meal-detail' && selectedMeal) {
     return (
-      <div className="flex flex-col h-screen bg-background">
+      <div className="flex h-[100dvh] flex-col bg-background">
         <MealDetail
           meal={selectedMeal}
           isFavorite={favoriteMeals.includes(selectedMeal.id)}
@@ -810,7 +810,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // Show search screen (full screen, no navigation)
   if (currentScreen === 'search') {
     return (
-      <div className="flex flex-col h-screen bg-background">
+      <div className="flex h-[100dvh] flex-col bg-background">
         <SearchScreen
           onMealSelect={handleMealSelect}
           onBack={handleBack}
@@ -825,7 +825,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // NutritionProvider is now at root layout level, so we don't need to wrap here
   // However, we can still pass props to update it if needed via context methods
   return (
-    <div className="flex flex-col h-screen bg-background overflow-hidden">
+    <div className="flex h-[100dvh] flex-col overflow-hidden bg-background">
       <div className="flex-1 relative h-full overflow-hidden">
         {currentScreen === 'home' && (
           <HomeScreen

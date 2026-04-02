@@ -205,6 +205,23 @@ function getSwapQuantityConfig(swapLabel: string, mealName: string): SwapQuantit
   return undefined;
 }
 
+function normalizeSwapQuantityConfig(config: Partial<SwapQuantityConfig> | undefined): SwapQuantityConfig | undefined {
+  if (!config?.unitLabel) {
+    return undefined;
+  }
+
+  const min = Math.max(1, Number(config.min ?? 1));
+  const defaultQuantity = Math.max(min, Number(config.defaultQuantity ?? min));
+  const max = Math.max(defaultQuantity, Number(config.max ?? defaultQuantity));
+
+  return {
+    unitLabel: config.unitLabel,
+    min,
+    defaultQuantity,
+    max,
+  };
+}
+
 function SauceSelector({
   sauces,
   selectedSauceIds,
@@ -475,7 +492,9 @@ export function MealDetail({
             confidenceLabel: mod.confidenceLabel,
             modifierItemIds: mod.modifierItemIds || [],
             isModification: true, // Mark as modification
-            quantityConfig: getSwapQuantityConfig(mod.label || mod.swapTitle || 'Modification', meal.name),
+            quantityConfig:
+              normalizeSwapQuantityConfig(mod.quantityConfig) ??
+              getSwapQuantityConfig(mod.label || mod.swapTitle || 'Modification', meal.name),
             deltaMacros: {
               calories: mod.deltaMacros?.calories ?? mod.estimatedDelta?.calories ?? 0,
               protein: mod.deltaMacros?.protein ?? mod.estimatedDelta?.protein ?? 0,

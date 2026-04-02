@@ -46,6 +46,24 @@ const MACRO_CONFIG: Record<MacroType, MacroConfig> = {
   fats: { label: "Fats", unit: "g", min: 0, max: 100, step: 5 },
 };
 
+const HOME_SEARCH_STATUS_MESSAGES = [
+  "Scanning menus...",
+  "Matching your macros...",
+  "Ranking best fits...",
+];
+
+function formatMacroConstraint(type: MacroType, value: number, direction: Direction): string {
+  const roundedValue = Math.round(value);
+  const arrow = direction === "below" ? "↓" : "↑";
+
+  if (type === "calories") {
+    return `${arrow} ${roundedValue} calories`;
+  }
+
+  const unit = MACRO_CONFIG[type].unit ?? "";
+  return `${arrow} ${roundedValue}${unit} ${MACRO_CONFIG[type].label.toLowerCase()}`;
+}
+
 function getGreeting(): string {
   const hour = new Date().getHours();
   if (hour >= 5 && hour < 12) return "Good morning";
@@ -184,6 +202,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   const [allSearchMeals, setAllSearchMeals] = useState<Meal[]>([]);
   
   const [isLoadingMeals, setIsLoadingMeals] = useState(false);
+  const [loadingStatusIndex, setLoadingStatusIndex] = useState(0);
   const [hasSearched, setHasSearched] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
 
@@ -198,6 +217,19 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       window.history.scrollRestoration = 'manual';
     }
   }, []);
+
+  useEffect(() => {
+    if (!isLoadingMeals) {
+      setLoadingStatusIndex(0);
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setLoadingStatusIndex((current) => (current + 1) % HOME_SEARCH_STATUS_MESSAGES.length);
+    }, 1400);
+
+    return () => window.clearInterval(intervalId);
+  }, [isLoadingMeals]);
   
   // Load meals from localStorage on mount and whenever component becomes visible
   useEffect(() => {
@@ -844,6 +876,29 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   const canLoadMoreMeals =
     recommendedMeals.length < allSearchMeals.length || Boolean(lastSearchParams?.hasMore);
 
+  const resultsConstraintSummary = useMemo(() => {
+    const searchMacroValues = lastSearchParams?.macroValues ?? macroValues;
+    const searchMacroEnabled = lastSearchParams?.macroEnabled ?? macroEnabled;
+    const searchMacroDirections = (lastSearchParams?.macroDirections as Partial<Record<MacroType, Direction>> | undefined) ?? macroDirections;
+
+    const orderedTypes: MacroType[] = ["calories", "protein", "carbs", "fats"];
+    const parts = orderedTypes
+      .filter((type) => searchMacroEnabled?.[type] !== false)
+      .map((type) => {
+        const value = searchMacroValues?.[type];
+        const direction = searchMacroDirections?.[type] ?? "below";
+
+        if (typeof value !== "number") {
+          return null;
+        }
+
+        return formatMacroConstraint(type, value, direction);
+      })
+      .filter((part): part is string => Boolean(part));
+
+    return parts.join(" / ");
+  }, [lastSearchParams, macroDirections, macroEnabled, macroValues]);
+
   // Restore scroll position to specific meal card or saved position
   useEffect(() => {
     if (!containerRef.current || hasRestoredScrollRef.current || recommendedMeals.length === 0) return;
@@ -916,10 +971,10 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           }
         }
       }}
-      className="w-full h-full bg-background text-foreground px-4 pb-safe flex flex-col overflow-y-auto relative"
+      className="relative flex h-full w-full flex-col overflow-y-auto bg-background px-3 pb-safe text-foreground sm:px-4"
       style={{ 
         paddingTop: `calc(0.75rem + env(safe-area-inset-top, 0px))`,
-        paddingBottom: `calc(8rem + env(safe-area-inset-bottom, 0px))`,
+        paddingBottom: `calc(var(--app-nav-safe-offset) + 2rem)`,
         scrollBehavior: 'auto',
       }}
     >
@@ -961,29 +1016,41 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-10 mb-5 sm:mb-6 text-center"
+        className="relative z-10 mb-4 sm:mb-5 text-center"
       >
-        <p className="text-sm sm:text-base mb-0.5 bg-gradient-to-r from-[#3A8BFF] via-[#4DDDF9] to-[#3A8BFF] bg-clip-text text-transparent font-medium">
-          {getGreeting()}, <span className="font-semibold">{userName}</span>
-        </p>
-        <p className="text-lg sm:text-xl font-semibold bg-gradient-to-r from-[#3A8BFF] via-[#4DDDF9] to-[#3A8BFF] bg-clip-text text-transparent">
-          Set your macros. We&apos;ll find the meals.
+        <p className="bg-gradient-to-r from-[#0369A1] via-[#0891B2] to-[#1D4ED8] bg-clip-text text-base font-bold tracking-tight text-transparent sm:text-lg">
+          {getGreeting()}, <span className="font-bold">{userName}</span>
         </p>
       </motion.section>
 
-      {/* Main content: plate only */}
+      {/* Main content: unified search system */}
       <main className="relative z-10 flex-1 flex flex-col items-center">
+        <motion.section
+          initial={{ opacity: 0, scale: 0.96, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.45, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full max-w-3xl rounded-[2rem] border border-border/70 bg-card/80 px-4 py-5 shadow-[0_20px_70px_rgba(15,23,42,0.08)] backdrop-blur-md sm:px-8 sm:py-7"
+        >
+          <div className="flex flex-col items-center text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground sm:text-xs">
+              Build Your Search
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground sm:text-[15px]">
+              Set your calorie target, choose your macros, then find matching meals.
+            </p>
+          </div>
         <motion.div
           initial={{ opacity: 0, scale: 0.92 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full flex justify-center items-center py-6 sm:py-8"
+          className="w-full flex justify-center items-center pt-4 pb-4 sm:pt-5 sm:pb-5"
         >
           <div className="relative overflow-visible">
             <PlateSelector
               macro={macro}
               value={currentValue}
               config={config}
+              isLoading={isLoadingMeals}
             />
           </div>
         </motion.div>
@@ -993,7 +1060,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.2 }}
-          className="mt-6 sm:mt-8 flex gap-2 sm:gap-5 flex-nowrap justify-center"
+          className="flex gap-2 sm:gap-4 flex-wrap justify-center"
         >
           {(["calories", "protein", "carbs", "fats"] as MacroType[]).map(
             (type) => {
@@ -1085,7 +1152,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         </motion.div>
 
         {/* Ruler slider – always visible */}
-        <div className="mt-2 sm:mt-3 w-full max-w-md">
+        <div className="mt-3 sm:mt-4 w-full max-w-md mx-auto">
           <RulerSlider
             min={config.min}
             max={config.max}
@@ -1102,7 +1169,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           disabled={isLoadingMeals}
           whileHover={!isLoadingMeals ? { scale: 1.02 } : {}}
           whileTap={!isLoadingMeals ? { scale: 0.98 } : {}}
-          className="mt-3 sm:mt-4 w-full max-w-md h-12 sm:h-14 rounded-2xl bg-gradient-to-r from-[#3A8BFF] to-[#4DDDF9] text-white text-sm sm:text-base font-semibold flex items-center justify-center gap-2 shadow-lg shadow-[#3A8BFF]/30 hover:shadow-[#3A8BFF]/40 hover:opacity-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-4 sm:mt-5 w-full max-w-md mx-auto h-12 sm:h-14 rounded-2xl bg-gradient-to-r from-[#3A8BFF] to-[#4DDDF9] text-white text-sm sm:text-base font-semibold flex items-center justify-center gap-2 shadow-lg shadow-[#3A8BFF]/30 hover:shadow-[#3A8BFF]/40 hover:opacity-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoadingMeals ? (
             <>
@@ -1113,19 +1180,47 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
             "Find Meals That Match"
           )}
         </motion.button>
+        {isLoadingMeals && (
+          <motion.p
+            key={loadingStatusIndex}
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="mt-3 text-center text-sm font-medium text-muted-foreground"
+          >
+            {HOME_SEARCH_STATUS_MESSAGES[loadingStatusIndex]}
+          </motion.p>
+        )}
         {searchError && (
           <p className="mt-3 text-sm text-destructive text-center max-w-md mx-auto px-4">
             {searchError}
           </p>
         )}
+        </motion.section>
       </main>
 
       {/* Recommended Meals Section */}
       {(hasSearched || recommendedMeals.length > 0) && (
         <section ref={mealsSectionRef} className="relative z-10 w-full mt-6 sm:mt-8 mb-24 bg-background">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4 px-4 text-foreground">
-            Recommended Meals
-          </h2>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="mb-6 px-4"
+          >
+            <div className="flex items-center gap-3 pb-3">
+              <div className="h-px flex-1 bg-border" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                Meals matched to
+              </span>
+              <div className="h-px flex-1 bg-border" />
+            </div>
+            <div className="mx-auto max-w-2xl rounded-2xl border border-border/70 bg-card px-4 py-3 text-center shadow-sm sm:px-6">
+              <p className="text-sm sm:text-base font-semibold leading-relaxed text-foreground">
+                {resultsConstraintSummary || "Your current macro targets"}
+              </p>
+            </div>
+          </motion.div>
           
           {isLoadingMeals && recommendedMeals.length === 0 ? (
             <div className="flex items-center justify-center py-12">
@@ -1133,7 +1228,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
             </div>
           ) : recommendedMeals.length > 0 ? (
             <>
-              <div className="px-4 grid grid-cols-2 gap-3 sm:gap-4 items-stretch">
+              <div className="grid grid-cols-1 gap-4 px-1 min-[560px]:grid-cols-2 sm:gap-5 sm:px-4">
                 {recommendedMeals.map((meal, index) => (
                   <React.Fragment key={meal.id}>
                     {index === HOME_MEALS_PAGE_SIZE && (
@@ -1211,47 +1306,78 @@ type PlateSelectorProps = {
   macro: MacroType;
   value: number;
   config: MacroConfig;
+  isLoading?: boolean;
 };
 
-function PlateSelector({ macro, value, config }: PlateSelectorProps) {
+function PlateSelector({ macro, value, config, isLoading = false }: PlateSelectorProps) {
   return (
     <div className="mt-0 sm:mt-1 relative">
       <div className="relative h-40 w-40 sm:h-52 sm:w-52 mx-auto flex items-center justify-center">
+        <motion.div
+          animate={isLoading ? { rotate: 360 } : { rotate: 0 }}
+          transition={isLoading ? { duration: 1.15, repeat: Infinity, ease: "linear" } : { duration: 0.35, ease: "easeOut" }}
+          className="absolute inset-0"
+          style={{ transformOrigin: "50% 50%" }}
+        >
         {/* Plate: outer rim – raised edge like a real plate */}
         <div
           className="absolute inset-0 rounded-full dark:hidden"
           style={{
-            background: 'linear-gradient(145deg, #f5f5f5 0%, #e8e8e8 40%, #d4d4d4 100%)',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9)',
-            border: '3px solid rgba(255,255,255,0.9)',
+            background: 'radial-gradient(circle at 34% 28%, rgba(255,255,255,0.98) 0%, rgba(243,244,246,0.98) 32%, rgba(219,223,230,1) 68%, rgba(186,192,201,1) 100%)',
+            boxShadow: '0 16px 42px rgba(15,23,42,0.16), 0 6px 18px rgba(15,23,42,0.08), inset 0 2px 1px rgba(255,255,255,0.95), inset 0 -6px 12px rgba(148,163,184,0.25)',
+            border: '3px solid rgba(255,255,255,0.94)',
           }}
         />
         {/* Dark mode plate */}
         <div
           className="absolute inset-0 rounded-full dark:block hidden"
           style={{
-            background: 'linear-gradient(145deg, #475569 0%, #334155 40%, #1e293b 100%)',
-            boxShadow: '0 10px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)',
+            background: 'radial-gradient(circle at 35% 28%, rgba(100,116,139,0.96) 0%, rgba(71,85,105,0.98) 36%, rgba(30,41,59,1) 74%, rgba(15,23,42,1) 100%)',
+            boxShadow: '0 16px 44px rgba(2,6,23,0.42), inset 0 2px 1px rgba(255,255,255,0.08), inset 0 -8px 14px rgba(15,23,42,0.45)',
             border: '3px solid rgba(255,255,255,0.15)',
+          }}
+        />
+        <div
+          className="absolute inset-[10px] sm:inset-[14px] rounded-full dark:hidden"
+          style={{
+            border: '1.5px solid rgba(255,255,255,0.75)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.75)',
+          }}
+        />
+        <div
+          className="absolute inset-[10px] sm:inset-[14px] rounded-full hidden dark:block"
+          style={{
+            border: '1.5px solid rgba(255,255,255,0.08)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
           }}
         />
         {/* Inner well – recessed center (the “food” area) */}
         <div
           className="absolute inset-5 sm:inset-7 rounded-full dark:hidden"
           style={{
-            background: 'linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%)',
-            boxShadow: 'inset 0 6px 20px rgba(0,0,0,0.12), inset 0 -2px 8px rgba(255,255,255,0.6)',
-            border: '2px solid rgba(0,0,0,0.06)',
+            background: 'radial-gradient(circle at 50% 32%, rgba(255,255,255,0.98) 0%, rgba(249,250,251,0.98) 44%, rgba(234,237,242,0.98) 100%)',
+            boxShadow: 'inset 0 10px 22px rgba(148,163,184,0.18), inset 0 -3px 10px rgba(255,255,255,0.72)',
+            border: '2px solid rgba(148,163,184,0.14)',
           }}
         />
         <div
           className="absolute inset-5 sm:inset-7 rounded-full hidden dark:block"
           style={{
-            background: 'linear-gradient(180deg, #334155 0%, #1e293b 100%)',
-            boxShadow: 'inset 0 6px 20px rgba(0,0,0,0.4), inset 0 -2px 8px rgba(255,255,255,0.03)',
+            background: 'radial-gradient(circle at 50% 32%, rgba(71,85,105,0.82) 0%, rgba(30,41,59,0.96) 58%, rgba(15,23,42,1) 100%)',
+            boxShadow: 'inset 0 10px 22px rgba(2,6,23,0.42), inset 0 -3px 10px rgba(255,255,255,0.03)',
             border: '2px solid rgba(255,255,255,0.06)',
           }}
         />
+        {isLoading && (
+          <div className="absolute inset-[8px] sm:inset-[12px] rounded-full bg-[conic-gradient(from_0deg,transparent_0deg,transparent_248deg,rgba(37,99,235,0.10)_302deg,rgba(8,145,178,0.22)_326deg,rgba(77,221,249,0.34)_344deg,transparent_360deg)]" />
+        )}
+        {isLoading && (
+          <div className="absolute inset-[18px] sm:inset-[24px] rounded-full border border-[#0891B2]/18" />
+        )}
+        {isLoading && (
+          <div className="absolute inset-[28px] sm:inset-[38px] rounded-full border border-[#2563EB]/14" />
+        )}
+        </motion.div>
         {/* Content */}
         <div className="relative z-10 flex flex-col items-center justify-center">
           <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.16em] text-muted-foreground mb-0.5 font-medium">

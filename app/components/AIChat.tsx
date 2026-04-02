@@ -1813,7 +1813,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
       <div
         ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto p-4 space-y-4 pb-[220px]"
+        className="flex-1 space-y-4 overflow-y-auto p-4 pb-[calc(var(--app-nav-safe-offset)+10rem)]"
       >
         {messages.map((m) => {
           return (
@@ -1997,7 +1997,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       </div>
 
       {/* Quick Prompt Chips */}
-      <div className={`fixed bottom-[125px] md:bottom-[152px] left-0 right-0 w-full z-20 pb-2 md:pb-3 transition-all duration-300 ${isDark ? 'bg-gray-900' : 'bg-white'} ${isAtBottom ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}>
+      <div className={`fixed bottom-[calc(var(--app-nav-safe-offset)+var(--app-chat-composer-height)+0.5rem)] left-0 right-0 w-full z-20 pb-2 md:pb-3 transition-all duration-300 ${isDark ? 'bg-gray-900' : 'bg-white'} ${isAtBottom ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}>
         <div className="relative w-full max-w-3xl mx-auto px-3 md:px-4">
           <div className={`rounded-[1.25rem] border px-3 py-2 shadow-lg backdrop-blur-xl ${isDark ? 'border-gray-800 bg-gray-900/92 shadow-black/20' : 'border-gray-200 bg-white/92 shadow-gray-200/80'}`}>
             <p className={`mb-1 px-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
@@ -2024,7 +2024,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       </div>
 
       {/* Input Bar */}
-      <div className={`fixed bottom-0 left-0 right-0 w-full mb-[60px] z-30 flex items-center justify-center transition-all duration-300 ${isDark ? 'bg-gradient-to-t from-gray-950 via-gray-950/95 to-transparent' : 'bg-gradient-to-t from-white via-white/95 to-transparent'}`}>
+      <div className={`fixed bottom-[var(--app-nav-safe-offset)] left-0 right-0 z-30 flex w-full items-center justify-center transition-all duration-300 ${isDark ? 'bg-gradient-to-t from-gray-950 via-gray-950/95 to-transparent' : 'bg-gradient-to-t from-white via-white/95 to-transparent'}`}>
         <div className="w-full max-w-3xl px-3 pb-3 md:px-4 md:pb-4">
           <form
             onSubmit={onSubmit}

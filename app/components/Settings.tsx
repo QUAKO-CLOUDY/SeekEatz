@@ -27,10 +27,21 @@ import { useChat } from '../contexts/ChatContext';
 import { createClient } from '@/utils/supabase/client';
 import type { UserProfile } from '../types';
 import { requestNotificationPermission, sendMealSuggestionNotification } from '@/utils/notifications';
+import cavaData from '@/data/jsons/cava_raw.json';
 
 type Props = {
   userProfile: UserProfile;
   onUpdateProfile: (profile: UserProfile) => void;
+};
+
+type NotificationPreferenceKey = 'mealSuggestions' | 'dailySummary' | 'progressReminders';
+
+type NotificationPreferences = Record<NotificationPreferenceKey, boolean>;
+
+const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
+  mealSuggestions: false,
+  dailySummary: false,
+  progressReminders: false,
 };
 
 // Helper to generate initials from name
@@ -53,7 +64,6 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   // User data state
   const [userEmail, setUserEmail] = useState<string>('');
   const [userFullName, setUserFullName] = useState<string>('');
-  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
   const [updateError, setUpdateError] = useState<string | null>(null);
 
   // Helper function to safely convert number to database value (handles undefined/null/NaN)
@@ -72,7 +82,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   // Helper function to convert UserProfile to flat database columns
   const profileToDbColumns = (profile: UserProfile) => {
     // Use the component-level safeNumberForDb helper (defined above)
-    const columns: Record<string, any> = {
+    const columns: Record<string, unknown> = {
       target_calories: safeNumberForDb(profile.target_calories),
       target_protein_g: safeNumberForDb(profile.target_protein_g),
       target_carbs_g: safeNumberForDb(profile.target_carbs_g),
@@ -128,14 +138,6 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
     target_fats_g: safeNumberToString(userProfile.target_fats_g),
   });
   
-  // State for "Other" diet type input
-  const [showOtherDietInput, setShowOtherDietInput] = useState(false);
-  const [customDietType, setCustomDietType] = useState<string>('');
-  
-  // State for "Other" dietary options input
-  const [showOtherDietaryInput, setShowOtherDietaryInput] = useState(false);
-  const [customDietaryOption, setCustomDietaryOption] = useState<string>('');
-  
   // Notification preferences
   const [mealSuggestions, setMealSuggestions] = useState(false);
   const [dailySummary, setDailySummary] = useState(false);
@@ -143,6 +145,14 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
 
   // Settings subviews
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
+
+  const notificationStorageKey = `seekeatz-notification-prefs:${userEmail || 'guest'}`;
+
+  const applyNotificationPreferences = (preferences: NotificationPreferences) => {
+    setMealSuggestions(preferences.mealSuggestions);
+    setDailySummary(preferences.dailySummary);
+    setProgressReminders(preferences.progressReminders);
+  };
 
   // Migrate 'auto' theme to 'light' on mount
   useEffect(() => {
@@ -152,7 +162,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
       setTheme('light');
       localStorage.setItem('seekeatz-theme', 'light');
     }
-  }, []);
+  }, [setTheme]);
 
   // Load user profile data from Supabase on mount and when component becomes visible
   useEffect(() => {
@@ -184,8 +194,8 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
             
             // Convert flat database columns back to UserProfile object
             // Ensure numeric values are numbers or undefined (never null/NaN)
-            const safeNumber = (val: any): number | undefined => {
-              if (val === null || val === undefined || isNaN(val)) {
+            const safeNumber = (val: unknown): number | undefined => {
+              if (val === null || val === undefined) {
                 return undefined;
               }
               const num = typeof val === 'number' ? val : Number(val);
@@ -230,7 +240,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                     .eq('id', user.id);
                   // Also update localStorage
                   localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-                } catch (error: any) {
+                } catch (error: unknown) {
                   console.error('Error saving default search distance:', error);
                 }
               })();
@@ -251,8 +261,6 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
         console.error('Error loading user data:', error);
         setUserEmail('user@example.com');
         setUserFullName('User');
-      } finally {
-        setIsLoadingProfile(false);
       }
     };
 
@@ -280,181 +288,13 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
     }
   }, [userProfile.full_name, isEditing]);
 
-  // Handle diet type change - update Supabase (single selection: click to select, click again to deselect)
-  const handleDietTypeChange = async (dietType: string) => {
-    try {
-      setUpdateError(null);
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const currentDietType = userProfile.diet_type;
-      // Toggle: if already selected, clear it; otherwise set it
-      const updatedDietType = currentDietType === dietType ? undefined : dietType;
-      
-      const updatedProfile = { 
-        ...userProfile, 
-        diet_type: updatedDietType,
-      };
-      
-      // Update local state immediately for instant feedback
-      onUpdateProfile(updatedProfile);
 
-      if (!user) {
-        // If not logged in, still update local state and localStorage
-        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-        return;
-      }
-
-      // Convert to flat database columns
-      const dbColumns = profileToDbColumns(updatedProfile);
-
-      // Update in Supabase using flat columns with .update()
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          ...dbColumns,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user.id);
-
-      if (error) {
-        console.error('Error updating diet type:', error);
-        setUpdateError(`Failed to update diet type: ${error.message}`);
-        // Revert on error
-        onUpdateProfile(userProfile);
-        // Clear error after 5 seconds
-        setTimeout(() => setUpdateError(null), 5000);
-      } else {
-        // Also update localStorage
-        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-      }
-    } catch (error) {
-      console.error('Error saving diet type:', error);
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-      setUpdateError(`Failed to update diet type: ${errorMessage}`);
-      // Revert on error
-      onUpdateProfile(userProfile);
-      // Clear error after 5 seconds
-      setTimeout(() => setUpdateError(null), 5000);
-    }
-  };
-
-  // Handle "Other" diet type
-  const handleOtherDietTypeSubmit = async () => {
-    if (!customDietType.trim()) {
-      setShowOtherDietInput(false);
-      return;
-    }
-    
-    await handleDietTypeChange(customDietType.trim());
-    setCustomDietType('');
-    setShowOtherDietInput(false);
-  };
-
-  // Handle clicking "Other" button
-  const handleOtherDietTypeClick = () => {
-    if (showOtherDietInput) {
-      // If already showing, submit the custom diet type
-      handleOtherDietTypeSubmit();
-    } else {
-      // Show the input field
-      setShowOtherDietInput(true);
-    }
-  };
-
-  // Handle dietary options change - update Supabase
-  const handleDietaryOptionsChange = async (option: string, isSelected: boolean) => {
-    try {
-      setUpdateError(null);
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const currentOptions = userProfile.dietary_options || [];
-      const updatedOptions = isSelected
-        ? [...currentOptions, option]
-        : currentOptions.filter(opt => opt !== option);
-
-      const updatedProfile = { ...userProfile, dietary_options: updatedOptions };
-      
-      // Update local state immediately for instant feedback
-      onUpdateProfile(updatedProfile);
-
-      if (!user) {
-        // If not logged in, just update localStorage
-        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-        return;
-      }
-
-      // Convert to flat database columns
-      const dbColumns = profileToDbColumns(updatedProfile);
-      // Always include dietary_options, even if empty array
-      dbColumns.dietary_options = updatedOptions;
-
-      // Update in Supabase using flat columns with .update()
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          ...dbColumns,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user.id);
-
-      if (error) {
-        console.error('Error updating dietary options:', error);
-        setUpdateError(`Failed to update dietary options: ${error.message}`);
-        // Revert on error
-        onUpdateProfile(userProfile);
-        // Clear error after 5 seconds
-        setTimeout(() => setUpdateError(null), 5000);
-      } else {
-        // Also update localStorage
-        localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-      }
-    } catch (error) {
-      console.error('Error saving dietary options:', error);
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-      setUpdateError(`Failed to update dietary options: ${errorMessage}`);
-      // Revert on error
-      onUpdateProfile(userProfile);
-      // Clear error after 5 seconds
-      setTimeout(() => setUpdateError(null), 5000);
-    }
-  };
-
-  // Handle "Other" dietary option submit
-  const handleOtherDietaryOptionSubmit = async () => {
-    if (!customDietaryOption.trim()) {
-      setShowOtherDietaryInput(false);
-      return;
-    }
-    
-    const trimmedOption = customDietaryOption.trim();
-    // Check if it's already in the list
-    const currentOptions = userProfile.dietary_options || [];
-    if (currentOptions.includes(trimmedOption)) {
-      // If already selected, deselect it
-      await handleDietaryOptionsChange(trimmedOption, false);
-    } else {
-      // Add the custom option
-      await handleDietaryOptionsChange(trimmedOption, true);
-    }
-    
-    setCustomDietaryOption('');
-    setShowOtherDietaryInput(false);
-  };
-
-  // Handle clicking "Other" button for dietary options
-  const handleOtherDietaryOptionClick = () => {
-    if (showOtherDietaryInput) {
-      // If already showing, submit the custom dietary option
-      handleOtherDietaryOptionSubmit();
-    } else {
-      // Show the input field
-      setShowOtherDietaryInput(true);
-    }
-  };
 
   // Handle search distance change - update Supabase
   // IMPORTANT: This function MUST NOT send any chat messages or trigger AI prompts.
   // Radius changes should only update state and refresh meal results - never post to chat.
+  // This path is retained for the upcoming search-distance settings UI.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSearchDistanceChange = async (distance: number) => {
     setUpdateError(null);
     
@@ -513,7 +353,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
 
     // 2) LOG THE ACTUAL SUPABASE RESPONSE - Full response object
     try {
-      const updateData: Record<string, any> = {
+      const updateData: Record<string, unknown> = {
         [columnName]: valueToSave,
         updated_at: new Date().toISOString(),
       };
@@ -692,7 +532,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
         // Success - theme saved to Supabase (already saved to localStorage via setTheme above)
         console.log('✅ Theme preference saved to Supabase');
       }
-    } catch (exception: any) {
+    } catch (exception: unknown) {
       // Catch any unexpected exceptions (network errors, etc.)
       // Renamed to 'exception' to avoid shadowing Supabase error variable
       console.error('=== EXCEPTION DURING THEME SAVE ===');
@@ -708,21 +548,8 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
     }
   };
 
-  // Helper to pick a simple meal suggestion from static data
   const getRandomMealSuggestion = () => {
-    // For now, pick a random meal from CAVA data; this can be swapped
-    // to use the active meal database / user context later.
     try {
-      // Dynamic import to avoid affecting bundle size too much
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const cavaData = require('@/data/jsons/cava_raw.json') as {
-        restaurant_name: string;
-        items: Array<{
-          name: string;
-          macros?: { calories?: number; protein?: number };
-        }>;
-      };
-
       const items = cavaData?.items ?? [];
       if (!items.length) return null;
 
@@ -737,7 +564,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
 
       return {
         title,
-        body: bodyParts.join(' • '),
+        body: bodyParts.join(' | '),
       };
     } catch (err) {
       console.error('Error selecting meal suggestion:', err);
@@ -747,28 +574,33 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
 
   // Handle notification toggle
   const handleNotificationChange = (
-    key: 'mealSuggestions' | 'dailySummary' | 'progressReminders',
+    key: NotificationPreferenceKey,
     value: boolean
   ) => {
-    // Only update local state for now (no Supabase persistence yet)
-    if (key === 'mealSuggestions') {
-      setMealSuggestions(value);
+    const nextPreferences: NotificationPreferences = {
+      mealSuggestions,
+      dailySummary,
+      progressReminders,
+      [key]: value,
+    };
 
-      // When user turns Meal Suggestions ON, immediately send a suggestion
-      if (value) {
-        (async () => {
-          const permission = await requestNotificationPermission();
-          if (permission === 'granted') {
-            const suggestion = getRandomMealSuggestion();
-            if (suggestion) {
-              sendMealSuggestionNotification(suggestion);
-            }
-          }
-        })();
-      }
+    applyNotificationPreferences(nextPreferences);
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(notificationStorageKey, JSON.stringify(nextPreferences));
     }
-    if (key === 'dailySummary') setDailySummary(value);
-    if (key === 'progressReminders') setProgressReminders(value);
+
+    if (key === 'mealSuggestions' && value) {
+      (async () => {
+        const permission = await requestNotificationPermission();
+        if (permission === 'granted') {
+          const suggestion = getRandomMealSuggestion();
+          if (suggestion) {
+            sendMealSuggestionNotification(suggestion);
+          }
+        }
+      })();
+    }
   };
 
   // Handle edit mode toggle
@@ -937,6 +769,30 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
     }
   }, [userProfile, isEditing, userFullName]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const storedPreferences = localStorage.getItem(notificationStorageKey);
+    if (!storedPreferences) {
+      applyNotificationPreferences(DEFAULT_NOTIFICATION_PREFERENCES);
+      return;
+    }
+
+    try {
+      const parsedPreferences = JSON.parse(storedPreferences) as Partial<NotificationPreferences>;
+      applyNotificationPreferences({
+        mealSuggestions: parsedPreferences.mealSuggestions ?? false,
+        dailySummary: parsedPreferences.dailySummary ?? false,
+        progressReminders: parsedPreferences.progressReminders ?? false,
+      });
+    } catch (error) {
+      console.error('Error loading notification preferences:', error);
+      applyNotificationPreferences(DEFAULT_NOTIFICATION_PREFERENCES);
+    }
+  }, [notificationStorageKey]);
+
 
   // Handle logout
   const handleLogout = async () => {
@@ -953,25 +809,13 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
     }
   };
 
-  // Diet type options
-  const dietTypeOptions: Array<{ id: string; label: string }> = [
-    { id: 'Regular', label: 'Regular' },
-    { id: 'Vegetarian', label: 'Vegetarian' },
-    { id: 'Vegan', label: 'Vegan' },
-    { id: 'Pescatarian', label: 'Pescatarian' },
-    { id: 'Keto', label: 'Keto' },
-    { id: 'Low Carb', label: 'Low Carb' },
-  ];
-
-  // Dietary options/restrictions (allergen filters disabled for MVP)
-  const dietaryOptionLabels = [
-    'High Protein',
-  ];
+  const isLightTheme = theme === 'light' || resolvedTheme === 'light';
+  const isDarkTheme = theme === 'dark' || resolvedTheme === 'dark';
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-background h-full">
       {/* Header */}
-      <div className="border-b px-4 py-4 flex items-center gap-3">
+      <div className="flex items-center gap-3 border-b px-4 py-4">
         {showPrivacyPolicy && (
           <button
             type="button"
@@ -988,201 +832,302 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
 
       {/* Content */}
       {!showPrivacyPolicy ? (
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-background pb-24">
+      <div className="flex-1 space-y-4 overflow-y-auto bg-background px-4 py-5 pb-[calc(var(--app-nav-safe-offset)+1.5rem)] sm:p-6">
         {/* Profile & Goals Section */}
-        <div className="bg-card border rounded-lg p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-base font-medium text-foreground">Profile & Goals</h2>
-            {!isEditing ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleEditClick}
-                className="h-8"
-              >
-                <Edit className="size-4 mr-2" />
-                Edit
-              </Button>
-            ) : (
-              <div className="flex gap-2">
+        <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
+          <div className="border-b border-border/70 bg-gradient-to-r from-sky-500/10 via-cyan-500/10 to-transparent px-6 py-5">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="flex size-11 items-center justify-center rounded-xl border border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-300">
+                  <User className="size-5" />
+                </div>
+                <div className="space-y-1">
+                  <h2 className="text-lg font-semibold text-foreground">Profile & Goals</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Manage your identity and the calorie and macro targets used throughout the app.
+                  </p>
+                </div>
+              </div>
+              {!isEditing ? (
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  onClick={handleCancelEdit}
-                  disabled={isSaving}
-                  className="h-8"
+                  onClick={handleEditClick}
+                  className="h-9 rounded-lg px-4 text-black hover:text-black dark:text-white dark:hover:text-white"
                 >
-                  <X className="size-4 mr-2" />
-                  Cancel
+                  <Edit className="mr-2 size-4" />
+                  Edit Profile
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSaveProfile}
-                  disabled={isSaving}
-                  className="h-8"
-                >
-                  {isSaving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-foreground mr-2"></div>
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="size-4 mr-2" />
-                      Save
-                    </>
-                  )}
-                </Button>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCancelEdit}
+                    disabled={isSaving}
+                    className="h-9 rounded-lg px-4 text-black hover:text-black dark:text-white dark:hover:text-white"
+                  >
+                    <X className="mr-2 size-4" />
+                    Cancel
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleSaveProfile}
+                    disabled={isSaving}
+                    className="h-9 rounded-lg px-4"
+                  >
+                    {isSaving ? (
+                      <>
+                        <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current/25 border-t-current"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 size-4" />
+                        Save Changes
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-4 px-6 py-6">
+            {editError && (
+              <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-950/20 dark:text-red-400">
+                {editError}
               </div>
             )}
-          </div>
+            {updateError && (
+              <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-950/20 dark:text-red-400">
+                {updateError}
+              </div>
+            )}
 
-          {/* Error messages */}
-          {editError && (
-            <div className="mb-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-md p-3 text-sm">
-              {editError}
-            </div>
-          )}
-          {updateError && (
-            <div className="mb-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-md p-3 text-sm">
-              {updateError}
-            </div>
-          )}
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+              <div className="rounded-2xl border border-border/70 bg-background/60 p-5">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex size-12 items-center justify-center rounded-xl bg-muted text-sm font-semibold text-foreground">
+                    {getInitials(isEditing ? inputValues.full_name : (userProfile.full_name || userFullName))}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                      Identity
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      This name is used across your home, log, and chat experience.
+                    </p>
+                  </div>
+                </div>
 
-          {/* Avatar and Name/Email */}
-          <div className="flex items-center gap-4 mb-6 pb-6 border-b">
-            <div className="size-12 bg-muted rounded-md flex items-center justify-center text-foreground text-sm font-medium">
-              {getInitials(isEditing ? inputValues.full_name : (userProfile.full_name || userFullName))}
-            </div>
-            <div className="flex-1 min-w-0">
-              {isEditing ? (
-                <Input
-                  type="text"
-                  value={inputValues.full_name}
-                  onChange={(e) => setInputValues(prev => ({ ...prev, full_name: e.target.value }))}
-                  placeholder="Enter your name"
-                  className="text-base font-medium h-9 mb-1"
-                  autoFocus
-                />
-              ) : (
-                <h3 className="text-base font-medium text-foreground truncate">
-                  {userProfile.full_name || userFullName || 'User'}
-                </h3>
-              )}
-              <p className="text-sm text-muted-foreground truncate">
-                {userEmail || 'user@example.com'}
-              </p>
-            </div>
-          </div>
+                {isEditing ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="full_name" className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                      Full Name
+                    </Label>
+                    <Input
+                      id="full_name"
+                      type="text"
+                      value={inputValues.full_name}
+                      onChange={(e) => setInputValues(prev => ({ ...prev, full_name: e.target.value }))}
+                      placeholder="Enter your name"
+                      className="h-10 text-base font-medium"
+                      autoFocus
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Your email stays tied to your account and cannot be edited here.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <h3 className="truncate text-lg font-semibold text-foreground">
+                      {userProfile.full_name || userFullName || 'User'}
+                    </h3>
+                    <p className="truncate text-sm text-muted-foreground">
+                      {userEmail || 'user@example.com'}
+                    </p>
+                  </div>
+                )}
+              </div>
 
-          {/* Macro Targets */}
-          <div className="space-y-3 text-sm">
-            <div className="flex items-center justify-between py-3 border-b">
-              <span className="text-muted-foreground">Daily Calories</span>
-              {isEditing ? (
-                <Input
-                  type="number"
-                  min="500"
-                  max="5000"
-                  step="50"
-                  value={inputValues.target_calories}
-                  onChange={(e) => setInputValues(prev => ({ 
-                    ...prev, 
-                    target_calories: e.target.value 
-                  }))}
-                  className="w-32 h-8 text-right"
-                />
-              ) : (
-                <span className="text-foreground font-medium">{safeNumberToString(userProfile.target_calories) || 'Not set'} cal</span>
-              )}
-            </div>
-            <div className="flex items-center justify-between py-3 border-b">
-              <span className="text-muted-foreground">Protein Target</span>
-              {isEditing ? (
-                <Input
-                  type="number"
-                  min="0"
-                  max="500"
-                  step="5"
-                  value={inputValues.target_protein_g}
-                  onChange={(e) => setInputValues(prev => ({ 
-                    ...prev, 
-                    target_protein_g: e.target.value 
-                  }))}
-                  className="w-32 h-8 text-right"
-                />
-              ) : (
-                <span className="text-foreground font-medium">{safeNumberToString(userProfile.target_protein_g) || 'Not set'}g</span>
-              )}
-            </div>
-            <div className="flex items-center justify-between py-3 border-b">
-              <span className="text-muted-foreground">Carbs Target</span>
-              {isEditing ? (
-                <Input
-                  type="number"
-                  min="0"
-                  max="600"
-                  step="10"
-                  value={inputValues.target_carbs_g}
-                  onChange={(e) => setInputValues(prev => ({ 
-                    ...prev, 
-                    target_carbs_g: e.target.value 
-                  }))}
-                  className="w-32 h-8 text-right"
-                />
-              ) : (
-                <span className="text-foreground font-medium">{safeNumberToString(userProfile.target_carbs_g) || 'Not set'}g</span>
-              )}
-            </div>
-            <div className="flex items-center justify-between py-3">
-              <span className="text-muted-foreground">Fats Target</span>
-              {isEditing ? (
-                <Input
-                  type="number"
-                  min="0"
-                  max="300"
-                  step="5"
-                  value={inputValues.target_fats_g}
-                  onChange={(e) => setInputValues(prev => ({ 
-                    ...prev, 
-                    target_fats_g: e.target.value 
-                  }))}
-                  className="w-32 h-8 text-right"
-                />
-              ) : (
-                <span className="text-foreground font-medium">{safeNumberToString(userProfile.target_fats_g) || 'Not set'}g</span>
-              )}
+              <div className="rounded-2xl border border-border/70 bg-background/60 p-5">
+                <div className="mb-4">
+                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                    Daily Targets
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    These goals power your log screen, meal-detail previews, and personalized meal matching.
+                  </p>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-border/70 bg-card/80 p-4 sm:col-span-2">
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Daily Calories</p>
+                    {isEditing ? (
+                      <>
+                        <Input
+                          type="number"
+                          min="500"
+                          max="5000"
+                          step="50"
+                          value={inputValues.target_calories}
+                          onChange={(e) => setInputValues(prev => ({
+                            ...prev,
+                            target_calories: e.target.value
+                          }))}
+                          className="mt-3 h-10 text-base font-semibold"
+                        />
+                        <p className="mt-2 text-xs text-muted-foreground">500-5000 cal</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="mt-3 text-2xl font-semibold text-foreground">
+                          {safeNumberToString(userProfile.target_calories) || 'Not set'}{safeNumberToString(userProfile.target_calories) ? ' cal' : ''}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">Daily energy target</p>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="rounded-xl border border-border/70 bg-card/80 p-4">
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Protein</p>
+                    {isEditing ? (
+                      <>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="500"
+                          step="5"
+                          value={inputValues.target_protein_g}
+                          onChange={(e) => setInputValues(prev => ({
+                            ...prev,
+                            target_protein_g: e.target.value
+                          }))}
+                          className="mt-3 h-10 text-base font-semibold"
+                        />
+                        <p className="mt-2 text-xs text-muted-foreground">0-500g</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="mt-3 text-xl font-semibold text-foreground">
+                          {safeNumberToString(userProfile.target_protein_g) || 'Not set'}{safeNumberToString(userProfile.target_protein_g) ? 'g' : ''}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">Daily protein target</p>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="rounded-xl border border-border/70 bg-card/80 p-4">
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Carbs</p>
+                    {isEditing ? (
+                      <>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="600"
+                          step="10"
+                          value={inputValues.target_carbs_g}
+                          onChange={(e) => setInputValues(prev => ({
+                            ...prev,
+                            target_carbs_g: e.target.value
+                          }))}
+                          className="mt-3 h-10 text-base font-semibold"
+                        />
+                        <p className="mt-2 text-xs text-muted-foreground">0-600g</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="mt-3 text-xl font-semibold text-foreground">
+                          {safeNumberToString(userProfile.target_carbs_g) || 'Not set'}{safeNumberToString(userProfile.target_carbs_g) ? 'g' : ''}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">Daily carb target</p>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="rounded-xl border border-border/70 bg-card/80 p-4 sm:col-span-2">
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Fats</p>
+                    {isEditing ? (
+                      <>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="300"
+                          step="5"
+                          value={inputValues.target_fats_g}
+                          onChange={(e) => setInputValues(prev => ({
+                            ...prev,
+                            target_fats_g: e.target.value
+                          }))}
+                          className="mt-3 h-10 text-base font-semibold"
+                        />
+                        <p className="mt-2 text-xs text-muted-foreground">0-300g</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="mt-3 text-xl font-semibold text-foreground">
+                          {safeNumberToString(userProfile.target_fats_g) || 'Not set'}{safeNumberToString(userProfile.target_fats_g) ? 'g' : ''}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">Daily fat target</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Appearance Section */}
-        <div className="bg-card border rounded-lg p-6">
-          <h2 className="text-base font-medium text-foreground mb-4">Appearance</h2>
-          <Label className="mb-3 block text-muted-foreground">Theme</Label>
-          <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm">
+          <div className="mb-4">
+            <h2 className="text-base font-semibold text-foreground">Appearance</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Choose the interface that feels best for everyday meal tracking.</p>
+          </div>
+          <Label className="mb-3 block text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Theme</Label>
+          <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2">
             <button
               onClick={() => handleThemeChange('light')}
-              className={`p-3 rounded-md border transition-all flex flex-col items-center justify-center gap-2 ${
-                (theme === 'light' || resolvedTheme === 'light')
-                  ? 'border-foreground bg-muted'
+              className={`rounded-2xl border p-4 text-left transition-all ${
+                isLightTheme
+                  ? 'border-sky-500/40 bg-sky-500/10 shadow-[0_0_0_1px_rgba(14,165,233,0.15)]'
                   : 'border-border hover:bg-muted/50'
               }`}
             >
-              <Sun className={`size-4 ${(theme === 'light' || resolvedTheme === 'light') ? 'text-foreground' : 'text-muted-foreground'}`} />
-              <p className={`text-sm ${(theme === 'light' || resolvedTheme === 'light') ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>Light</p>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className={`flex size-10 items-center justify-center rounded-xl ${isLightTheme ? 'bg-white text-sky-700 shadow-sm' : 'bg-muted text-muted-foreground'}`}>
+                    <Sun className="size-4" />
+                  </div>
+                  <div>
+                    <p className={`text-sm font-semibold ${isLightTheme ? 'text-foreground' : 'text-foreground'}`}>Light</p>
+                    <p className="text-xs text-muted-foreground">Bright, clean, and easy to scan.</p>
+                  </div>
+                </div>
+                <div className={`size-3 rounded-full ${isLightTheme ? 'bg-sky-500' : 'bg-border'}`}></div>
+              </div>
             </button>
             <button
               onClick={() => handleThemeChange('dark')}
-              className={`p-3 rounded-md border transition-all flex flex-col items-center justify-center gap-2 ${
-                (theme === 'dark' || resolvedTheme === 'dark')
-                  ? 'border-foreground bg-muted'
+              className={`rounded-2xl border p-4 text-left transition-all ${
+                isDarkTheme
+                  ? 'border-sky-500/40 bg-sky-500/10 shadow-[0_0_0_1px_rgba(14,165,233,0.15)]'
                   : 'border-border hover:bg-muted/50'
               }`}
             >
-              <Moon className={`size-4 ${(theme === 'dark' || resolvedTheme === 'dark') ? 'text-foreground' : 'text-muted-foreground'}`} />
-              <p className={`text-sm ${(theme === 'dark' || resolvedTheme === 'dark') ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>Dark</p>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className={`flex size-10 items-center justify-center rounded-xl ${isDarkTheme ? 'bg-slate-950 text-sky-300 shadow-sm dark:bg-slate-900' : 'bg-muted text-muted-foreground'}`}>
+                    <Moon className="size-4" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Dark</p>
+                    <p className="text-xs text-muted-foreground">Lower glare with stronger contrast at night.</p>
+                  </div>
+                </div>
+                <div className={`size-3 rounded-full ${isDarkTheme ? 'bg-sky-500' : 'bg-border'}`}></div>
+              </div>
             </button>
           </div>
         </div>
@@ -1228,21 +1173,35 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
         </div>
 
         {/* Subscription Section */}
-        <div className="bg-card border rounded-lg p-6">
-          <h2 className="text-base font-medium text-foreground mb-4">Subscription</h2>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-foreground font-medium">Plan: Free</p>
-              <p className="text-sm text-muted-foreground">Upgrade to unlock premium features</p>
+        <div className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="flex size-10 items-center justify-center rounded-xl border border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-300">
+                <CreditCard className="size-5" />
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-foreground">Subscription</h2>
+              </div>
             </div>
+            <span className="rounded-full border border-border/70 bg-muted px-3 py-1 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              Free Plan
+            </span>
           </div>
-          <Button
-            onClick={() => router.push('/upgrade')}
-            variant="outline"
-            className="w-full text-black dark:text-white hover:text-white"
-          >
-            Manage Subscription
-          </Button>
+
+          <div className="mt-5 rounded-2xl border border-sky-500/15 bg-gradient-to-br from-sky-500/[0.08] via-background to-background p-5">
+            <p className="text-base font-semibold text-foreground">
+              Upgrade for unlimited searches and full access to all our features.
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Unlock the full SeekEatz concierge experience and head straight to the upgrade screen to choose a paid plan.
+            </p>
+            <Button
+              onClick={() => router.push('/upgrade')}
+              className="mt-4 w-full"
+            >
+              Manage Subscription
+            </Button>
+          </div>
         </div>
 
         {/* Help & Support Section */}
@@ -1296,34 +1255,39 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
         </div>
 
         {/* Account Section */}
-        <div className="bg-card border rounded-lg p-6">
-          <h2 className="text-base font-medium text-foreground mb-4">Account</h2>
+        <div className="rounded-2xl border border-red-200 bg-red-50/70 p-6 shadow-sm dark:border-red-900 dark:bg-red-950/15">
+          <div className="mb-4 space-y-1">
+            <h2 className="text-base font-semibold text-foreground">Account</h2>
+            <p className="text-sm text-muted-foreground">
+              Sign out of SeekEatz on this device. This action does not delete your account or saved data.
+            </p>
+          </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-3 p-3 border border-red-200 dark:border-red-800 rounded-md hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-red-200 bg-background/90 p-3 transition-colors hover:bg-red-50 dark:border-red-800 dark:bg-background/40 dark:hover:bg-red-950/20"
           >
             <LogOut className="size-4 text-red-600 dark:text-red-400" />
-            <span className="text-red-600 dark:text-red-400 font-medium">Log Out</span>
+            <span className="font-medium text-red-600 dark:text-red-400">Log Out</span>
           </button>
         </div>
       </div>
       ) : (
-        <div className="flex-1 overflow-y-auto px-4 py-6 bg-background pb-24">
-          <div className="max-w-2xl mx-auto space-y-6 text-sm text-muted-foreground">
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold text-foreground">Privacy Policy</h2>
-              <p className="font-semibold text-foreground">Last updated: March 17, 2026</p>
+        <div className="flex-1 overflow-y-auto bg-background px-4 py-6 pb-[calc(var(--app-nav-safe-offset)+1.5rem)]">
+          <div className="mx-auto max-w-3xl space-y-5">
+            <div className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm space-y-3 text-sm leading-7 text-muted-foreground">
+              <h2 className="text-xl font-semibold text-foreground">Privacy Policy</h2>
+              <p className="text-sm font-medium text-foreground">Last updated: March 17, 2026</p>
               <p>
-                <span className="font-semibold text-foreground">SeekEatz</span> (“SeekEatz,” “we,” “us,” or “our”) respects your privacy and is committed to protecting the information you share with us.
+                <span className="font-semibold text-foreground">SeekEatz</span> (&quot;SeekEatz,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) respects your privacy and is committed to protecting the information you share with us.
                 This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our applications, website,
-                and related services (the “Service”).
+                and related services (the &quot;Service&quot;).
               </p>
               <p>
                 By using the Service, you agree to the practices described in this Privacy Policy. If you do not agree with this policy, please do not use the Service.
               </p>
             </div>
 
-            <section className="space-y-2">
+            <section className="rounded-2xl border border-border/70 bg-card/70 p-5 text-sm leading-7 text-muted-foreground shadow-sm space-y-3">
               <h3 className="text-base font-semibold text-foreground">1. Information We Collect</h3>
               <p>We collect information in the following ways:</p>
 
@@ -1365,7 +1329,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               </ul>
             </section>
 
-            <section className="space-y-2">
+            <section className="rounded-2xl border border-border/70 bg-card/70 p-5 text-sm leading-7 text-muted-foreground shadow-sm space-y-3">
               <h3 className="text-base font-semibold text-foreground">2. How We Use Your Information</h3>
               <p>We use collected information to operate and improve SeekEatz, including to:</p>
               <ul className="list-disc pl-5 space-y-1">
@@ -1382,13 +1346,13 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               </p>
             </section>
 
-            <section className="space-y-2">
+            <section className="rounded-2xl border border-border/70 bg-card/70 p-5 text-sm leading-7 text-muted-foreground shadow-sm space-y-3">
               <h3 className="text-base font-semibold text-foreground">3. AI Features and Your Data</h3>
               <p>
                 SeekEatz includes AI-powered features designed to help users discover meals and receive personalized recommendations.
               </p>
               <p>
-                To generate responses, certain inputs—such as chat messages, search queries, and relevant profile information—may be processed by AI service providers
+                To generate responses, certain inputs such as chat messages, search queries, and relevant profile information may be processed by AI service providers
                 operating on our behalf.
               </p>
               <p>
@@ -1400,7 +1364,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               </p>
             </section>
 
-            <section className="space-y-2">
+            <section className="rounded-2xl border border-border/70 bg-card/70 p-5 text-sm leading-7 text-muted-foreground shadow-sm space-y-3">
               <h3 className="text-base font-semibold text-foreground">4. Cookies and Similar Technologies</h3>
               <p>
                 We may use cookies, local storage, and similar technologies to:
@@ -1416,7 +1380,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               </p>
             </section>
 
-            <section className="space-y-2">
+            <section className="rounded-2xl border border-border/70 bg-card/70 p-5 text-sm leading-7 text-muted-foreground shadow-sm space-y-3">
               <h3 className="text-base font-semibold text-foreground">5. How We Share Information</h3>
               <p>We may share information in the following situations:</p>
               <p className="font-semibold text-foreground">Service Providers</p>
@@ -1441,7 +1405,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               </p>
             </section>
 
-            <section className="space-y-2">
+            <section className="rounded-2xl border border-border/70 bg-card/70 p-5 text-sm leading-7 text-muted-foreground shadow-sm space-y-3">
               <h3 className="text-base font-semibold text-foreground">6. Data Retention</h3>
               <p>
                 We retain personal information only for as long as necessary to provide the Service and fulfill legitimate business or legal obligations.
@@ -1451,7 +1415,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               </p>
             </section>
 
-            <section className="space-y-2">
+            <section className="rounded-2xl border border-border/70 bg-card/70 p-5 text-sm leading-7 text-muted-foreground shadow-sm space-y-3">
               <h3 className="text-base font-semibold text-foreground">7. Security</h3>
               <p>
                 We implement reasonable technical and organizational safeguards designed to protect your information, including encryption in transit,
@@ -1462,7 +1426,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               </p>
             </section>
 
-            <section className="space-y-2">
+            <section className="rounded-2xl border border-border/70 bg-card/70 p-5 text-sm leading-7 text-muted-foreground shadow-sm space-y-3">
               <h3 className="text-base font-semibold text-foreground">8. Your Rights and Choices</h3>
               <p>
                 Depending on your location, you may have rights regarding your personal information, including the ability to:
@@ -1481,7 +1445,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               </p>
             </section>
 
-            <section className="space-y-2">
+            <section className="rounded-2xl border border-border/70 bg-card/70 p-5 text-sm leading-7 text-muted-foreground shadow-sm space-y-3">
               <h3 className="text-base font-semibold text-foreground">9. Children&apos;s Privacy</h3>
               <p>
                 SeekEatz is not intended for children under the age of 13 (or under 16 in certain jurisdictions). We do not knowingly collect personal
@@ -1493,7 +1457,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               </p>
             </section>
 
-            <section className="space-y-2">
+            <section className="rounded-2xl border border-border/70 bg-card/70 p-5 text-sm leading-7 text-muted-foreground shadow-sm space-y-3">
               <h3 className="text-base font-semibold text-foreground">10. Third-Party Links</h3>
               <p>
                 The Service may contain links to third-party websites or services. SeekEatz is not responsible for the privacy practices of those third parties,
@@ -1501,18 +1465,18 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               </p>
             </section>
 
-            <section className="space-y-2">
+            <section className="rounded-2xl border border-border/70 bg-card/70 p-5 text-sm leading-7 text-muted-foreground shadow-sm space-y-3">
               <h3 className="text-base font-semibold text-foreground">11. Changes to This Policy</h3>
               <p>
                 We may update this Privacy Policy periodically to reflect changes in our practices, technology, or legal requirements. When updates occur,
-                the “Last updated” date will be revised.
+                the &quot;Last updated&quot; date will be revised.
               </p>
               <p>
                 Continued use of the Service after changes become effective constitutes acceptance of the updated policy.
               </p>
             </section>
 
-            <section className="space-y-2">
+            <section className="rounded-2xl border border-border/70 bg-card/70 p-5 text-sm leading-7 text-muted-foreground shadow-sm space-y-3">
               <h3 className="text-base font-semibold text-foreground">12. Contact Us</h3>
               <p>
                 If you have questions about this Privacy Policy or our data practices, please contact us at:

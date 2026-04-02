@@ -3,6 +3,7 @@
  * Fetches single-ingredient (modifier) rows from menu_items for a specific restaurant
  */
 
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { normalizeMacros, type Macros } from '@/lib/macro-utils';
 
 export type ModifierCandidate = {
@@ -10,6 +11,31 @@ export type ModifierCandidate = {
   name: string;
   category: string;
   macros: Macros;
+  relationType?: string;
+  groupName?: string;
+  minQuantity?: number;
+  defaultQuantity?: number;
+  maxQuantity?: number;
+  unitLabel?: string | null;
+};
+
+type MenuItemCandidateRow = {
+  id: string;
+  name: string | null;
+  category: string | null;
+  macros: unknown;
+  modifier_unit_label?: string | null;
+  modifier_unit_default_qty?: number | null;
+  modifier_unit_max_qty?: number | null;
+};
+
+type MenuItemRelationRow = {
+  child_item_id: string;
+  relation_type: string;
+  group_name: string | null;
+  min_quantity: number | null;
+  default_quantity: number | null;
+  max_quantity: number | null;
 };
 
 export type MealModifierContext =
@@ -161,7 +187,7 @@ export function filterModifierCandidatesForMeal(
  *   category ILIKE any of: '%modifier%', '%ingredient%', '%add%', '%topping%', '%protein%', '%side%', '%sauce%', '%extra%'
  */
 export async function getModifierCandidates(
-  supabase: any,
+  supabase: SupabaseClient,
   restaurant_name: string
 ): Promise<ModifierCandidate[]> {
   if (!restaurant_name || !supabase) {
@@ -258,6 +284,103 @@ export async function getModifierCandidates(
     return candidates;
   } catch (error) {
     console.error('[modifierCandidates] Exception fetching candidates:', error);
+    return [];
+  }
+}
+
+export async function getLinkedModifierCandidates(
+  supabase: SupabaseClient,
+  mealId: string | number | null | undefined
+): Promise<ModifierCandidate[]> {
+  if (!mealId || !supabase) {
+    return [];
+  }
+
+  try {
+    const { data: relations, error: relationsError } = await supabase
+      .from('menu_item_relations')
+      .select(`
+        child_item_id,
+        relation_type,
+        group_name,
+        min_quantity,
+        default_quantity,
+        max_quantity
+      `)
+      .eq('parent_item_id', mealId);
+
+    if (relationsError) {
+      console.error('[modifierCandidates] Error fetching linked relations:', relationsError);
+      return [];
+    }
+
+    if (!relations || relations.length === 0) {
+      return [];
+    }
+
+    const typedRelations = relations as MenuItemRelationRow[];
+    const childIds = [...new Set(typedRelations.map((relation) => relation.child_item_id).filter(Boolean))];
+    if (childIds.length === 0) {
+      return [];
+    }
+
+    const { data: linkedItems, error: itemsError } = await supabase
+      .from('menu_items')
+      .select(`
+        id,
+        name,
+        category,
+        macros,
+        modifier_unit_label,
+        modifier_unit_default_qty,
+        modifier_unit_max_qty
+      `)
+      .in('id', childIds);
+
+    if (itemsError) {
+      console.error('[modifierCandidates] Error fetching linked items:', itemsError);
+      return [];
+    }
+
+    if (!linkedItems || linkedItems.length === 0) {
+      return [];
+    }
+
+    const relationByChildId = new Map(
+      typedRelations.map((relation) => [String(relation.child_item_id), relation])
+    );
+
+    const candidates: ModifierCandidate[] = [];
+
+    for (const item of linkedItems as MenuItemCandidateRow[]) {
+      if (!item.macros || typeof item.macros !== 'object') {
+        continue;
+      }
+
+      const normalizedMacros = normalizeMacros(item.macros);
+      if (!normalizedMacros || normalizedMacros.calories <= 0) {
+        continue;
+      }
+
+      const relation = relationByChildId.get(String(item.id));
+
+      candidates.push({
+        id: item.id,
+        name: item.name || 'Unknown',
+        category: item.category || '',
+        macros: normalizedMacros,
+        relationType: relation?.relation_type,
+        groupName: relation?.group_name,
+        minQuantity: relation?.min_quantity,
+        defaultQuantity: relation?.default_quantity ?? item.modifier_unit_default_qty ?? 1,
+        maxQuantity: relation?.max_quantity ?? item.modifier_unit_max_qty ?? 1,
+        unitLabel: item.modifier_unit_label ?? null,
+      });
+    }
+
+    return candidates;
+  } catch (error) {
+    console.error('[modifierCandidates] Exception fetching linked candidates:', error);
     return [];
   }
 }

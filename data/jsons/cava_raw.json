@@ -1,280 +1,1149 @@
 {
     "restaurant_name": "CAVA",
     "items": [
-        {
-            "name": "Spicy Lamb + Avocado",
-            "category": "Entree",
-            "price_estimate": null,
-            "macros": {
-                "calories": 800,
-                "protein": 43,
-                "carbs": 49,
-                "fat": 52
-            }
-        },
-        {
-            "name": "Steak + Harissa",
-            "category": "Entree",
-            "price_estimate": null,
-            "macros": {
-                "calories": 620,
-                "protein": 36,
-                "carbs": 39,
-                "fat": 36
-            }
-        },
-        {
-            "name": "Harissa Avocado",
-            "category": "Entree",
-            "price_estimate": null,
-            "macros": {
-                "calories": 830,
-                "protein": 41,
-                "carbs": 62,
-                "fat": 49
-            }
-        },
-        {
-            "name": "Chicken + Rice",
-            "category": "Entree",
-            "price_estimate": null,
-            "macros": {
-                "calories": 700,
-                "protein": 40,
-                "carbs": 44,
-                "fat": 42
-            }
-        },
-        {
-            "name": "Greek Salad",
-            "category": "Entree",
-            "price_estimate": null,
-            "macros": {
-                "calories": 580,
-                "protein": 37,
-                "carbs": 19,
-                "fat": 40
-            }
-        },
-        {
-            "name": "Garlicky Chicken Shawarma",
-            "category": "Entree",
-            "price_estimate": null,
-            "macros": {
-                "calories": 600,
-                "protein": 27,
-                "carbs": 50,
-                "fat": 34
-            }
-        },
-        {
-            "name": "Falafel Crunch",
-            "category": "Entree",
-            "price_estimate": null,
-            "macros": {
-                "calories": 860,
-                "protein": 24,
-                "carbs": 88,
-                "fat": 56
-            }
-        },
-        {
-            "name": "Spicy Chicken + Avocado",
-            "category": "Entree",
-            "price_estimate": null,
-            "macros": {
-                "calories": 980,
-                "protein": 50,
-                "carbs": 85,
-                "fat": 51
-            }
-        },
-        {
-            "name": "Steak + Feta",
-            "category": "Entree",
-            "price_estimate": null,
-            "macros": {
-                "calories": 820,
-                "protein": 44,
-                "carbs": 68,
-                "fat": 42
-            }
-        },
-        {
-            "name": "Chicken Shawarma",
-            "category": "Entree",
-            "price_estimate": null,
-            "macros": {
-                "calories": 640,
-                "protein": 33,
-                "carbs": 70,
-                "fat": 26
-            }
-        },
-        {
-            "name": "Greek Chicken",
-            "category": "Entree",
-            "price_estimate": null,
-            "macros": {
-                "calories": 870,
-                "protein": 48,
-                "carbs": 69,
-                "fat": 45
-            }
-        },
-        {
-            "name": "Braised Lamb",
-            "category": "Protein",
-            "price_estimate": null,
-            "macros": {
-                "calories": 210,
-                "protein": 24,
-                "carbs": 2,
-                "fat": 12
-            }
-        },
-        {
-            "name": "Grilled Chicken",
-            "category": "Protein",
-            "price_estimate": null,
-            "macros": {
-                "calories": 250,
-                "protein": 28,
-                "carbs": 3,
-                "fat": 13
-            }
-        },
-        {
-            "name": "Falafel",
-            "category": "Protein",
-            "price_estimate": null,
-            "macros": {
-                "calories": 350,
-                "protein": 6,
-                "carbs": 24,
-                "fat": 26
-            }
-        },
-        {
-            "name": "Grilled Steak",
-            "category": "Protein",
-            "price_estimate": null,
-            "macros": {
-                "calories": 170,
-                "protein": 23,
-                "carbs": 1,
-                "fat": 9
-            }
-        },
-        {
-            "name": "Harissa Honey Chicken",
-            "category": "Protein",
-            "price_estimate": null,
-            "macros": {
-                "calories": 260,
-                "protein": 26,
-                "carbs": 7,
-                "fat": 14
-            }
-        },
-        {
-            "name": "Spicy Lamb Meatballs",
-            "category": "Protein",
-            "price_estimate": null,
-            "macros": {
-                "calories": 300,
-                "protein": 24,
-                "carbs": 3,
-                "fat": 21
-            }
-        },
-        {
-            "name": "Greek Vinaigrette",
-            "category": "Sauce",
-            "price_estimate": null,
-            "macros": {
-                "calories": 130,
-                "protein": 0,
-                "carbs": 1,
-                "fat": 14
-            }
-        },
-        {
-            "name": "Garlic Dressing",
-            "category": "Sauce",
-            "price_estimate": null,
-            "macros": {
-                "calories": 180,
-                "protein": 0,
-                "carbs": 0,
-                "fat": 20
-            }
-        },
-        {
-            "name": "Lemon Herb Tahini",
-            "category": "Sauce",
-            "price_estimate": null,
-            "macros": {
-                "calories": 70,
-                "protein": 2,
-                "carbs": 4,
-                "fat": 6
-            }
-        },
-        {
-            "name": "Tahin Caesar",
-            "category": "Sauce",
-            "price_estimate": null,
-            "macros": {
-                "calories": 90,
-                "protein": 2,
-                "carbs": 3,
-                "fat": 8
-            }
-        },
-        {
-            "name": "Skhung",
-            "category": "Sauce",
-            "price_estimate": null,
-            "macros": {
-                "calories": 80,
-                "protein": 0,
-                "carbs": 1,
-                "fat": 9
-            }
-        },
-        {
-            "name": "Hot Harissa Vinaigrette",
-            "category": "Sauce",
-            "price_estimate": null,
-            "macros": {
-                "calories": 70,
-                "protein": 0,
-                "carbs": 1,
-                "fat": 7
-            }
-        },
-        {
-            "name": "Balsamic Date Vinaigrette",
-            "category": "Sauce",
-            "price_estimate": null,
-            "macros": {
-                "calories": 60,
-                "protein": 0,
-                "carbs": 7,
-                "fat": 4
-            }
-        },
-        {
-            "name": "Yogurt Dill",
-            "category": "Sauce",
-            "price_estimate": null,
-            "macros": {
-                "calories": 30,
-                "protein": 2,
-                "carbs": 1,
-                "fat": 2
-            }
+      {
+        "name": "Spicy Lamb + Avocado",
+        "category": "Curated Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 800,
+          "protein": 43,
+          "carbs": 49,
+          "fat": 52
         }
+      },
+      {
+        "name": "Steak + Harissa",
+        "category": "Curated Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 620,
+          "protein": 36,
+          "carbs": 39,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Harissa Avocado",
+        "category": "Curated Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 830,
+          "protein": 41,
+          "carbs": 62,
+          "fat": 49
+        }
+      },
+      {
+        "name": "Chicken + Rice",
+        "category": "Curated Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 700,
+          "protein": 40,
+          "carbs": 44,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Greek Salad",
+        "category": "Curated Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 580,
+          "protein": 37,
+          "carbs": 19,
+          "fat": 40
+        }
+      },
+      {
+        "name": "Garlicky Chicken Shawarma",
+        "category": "Curated Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 600,
+          "protein": 27,
+          "carbs": 50,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Falafel Crunch",
+        "category": "Curated Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 860,
+          "protein": 24,
+          "carbs": 88,
+          "fat": 56
+        }
+      },
+      {
+        "name": "Spicy Chicken + Avocado",
+        "category": "Curated Pitas",
+        "price_estimate": null,
+        "macros": {
+          "calories": 980,
+          "protein": 50,
+          "carbs": 85,
+          "fat": 51
+        }
+      },
+      {
+        "name": "Steak + Feta",
+        "category": "Curated Pitas",
+        "price_estimate": null,
+        "macros": {
+          "calories": 820,
+          "protein": 44,
+          "carbs": 68,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Chicken Shawarma",
+        "category": "Curated Pitas",
+        "price_estimate": null,
+        "macros": {
+          "calories": 640,
+          "protein": 33,
+          "carbs": 70,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Greek Chicken",
+        "category": "Curated Pitas",
+        "price_estimate": null,
+        "macros": {
+          "calories": 870,
+          "protein": 48,
+          "carbs": 69,
+          "fat": 45
+        }
+      },
+      {
+        "name": "Brown Rice",
+        "category": "Greens + Grains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 310,
+          "protein": 7,
+          "carbs": 48,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Saffron Basmati Rice",
+        "category": "Greens + Grains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 290,
+          "protein": 5,
+          "carbs": 54,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Black Lentils",
+        "category": "Greens + Grains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 270,
+          "protein": 18,
+          "carbs": 37,
+          "fat": 7
+        }
+      },
+      {
+        "name": "SuperGreens",
+        "category": "Greens + Grains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 3,
+          "carbs": 6,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Arugula",
+        "category": "Greens + Grains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 2,
+          "carbs": 3,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Baby Spinach",
+        "category": "Greens + Grains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 3,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Romaine",
+        "category": "Greens + Grains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 1,
+          "carbs": 4,
+          "fat": 0
+        }
+      },
+      {
+        "name": "SplendidGreens®",
+        "category": "Greens + Grains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 1,
+          "carbs": 4,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Braised Lamb",
+        "category": "Mains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 24,
+          "carbs": 2,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Grilled Chicken",
+        "category": "Mains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 28,
+          "carbs": 3,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Falafel",
+        "category": "Mains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 350,
+          "protein": 6,
+          "carbs": 24,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Grilled Steak",
+        "category": "Mains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 23,
+          "carbs": 1,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Harissa Honey Chicken",
+        "category": "Mains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 260,
+          "protein": 26,
+          "carbs": 7,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Roasted Vegetables",
+        "category": "Mains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 3,
+          "carbs": 14,
+          "fat": 4.5
+        }
+      },
+      {
+        "name": "Spicy Lamb Meatballs",
+        "category": "Mains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 24,
+          "carbs": 3,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Chicken Shawarma",
+        "category": "Mains",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 16,
+          "carbs": 1,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Kids Pita Chips",
+        "category": "Kids Meal",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 5,
+          "carbs": 20,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Kids Saffron Basmati Rice",
+        "category": "Kids Meal",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 3,
+          "carbs": 27,
+          "fat": 3.5
+        }
+      },
+      {
+        "name": "Kids Brown Rice",
+        "category": "Kids Meal",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 3,
+          "carbs": 24,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Kids Black Lentils",
+        "category": "Kids Meal",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 9,
+          "carbs": 18,
+          "fat": 3.5
+        }
+      },
+      {
+        "name": "Kids Mini Pita",
+        "category": "Kids Meal",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 7,
+          "carbs": 27,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Carrot Sticks",
+        "category": "Kids Meal",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 1,
+          "carbs": 10,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Kids Chicken",
+        "category": "Kids Meal",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 14,
+          "carbs": 1,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Kids Harissa Honey Chicken",
+        "category": "Kids Meal",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 13,
+          "carbs": 4,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Kids Chicken Shawarma",
+        "category": "Kids Meal",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 8,
+          "carbs": 1,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Kids Falafel",
+        "category": "Kids Meal",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 3,
+          "carbs": 12,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Kids Spicy Lamb Meatballs",
+        "category": "Kids Meal",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 12,
+          "carbs": 2,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Kids Roasted Vegetables",
+        "category": "Kids Meal",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 2,
+          "carbs": 7,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Kids Braised Lamb",
+        "category": "Kids Meal",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 12,
+          "carbs": 1,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Kids Grilled Steak",
+        "category": "Kids Meal",
+        "price_estimate": null,
+        "macros": {
+          "calories": 90,
+          "protein": 11,
+          "carbs": 0,
+          "fat": 4.5
+        }
+      },
+      {
+        "name": "Shredded Romaine",
+        "category": "Toppings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Pita Crisps",
+        "category": "Toppings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 1,
+          "carbs": 6,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Cabbage Slaw",
+        "category": "Toppings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Tomato + Onion",
+        "category": "Toppings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Persian Cucumber",
+        "category": "Toppings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Tomato + Cucumber",
+        "category": "Toppings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Kalamata Olives",
+        "category": "Toppings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Fiery Broccoli",
+        "category": "Toppings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Pickled Onions",
+        "category": "Toppings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Salt-Brined Pickles",
+        "category": "Toppings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Crumbled Feta",
+        "category": "Toppings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 3,
+          "carbs": 0,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Fire-Roasted Corn",
+        "category": "Toppings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 45,
+          "protein": 1,
+          "carbs": 5,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Avocado",
+        "category": "Toppings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 1,
+          "carbs": 6,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Tzatziki",
+        "category": "Dips + Spreads",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 2,
+          "carbs": 1,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Hummus",
+        "category": "Dips + Spreads",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 2,
+          "carbs": 4,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Roasted Eggplant",
+        "category": "Dips + Spreads",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Crazy Feta®",
+        "category": "Dips + Spreads",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 4,
+          "carbs": 1,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Harissa",
+        "category": "Dips + Spreads",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 1,
+          "carbs": 5,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Red Pepper Hummus",
+        "category": "Dips + Spreads",
+        "price_estimate": null,
+        "macros": {
+          "calories": 40,
+          "protein": 2,
+          "carbs": 5,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Balsamic Date Vinaigrette",
+        "category": "Dressings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 60,
+          "protein": 0,
+          "carbs": 7,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Yogurt Dill",
+        "category": "Dressings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 2,
+          "carbs": 1,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Lemon-Herb Tahini",
+        "category": "Dressings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 2,
+          "carbs": 4,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Tahini Caesar",
+        "category": "Dressings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 90,
+          "protein": 2,
+          "carbs": 3,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Greek Vinaigrette",
+        "category": "Dressings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Skhug",
+        "category": "Dressings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Hot Harissa Vinaigrette",
+        "category": "Dressings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Garlic Dressing",
+        "category": "Dressings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 180,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Whole Pita",
+        "category": "Sides",
+        "price_estimate": null,
+        "macros": {
+          "calories": 320,
+          "protein": 13,
+          "carbs": 54,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Side Pita",
+        "category": "Sides",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 3,
+          "carbs": 14,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Pita Chips",
+        "category": "Sides",
+        "price_estimate": null,
+        "macros": {
+          "calories": 280,
+          "protein": 10,
+          "carbs": 41,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Cinnamon Sugar Pita Chips",
+        "category": "Sides",
+        "price_estimate": null,
+        "macros": {
+          "calories": 310,
+          "protein": 10,
+          "carbs": 50,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Greyston Chocolate Chip Blondie",
+        "category": "Sides",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 2,
+          "carbs": 22,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Greyston Brownie",
+        "category": "Sides",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 2,
+          "carbs": 17,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Whisked! Apricot Honey (DMV)",
+        "category": "Sides",
+        "price_estimate": null,
+        "macros": {
+          "calories": 220,
+          "protein": 3,
+          "carbs": 34,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Whisked! Salted Dark Chocolate Oat Cookie",
+        "category": "Sides",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 4,
+          "carbs": 31,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Classic Lemonade - Kids (12 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 200,
+          "protein": 0,
+          "carbs": 52,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Classic Lemonade - Small (16 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 260,
+          "protein": 0,
+          "carbs": 69,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Classic Lemonade - Large (22 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 0,
+          "carbs": 95,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Classic Lemonade (CA) - Kids (12 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 0,
+          "carbs": 41,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Classic Lemonade (CA) - Small (16 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 0,
+          "carbs": 55,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Classic Lemonade (CA) - Large (22 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 290,
+          "protein": 0,
+          "carbs": 75,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Black Tea Unsweetened - Kids (12 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Black Tea Unsweetened - Small (16 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Black Tea Unsweetened - Large (22 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sweet Tea - Kids (12 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 0,
+          "carbs": 28,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sweet Tea - Small (16 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 0,
+          "carbs": 37,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sweet Tea - Large (22 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 200,
+          "protein": 0,
+          "carbs": 51,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Jasmine Tea - Kids (12 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Strawberry Citrus - Kids (12 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 26,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Strawberry Citrus - Small (16 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 0,
+          "carbs": 35,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Strawberry Citrus - Large (22 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 1,
+          "carbs": 48,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Cucumber Mint Lime - Kids (12 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 0,
+          "carbs": 33,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Cucumber Mint Lime - Small (16 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 180,
+          "protein": 1,
+          "carbs": 44,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Cucumber Mint Lime - Large (22 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 1,
+          "carbs": 61,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Blueberry Lavender - Kids (12 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 0,
+          "carbs": 27,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Blueberry Lavender - Small (16 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 0,
+          "carbs": 36,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Blueberry Lavender - Large (22 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 0,
+          "carbs": 50,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Pineapple Apple Mint Juice - Kids (12 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 0,
+          "carbs": 22,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Maine Root Soda (Fountain) - Kids (12 oz)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 145,
+          "protein": 0,
+          "carbs": 35,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Spindrift Grapefruit",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 17,
+          "protein": 0,
+          "carbs": 4,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Horizon Chocolate Milk",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 8,
+          "carbs": 22,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Horizon 1% Milk",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 8,
+          "carbs": 12,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Honest Apple Juice",
+        "category": "Drinks",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 0,
+          "carbs": 9,
+          "fat": 0
+        }
+      }
     ]
-}
+  }

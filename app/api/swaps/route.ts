@@ -1,9 +1,28 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 import { type MacroGoals } from '@/utils/swap-rule-engine';
-import { filterModifierCandidatesForMeal, getModifierCandidates } from '@/utils/modifier-candidates';
+import {
+  filterModifierCandidatesForMeal,
+  getLinkedModifierCandidates,
+  getModifierCandidates,
+} from '@/utils/modifier-candidates';
 import { normalizeMacros } from '@/lib/macro-utils';
 import { generateHybridSwaps } from '@/utils/hybrid-swap-generator';
+
+type SearchableMenuItem = {
+  id: string;
+  restaurant_name: string;
+  name: string;
+  category: string | null;
+  macros: {
+    calories?: number;
+    protein?: number;
+    carbs?: number;
+    fat?: number;
+    fats?: number;
+  } | null;
+};
+
 /**
  * Swap endpoint v2: Hybrid Swap Engine
  * Returns modification suggestions (DB-backed + global + LLM fallback) and alternative menu items.
@@ -37,17 +56,27 @@ export async function POST(req: Request) {
     const supabase = await createClient();
 
     // ========== PRIMARY: Hybrid Swap Engine v2 ==========
-    // Step 1: Fetch modifier candidates from DB (same restaurant only)
+    // Step 1: Fetch modifier candidates from DB
+    // Prefer explicit meal relations. Fall back to restaurant-wide inference only if no links exist.
+    const linkedModifierCandidates = await getLinkedModifierCandidates(supabase, meal_id);
     const restaurantModifierCandidates = await getModifierCandidates(supabase, restaurant_name);
-    const modifierCandidates = filterModifierCandidatesForMeal(meal_name, restaurantModifierCandidates);
+    const filteredRestaurantModifierCandidates = filterModifierCandidatesForMeal(meal_name, restaurantModifierCandidates);
+    const modifierCandidates =
+      linkedModifierCandidates.length > 0
+        ? linkedModifierCandidates
+        : filteredRestaurantModifierCandidates;
 
     // Log in dev
     if (process.env.NODE_ENV === 'development') {
       console.log('[swaps] Modifier candidates:', {
         restaurant_name,
+        meal_id,
         meal_name,
+        linkedCount: linkedModifierCandidates.length,
         restaurantWideCount: restaurantModifierCandidates.length,
-        mealScopedCount: modifierCandidates.length,
+        mealScopedCount: filteredRestaurantModifierCandidates.length,
+        finalCount: modifierCandidates.length,
+        source: linkedModifierCandidates.length > 0 ? 'relations' : 'restaurant_fallback',
         sampleNames: modifierCandidates.slice(0, 5).map(c => c.name),
       });
     }
@@ -119,7 +148,15 @@ export async function POST(req: Request) {
     // ========== SECONDARY: Find DB-only alternate menu items ==========
     // Alternatives are ONLY returned as fallback when no good modifications exist
     // Alternatives must be: same restaurant, same dish type, and move toward user's constraints
-    const alternatives: any[] = [];
+    const alternatives: Array<{
+      id: string;
+      name: string;
+      restaurant: string;
+      calories: number;
+      protein: number;
+      carbs: number;
+      fats: number;
+    }> = [];
 
     // Only fetch alternatives if we have NO modifications AND no global/LLM swaps
     // Modifications + global swaps are always preferred over alternatives
@@ -143,7 +180,7 @@ export async function POST(req: Request) {
       if (!error && allItems) {
         // Filter to only full meals (not modifiers)
         // No dish type filtering - we just filter by constraints and exclude current meal
-        const fullMeals = allItems.filter((item: any) => {
+        const fullMeals = (allItems as SearchableMenuItem[]).filter((item) => {
           // Must have valid macros
           const macros = item.macros;
           if (!macros || typeof macros !== 'object') return false;
@@ -169,7 +206,7 @@ export async function POST(req: Request) {
         // Convert to alternative format (limit to 3-5)
         // Normalize fat: prefer fat (singular) from DB, fallback to fats (plural)
         // Meal object uses fats (plural) to match Meal type
-        alternatives.push(...fullMeals.slice(0, 5).map((item: any) => {
+        alternatives.push(...fullMeals.slice(0, 5).map((item) => {
           const itemFat = item.macros?.fat ?? item.macros?.fats ?? 0;
           return {
             id: item.id,
@@ -197,6 +234,7 @@ export async function POST(req: Request) {
       swapType: mod.swapType,
       details: mod.details,
       modifierItemIds: mod.modifierItemIds,
+      quantityConfig: mod.quantityConfig,
       impactLabels: [] as string[],
       source: 'db' as const,
       deltaMacros: {

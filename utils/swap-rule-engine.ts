@@ -33,6 +33,12 @@ export interface SwapModification {
   swapType: 'higherProtein' | 'lowerCalories' | 'lowerCarbs' | 'macroDown' | 'macroUp' | 'carbDown' | 'fatDown' | 'proteinUp' | 'calorieDown' | 'calorieUp' | 'neutral'; // Goal-aware type
   details: string; // Additional context for the swap
   modifierItemIds: string[]; // REQUIRED: modifier item IDs from DB (must exist in menu_items)
+  quantityConfig?: {
+    unitLabel: string;
+    min: number;
+    defaultQuantity: number;
+    max: number;
+  };
 }
 
 export interface MacroGoals {
@@ -93,6 +99,48 @@ function detectDishType(mealName: string): string | null {
 const SINGLE_INGREDIENT_NAME_PATTERN =
   /\b(bacon|sausage|ham|turkey|chicken|steak|egg|eggs|patty|links?|canadian bacon|chorizo|corned beef|protein|cheese)\b/i;
 
+const REDUCEABLE_MODIFIER_NAME_PATTERN =
+  /\b(avocado|guacamole|feta|cheese|aioli|dressing|vinaigrette|sauce|harissa|crazy feta|dip|spread|hummus|tzatziki|ranch|mayo|crema)\b/i;
+
+function getRelationPriority(candidate: ModifierCandidate): number {
+  switch (candidate.relationType) {
+    case 'protein_option':
+      return 2.5;
+    case 'add_on':
+      return 2;
+    case 'egg_swap':
+      return 1.75;
+    case 'side_option':
+      return 1.25;
+    case 'sauce_option':
+    case 'dressing_option':
+      return 0.5;
+    default:
+      return 0;
+  }
+}
+
+function getCandidateQuantityConfig(candidate: ModifierCandidate): SwapModification['quantityConfig'] | undefined {
+  if (!candidate.unitLabel) {
+    return undefined;
+  }
+
+  const max = candidate.maxQuantity ?? 1;
+  const min = candidate.minQuantity ?? 0;
+  const defaultQuantity = candidate.defaultQuantity ?? 1;
+
+  if (max <= 1 && defaultQuantity <= 1 && min <= 0) {
+    return undefined;
+  }
+
+  return {
+    unitLabel: candidate.unitLabel,
+    min: Math.max(1, min || 1),
+    defaultQuantity: Math.max(1, defaultQuantity),
+    max: Math.max(1, max),
+  };
+}
+
 function formatMacroEffect(macros: { calories: number; protein: number; carbs: number; fats: number }): string {
   const effects: string[] = [];
 
@@ -110,6 +158,34 @@ function formatMacroEffect(macros: { calories: number; protein: number; carbs: n
   }
 
   return effects.join(', ') || 'Adjust macros';
+}
+
+function normalizeSwapText(value: string): string {
+  return value.toLowerCase().replace(/[^a-z0-9\s]+/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function mealMentionsCandidate(mealName: string, candidateName: string): boolean {
+  const normalizedMealName = normalizeSwapText(mealName);
+  const normalizedCandidateName = normalizeSwapText(candidateName);
+
+  if (!normalizedMealName || !normalizedCandidateName) {
+    return false;
+  }
+
+  if (normalizedMealName.includes(normalizedCandidateName)) {
+    return true;
+  }
+
+  const candidateTokens = normalizedCandidateName
+    .split(' ')
+    .filter((token) => token.length >= 4 && !['with', 'side', 'extra'].includes(token));
+
+  if (candidateTokens.length === 0) {
+    return false;
+  }
+
+  const matchedTokens = candidateTokens.filter((token) => normalizedMealName.includes(token));
+  return matchedTokens.length >= Math.min(2, candidateTokens.length);
 }
 
 function mealAlreadyIncludesCandidate(mealName: string, candidateName: string): boolean {
@@ -173,7 +249,7 @@ function generateContextualSingleIngredientSwap(
     .map((candidate) => {
       const lowerCategory = candidate.category.toLowerCase();
       const proteinEfficiency = candidate.macros.protein / Math.max(candidate.macros.calories, 1);
-      let score = proteinEfficiency;
+      let score = proteinEfficiency + getRelationPriority(candidate);
 
       if (lowerCategory.includes('range-add-ons')) {
         score += 1.2;
@@ -209,6 +285,7 @@ function generateContextualSingleIngredientSwap(
     swapType: 'neutral',
     details: `Add ${bestCandidate.name} using the restaurant's real modifier data`,
     modifierItemIds: [bestCandidate.id],
+    quantityConfig: getCandidateQuantityConfig(bestCandidate),
   };
 }
 
@@ -294,9 +371,9 @@ function generateHigherProteinSwap(
   // Score candidates by protein increase per calories (protein/calories)
   const scoredCandidates = proteinCandidates.map(candidate => ({
     candidate,
-    score: candidate.macros.calories > 0 
+    score: (candidate.macros.calories > 0
       ? candidate.macros.protein / candidate.macros.calories 
-      : 0,
+      : 0) + getRelationPriority(candidate),
     proteinIncrease: candidate.macros.protein,
   }));
 
@@ -344,6 +421,7 @@ function generateHigherProteinSwap(
     swapType: 'higherProtein',
     details: `Add ${bestCandidate.name} to increase protein`,
     modifierItemIds: [bestCandidate.id],
+    quantityConfig: getCandidateQuantityConfig(bestCandidate),
   };
 }
 
@@ -380,18 +458,19 @@ function generateLowerCaloriesSwap(
 
   const dishType = inferDishType(mealName);
   const supportsStructureSwap = dishType === 'burger' || dishType === 'sub' || dishType === 'wrap' || dishType === 'taco';
-  if (!supportsStructureSwap) {
-    return null;
-  }
 
   // Find bun/tortilla/wrap candidates
-  const bunCandidates = modifierCandidates.filter(candidate => isStructureCandidate(candidate.name));
+  const bunCandidates = supportsStructureSwap
+    ? modifierCandidates.filter(candidate => isStructureCandidate(candidate.name))
+    : [];
 
   // Find lettuce wrap candidate
   const lettucePattern = /lettuce wrap|lettuce|wrap lettuce|greens wrap/i;
-  const lettuceCandidates = modifierCandidates.filter(candidate =>
-    lettucePattern.test(candidate.name)
-  );
+  const lettuceCandidates = supportsStructureSwap
+    ? modifierCandidates.filter(candidate =>
+        lettucePattern.test(candidate.name)
+      )
+    : [];
 
   // Prefer replace: bun -> lettuce wrap (requires both candidates)
   if (bunCandidates.length > 0 && lettuceCandidates.length > 0) {
@@ -424,6 +503,7 @@ function generateLowerCaloriesSwap(
         swapType: wantsLowerCarbs ? 'lowerCarbs' : 'lowerCalories',
         details: `Replace ${bunCandidate.name} with ${lettuceCandidate.name}`,
         modifierItemIds: [bunCandidate.id, lettuceCandidate.id],
+        quantityConfig: getCandidateQuantityConfig(bunCandidate),
       };
     }
   }
@@ -451,6 +531,87 @@ function generateLowerCaloriesSwap(
       swapType: wantsLowerCarbs ? 'lowerCarbs' : 'lowerCalories',
       details: `Remove ${bunCandidate.name} to reduce calories/carbs`,
       modifierItemIds: [bunCandidate.id],
+      quantityConfig: getCandidateQuantityConfig(bunCandidate),
+    };
+  }
+
+  const genericReduceCandidates = modifierCandidates
+    .filter((candidate) => {
+      if (candidate.macros.calories <= 0) {
+        return false;
+      }
+
+      const candidateName = candidate.name || '';
+      const relationType = candidate.relationType || '';
+      const isLinkedReductionTarget =
+        relationType === 'sauce_option' ||
+        relationType === 'dressing_option' ||
+        relationType === 'add_on';
+
+      if (!isLinkedReductionTarget) {
+        return false;
+      }
+
+      const hasMealTokenOverlap = mealMentionsCandidate(mealName, candidateName);
+      const isKnownReducibleModifier = REDUCEABLE_MODIFIER_NAME_PATTERN.test(candidateName);
+
+      return hasMealTokenOverlap || isKnownReducibleModifier;
+    })
+    .map((candidate) => {
+      let score = candidate.macros.calories;
+
+      if (mealMentionsCandidate(mealName, candidate.name)) {
+        score += 90;
+      }
+
+      if (candidate.relationType === 'dressing_option' || candidate.relationType === 'sauce_option') {
+        score += 50;
+      }
+
+      if (/avocado|guacamole|cheese|feta/i.test(candidate.name)) {
+        score += 35;
+      }
+
+      if (candidate.macros.fats > 0) {
+        score += candidate.macros.fats * 2;
+      }
+
+      if (candidate.macros.carbs > 0) {
+        score += candidate.macros.carbs * 0.75;
+      }
+
+      return { candidate, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  const bestReduceCandidate = genericReduceCandidates[0]?.candidate;
+  if (bestReduceCandidate) {
+    const modeLabel =
+      bestReduceCandidate.relationType === 'sauce_option' || bestReduceCandidate.relationType === 'dressing_option'
+        ? `Go light on ${bestReduceCandidate.name}`
+        : `Skip ${bestReduceCandidate.name}`;
+
+    const effects: string[] = [];
+    if (bestReduceCandidate.macros.calories > 0) effects.push(`↓ ${bestReduceCandidate.macros.calories} cal`);
+    if (bestReduceCandidate.macros.carbs > 0) effects.push(`↓ ${bestReduceCandidate.macros.carbs}g carbs`);
+    if (bestReduceCandidate.macros.fats > 0) effects.push(`↓ ${bestReduceCandidate.macros.fats}g fat`);
+
+    return {
+      id: `reduce-modifier-${bestReduceCandidate.id}`,
+      swapTitle: modeLabel,
+      expectedEffect: effects.join(', ') || 'Reduce calories',
+      estimatedDelta: {
+        calories: -bestReduceCandidate.macros.calories,
+        protein: -bestReduceCandidate.macros.protein,
+        carbs: -bestReduceCandidate.macros.carbs,
+        fats: -bestReduceCandidate.macros.fats,
+      },
+      confidenceLabel: 'Likely available',
+      type: 'remove',
+      swapType: wantsLowerCarbs ? 'lowerCarbs' : 'lowerCalories',
+      details: `Reduce or remove ${bestReduceCandidate.name} using the restaurant's linked modifier data`,
+      modifierItemIds: [bestReduceCandidate.id],
+      quantityConfig: getCandidateQuantityConfig(bestReduceCandidate),
     };
   }
 

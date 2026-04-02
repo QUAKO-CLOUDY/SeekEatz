@@ -14,11 +14,17 @@ export function Navigation({ currentScreen, onNavigate }: Props) {
   const isAIChatActive = currentScreen === "chat";
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 flex items-end justify-around px-2 pt-0.5 bg-card border-t border-border z-[100]" style={{ paddingBottom: `calc(0.25rem + env(safe-area-inset-bottom, 0px))` }}>
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-[100] flex items-center justify-around border-t border-border bg-card/95 px-2 pt-0.5 backdrop-blur-xl md:left-1/2 md:w-full md:max-w-2xl md:-translate-x-1/2 md:rounded-t-3xl md:border-x lg:max-w-4xl xl:max-w-5xl"
+      style={{
+        minHeight: "var(--app-nav-safe-offset)",
+        paddingBottom: "env(safe-area-inset-bottom, 0px)",
+      }}
+    >
       {/* Home */}
       <button
         onClick={() => onNavigate("home")}
-        className="flex flex-col items-center gap-0.5 py-1 px-2 transition-all flex-1"
+        className="flex flex-1 flex-col items-center gap-0.5 px-2 py-1.5 transition-all"
       >
         <div
           className={`p-1.5 rounded-lg ${
@@ -43,7 +49,7 @@ export function Navigation({ currentScreen, onNavigate }: Props) {
       {/* Log */}
       <button
         onClick={() => onNavigate("log")}
-        className="flex flex-col items-center gap-0.5 py-1 px-2 transition-all flex-1"
+        className="flex flex-1 flex-col items-center gap-0.5 px-2 py-1.5 transition-all"
       >
         <div
           className={`p-1.5 rounded-lg ${
@@ -66,7 +72,7 @@ export function Navigation({ currentScreen, onNavigate }: Props) {
       </button>
 
       {/* Center AI Chat FAB */}
-      <div className="flex flex-col items-center flex-1 pb-0.5">
+      <div className="flex flex-1 flex-col items-center pb-0.5">
         <button
           onClick={() => onNavigate("chat")}
           className="relative group"
@@ -121,7 +127,7 @@ export function Navigation({ currentScreen, onNavigate }: Props) {
       {/* Favorites */}
       <button
         onClick={() => onNavigate("favorites")}
-        className="flex flex-col items-center gap-0.5 py-1 px-2 transition-all flex-1"
+        className="flex flex-1 flex-col items-center gap-0.5 px-2 py-1.5 transition-all"
       >
         <div
           className={`p-1.5 rounded-lg ${
@@ -148,7 +154,7 @@ export function Navigation({ currentScreen, onNavigate }: Props) {
       {/* Settings */}
       <button
         onClick={() => onNavigate("settings")}
-        className="flex flex-col items-center gap-0.5 py-1 px-2 transition-all flex-1"
+        className="flex flex-1 flex-col items-center gap-0.5 px-2 py-1.5 transition-all"
       >
         <div
           className={`p-1.5 rounded-lg ${

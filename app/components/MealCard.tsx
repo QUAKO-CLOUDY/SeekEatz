@@ -158,14 +158,14 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
     return (
       <div
         onClick={onClick}
-        className="group relative h-[102px] w-full max-w-[372px] cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-white via-slate-50 to-white shadow-lg transition-all hover:border-cyan-500/40 hover:shadow-xl dark:border-gray-700 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-800"
+        className="group relative min-h-[108px] w-full cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-white via-slate-50 to-white shadow-lg transition-all hover:border-cyan-500/40 hover:shadow-xl sm:max-w-[372px] dark:border-gray-700 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-800"
       >
-        <div className="flex h-full flex-col px-3 py-2">
-          <h3 className="line-clamp-2 break-words pr-7 text-[14px] font-bold leading-[1.15] text-foreground">
+        <div className="flex h-full flex-col px-3 py-2.5">
+          <h3 className="line-clamp-2 break-words pr-9 text-[14px] font-bold leading-[1.15] text-foreground">
             {meal.name}
           </h3>
 
-          <div className="mt-2 flex min-h-0 flex-1 items-center gap-2.5">
+          <div className="mt-2 grid min-h-0 flex-1 grid-cols-[auto_minmax(0,1fr)] items-center gap-2.5">
             {/* Left Logo - Restaurant Logo */}
             <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
               <img
@@ -185,20 +185,21 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
               />
             </div>
 
-            {/* Restaurant */}
-            <div className="w-[76px] flex-shrink-0">
-              <p className={`text-[9px] font-medium uppercase leading-[1.05] tracking-[0.08em] text-muted-foreground ${compactRestaurantLabel.secondLine ? '' : 'text-center'}`}>
-                <span className="block whitespace-normal break-normal">{compactRestaurantLabel.firstLine}</span>
-                {compactRestaurantLabel.secondLine && (
-                  <span className="mt-0.5 block whitespace-normal break-normal">{compactRestaurantLabel.secondLine}</span>
-                )}
-              </p>
-            </div>
+            <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+              {/* Restaurant */}
+              <div className="min-w-0">
+                <p className={`text-[9px] font-medium uppercase leading-[1.05] tracking-[0.08em] text-muted-foreground ${compactRestaurantLabel.secondLine ? '' : 'text-center'}`}>
+                  <span className="block whitespace-normal break-normal">{compactRestaurantLabel.firstLine}</span>
+                  {compactRestaurantLabel.secondLine && (
+                    <span className="mt-0.5 block whitespace-normal break-normal">{compactRestaurantLabel.secondLine}</span>
+                  )}
+                </p>
+              </div>
 
-            {/* Right - Nutritional Boxes */}
-            <div className="ml-0.5 flex flex-shrink-0 items-center gap-1 pr-7">
+              {/* Right - Nutritional Boxes */}
+              <div className="grid grid-cols-4 gap-1">
             {/* Calories */}
-            <div className="min-w-[42px] rounded-lg bg-pink-100 px-1.5 py-1 text-center dark:bg-pink-900/30">
+            <div className="min-w-0 rounded-lg bg-pink-100 px-1.5 py-1 text-center dark:bg-pink-900/30">
               <p className="text-pink-600 dark:text-pink-400 font-bold text-[10px] leading-tight">
                 {meal.calories}
               </p>
@@ -218,7 +219,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             </div>
 
             {/* Protein */}
-            <div className="min-w-[42px] rounded-lg bg-blue-100 px-1.5 py-1 text-center dark:bg-blue-900/30">
+            <div className="min-w-0 rounded-lg bg-blue-100 px-1.5 py-1 text-center dark:bg-blue-900/30">
               <p className="text-blue-600 dark:text-blue-400 font-bold text-[10px] leading-tight">
                 {meal.protein}g
               </p>
@@ -228,7 +229,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             </div>
 
             {/* Carbs */}
-            <div className="min-w-[42px] rounded-lg bg-green-100 px-1.5 py-1 text-center dark:bg-green-900/30">
+            <div className="min-w-0 rounded-lg bg-green-100 px-1.5 py-1 text-center dark:bg-green-900/30">
               <p className="text-green-600 dark:text-green-400 font-bold text-[10px] leading-tight">
                 {meal.carbs}g
               </p>
@@ -238,7 +239,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             </div>
 
             {/* Fat */}
-            <div className="min-w-[42px] rounded-lg bg-orange-100 px-1.5 py-1 text-center dark:bg-orange-900/30">
+            <div className="min-w-0 rounded-lg bg-orange-100 px-1.5 py-1 text-center dark:bg-orange-900/30">
               <p className="text-orange-600 dark:text-orange-400 font-bold text-[10px] leading-tight">
                 {meal.fats}g
               </p>
@@ -246,7 +247,8 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
                 fat
               </p>
             </div>
-          </div>
+              </div>
+            </div>
           </div>
 
           {/* Favorite Button - Top Right (with space for nutritional boxes) */}

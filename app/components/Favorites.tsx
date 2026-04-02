@@ -50,7 +50,7 @@ const favoriteMealsList: Meal[] = favoriteMeals
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto -mt-4 bg-background rounded-t-3xl border-t border-white/5 relative z-10 pb-20 pb-safe">
+      <div className="relative z-10 -mt-4 flex-1 overflow-y-auto rounded-t-3xl border-t border-white/5 bg-background pb-safe" style={{ paddingBottom: "calc(var(--app-nav-safe-offset) + 1rem)" }}>
         <div className="p-6 space-y-8">
           
           {/* Favorites Section */}

@@ -425,7 +425,7 @@ export function LogScreen({
         </div>
 
         {/* Macro Grid */}
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <div className={`rounded-2xl p-3 border text-center ${isDark
             ? "bg-gradient-to-br from-pink-500/20 to-rose-500/20 backdrop-blur-sm border-pink-500/30"
             : "bg-gradient-to-br from-pink-300 to-rose-300 border-pink-400/70"
@@ -474,7 +474,7 @@ export function LogScreen({
       </div>
 
       {/* BOTTOM SECTION – MANUAL ENTRY, RECOMMENDATIONS, MEALS, HISTORY */}
-      <div className="p-6 pb-32 space-y-6 bg-background" style={{ paddingBottom: `calc(8rem + env(safe-area-inset-bottom, 0px))` }}>
+      <div className="space-y-6 bg-background p-6 pb-32" style={{ paddingBottom: `calc(var(--app-nav-safe-offset) + 3rem)` }}>
         {/* Manual food entry – add & edit */}
         {onAddMeal && (
           <div className="rounded-2xl border border-border bg-gradient-to-br from-card to-muted/50 overflow-hidden">
@@ -614,7 +614,7 @@ export function LogScreen({
                             )}
                           </p>
                         </div>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-1 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
                           {onUpdateMeal && (
                             <Button
                               variant="ghost"

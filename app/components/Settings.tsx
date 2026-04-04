@@ -28,6 +28,8 @@ import { createClient } from '@/utils/supabase/client';
 import type { UserProfile } from '../types';
 import { requestNotificationPermission, sendMealSuggestionNotification } from '@/utils/notifications';
 import cavaData from '@/data/jsons/cava_raw.json';
+import { getEntitlementPlanLabel } from '@/lib/entitlements';
+import { useAccountEntitlement } from '@/app/hooks/useAccountEntitlement';
 
 type Props = {
   userProfile: UserProfile;
@@ -65,6 +67,8 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   const [userEmail, setUserEmail] = useState<string>('');
   const [userFullName, setUserFullName] = useState<string>('');
   const [updateError, setUpdateError] = useState<string | null>(null);
+  const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
+  const { entitlement, refresh: refreshEntitlement } = useAccountEntitlement(true);
 
   // Helper function to safely convert number to database value (handles undefined/null/NaN)
   // Returns: valid number or null (never undefined, NaN, or string)
@@ -147,6 +151,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
 
   const notificationStorageKey = `seekeatz-notification-prefs:${userEmail || 'guest'}`;
+  const subscriptionPlanLabel = getEntitlementPlanLabel(entitlement);
 
   const applyNotificationPreferences = (preferences: NotificationPreferences) => {
     setMealSuggestions(preferences.mealSuggestions);
@@ -163,6 +168,15 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
       localStorage.setItem('seekeatz-theme', 'light');
     }
   }, [setTheme]);
+
+  useEffect(() => {
+    if (!saveSuccessMessage) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => setSaveSuccessMessage(null), 2500);
+    return () => window.clearTimeout(timeoutId);
+  }, [saveSuccessMessage]);
 
   // Load user profile data from Supabase on mount and when component becomes visible
   useEffect(() => {
@@ -269,6 +283,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
     // Also reload when window becomes visible (user returns from account page)
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
+        void refreshEntitlement();
         loadUserData();
       }
     };
@@ -279,7 +294,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [supabase]);
+  }, [refreshEntitlement, supabase]);
 
   // Sync userFullName when userProfile.full_name changes (from parent component updates)
   useEffect(() => {
@@ -446,10 +461,8 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   // Handle theme change - save to Supabase and localStorage
   const handleThemeChange = async (newTheme: 'light' | 'dark') => {
     try {
-      // Update theme immediately (UI updates regardless of Supabase success)
       setTheme(newTheme);
-      
-      // Note: ThemeContext already saves to localStorage with 'seekeatz-theme' key
+      setSaveSuccessMessage(`${newTheme === 'dark' ? 'Dark' : 'Light'} theme applied`);
 
       const { data: { user }, error: authError } = await supabase.auth.getUser();
 
@@ -590,6 +603,8 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
       localStorage.setItem(notificationStorageKey, JSON.stringify(nextPreferences));
     }
 
+    setSaveSuccessMessage('Notification preferences updated');
+
     if (key === 'mealSuggestions' && value) {
       (async () => {
         const permission = await requestNotificationPermission();
@@ -606,6 +621,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   // Handle edit mode toggle
   const handleEditClick = () => {
     setEditedProfile(userProfile);
+    setSaveSuccessMessage(null);
     setInputValues({
       full_name: userProfile.full_name || userFullName || '',
       target_calories: safeNumberToString(userProfile.target_calories),
@@ -621,6 +637,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   const handleCancelEdit = () => {
     setIsEditing(false);
     setEditedProfile(userProfile);
+    setSaveSuccessMessage(null);
     setInputValues({
       full_name: userProfile.full_name || userFullName || '',
       target_calories: safeNumberToString(userProfile.target_calories),
@@ -702,6 +719,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
       }
 
       setIsEditing(false);
+      setSaveSuccessMessage('Profile updated');
 
       // Sync to Supabase in the background so a slow network never traps the UI in "Saving...".
       void (async () => {
@@ -799,12 +817,14 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
     if (confirm('Are you sure you want to log out?')) {
       try {
         clearChat();
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('seekeatz_start_app_tutorial');
+        }
         await supabase.auth.signOut();
       } catch (error) {
         console.error('Error signing out:', error);
       } finally {
-        // Full page redirect so the app reloads and root page shows the landing screen
-        window.location.href = '/?loggedOut=1';
+        window.location.href = '/auth/signin?loggedOut=1';
       }
     }
   };
@@ -832,7 +852,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
 
       {/* Content */}
       {!showPrivacyPolicy ? (
-      <div className="flex-1 space-y-4 overflow-y-auto bg-background px-4 py-5 pb-[calc(var(--app-nav-safe-offset)+1.5rem)] sm:p-6">
+      <div className="flex-1 space-y-4 overflow-y-auto bg-background px-4 py-5 pb-[calc(var(--app-nav-safe-offset)+5.5rem)] sm:px-6 sm:py-6 sm:pb-28">
         {/* Profile & Goals Section */}
         <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
           <div className="border-b border-border/70 bg-gradient-to-r from-sky-500/10 via-cyan-500/10 to-transparent px-6 py-5">
@@ -853,6 +873,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                   variant="outline"
                   size="sm"
                   onClick={handleEditClick}
+                  data-tutorial-target="settings-edit-profile"
                   className="h-9 rounded-lg px-4 text-black hover:text-black dark:text-white dark:hover:text-white"
                 >
                   <Edit className="mr-2 size-4" />
@@ -894,6 +915,11 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
           </div>
 
           <div className="space-y-4 px-6 py-6">
+            {saveSuccessMessage && (
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/20 dark:text-emerald-300">
+                {saveSuccessMessage}
+              </div>
+            )}
             {editError && (
               <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600 dark:border-red-800 dark:bg-red-950/20 dark:text-red-400">
                 {editError}
@@ -905,7 +931,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               </div>
             )}
 
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
               <div className="rounded-2xl border border-border/70 bg-background/60 p-5">
                 <div className="mb-4 flex items-center gap-3">
                   <div className="flex size-12 items-center justify-center rounded-xl bg-muted text-sm font-semibold text-foreground">
@@ -952,7 +978,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               </div>
 
               <div className="rounded-2xl border border-border/70 bg-background/60 p-5">
-                <div className="mb-4">
+                <div className="mb-3">
                   <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                     Daily Targets
                   </p>
@@ -961,8 +987,8 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                   </p>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-xl border border-border/70 bg-card/80 p-4 sm:col-span-2">
+                <div className="grid gap-2.5 sm:grid-cols-2">
+                  <div className="rounded-xl border border-border/70 bg-card/80 p-3.5">
                     <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Daily Calories</p>
                     {isEditing ? (
                       <>
@@ -976,21 +1002,21 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                             ...prev,
                             target_calories: e.target.value
                           }))}
-                          className="mt-3 h-10 text-base font-semibold"
+                          className="mt-2.5 h-9 text-sm font-semibold"
                         />
-                        <p className="mt-2 text-xs text-muted-foreground">500-5000 cal</p>
+                        <p className="mt-1.5 text-[11px] text-muted-foreground">500-5000 cal</p>
                       </>
                     ) : (
                       <>
-                        <p className="mt-3 text-2xl font-semibold text-foreground">
+                        <p className="mt-2.5 text-xl font-semibold text-foreground">
                           {safeNumberToString(userProfile.target_calories) || 'Not set'}{safeNumberToString(userProfile.target_calories) ? ' cal' : ''}
                         </p>
-                        <p className="mt-1 text-xs text-muted-foreground">Daily energy target</p>
+                        <p className="mt-1 text-[11px] text-muted-foreground">Daily energy target</p>
                       </>
                     )}
                   </div>
 
-                  <div className="rounded-xl border border-border/70 bg-card/80 p-4">
+                  <div className="rounded-xl border border-border/70 bg-card/80 p-3.5">
                     <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Protein</p>
                     {isEditing ? (
                       <>
@@ -1004,21 +1030,21 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                             ...prev,
                             target_protein_g: e.target.value
                           }))}
-                          className="mt-3 h-10 text-base font-semibold"
+                          className="mt-2.5 h-9 text-sm font-semibold"
                         />
-                        <p className="mt-2 text-xs text-muted-foreground">0-500g</p>
+                        <p className="mt-1.5 text-[11px] text-muted-foreground">0-500g</p>
                       </>
                     ) : (
                       <>
-                        <p className="mt-3 text-xl font-semibold text-foreground">
+                        <p className="mt-2.5 text-lg font-semibold text-foreground">
                           {safeNumberToString(userProfile.target_protein_g) || 'Not set'}{safeNumberToString(userProfile.target_protein_g) ? 'g' : ''}
                         </p>
-                        <p className="mt-1 text-xs text-muted-foreground">Daily protein target</p>
+                        <p className="mt-1 text-[11px] text-muted-foreground">Daily protein target</p>
                       </>
                     )}
                   </div>
 
-                  <div className="rounded-xl border border-border/70 bg-card/80 p-4">
+                  <div className="rounded-xl border border-border/70 bg-card/80 p-3.5">
                     <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Carbs</p>
                     {isEditing ? (
                       <>
@@ -1032,21 +1058,21 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                             ...prev,
                             target_carbs_g: e.target.value
                           }))}
-                          className="mt-3 h-10 text-base font-semibold"
+                          className="mt-2.5 h-9 text-sm font-semibold"
                         />
-                        <p className="mt-2 text-xs text-muted-foreground">0-600g</p>
+                        <p className="mt-1.5 text-[11px] text-muted-foreground">0-600g</p>
                       </>
                     ) : (
                       <>
-                        <p className="mt-3 text-xl font-semibold text-foreground">
+                        <p className="mt-2.5 text-lg font-semibold text-foreground">
                           {safeNumberToString(userProfile.target_carbs_g) || 'Not set'}{safeNumberToString(userProfile.target_carbs_g) ? 'g' : ''}
                         </p>
-                        <p className="mt-1 text-xs text-muted-foreground">Daily carb target</p>
+                        <p className="mt-1 text-[11px] text-muted-foreground">Daily carb target</p>
                       </>
                     )}
                   </div>
 
-                  <div className="rounded-xl border border-border/70 bg-card/80 p-4 sm:col-span-2">
+                  <div className="rounded-xl border border-border/70 bg-card/80 p-3.5">
                     <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Fats</p>
                     {isEditing ? (
                       <>
@@ -1060,16 +1086,16 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                             ...prev,
                             target_fats_g: e.target.value
                           }))}
-                          className="mt-3 h-10 text-base font-semibold"
+                          className="mt-2.5 h-9 text-sm font-semibold"
                         />
-                        <p className="mt-2 text-xs text-muted-foreground">0-300g</p>
+                        <p className="mt-1.5 text-[11px] text-muted-foreground">0-300g</p>
                       </>
                     ) : (
                       <>
-                        <p className="mt-3 text-xl font-semibold text-foreground">
+                        <p className="mt-2.5 text-lg font-semibold text-foreground">
                           {safeNumberToString(userProfile.target_fats_g) || 'Not set'}{safeNumberToString(userProfile.target_fats_g) ? 'g' : ''}
                         </p>
-                        <p className="mt-1 text-xs text-muted-foreground">Daily fat target</p>
+                        <p className="mt-1 text-[11px] text-muted-foreground">Daily fat target</p>
                       </>
                     )}
                   </div>
@@ -1184,22 +1210,32 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               </div>
             </div>
             <span className="rounded-full border border-border/70 bg-muted px-3 py-1 text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-              Free Plan
+              {subscriptionPlanLabel}
             </span>
           </div>
 
           <div className="mt-5 rounded-2xl border border-sky-500/15 bg-gradient-to-br from-sky-500/[0.08] via-background to-background p-5">
             <p className="text-base font-semibold text-foreground">
-              Upgrade for unlimited searches and full access to all our features.
+              {!entitlement.hasPremiumAccess
+                ? 'Upgrade for unlimited AI chat, meal logging, saved meals, and premium tools.'
+                : entitlement.billingStatus === 'trialing'
+                  ? 'Your waitlist free month is active and all premium features are unlocked.'
+                  : entitlement.billingTier === 'yearly'
+                    ? 'Your yearly plan unlocks full access to everything SeekEatz offers.'
+                    : 'Your monthly plan unlocks full access to everything SeekEatz offers.'}
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Unlock the full SeekEatz concierge experience and head straight to the upgrade screen to choose a paid plan.
+              {!entitlement.hasPremiumAccess
+                ? 'Free accounts get 2 AI searches per day and read-only access outside the home and chat surfaces.'
+                : entitlement.billingStatus === 'trialing' && entitlement.trialExpiresAt
+                  ? `Your free month ends on ${new Date(entitlement.trialExpiresAt).toLocaleDateString()}.`
+                  : 'Manage your plan details or review upgrade options on the subscription screen.'}
             </p>
             <Button
               onClick={() => router.push('/upgrade')}
               className="mt-4 w-full"
             >
-              Manage Subscription
+              {!entitlement.hasPremiumAccess ? 'View Plans' : 'Manage Subscription'}
             </Button>
           </div>
         </div>
@@ -1242,7 +1278,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
             </button>
             
             <button
-              onClick={() => setShowPrivacyPolicy(true)}
+              onClick={() => router.push('/legal/privacy')}
               className="w-full flex items-center justify-between p-3 hover:bg-muted rounded-md transition-colors"
             >
               <div className="flex items-center gap-3">
@@ -1272,7 +1308,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
         </div>
       </div>
       ) : (
-        <div className="flex-1 overflow-y-auto bg-background px-4 py-6 pb-[calc(var(--app-nav-safe-offset)+1.5rem)]">
+        <div className="flex-1 overflow-y-auto bg-background px-4 py-6 pb-[calc(var(--app-nav-safe-offset)+5.5rem)] sm:px-6 sm:pb-28">
           <div className="mx-auto max-w-3xl space-y-5">
             <div className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm space-y-3 text-sm leading-7 text-muted-foreground">
               <h2 className="text-xl font-semibold text-foreground">Privacy Policy</h2>

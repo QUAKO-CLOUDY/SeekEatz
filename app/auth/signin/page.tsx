@@ -10,7 +10,8 @@ import { Button } from "@/app/components/ui/button";
 import { clearGuestSessionFull } from "@/lib/guest-session";
 import { claimAnonymousData } from "@/lib/claim-anon-data";
 import { AuthProviders } from "@/app/components/AuthProviders";
-import { setDevFullAccess, setSubscriptionTier } from "@/lib/onboarding-flow";
+import { setDevFullAccess } from "@/lib/onboarding-flow";
+import { bootstrapAccount } from "@/lib/bootstrap-account";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -23,10 +24,13 @@ export default function SignInPage() {
   const redirectTo = searchParams.get("redirectTo") || "/chat";
   const isMasterMode = searchParams.get("master") === "1";
   const isSwitchAccountMode = searchParams.get("switch") === "1";
+  const shouldStartTutorial = searchParams.get("tutorial") === "1";
   const devMasterEmail =
     process.env.NEXT_PUBLIC_ENABLE_MASTER_LOGIN === "true"
       ? process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL ?? ""
       : "";
+  const encodedRedirectTo = encodeURIComponent(redirectTo);
+  const upgradeHref = `/upgrade?redirectTo=${encodedRedirectTo}${shouldStartTutorial ? "&tutorial=1" : ""}${isMasterMode ? "&master=1" : ""}`;
 
   useEffect(() => {
     if (!email && devMasterEmail) {
@@ -202,8 +206,11 @@ export default function SignInPage() {
         // Update localStorage
         localStorage.setItem(`seekEatz_lastLogin_${userId}`, now.toString());
         localStorage.setItem("seekEatz_lastLogin", now.toString());
+        if (shouldStartTutorial) {
+          localStorage.setItem("seekeatz_start_app_tutorial", "true");
+          localStorage.removeItem(`seekeatz_app_tutorial_completed_${userId}`);
+        }
         if (normalizedSignedInEmail && normalizedSignedInEmail === normalizedMasterEmail) {
-          setSubscriptionTier("premium");
           setDevFullAccess(true);
         }
         
@@ -221,6 +228,19 @@ export default function SignInPage() {
         // Clear any saved last screen so user always goes to chat first after sign-in
         localStorage.removeItem("seekeatz_current_screen");
         localStorage.removeItem("seekeatz_nav_history");
+
+        try {
+          const bootstrapResult = await bootstrapAccount({
+            profile,
+            hasCompletedOnboarding: !!(profile || hasCompletedOnboarding),
+          });
+
+          if (bootstrapResult.waitlistGrantApplied) {
+            localStorage.setItem("seekeatz_waitlist_trial_activated", "true");
+          }
+        } catch (bootstrapError) {
+          console.warn("Account bootstrap failed after sign-in:", bootstrapError);
+        }
         
         // Refresh router to ensure session is updated in all components
         router.refresh();
@@ -242,7 +262,16 @@ export default function SignInPage() {
           <p className="text-black">Sign in to continue to SeekEatz</p>
         </div>
 
-        <AuthProviders mode="signin" oauthRedirectPath={redirectTo} className="mb-6" />
+        <AuthProviders
+          mode="signin"
+          oauthRedirectPath={redirectTo}
+          className="mb-6"
+          onBeforeRedirect={() => {
+            if (shouldStartTutorial && typeof window !== "undefined") {
+              localStorage.setItem("seekeatz_start_app_tutorial", "true");
+            }
+          }}
+        />
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -302,7 +331,7 @@ export default function SignInPage() {
         <p className="text-black text-sm text-center mt-6">
           Don't have an account?{" "}
           <button
-            onClick={() => router.push(`/auth/signup?redirectTo=${encodeURIComponent(redirectTo)}&switch=1${isMasterMode ? "&master=1" : ""}`)}
+            onClick={() => router.push(upgradeHref)}
             className="text-cyan-600 hover:text-cyan-700 font-medium"
           >
             Sign up

@@ -12,6 +12,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Meal } from '@/app/types';
 import type { RawResult } from './ranker';
 import { calculateDistanceMiles } from '@/lib/distance-utils';
+import { getRestaurantLogoUrl } from '@/lib/image-utils';
 
 // ─── Restaurant logo cache (per-request, not global) ─────────────────────────
 
@@ -73,6 +74,7 @@ export class ResponseFormatter {
     const macros = item.macros ?? {};
     const restaurantMeta = this.restaurantCache.get(item.restaurant_id) ?? {};
     const restaurantName = item.restaurant_name || restaurantMeta.name || '';
+    const restaurantLogoUrl = restaurantMeta.logo_url;
     const latitude = restaurantMeta.latitude;
     const longitude = restaurantMeta.longitude;
     const distance =
@@ -99,7 +101,7 @@ export class ResponseFormatter {
         fat:      Number(macros.fat      ?? 0),
       },
       // Images
-      image:      item.image_url ?? '',
+      image:      getRestaurantLogoUrl(restaurantName, restaurantLogoUrl),
       // Price
       price:      item.price != null ? Number(item.price) : undefined,
       // Description
@@ -112,7 +114,7 @@ export class ResponseFormatter {
       ...(item.matchReasons ? { matchReasons: item.matchReasons } as any : {}),
       ...(item.searchMetadata ? { searchMetadata: item.searchMetadata } as any : {}),
       // Restaurant logo (from restaurants table)
-      ...(restaurantMeta.logo_url ? { restaurantLogoUrl: restaurantMeta.logo_url } as any : {}),
+      ...(restaurantLogoUrl ? { restaurantLogoUrl } as any : {}),
       ...(distance !== undefined ? { distance } : {}),
       ...(latitude !== undefined ? { latitude } : {}),
       ...(longitude !== undefined ? { longitude } : {}),
@@ -130,6 +132,7 @@ export function formatMealsSync(items: RawResult[]): Meal[] {
   return items.map(item => {
     const macros = item.macros ?? {};
     const restaurantName = item.restaurant_name ?? '';
+    const restaurantLogoUrl = getRestaurantLogoUrl(restaurantName);
     return {
       id:              String(item.id),
       name:            item.name ?? '',
@@ -145,12 +148,13 @@ export function formatMealsSync(items: RawResult[]): Meal[] {
         carbs:    Number(macros.carbs    ?? 0),
         fat:      Number(macros.fat      ?? 0),
       },
-      image:       item.image_url ?? '',
+      image:       restaurantLogoUrl,
       price:       item.price != null ? Number(item.price) : undefined,
       description: item.description ?? undefined,
       tags:        item.food_tags ?? [],
       dietary_tags: item.food_tags ?? [],
       matchScore:  item.matchScore,
+      restaurantLogoUrl,
       ...(item.matchReasons ? { matchReasons: item.matchReasons } as any : {}),
       ...(item.searchMetadata ? { searchMetadata: item.searchMetadata } as any : {}),
     };

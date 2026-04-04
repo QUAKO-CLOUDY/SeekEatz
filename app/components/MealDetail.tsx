@@ -32,6 +32,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useNutrition } from '../contexts/NutritionContext';
 import { calculateCalorieRemaining } from '@/utils/calorie-calculator';
 import { getLogo } from '@/utils/logos';
+import { getRestaurantLogoUrl } from '@/lib/image-utils';
 
 // --- TYPES ---
 type Props = {
@@ -1169,44 +1170,29 @@ export function MealDetail({
                             padding: '10px'
                           }}
                         >
-                          {/* Meal Image */}
-                          {similar.image && similar.image !== '/placeholder-food.jpg' && similar.image !== '' ? (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <img
-                                src={similar.image}
-                                alt={similar.name}
-                                className="w-full h-full object-contain object-center"
-                                style={{
-                                  width: '100%',
-                                  height: '100%',
-                                  objectFit: 'contain',
-                                  objectPosition: 'center',
-                                  display: 'block',
-                                  maxWidth: '100%',
-                                  maxHeight: '100%'
-                                }}
-                                onError={(e) => {
-                                  // Fallback to default.png if meal image fails
-                                  e.currentTarget.src = '/logos/default.png';
-                                  e.currentTarget.onerror = null;
-                                }}
-                              />
-                            </div>
-                          ) : (
-                            /* Fallback to default.png if no meal image */
-                            <div className="w-full h-full flex items-center justify-center">
-                              <img
-                                src="/logos/default.png"
-                                alt="Default meal"
-                                className="w-full h-full object-contain object-center"
-                                style={{ maxWidth: '100%', maxHeight: '100%' }}
-                                onError={(e) => {
-                                  // Final fallback - hide image if default.png also fails
-                                  e.currentTarget.style.display = 'none';
-                                }}
-                              />
-                            </div>
-                          )}
+                          <div className="w-full h-full flex items-center justify-center">
+                            <img
+                              src={getRestaurantLogoUrl(
+                                similar.restaurant_name || similar.restaurant || '',
+                                similar.restaurantLogoUrl
+                              )}
+                              alt={similar.restaurant || similar.restaurant_name || 'Restaurant logo'}
+                              className="w-full h-full object-contain object-center"
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'contain',
+                                objectPosition: 'center',
+                                display: 'block',
+                                maxWidth: '100%',
+                                maxHeight: '100%',
+                              }}
+                              onError={(e) => {
+                                e.currentTarget.src = '/logos/default.png';
+                                e.currentTarget.onerror = null;
+                              }}
+                            />
+                          </div>
                           {/* Gradient overlay */}
                           <div className="absolute inset-0 bg-gradient-to-t from-background dark:from-gray-950 via-background/20 dark:via-gray-950/20 to-transparent pointer-events-none" />
                         </div>
@@ -1263,7 +1249,7 @@ export function MealDetail({
             )}
 
             {/* --- ACTION BUTTONS (Inside scrollable content, only visible when scrolled to bottom) --- */}
-            <div className="mt-4 mb-8 space-y-3" style={{ height: '96px' }}>
+            <div className="mt-5 mb-8 rounded-3xl border border-border/70 bg-background/70 p-2.5 shadow-sm backdrop-blur-sm" style={{ minHeight: '128px' }}>
               <button
                 onClick={() => {
                   if (!isPremium) {
@@ -1272,20 +1258,47 @@ export function MealDetail({
                   }
                   setShowLogModal(true);
                 }}
-                className="w-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-[#020617] font-bold text-sm py-4 rounded-2xl shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                className="flex w-full items-center justify-between rounded-2xl border border-emerald-400/30 bg-gradient-to-r from-emerald-400 via-emerald-400 to-emerald-500 px-4 py-3.5 text-left text-[#032012] shadow-lg shadow-emerald-500/20 transition-all hover:shadow-emerald-500/30 active:scale-[0.98] dark:border-emerald-300/10"
               >
-                <Plus className="w-3.5 h-3.5" />
-                {effectiveMacros.calories !== meal.calories
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-black/10 ring-1 ring-black/5">
+                    <Plus className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold leading-tight">Log to Daily Tracker</p>
+                    <p className="mt-0.5 text-[11px] font-medium leading-tight text-[#032012]/70">
+                      Add this meal to today&apos;s log
+                    </p>
+                  </div>
+                </div>
+                {effectiveMacros.calories !== meal.calories && (
+                  <span className="ml-3 rounded-full bg-black/10 px-2.5 py-1 text-[11px] font-semibold text-[#032012] ring-1 ring-black/5">
+                    {effectiveMacros.calories} cal
+                  </span>
+                )}{/*
                   ? `Log to Daily Tracker • ${effectiveMacros.calories} cal`
                   : 'Log to Daily Tracker'}
+                */}
               </button>
 
               <button
                 onClick={() => setShowManualModal(true)}
-                className="w-full bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-sm py-4 rounded-2xl shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                className="mt-2.5 flex w-full items-center justify-between rounded-2xl border border-cyan-200/80 bg-gradient-to-r from-white to-cyan-50/80 px-4 py-3.5 text-left text-slate-900 shadow-sm transition-all hover:border-cyan-300 hover:shadow-md active:scale-[0.98] dark:border-cyan-500/20 dark:bg-gradient-to-r dark:from-slate-900 dark:to-cyan-950/40 dark:text-white"
               >
-                <Plus className="w-4 h-4" />
-                Add Meal Manually
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-700 ring-1 ring-cyan-500/15 dark:bg-cyan-500/15 dark:text-cyan-300 dark:ring-cyan-400/10">
+                    <Plus className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold leading-tight">Add Meal Manually</p>
+                    <p className="mt-0.5 text-[11px] font-medium leading-tight text-slate-500 dark:text-slate-400">
+                      Enter your own meal and macros
+                    </p>
+                  </div>
+                </div>
+                <span className="rounded-full border border-cyan-200/80 bg-white/80 px-2.5 py-1 text-[11px] font-semibold text-cyan-700 dark:border-cyan-400/20 dark:bg-slate-900/70 dark:text-cyan-300">
+                  Custom
+                </span>
               </button>
             </div>
           </div>

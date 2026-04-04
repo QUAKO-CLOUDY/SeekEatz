@@ -1,369 +1,588 @@
 {
-    "restaurant_name": "Smashburger",
-    "items": [
-      {
-        "name": "Classic Smash",
-        "category": "SMASHBURGERS",
-        "price_estimate": 8.39,
-        "image_url": null,
-        "macros": {
-          "calories": 630,
-          "protein": 30,
-          "carbs": 41,
-          "fat": 37
-        }
-      },
-      {
-        "name": "Double Classic Smash",
-        "category": "SMASHBURGERS",
-        "price_estimate": 11.75,
-        "image_url": null,
-        "macros": {
-          "calories": 970,
-          "protein": 54,
-          "carbs": 42,
-          "fat": 62
-        }
-      },
-      {
-        "name": "Veggie Smash",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 480,
-          "protein": 13,
-          "carbs": 56,
-          "fat": 23
-        }
-      },
-      {
-        "name": "All-American Smash",
-        "category": "SMASHBURGERS",
-        "price_estimate": 5.99,
-        "image_url": null,
-        "macros": {
-          "calories": 550,
-          "protein": 30,
-          "carbs": 40,
-          "fat": 30
-        }
-      },
-      {
-        "name": "Double All-American Smash",
-        "category": "SMASHBURGERS",
-        "price_estimate": 8.39,
-        "image_url": null,
-        "macros": {
-          "calories": 890,
-          "protein": 54,
-          "carbs": 41,
-          "fat": 55
-        }
-      },
-      {
-        "name": "Bacon Stack Smash",
-        "category": "SMASHBURGERS",
-        "price_estimate": 11.15,
-        "image_url": null,
-        "macros": {
-          "calories": 730,
-          "protein": 36,
-          "carbs": 34,
-          "fat": 49
-        }
-      },
-      {
-        "name": "Double Bacon Stack Smash",
-        "category": "SMASHBURGERS",
-        "price_estimate": 13.91,
-        "image_url": null,
-        "macros": {
-          "calories": 1110,
-          "protein": 63,
-          "carbs": 35,
-          "fat": 77
-        }
-      },
-      {
-        "name": "Spicy Jalapeno Smash",
-        "category": "SMASHBURGERS",
-        "price_estimate": 11.15,
-        "image_url": null,
-        "macros": {
-          "calories": 710,
-          "protein": 37,
-          "carbs": 35,
-          "fat": 48
-        }
-      },
-      {
-        "name": "Double Spicy Jalapeno Smash",
-        "category": "SMASHBURGERS",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 1060,
-          "protein": 63,
-          "carbs": 34,
-          "fat": 77
-        }
-      },
-      {
-        "name": "BBQ Bacon Smash",
-        "category": "13.91",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 690,
-          "protein": 35,
-          "carbs": 46,
-          "fat": 42
-        }
-      },
-      {
-        "name": "Double BBQ Bacon Smash",
-        "category": "SMASHBURGERS",
-        "price_estimate": 13.19,
-        "image_url": null,
-        "macros": {
-          "calories": 1060,
-          "protein": 61,
-          "carbs": 55,
-          "fat": 68
-        }
-      },
-      
-      
-      {
-        "name": "Crispy Chicken Sandwich",
-        "category": "CHICKEN",
-        "price_estimate": 10.07,
-        "image_url": null,
-        "macros": {
-          "calories": 680,
-          "protein": 35,
-          "carbs": 52,
-          "fat": 37
-        }
-      },
-      
-      {
-        "name": "Chicken Smash Burger",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 460,
-          "protein": 26,
-          "carbs": 33,
-          "fat": 24
-        }
-      },
-      {
-        "name": "Double Chicken Smash Burger",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 620,
-          "protein": 46,
-          "carbs": 33,
-          "fat": 32
-        }
-      },
-      {
-        "name": "3 Chicken Tenders",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 570,
-          "protein": 44,
-          "carbs": 28,
-          "fat": 32
-        }
-      },
-      {
-        "name": "5 Chicken Tenders",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 960,
-          "protein": 73,
-          "carbs": 40,
-          "fat": 53
-        }
-      },
-      {
-        "name": "3 Scorchin' Hot Chicken Tenders",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 870,
-          "protein": 44,
-          "carbs": 29,
-          "fat": 64
-        }
-      },
-      {
-        "name": "5 Scorchin' Hot Chicken Tenders",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 1450,
-          "protein": 73,
-          "carbs": 48,
-          "fat": 107
-        }
-      },
-      {
-        "name": "Crispy Brussels Sprouts",
-        "category": "SIDES",
-        "price_estimate": 4.55,
-        "image_url": null,
-        "macros": {
-          "calories": 450,
-          "protein": 5,
-          "carbs": 14,
-          "fat": 44
-        }
-      },
-      {
-        "name": "Smash Fries (Reg)",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 420,
-          "protein": 4,
-          "carbs": 53,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Smash Fries (Large)",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 630,
-          "protein": 6,
-          "carbs": 80,
-          "fat": 32
-        }
-      },
-      {
-        "name": "French Fries (Reg)",
-        "category": "SIDES",
-        "price_estimate": 3.95,
-        "image_url": null,
-        "macros": {
-          "calories": 370,
-          "protein": 4,
-          "carbs": 56,
-          "fat": 14
-        }
-      },
-      {
-        "name": "French Fries (Large)",
-        "category": "SIDES",
-        "price_estimate": 3.95,
-        "image_url": null,
-        "macros": {
-          "calories": 560,
-          "protein": 6,
-          "carbs": 84,
-          "fat": 21
-        }
-      },
-      {
-        "name": "Sweet Potato Waffle Fries (Reg)",
-        "category": "SIDES",
-        "price_estimate": 3.95,
-        "image_url": null,
-        "macros": {
-          "calories": 310,
-          "protein": 3,
-          "carbs": 42,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Sweet Potato Waffle Fries (Large)",
-        "category": "SIDES",
-        "price_estimate": 5.15,
-        "image_url": null,
-        "macros": {
-          "calories": 390,
-          "protein": 4,
-          "carbs": 53,
-          "fat": 18
-        }
-      },
-      {
-        "name": "Scorchin' Hot Fries (Regular)",
-        "category": "SIDES",
-        "price_estimate": 4.07,
-        "image_url": null,
-        "macros": {
-          "calories": 550,
-          "protein": 4,
-          "carbs": 60,
-          "fat": 32
-        }
-      },
-      {
-        "name": "Scorchin' Hot Fries (Large)",
-        "category": "SIDES",
-        "price_estimate": 4.79,
-        "image_url": null,
-        "macros": {
-          "calories": 770,
-          "protein": 6,
-          "carbs": 84,
-          "fat": 45
-        }
-      },
-      {
-        "name": "Tots",
-        "category": "SIDES",
-        "price_estimate": 3.95
-,
-        "image_url": null,
-        "macros": {
-          "calories": 240,
-          "protein": 3,
-          "carbs": 29,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Smash Tots",
-        "category": "SIDES",
-        "price_estimate": 4.07,
-        "image_url": null,
-        "macros": {
-          "calories": 350,
-          "protein": 3,
-          "carbs": 29,
-          "fat": 25
-        }
-      },
-      {
-        "name": "Scorchin' Hot Tots",
-        "category": "SIDES",
-        "price_estimate": 4.07,
-        "image_url": null,
-        "macros": {
-          "calories": 640,
-          "protein": 4,
-          "carbs": 36,
-          "fat": 51
-     }
+  "restaurant_name": "Smashburger",
+  "items": [
+    {
+      "name": "Classic Smash",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 630,
+        "protein": 30,
+        "carbs": 41,
+        "fat": 37
       }
-    ]
-  }
+    },
+    {
+      "name": "Double Classic Smash",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 970,
+        "protein": 54,
+        "carbs": 42,
+        "fat": 62
+      }
+    },
+    {
+      "name": "Veggie Smash",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 480,
+        "protein": 13,
+        "carbs": 56,
+        "fat": 23
+      }
+    },
+    {
+      "name": "All-American Smash",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 550,
+        "protein": 30,
+        "carbs": 40,
+        "fat": 30
+      }
+    },
+    {
+      "name": "Double All-American Smash",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 890,
+        "protein": 54,
+        "carbs": 41,
+        "fat": 55
+      }
+    },
+    {
+      "name": "Bacon Stack Smash",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 730,
+        "protein": 36,
+        "carbs": 34,
+        "fat": 49
+      }
+    },
+    {
+      "name": "Double Bacon Stack Smash",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 1110,
+        "protein": 63,
+        "carbs": 35,
+        "fat": 77
+      }
+    },
+    {
+      "name": "Spicy Jalapeno Smash",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 710,
+        "protein": 37,
+        "carbs": 35,
+        "fat": 48
+      }
+    },
+    {
+      "name": "Double Spicy Jalapeno Smash",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 1060,
+        "protein": 63,
+        "carbs": 34,
+        "fat": 77
+      }
+    },
+    {
+      "name": "BBQ Bacon Smash",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 690,
+        "protein": 35,
+        "carbs": 46,
+        "fat": 42
+      }
+    },
+    {
+      "name": "Double BBQ Bacon Smash",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 1060,
+        "protein": 61,
+        "carbs": 55,
+        "fat": 68
+      }
+    },
+    {
+      "name": "Truffle Mushroom Smash",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 650,
+        "protein": 33,
+        "carbs": 32,
+        "fat": 43
+      }
+    },
+    {
+      "name": "Double Truffle Mushroom Smash",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 980,
+        "protein": 60,
+        "carbs": 32,
+        "fat": 68
+      }
+    },
+    {
+      "name": "Crispy Chicken Sandwich",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 680,
+        "protein": 35,
+        "carbs": 52,
+        "fat": 37
+      }
+    },
+    {
+      "name": "Scorchin' Hot Crispy Chicken Sandwich",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 870,
+        "protein": 35,
+        "carbs": 50,
+        "fat": 60
+      }
+    },
+    {
+      "name": "Chicken Smash Burger",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 460,
+        "protein": 26,
+        "carbs": 33,
+        "fat": 24
+      }
+    },
+    {
+      "name": "Double Chicken Smash Burger",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "macros": {
+        "calories": 620,
+        "protein": 46,
+        "carbs": 33,
+        "fat": 32
+      }
+    },
+    {
+      "name": "3 Chicken Tenders",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 570,
+        "protein": 44,
+        "carbs": 28,
+        "fat": 32
+      }
+    },
+    {
+      "name": "5 Chicken Tenders",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 960,
+        "protein": 73,
+        "carbs": 40,
+        "fat": 53
+      }
+    },
+    {
+      "name": "3 Scorchin' Hot Chicken Tenders",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 870,
+        "protein": 44,
+        "carbs": 29,
+        "fat": 64
+      }
+    },
+    {
+      "name": "5 Scorchin' Hot Chicken Tenders",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 1450,
+        "protein": 73,
+        "carbs": 48,
+        "fat": 107
+      }
+    },
+    {
+      "name": "Crispy Brussels Sprouts",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 450,
+        "protein": 5,
+        "carbs": 14,
+        "fat": 44
+      }
+    },
+    {
+      "name": "Smash Fries (Reg)",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 420,
+        "protein": 4,
+        "carbs": 53,
+        "fat": 21
+      }
+    },
+    {
+      "name": "Smash Fries (Large)",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 630,
+        "protein": 6,
+        "carbs": 80,
+        "fat": 32
+      }
+    },
+    {
+      "name": "French Fries (Reg)",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 370,
+        "protein": 4,
+        "carbs": 56,
+        "fat": 14
+      }
+    },
+    {
+      "name": "French Fries (Large)",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 560,
+        "protein": 6,
+        "carbs": 84,
+        "fat": 21
+      }
+    },
+    {
+      "name": "Sweet Potato Waffle Fries (Reg)",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 310,
+        "protein": 3,
+        "carbs": 42,
+        "fat": 14
+      }
+    },
+    {
+      "name": "Sweet Potato Waffle Fries (Large)",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 390,
+        "protein": 4,
+        "carbs": 53,
+        "fat": 18
+      }
+    },
+    {
+      "name": "Scorchin' Hot Fries (Regular)",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 550,
+        "protein": 4,
+        "carbs": 60,
+        "fat": 32
+      }
+    },
+    {
+      "name": "Scorchin' Hot Fries (Large)",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 770,
+        "protein": 6,
+        "carbs": 84,
+        "fat": 45
+      }
+    },
+    {
+      "name": "Tots",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 240,
+        "protein": 3,
+        "carbs": 29,
+        "fat": 12
+      }
+    },
+    {
+      "name": "Smash Tots",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 350,
+        "protein": 3,
+        "carbs": 29,
+        "fat": 25
+      }
+    },
+    {
+      "name": "Scorchin' Hot Tots",
+      "category": "Sides",
+      "price_estimate": null,
+      "macros": {
+        "calories": 480,
+        "protein": 4,
+        "carbs": 35,
+        "fat": 25
+      }
+    },
+    {
+      "name": "Classic Bun",
+      "category": "Buns",
+      "price_estimate": null,
+      "macros": {
+        "calories": 190,
+        "protein": 5,
+        "carbs": 31,
+        "fat": 5
+      }
+    },
+    {
+      "name": "Gluten-Free Udi's Bun",
+      "category": "Buns",
+      "price_estimate": null,
+      "macros": {
+        "calories": 220,
+        "protein": 4,
+        "carbs": 39,
+        "fat": 6
+      }
+    },
+    {
+      "name": "Burger Patty",
+      "category": "Proteins",
+      "price_estimate": null,
+      "macros": {
+        "calories": 250,
+        "protein": 21,
+        "carbs": 0,
+        "fat": 19
+      }
+    },
+    {
+      "name": "Veggie Burger Patty",
+      "category": "Proteins",
+      "price_estimate": null,
+      "macros": {
+        "calories": 180,
+        "protein": 7,
+        "carbs": 23,
+        "fat": 7
+      }
+    },
+    {
+      "name": "Chopped Chicken Patty",
+      "category": "Proteins",
+      "price_estimate": null,
+      "macros": {
+        "calories": 160,
+        "protein": 20,
+        "carbs": 0,
+        "fat": 8
+      }
+    },
+    {
+      "name": "Crispy Chicken Patty",
+      "category": "Proteins",
+      "price_estimate": null,
+      "macros": {
+        "calories": 380,
+        "protein": 29,
+        "carbs": 19,
+        "fat": 21
+      }
+    },
+    {
+      "name": "American Cheese",
+      "category": "Cheese",
+      "price_estimate": null,
+      "macros": {
+        "calories": 90,
+        "protein": 3,
+        "carbs": 1,
+        "fat": 6
+      }
+    },
+    {
+      "name": "Cheddar Cheese",
+      "category": "Cheese",
+      "price_estimate": null,
+      "macros": {
+        "calories": 80,
+        "protein": 5,
+        "carbs": 0,
+        "fat": 7
+      }
+    },
+    {
+      "name": "Swiss Cheese",
+      "category": "Cheese",
+      "price_estimate": null,
+      "macros": {
+        "calories": 80,
+        "protein": 6,
+        "carbs": 0,
+        "fat": 6
+      }
+    },
+    {
+      "name": "Pepper Jack Cheese",
+      "category": "Cheese",
+      "price_estimate": null,
+      "macros": {
+        "calories": 80,
+        "protein": 5,
+        "carbs": 1,
+        "fat": 6
+      }
+    },
+    {
+      "name": "Ketchup",
+      "category": "Sauces",
+      "price_estimate": null,
+      "macros": {
+        "calories": 15,
+        "protein": 0,
+        "carbs": 4,
+        "fat": 0
+      }
+    },
+    {
+      "name": "BBQ Sauce",
+      "category": "Sauces",
+      "price_estimate": null,
+      "macros": {
+        "calories": 35,
+        "protein": 0,
+        "carbs": 6,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Smash Sauce",
+      "category": "Sauces",
+      "price_estimate": null,
+      "macros": {
+        "calories": 70,
+        "protein": 0,
+        "carbs": 2,
+        "fat": 7
+      }
+    },
+    {
+      "name": "Mayo/Truffle Mayo",
+      "category": "Sauces",
+      "price_estimate": null,
+      "macros": {
+        "calories": 100,
+        "protein": 0,
+        "carbs": 0,
+        "fat": 11
+      }
+    },
+    {
+      "name": "Ranch",
+      "category": "Sauces",
+      "price_estimate": null,
+      "macros": {
+        "calories": 50,
+        "protein": 0,
+        "carbs": 1,
+        "fat": 5
+      }
+    },
+    {
+      "name": "Mustard",
+      "category": "Sauces",
+      "price_estimate": null,
+      "macros": {
+        "calories": 0,
+        "protein": 0,
+        "carbs": 0,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Bacon",
+      "category": "Toppings",
+      "price_estimate": null,
+      "macros": {
+        "calories": 45,
+        "protein": 3,
+        "carbs": 0,
+        "fat": 4
+      }
+    },
+    {
+      "name": "Grilled Onion/Sautéed Mushrooms",
+      "category": "Toppings",
+      "price_estimate": null,
+      "macros": {
+        "calories": 45,
+        "protein": 0,
+        "carbs": 1,
+        "fat": 4
+      }
+    },
+    {
+      "name": "Smashed Avocado",
+      "category": "Toppings",
+      "price_estimate": null,
+      "macros": {
+        "calories": 70,
+        "protein": 1,
+        "carbs": 2,
+        "fat": 7
+      }
+    },
+    {
+      "name": "Fried Onions",
+      "category": "Toppings",
+      "price_estimate": null,
+      "macros": {
+        "calories": 90,
+        "protein": 0,
+        "carbs": 6,
+        "fat": 7
+      }
+    }
+  ]
+}

@@ -4,6 +4,12 @@ import { embed } from 'ai';
 import { classifyMenuItem } from '@/lib/menu-item-classifier';
 import { resolveRestaurantUniversal } from '@/lib/restaurant-resolver';
 import type { SearchParams } from '@/app/types';
+import {
+  isSmoothieLikeMenuItem,
+  isSmoothieLikeText,
+  shouldRandomizeSmoothieResults,
+} from '@/lib/smoothie-search';
+import { getRestaurantLogoUrl } from '@/lib/image-utils';
 import { DISH_TAXONOMY } from '@/lib/taxonomy';
 
 // Dev-only counter for hard guard exclusions (tracks first 10)
@@ -312,6 +318,10 @@ function isDishItem(menuItem: any, dishType?: string | null): boolean {
   const category = (menuItem.category || '').toLowerCase().trim();
   const name = (menuItem.name || menuItem.item_name || '').toLowerCase().trim();
   const words = name.split(/\s+/).filter((w: string) => w.length > 0);
+
+  if (isSmoothieLikeMenuItem(menuItem)) {
+    return true;
+  }
 
   // COMPONENT BLACKLIST: Check name for component tokens/phrases BEFORE all other checks
   // This runs first to catch components even if category says "Entrees"
@@ -1662,6 +1672,7 @@ export async function searchHandler(params: SearchParams) {
   const dishType = reconstructedDishType !== undefined
     ? reconstructedDishType
     : (effectiveQuery ? extractDishType(effectiveQuery) : null);
+  const isSmoothieSearch = dishType === 'smoothie' || isSmoothieLikeText(effectiveQuery);
 
   // Extract excluded keywords from negation (e.g., "not chicken" → exclude chicken items)
   const excludedKeywords = effectiveQuery ? extractExcludedKeywords(effectiveQuery) : [];
@@ -1771,6 +1782,20 @@ export async function searchHandler(params: SearchParams) {
   // If searchKey was provided, use it; otherwise generate new one
   // STRICT: Only include rest in searchKey if restaurantName exists (canonical restaurant)
   if (!currentSearchKey) {
+    const randomizeSmoothies = shouldRandomizeSmoothieResults({
+      dishType: isSmoothieSearch ? 'smoothie' : dishType,
+      constraints: {
+        minCalories: effectiveMinCalories,
+        maxCalories: effectiveMaxCalories,
+        minProtein: effectiveMinProtein,
+        maxProtein: effectiveMaxProtein,
+        minCarbs: effectiveMinCarbs,
+        maxCarbs: effectiveMaxCarbs,
+        minFats: effectiveMinFats,
+        maxFats: effectiveMaxFats,
+      }
+    });
+
     const searchKeyData: any = {
       q: effectiveQuery.toLowerCase() || '',
       calMin: effectiveMinCalories,
@@ -1783,6 +1808,13 @@ export async function searchHandler(params: SearchParams) {
       fatMax: effectiveMaxFats,
       dishType: dishType || null
     };
+
+    if (randomizeSmoothies) {
+      searchKeyData.shuffleNonce =
+        globalThis.crypto?.randomUUID?.() ??
+        `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+    }
+
     // Only include rest if restaurantName exists (canonical restaurant)
     if (restaurantName) {
       searchKeyData.rest = restaurantName;
@@ -2355,7 +2387,25 @@ export async function searchHandler(params: SearchParams) {
   // If dishType exists: only keep items whose name matches dish keywords
   let dishTypeFilteredItems = dishFilteredItems;
 
-  if (dishType) {
+  if (isSmoothieSearch) {
+    const beforeSmoothieCount = dishFilteredItems.length;
+    dishTypeFilteredItems = dishFilteredItems.filter((item: any) => isSmoothieLikeMenuItem(item));
+    const afterSmoothieCount = dishTypeFilteredItems.length;
+
+    if (beforeSmoothieCount > afterSmoothieCount) {
+      console.log(`[searchHandler] Smoothie-only filter: ${beforeSmoothieCount} -> ${afterSmoothieCount} items`);
+    }
+
+    if (dishTypeFilteredItems.length === 0) {
+      return {
+        meals: [],
+        hasMore: false,
+        nextOffset: 0,
+        searchKey: currentSearchKey,
+        message: 'No smoothies match your request yet.'
+      };
+    }
+  } else if (dishType) {
     const beforeDishTypeCount = dishFilteredItems.length;
     dishTypeFilteredItems = applyDishTypeFilter(dishFilteredItems, dishType);
     const afterDishTypeCount = dishTypeFilteredItems.length;
@@ -2628,23 +2678,58 @@ export async function searchHandler(params: SearchParams) {
     diverseItems = applyRestaurantDiversity(filteredItems, currentSearchKey, userId);
   }
 
+  const uniqueRestaurantNames = [
+    ...new Set(
+      diverseItems
+        .map((item: any) => item.restaurant_name)
+        .filter((name: string | null | undefined): name is string => Boolean(name?.trim()))
+    ),
+  ];
+
+  const restaurantAssetMap = new Map<string, { logo_url?: string | null }>();
+
+  if (uniqueRestaurantNames.length > 0) {
+    const { data: restaurantAssets, error: restaurantAssetsError } = await supabase
+      .from('restaurants')
+      .select('name, logo_url')
+      .in('name', uniqueRestaurantNames);
+
+    if (restaurantAssetsError) {
+      console.warn('[search] Failed to fetch restaurant logo assets:', restaurantAssetsError.message);
+    } else {
+      for (const restaurant of restaurantAssets ?? []) {
+        if (!restaurant.name) continue;
+        restaurantAssetMap.set(restaurant.name.trim().toLowerCase(), {
+          logo_url: restaurant.logo_url,
+        });
+      }
+    }
+  }
+
   // 15. CONVERT TO FINAL MEAL FORMAT (for UI compatibility)
   // Use normalized canonical object directly - it already has all fields from schema
-  const finalMeals = diverseItems.map((item: any) => ({
-    id: item.id,
-    name: item.name,
-    restaurant: item.restaurant_name,
-    restaurant_name: item.restaurant_name, // Keep for logo logic
-    calories: item.calories,
-    protein: item.protein,
-    carbs: item.carbs,
-    fats: item.fats || item.fat || 0, // Use "fats" (plural) as primary, fallback to "fat" for backward compatibility
-    image: item.image_url || '/placeholder-food.jpg',
-    description: '', // Not in schema, leave empty
-    category: item.category || '',
-    dietary_tags: item.normalized_tags || [], // Use normalized dietary tags
-    price: item.price_estimate || null,
-  }));
+  const finalMeals = diverseItems.map((item: any) => {
+    const restaurantName = item.restaurant_name;
+    const restaurantAssets = restaurantAssetMap.get(restaurantName?.trim().toLowerCase());
+    const restaurantLogoUrl = getRestaurantLogoUrl(restaurantName, restaurantAssets?.logo_url);
+
+    return {
+      id: item.id,
+      name: item.name,
+      restaurant: restaurantName,
+      restaurant_name: restaurantName, // Keep for logo logic
+      calories: item.calories,
+      protein: item.protein,
+      carbs: item.carbs,
+      fats: item.fats || item.fat || 0, // Use "fats" (plural) as primary, fallback to "fat" for backward compatibility
+      image: restaurantLogoUrl,
+      restaurantLogoUrl,
+      description: '', // Not in schema, leave empty
+      category: item.category || '',
+      dietary_tags: item.normalized_tags || [], // Use normalized dietary tags
+      price: item.price_estimate || null,
+    };
+  });
 
   // STRICT RESTAURANT ENFORCEMENT: Dev assertion
   // If restaurant filter is active, ensure ALL returned meals are from that restaurant

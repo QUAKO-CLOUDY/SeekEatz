@@ -8,11 +8,34 @@ import { createClient } from "@/utils/supabase/client";
 import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
 import { Button } from "@/app/components/ui/button";
-import { getGuestChatForMigration, getCurrentSessionId, clearGuestSessionFull } from "@/lib/guest-session";
+import { getGuestChatForMigration, clearGuestSessionFull } from "@/lib/guest-session";
 import { claimAnonymousData } from "@/lib/claim-anon-data";
 import { AuthProviders } from "@/app/components/AuthProviders";
+import { bootstrapAccount } from "@/lib/bootstrap-account";
 
 const THIRTY_MINUTES = 30 * 60 * 1000;
+const EMAIL_OTP_LENGTH = 8;
+
+type PendingOnboardingProfile = {
+  goal?: string;
+  diet_type?: string;
+  dietary_options?: string[];
+  target_calories?: number;
+  target_protein_g?: number;
+  target_carbs_g?: number;
+  target_fats_g?: number;
+  preferredMealTypes?: string[];
+  search_distance_miles?: number;
+  [key: string]: unknown;
+};
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
+};
 
 export default function SignupPage() {
   const router = useRouter();
@@ -21,6 +44,9 @@ export default function SignupPage() {
   const redirectTo = searchParams.get("redirectTo") || "/chat";
   const isMasterMode = searchParams.get("master") === "1";
   const isSwitchAccountMode = searchParams.get("switch") === "1";
+  const shouldStartTutorial = searchParams.get("tutorial") === "1";
+  const emailOnly = searchParams.get("method") === "email";
+  const selectedPlan = searchParams.get("plan");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +58,9 @@ export default function SignupPage() {
 
   // OTP verification state
   const [showOtpScreen, setShowOtpScreen] = useState(false);
-  const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '', '', '']);
+  const [otpDigits, setOtpDigits] = useState<string[]>(
+    Array.from({ length: EMAIL_OTP_LENGTH }, () => "")
+  );
   const [otpError, setOtpError] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -116,12 +144,12 @@ export default function SignupPage() {
         // Show OTP verification screen
         setIsLoading(false);
         setShowOtpScreen(true);
-        setOtpDigits(['', '', '', '', '', '', '', '']);
+        setOtpDigits(Array.from({ length: EMAIL_OTP_LENGTH }, () => ""));
         setOtpError(null);
         startResendCooldown();
       }
-    } catch (err: any) {
-      setError(err?.message || "Something went wrong. Please try again.");
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Something went wrong. Please try again."));
       setIsLoading(false);
     }
   };
@@ -152,14 +180,14 @@ export default function SignupPage() {
   const handleOtpChange = (index: number, value: string) => {
     if (value.length > 1) {
       // Handle paste: distribute digits across inputs
-      const digits = value.replace(/\D/g, '').slice(0, 8).split('');
+      const digits = value.replace(/\D/g, "").slice(0, EMAIL_OTP_LENGTH).split("");
       const newOtpDigits = [...otpDigits];
       digits.forEach((digit, i) => {
-        if (index + i < 8) newOtpDigits[index + i] = digit;
+        if (index + i < EMAIL_OTP_LENGTH) newOtpDigits[index + i] = digit;
       });
       setOtpDigits(newOtpDigits);
       // Focus the next empty input or the last one
-      const nextIndex = Math.min(index + digits.length, 7);
+      const nextIndex = Math.min(index + digits.length, EMAIL_OTP_LENGTH - 1);
       otpInputRefs.current[nextIndex]?.focus();
       return;
     }
@@ -171,7 +199,7 @@ export default function SignupPage() {
     setOtpDigits(newOtpDigits);
 
     // Auto-focus next input
-    if (value && index < 7) {
+    if (value && index < EMAIL_OTP_LENGTH - 1) {
       otpInputRefs.current[index + 1]?.focus();
     }
   };
@@ -186,8 +214,8 @@ export default function SignupPage() {
   // Verify OTP and complete signup
   const handleVerifyOtp = async () => {
     const otpCode = otpDigits.join('');
-    if (otpCode.length !== 8) {
-      setOtpError("Please enter the full 8-digit code.");
+    if (otpCode.length !== EMAIL_OTP_LENGTH) {
+      setOtpError(`Please enter the full ${EMAIL_OTP_LENGTH}-digit code.`);
       return;
     }
 
@@ -222,11 +250,11 @@ export default function SignupPage() {
         localStorage.getItem('seekeatz_signup_from_chat_gate') === 'true';
 
       // Load pending onboarding profile if it exists
-      let profile = null;
+      let profile: PendingOnboardingProfile | null = null;
       const pendingProfile = localStorage.getItem("pendingOnboardingProfile");
       if (pendingProfile) {
         try {
-          profile = JSON.parse(pendingProfile);
+          profile = JSON.parse(pendingProfile) as PendingOnboardingProfile;
           localStorage.removeItem("pendingOnboardingProfile");
         } catch (e) {
           console.warn("Failed to parse pending onboarding profile:", e);
@@ -271,7 +299,7 @@ export default function SignupPage() {
 
       // Save profile to Supabase
       try {
-        const profileData: any = {
+        const profileData: Record<string, unknown> = {
           id: userId,
           email: verifyData.user.email,
           has_completed_onboarding: true,
@@ -306,7 +334,7 @@ export default function SignupPage() {
 
       // Clear guest session
       if (typeof window !== 'undefined') {
-        try { clearGuestSessionFull(); } catch (e) { /* noop */ }
+        try { clearGuestSessionFull(); } catch { /* noop */ }
       }
 
       // Set localStorage flags
@@ -315,8 +343,23 @@ export default function SignupPage() {
       localStorage.setItem(`seekEatz_hasCompletedOnboarding_${userId}`, "true");
       localStorage.setItem("hasCompletedOnboarding", "true");
       localStorage.setItem("onboarded", "true");
+      localStorage.setItem("seekeatz_start_app_tutorial", "true");
+      localStorage.removeItem(`seekeatz_app_tutorial_completed_${userId}`);
       if (profile) {
         localStorage.setItem("userProfile", JSON.stringify(profile));
+      }
+
+      try {
+        const bootstrapResult = await bootstrapAccount({
+          profile,
+          hasCompletedOnboarding: true,
+        });
+
+        if (bootstrapResult.waitlistGrantApplied) {
+          localStorage.setItem("seekeatz_waitlist_trial_activated", "true");
+        }
+      } catch (bootstrapError) {
+        console.warn("Account bootstrap failed after signup:", bootstrapError);
       }
 
       // Wait for propagation
@@ -326,8 +369,8 @@ export default function SignupPage() {
 
       // Redirect to chat with full access
       window.location.href = redirectTo;
-    } catch (err: any) {
-      setOtpError(err?.message || "Verification failed. Please try again.");
+    } catch (err: unknown) {
+      setOtpError(getErrorMessage(err, "Verification failed. Please try again."));
       setIsLoading(false);
     }
   };
@@ -349,9 +392,9 @@ export default function SignupPage() {
       }
 
       startResendCooldown();
-      setOtpDigits(['', '', '', '', '', '', '', '']);
+      setOtpDigits(Array.from({ length: EMAIL_OTP_LENGTH }, () => ""));
       otpInputRefs.current[0]?.focus();
-    } catch (err: any) {
+    } catch {
       setOtpError("Failed to resend code. Please try again.");
     }
   };
@@ -371,7 +414,7 @@ export default function SignupPage() {
               Verify Your Email
             </h1>
             <p className="text-gray-600">
-              We sent an 8-digit code to<br />
+              We sent an {EMAIL_OTP_LENGTH}-digit code to<br />
               <span className="font-medium text-black">{email}</span>
             </p>
           </div>
@@ -384,7 +427,7 @@ export default function SignupPage() {
                 ref={(el) => { otpInputRefs.current[index] = el; }}
                 type="text"
                 inputMode="numeric"
-                maxLength={8}
+                maxLength={EMAIL_OTP_LENGTH}
                 value={digit}
                 onChange={(e) => handleOtpChange(index, e.target.value)}
                 onKeyDown={(e) => handleOtpKeyDown(index, e)}
@@ -405,7 +448,7 @@ export default function SignupPage() {
           {/* Verify Button */}
           <Button
             onClick={handleVerifyOtp}
-            disabled={isLoading || otpDigits.join('').length !== 8}
+            disabled={isLoading || otpDigits.join("").length !== EMAIL_OTP_LENGTH}
             className="h-14 rounded-full w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 border-0 disabled:opacity-60 disabled:cursor-not-allowed mb-4"
           >
             {isLoading ? "Verifying..." : "Verify & Continue"}
@@ -433,7 +476,7 @@ export default function SignupPage() {
             onClick={() => {
               setShowOtpScreen(false);
               setOtpError(null);
-              setOtpDigits(['', '', '', '', '', '', '', '']);
+              setOtpDigits(Array.from({ length: EMAIL_OTP_LENGTH }, () => ""));
             }}
             className="text-gray-500 hover:text-gray-700 text-sm text-center w-full mt-4 transition-colors"
           >
@@ -450,14 +493,27 @@ export default function SignupPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-black mb-2">
-            Create Account
+            {selectedPlan === "free" ? "Create Your Free Account" : "Create Account"}
           </h1>
           <p className="text-black">
-            Sign up to get started with SeekEatz
+            {selectedPlan === "free"
+              ? "Enter your email to get 2 free chats a day with SeekEatz."
+              : "Sign up to get started with SeekEatz"}
           </p>
         </div>
 
-        <AuthProviders mode="signup" oauthRedirectPath={redirectTo} className="mb-6" />
+        {!emailOnly ? (
+          <AuthProviders
+            mode="signup"
+            oauthRedirectPath={redirectTo}
+            className="mb-6"
+            onBeforeRedirect={() => {
+              if (shouldStartTutorial && typeof window !== "undefined") {
+                localStorage.setItem("seekeatz_start_app_tutorial", "true");
+              }
+            }}
+          />
+        ) : null}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>

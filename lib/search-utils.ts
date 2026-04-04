@@ -79,6 +79,7 @@ export async function buildSearchParams(input: SearchInput): Promise<SearchParam
     // Normalize query: prefer 'query', fallback to 'message'
     const query = input.query || input.message || '';
     const queryText = query.trim();
+    const userContext = input.userContext || {};
 
     // Extract explicit restaurant query and macro filters from query text
     // Only extract if searchKey is NOT present (new search, not pagination)
@@ -91,29 +92,34 @@ export async function buildSearchParams(input: SearchInput): Promise<SearchParam
     // If searchKey exists (pagination), preserve any prior explicit restaurant constraint encoded in searchKey
     const explicitRestaurantQuery = (!input.searchKey && restaurantQuery) ? restaurantQuery : undefined;
 
-    // Normalize location: convert 'near me' string or radius_miles to location field
-    let location: string | undefined = undefined;
-    if (input.location === 'near me' || input.radius_miles !== undefined) {
-        location = 'near me';
-    }
-
-    // Extract location from userContext if available
-    const userContext = input.userContext || {};
-    const hasLocation = userContext.user_location_lat !== undefined &&
+    const hasUserContextLocation =
+        userContext.user_location_lat !== undefined &&
         userContext.user_location_lng !== undefined;
+    const hasTopLevelLocation =
+        input.user_location_lat !== undefined &&
+        input.user_location_lng !== undefined;
 
     // Build normalized userContext
-    const normalizedUserContext = hasLocation ? {
+    const normalizedUserContext = {
         ...userContext,
-        user_location_lat: userContext.user_location_lat ?? input.user_location_lat,
-        user_location_lng: userContext.user_location_lng ?? input.user_location_lng,
-        search_distance_miles: userContext.search_distance_miles ?? input.radius_miles,
-        userId: userContext.userId,
-    } : (input.user_location_lat && input.user_location_lng ? {
-        user_location_lat: input.user_location_lat,
-        user_location_lng: input.user_location_lng,
-        search_distance_miles: input.radius_miles,
-    } : userContext);
+        ...(input.radius_miles !== undefined && userContext.search_distance_miles === undefined
+            ? { search_distance_miles: input.radius_miles }
+            : {}),
+        ...(hasUserContextLocation || hasTopLevelLocation ? {
+            user_location_lat: userContext.user_location_lat ?? input.user_location_lat,
+            user_location_lng: userContext.user_location_lng ?? input.user_location_lng,
+        } : {}),
+    };
+
+    // Normalize location: activate nearby search for either legacy radius_miles or normalized userContext distance.
+    let location: string | undefined = undefined;
+    if (
+        input.location === 'near me' ||
+        input.radius_miles !== undefined ||
+        normalizedUserContext.search_distance_miles !== undefined
+    ) {
+        location = 'near me';
+    }
 
     // Merge macro filters: 
     // - For homepage: prioritize input.filters (new structured payload with enabled flags)

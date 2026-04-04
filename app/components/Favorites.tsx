@@ -6,6 +6,7 @@ import { Badge } from "./ui/badge";
 import { MealCard } from "./MealCard"; 
 import type { Meal } from "../types"; // <--- IMPORT SHARED TYPES
 import type { LoggedMeal } from "./LogScreen";
+import { getRestaurantLogoUrl } from "@/lib/image-utils";
 
 type Props = {
   favoriteMeals?: string[];
@@ -39,7 +40,10 @@ const favoriteMealsList: Meal[] = favoriteMeals
       {/* Header */}
       <div className="bg-gradient-to-br from-pink-900 via-rose-900/50 to-background text-white p-6 pb-8">
         <div className="flex items-center gap-4">
-          <div className="h-12 w-12 bg-gradient-to-br from-pink-500 to-rose-500 rounded-2xl flex items-center justify-center shadow-lg shadow-pink-500/50 ring-2 ring-white/10">
+          <div
+            className="h-12 w-12 bg-gradient-to-br from-pink-500 to-rose-500 rounded-2xl flex items-center justify-center shadow-lg shadow-pink-500/50 ring-2 ring-white/10"
+            data-tutorial-target="favorites-heart"
+          >
             <Heart className="h-6 w-6 text-white" />
           </div>
           <div>
@@ -90,34 +94,27 @@ const favoriteMealsList: Meal[] = favoriteMeals
             
             {recentMeals.length > 0 ? (
               <div className="space-y-3">
-                {recentMeals.map(meal => (
+                {recentMeals.map(meal => {
+                  const logoSrc = getRestaurantLogoUrl(
+                    meal.restaurant_name || meal.restaurant || '',
+                    meal.restaurantLogoUrl
+                  );
+
+                  return (
                   <div
                     key={meal.id}
                     onClick={() => onMealSelect(meal)}
                     className="group flex gap-4 p-4 rounded-2xl border bg-card/50 hover:bg-card hover:border-cyan-500/30 hover:shadow-lg hover:shadow-cyan-500/10 transition-all cursor-pointer"
                   >
-                    {meal.image && meal.image !== '/placeholder-food.jpg' && meal.image !== '' ? (
-                      <img
-                        src={meal.image}
-                        alt={meal.name}
-                        className="h-20 w-20 rounded-xl object-cover flex-shrink-0"
-                        onError={(e) => {
-                          // Fallback to default.png if meal image fails
-                          e.currentTarget.src = '/logos/default.png';
-                          e.currentTarget.onerror = null;
-                        }}
-                      />
-                    ) : (
-                      <img
-                        src="/logos/default.png"
-                        alt="Default meal"
-                        className="h-20 w-20 rounded-xl object-cover flex-shrink-0"
-                        onError={(e) => {
-                          // Final fallback - hide image if default.png also fails
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                    )}
+                    <img
+                      src={logoSrc}
+                      alt={meal.restaurant || meal.restaurant_name || 'Restaurant logo'}
+                      className="h-20 w-20 rounded-xl object-contain bg-white p-2 flex-shrink-0"
+                      onError={(e) => {
+                        e.currentTarget.src = '/logos/default.png';
+                        e.currentTarget.onerror = null;
+                      }}
+                    />
                   <div className="flex-1 min-w-0 py-1">
                     <p className="font-medium text-foreground mb-1 truncate group-hover:text-cyan-500 transition-colors">
                       {meal.name}
@@ -133,7 +130,8 @@ const favoriteMealsList: Meal[] = favoriteMeals
                     </div>
                   </div>
                 </div>
-              ))}
+                  );
+                })}
             </div>
             ) : (
               <div className="text-center py-12 border-2 border-dashed rounded-3xl bg-muted/30">

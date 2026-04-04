@@ -14,11 +14,15 @@ import { SearchScreen } from './SearchScreen';
 import { OnboardingFlow } from './OnboardingFlow';
 import { AuthScreen } from './AuthScreen';
 import { UpgradeModal } from './UpgradeModal';
+import { AppTutorialOverlay, type AppTutorialStep } from './AppTutorialOverlay';
 import type { UserProfile, Meal } from '../types';
 import type { LoggedMeal } from './LogScreen';
 import { useSessionActivity } from '../hooks/useSessionActivity';
 import { useNutrition } from '../contexts/NutritionContext'; // Import to sync loggedMeals with context
-import { getSubscriptionTier, hasDevFullAccess, setDevFullAccess, setSubscriptionTier } from '@/lib/onboarding-flow';
+import { hasDevFullAccess, setDevFullAccess } from '@/lib/onboarding-flow';
+import { clearCachedEntitlement } from '@/lib/entitlements';
+import { useAccountEntitlement } from '@/app/hooks/useAccountEntitlement';
+import { bootstrapAccount } from '@/lib/bootstrap-account';
 
 type View = 'main' | 'meal-detail';
 
@@ -27,6 +31,44 @@ type AppState = 'loading' | 'onboarding' | 'auth' | 'app';
 type MainAppProps = {
   initialScreen?: Screen;
 };
+
+const APP_TUTORIAL_STEPS: AppTutorialStep[] = [
+  {
+    screen: 'home',
+    title: 'Find meals fast that fit',
+    body: 'Set your calories and macros. We’ll show meals that match.',
+    target: 'home-find-meals',
+    buttonLabel: 'Next',
+  },
+  {
+    screen: 'log',
+    title: 'Log your meals',
+    body: 'Automatically log meals directly from your mealcards or manually here.',
+    target: 'log-progress-ring',
+    buttonLabel: 'Next',
+  },
+  {
+    screen: 'chat',
+    title: 'Chat with our AI conceirge',
+    body: 'Tell us what you want and we’ll find the best options near you.',
+    target: 'chat-input',
+    buttonLabel: 'Next',
+  },
+  {
+    screen: 'favorites',
+    title: 'Remember your favorites',
+    body: 'Save meals you enjoy to come back to in the future.',
+    target: 'favorites-heart',
+    buttonLabel: 'Next',
+  },
+  {
+    screen: 'settings',
+    title: 'Fit to you',
+    body: 'Customize your preferences and goals',
+    target: 'settings-edit-profile',
+    buttonLabel: 'Finish',
+  },
+];
 
 export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // ========== ALL HOOKS MUST BE DECLARED FIRST ==========
@@ -83,9 +125,11 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // Track current user ID
   const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
   const [currentUserEmail, setCurrentUserEmail] = useState<string | undefined>(undefined);
-  const [subscriptionTier, setSubscriptionTier] = useState<'free' | 'premium'>('free');
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [devFullAccess, setDevFullAccessState] = useState(false);
+  const [isTutorialActive, setIsTutorialActive] = useState(false);
+  const [tutorialStepIndex, setTutorialStepIndex] = useState(0);
+  const { entitlement, refresh: refreshEntitlement } = useAccountEntitlement(isMounted);
 
   // Get updateLoggedMeals from NutritionContext to sync state
   // NutritionProvider is now at root layout level, so this should always work
@@ -120,7 +164,6 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
   useEffect(() => {
     if (!isMounted) return;
-    setSubscriptionTier(getSubscriptionTier());
     setDevFullAccessState(hasDevFullAccess());
   }, [isMounted, currentUserId]);
 
@@ -146,15 +189,49 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   const isMasterAccount =
     !!normalizedCurrentUserEmail &&
     normalizedCurrentUserEmail === normalizedMasterEmail;
+  const tutorialCompletionKey = currentUserId
+    ? `seekeatz_app_tutorial_completed_${currentUserId}`
+    : 'seekeatz_app_tutorial_completed_guest';
 
   useEffect(() => {
     if (!isMounted) return;
-    if (isMasterAccount && subscriptionTier !== 'premium') {
-      setSubscriptionTier('premium');
+    if (isMasterAccount) {
       setDevFullAccess(true);
       setDevFullAccessState(true);
     }
-  }, [isMasterAccount, isMounted, subscriptionTier]);
+  }, [isMasterAccount, isMounted]);
+
+  useEffect(() => {
+    if (!isMounted || appState !== 'app') return;
+    if (typeof window === 'undefined') return;
+
+    if (localStorage.getItem('seekeatz_start_app_tutorial') !== 'true') {
+      return;
+    }
+
+    setIsTutorialActive(true);
+    setTutorialStepIndex(0);
+  }, [appState, currentUserId, isMounted]);
+
+  useEffect(() => {
+    if (!isTutorialActive) return;
+
+    const nextStep = APP_TUTORIAL_STEPS[tutorialStepIndex];
+    if (!nextStep) return;
+
+    setCurrentView('main');
+    setSelectedMeal(null);
+
+    if (currentScreen !== nextStep.screen) {
+      setCurrentScreen(nextStep.screen);
+      setNavHistory([nextStep.screen]);
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('seekeatz_current_screen', nextStep.screen);
+        localStorage.setItem('seekeatz_nav_history', JSON.stringify([nextStep.screen]));
+      }
+    }
+  }, [currentScreen, isTutorialActive, tutorialStepIndex]);
 
   // Load all localStorage state on mount (only after component is mounted on client)
   // Consolidated into single effect for better performance
@@ -451,10 +528,19 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         const normalizedMaster = process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL?.trim().toLowerCase();
         const isMasterSession = !!normalizedEmail && normalizedEmail === normalizedMaster;
         if (isMasterSession) {
-          setSubscriptionTier('premium');
           setDevFullAccess(true);
           setDevFullAccessState(true);
         }
+        try {
+          const completedOnboarding =
+            typeof window !== 'undefined' &&
+            (localStorage.getItem('hasCompletedOnboarding') === 'true' ||
+              localStorage.getItem('onboarded') === 'true');
+          await bootstrapAccount({ hasCompletedOnboarding: completedOnboarding });
+        } catch (bootstrapError) {
+          console.warn('MainApp bootstrap skipped after sign-in:', bootstrapError);
+        }
+        await refreshEntitlement();
         // User just signed in - reload profile
         const { data: profileData } = await supabase
           .from('profiles')
@@ -477,6 +563,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         setCurrentUserEmail(undefined);
         setDevFullAccess(false);
         setDevFullAccessState(false);
+        clearCachedEntitlement();
         setUserProfile({
           target_calories: 2000,
           target_protein_g: 150,
@@ -496,7 +583,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [supabase, isClient]);
+  }, [supabase, isClient, refreshEntitlement]);
 
   // Safety guard: If on chat route, never allow appState to be 'auth'
   useEffect(() => {
@@ -570,23 +657,36 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
   // Handle onboarding completion
   const handleOnboardingComplete = () => {
-    // Save onboarding flags and default post-onboarding destination
     if (typeof window !== 'undefined') {
       localStorage.setItem('onboarded', 'true');
       localStorage.setItem('hasCompletedOnboarding', 'true');
-      // After onboarding (including Allow Location), always start user in AI chat
-      localStorage.setItem('seekeatz_current_screen', 'chat');
-      localStorage.setItem('seekeatz_nav_history', JSON.stringify(['chat']));
     }
-    // Give full app access and jump straight to AI chat
-    setCurrentScreen('chat');
-    setNavHistory(['chat']);
-    setAppState('app');
+    router.push('/upgrade?flow=onboarding&tutorial=1');
   };
 
   // Handle auth success (fallback, but onAuthStateChange should handle it)
   const handleAuthSuccess = () => {
     setAppState('app');
+  };
+
+  const handleTutorialNext = () => {
+    if (tutorialStepIndex >= APP_TUTORIAL_STEPS.length - 1) {
+      setIsTutorialActive(false);
+      setTutorialStepIndex(0);
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(tutorialCompletionKey, 'true');
+        localStorage.removeItem('seekeatz_start_app_tutorial');
+        localStorage.setItem('seekeatz_current_screen', 'settings');
+        localStorage.setItem('seekeatz_nav_history', JSON.stringify(['settings']));
+      }
+
+      setCurrentScreen('settings');
+      setNavHistory(['settings']);
+      return;
+    }
+
+    setTutorialStepIndex((prev) => prev + 1);
   };
 
   // ========== CONDITIONAL RENDERS (after all hooks) ==========
@@ -632,8 +732,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   }
 
   // If we reach here, appState is 'app' - render the main app UI
-  const isPremium = subscriptionTier === 'premium';
-  const hasFullAccess = isPremium || isMasterAccount || devFullAccess;
+  const hasFullAccess = entitlement.hasPremiumAccess || isMasterAccount || devFullAccess;
 
   const handleNavigate = (screen: Screen) => {
     // Update activity on navigation
@@ -904,6 +1003,14 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         onClose={() => setShowUpgradeModal(false)}
         subtitle="Premium is where SeekEatz becomes your decision system: unlimited searches, AI swaps, meal logging, and saved meals."
       />
+      {isTutorialActive ? (
+        <AppTutorialOverlay
+          step={APP_TUTORIAL_STEPS[tutorialStepIndex]}
+          stepIndex={tutorialStepIndex}
+          totalSteps={APP_TUTORIAL_STEPS.length}
+          onNext={handleTutorialNext}
+        />
+      ) : null}
     </div>
   );
 }

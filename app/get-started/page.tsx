@@ -12,8 +12,7 @@ export default function GetStartedPage() {
   // Redirect logic only happens on root / route, not here
 
   const handleGetStarted = () => {
-    // Navigate to onboarding (no auth required)
-    router.push('/onboarding');
+    router.push('/upgrade');
   };
 
   return (
@@ -55,7 +54,7 @@ export default function GetStartedPage() {
 
           {/* Bottom text */}
           <p className="text-xs sm:text-sm text-center text-gray-600 mt-8 px-4">
-            Type what you want to eat, we'll handle the rest.
+            Type what you want to eat, we&apos;ll handle the rest.
           </p>
         </div>
       </div>

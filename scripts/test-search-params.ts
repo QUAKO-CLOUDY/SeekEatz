@@ -41,7 +41,6 @@ async function runTests() {
                 protein: { enabled: true, min: 30 }
             }
         };
-        // @ts-ignore - casting for test
         const params2 = await buildSearchParams(homeInput);
 
         assert(params2.maxCalories === 700, 'Mapped filters.calories (BELOW) to maxCalories');
@@ -72,6 +71,26 @@ async function runTests() {
 
         assert(params4.minProtein === 30, 'High protein -> minProtein 30');
         assert(params4.query === "high protein bowls", 'Query preserved');
+
+        // Test 5: Home Input (Nearby search from userContext)
+        console.log('\nTest 5: Home Input (Nearby via userContext)');
+        const nearbyInput = {
+            query: "find meals",
+            isHomepage: true,
+            userContext: {
+                search_distance_miles: 10,
+                user_location_lat: 33.4484,
+                user_location_lng: -112.0740,
+                diet_type: 'balanced',
+                dietary_options: ['high-protein']
+            }
+        };
+        const params5 = await buildSearchParams(nearbyInput);
+
+        assert(params5.location === 'near me', 'userContext distance activates nearby location search');
+        assert(params5.userContext?.search_distance_miles === 10, 'Preserved userContext search distance');
+        assert(params5.userContext?.user_location_lat === 33.4484, 'Preserved userContext latitude');
+        assert(params5.userContext?.diet_type === 'balanced', 'Preserved userContext diet_type');
 
     } catch (err) {
         console.error('Test Exception:', err);

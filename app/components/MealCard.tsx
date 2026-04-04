@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { Star, Heart, Flame, Zap, TrendingUp, UtensilsCrossed } from "lucide-react";
+import { useMemo } from "react";
+import { Star, Heart, Flame, Zap, TrendingUp } from "lucide-react";
 import type { Meal, UserProfile } from "../types"; // Use shared types
 import type { LoggedMeal } from "./LogScreen";
-import { getLogo } from "@/utils/logos";
 import { useNutrition } from "../contexts/NutritionContext";
+import { getRestaurantLogoUrl } from "@/lib/image-utils";
 
 type Props = {
   meal: Meal;
@@ -57,7 +57,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
       const calories = Number(loggedMeal.meal.calories ?? 0);
       return sum + (Number.isNaN(calories) ? 0 : Math.round(calories));
     }, 0);
-  }, [shouldShowRemaining, todaysTotals?.consumedCalories, loggedMeals, todayStr]);
+  }, [shouldShowRemaining, todaysTotals, loggedMeals, todayStr]);
 
   const logReady = shouldShowRemaining && !isNutritionLoading && targetCalories !== null && consumedCalories !== null;
 
@@ -95,7 +95,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
 
   // Removed useEffect - using derived values only (no state updates based on dependencies)
   // Extract restaurant name (handle both restaurant_name from Supabase and restaurant from Meal type)
-  const restaurantName = (meal as any).restaurant_name || meal.restaurant || "Unknown";
+  const restaurantName = meal.restaurant_name || meal.restaurant || "Unknown";
   const compactRestaurantLabel = useMemo(() => {
     const normalized = restaurantName.replace(/\s+/g, ' ').trim();
     if (!normalized) {
@@ -132,26 +132,16 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
     };
   }, [restaurantName]);
 
-  // State to track logo source (with fallback to default.png)
-  const [logoSrc, setLogoSrc] = useState(getLogo(restaurantName));
-  const [logoVersion, setLogoVersion] = useState(Date.now().toString());
-
-  // Reset logo src when meal changes and update version to bust cache
-  useEffect(() => {
-    const newLogoSrc = getLogo(restaurantName);
-    setLogoSrc(newLogoSrc);
-    // Update version to force browser to reload (especially useful in development)
-    setLogoVersion(Date.now().toString());
-  }, [meal.id, restaurantName]);
-
-  // Add cache-busting query parameter to force browser to reload updated logos
-  const logoSrcWithCacheBust = `${logoSrc}?v=${logoVersion}`;
+  const logoSrc = getRestaurantLogoUrl(restaurantName, meal.restaurantLogoUrl);
+  const logoSrcWithCacheBust = `${logoSrc}?v=${meal.id}`;
 
   // Check if it's a grocery/hot bar item
   const category = meal.category as string | undefined;
   const isGrocery = category === 'grocery' ||
     category === 'Grocery' ||
     category === 'Hot Bar';
+  const compactMetricCardBase = "min-w-0 rounded-xl border px-1.5 py-1.5 text-center shadow-sm";
+  const regularMetricCardBase = "rounded-xl border p-2 text-center shadow-sm";
 
   // Compact mode: horizontal layout matching reference image (340px × 75px)
   if (compact) {
@@ -160,12 +150,12 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
         onClick={onClick}
         className="group relative min-h-[108px] w-full cursor-pointer overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-white via-slate-50 to-white shadow-lg transition-all hover:border-cyan-500/40 hover:shadow-xl sm:max-w-[372px] dark:border-gray-700 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-800"
       >
-        <div className="flex h-full flex-col px-3 py-2.5">
+        <div className="flex h-full flex-col px-3.5 py-3">
           <h3 className="line-clamp-2 break-words pr-9 text-[14px] font-bold leading-[1.15] text-foreground">
             {meal.name}
           </h3>
 
-          <div className="mt-2 grid min-h-0 flex-1 grid-cols-[auto_minmax(0,1fr)] items-center gap-2.5">
+          <div className="mt-2.5 grid min-h-0 flex-1 grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
             {/* Left Logo - Restaurant Logo */}
             <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
               <img
@@ -173,22 +163,22 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
                 alt={restaurantName}
                 className="h-full w-full object-contain p-1.5"
                 onError={(e) => {
-                  // Fallback to default.png if logo fails to load
-                  if (logoSrc !== '/logos/default.png') {
-                    e.currentTarget.onerror = null; // Prevent infinite loop
-                    setLogoSrc('/logos/default.png');
-                  } else {
-                    // If default.png also fails, hide the image
+                  const fallbackSrc = `/logos/default.png?v=${meal.id}`;
+                  if (e.currentTarget.src.includes('/logos/default.png')) {
                     e.currentTarget.style.display = 'none';
+                    return;
                   }
+
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = fallbackSrc;
                 }}
               />
             </div>
 
             <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
               {/* Restaurant */}
-              <div className="min-w-0">
-                <p className={`text-[9px] font-medium uppercase leading-[1.05] tracking-[0.08em] text-muted-foreground ${compactRestaurantLabel.secondLine ? '' : 'text-center'}`}>
+              <div className="w-[84px] flex-shrink-0">
+                <p className={`text-[10px] font-medium leading-[1.1] tracking-[0.01em] text-slate-500 dark:text-slate-400 ${compactRestaurantLabel.secondLine ? '' : 'text-center'}`}>
                   <span className="block whitespace-normal break-normal">{compactRestaurantLabel.firstLine}</span>
                   {compactRestaurantLabel.secondLine && (
                     <span className="mt-0.5 block whitespace-normal break-normal">{compactRestaurantLabel.secondLine}</span>
@@ -197,13 +187,13 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
               </div>
 
               {/* Right - Nutritional Boxes */}
-              <div className="grid grid-cols-4 gap-1">
+              <div className="grid grid-cols-4 gap-1.5">
             {/* Calories */}
-            <div className="min-w-0 rounded-lg bg-pink-100 px-1.5 py-1 text-center dark:bg-pink-900/30">
-              <p className="text-pink-600 dark:text-pink-400 font-bold text-[10px] leading-tight">
+            <div className={`${compactMetricCardBase} border-pink-200 bg-pink-50/95 dark:border-pink-500/20 dark:bg-pink-500/10`}>
+              <p className="text-pink-600 dark:text-pink-300 font-bold text-[10px] leading-tight">
                 {meal.calories}
               </p>
-              <p className="text-pink-500 dark:text-pink-400 text-[8px] leading-tight">
+              <p className="text-pink-500 dark:text-pink-300/80 text-[8px] leading-tight">
                 cal
               </p>
               {!logReady ? (
@@ -305,14 +295,14 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
               maxHeight: '100%'
             }}
             onError={(e) => {
-              // Fallback to default.png if logo fails to load
-              if (logoSrc !== '/logos/default.png') {
-                e.currentTarget.onerror = null; // Prevent infinite loop
-                setLogoSrc('/logos/default.png');
-              } else {
-                // If default.png also fails, hide the image
+              const fallbackSrc = `/logos/default.png?v=${meal.id}`;
+              if (e.currentTarget.src.includes('/logos/default.png')) {
                 e.currentTarget.style.display = 'none';
+                return;
               }
+
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = fallbackSrc;
             }}
           />
         </div>
@@ -358,9 +348,9 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
         </div>
 
         <div className="mt-auto ml-0.5 grid grid-cols-4 gap-1.5 sm:ml-1 sm:gap-2 text-[10px] sm:text-xs">
-          <div className="bg-gradient-to-br from-pink-500/20 to-rose-500/20 rounded-md p-2 text-center border border-pink-500/30">
+          <div className={`${regularMetricCardBase} border-pink-200/80 bg-pink-50/90 dark:border-pink-500/20 dark:bg-pink-500/10`}>
             <div className="flex items-center justify-center mb-1">
-              <Flame className="w-3 h-3 text-pink-400" />
+              <Flame className="w-3 h-3 text-pink-500 dark:text-pink-300" />
             </div>
             <p className="text-foreground font-bold">{meal.calories}</p>
             <p className="text-pink-600 dark:text-pink-300/70 text-[10px]">cal</p>
@@ -375,23 +365,23 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
               </p>
             ) : null}
           </div>
-          <div className="bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-md p-2 text-center border border-cyan-400/30">
+          <div className="rounded-md border border-cyan-400/30 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 p-2 text-center">
             <div className="flex items-center justify-center mb-1">
               <Zap className="w-3 h-3 text-cyan-400" />
             </div>
             <p className="text-foreground font-bold">{meal.protein}g</p>
             <p className="text-cyan-600 dark:text-cyan-300/70 text-[10px]">pro</p>
           </div>
-          <div className="bg-gradient-to-br from-green-400/20 to-emerald-500/20 rounded-md p-2 text-center border border-green-400/30">
+          <div className="rounded-md border border-green-400/30 bg-gradient-to-br from-green-400/20 to-emerald-500/20 p-2 text-center">
             <div className="flex items-center justify-center mb-1">
               <TrendingUp className="w-3 h-3 text-green-400" />
             </div>
             <p className="text-foreground font-bold">{meal.carbs}g</p>
             <p className="text-green-600 dark:text-green-300/70 text-[10px]">carb</p>
           </div>
-          <div className="bg-gradient-to-br from-amber-400/20 to-orange-500/20 rounded-md p-2 text-center border border-amber-400/30">
+          <div className="rounded-md border border-amber-400/30 bg-gradient-to-br from-amber-400/20 to-orange-500/20 p-2 text-center">
             <div className="flex items-center justify-center mb-1">
-              <div className="w-3 h-3 rounded-full bg-amber-400" />
+              <div className="h-3 w-3 rounded-full bg-amber-400" />
             </div>
             <p className="text-foreground font-bold">{meal.fats}g</p>
             <p className="text-amber-600 dark:text-amber-300/70 text-[10px]">fat</p>

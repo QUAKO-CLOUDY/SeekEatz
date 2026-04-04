@@ -1,7 +1,7 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { ChevronRight, MapPin, Sparkles, Map, ShieldCheck } from "lucide-react";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/client";
@@ -14,21 +14,20 @@ type Props = {
 const TOTAL_STEPS = 4;
 
 export function OnboardingFlow({ onComplete }: Props) {
-  const router = useRouter();
   const supabase = createClient();
-  const [step, setStep] = useState(0); // Step 0 = Eat Anywhere, Step 1 = AI Menu Scraper, Step 2 = No Guesswork, Step 3 = Location
+  const [step, setStep] = useState(-1); // -1 = Welcome, 0-3 = onboarding slides
   const [isRequestingLocation, setIsRequestingLocation] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
 
   // Progress dots component
-  const ProgressDots = () => {
+  const ProgressDots = ({ activeStep }: { activeStep: number }) => {
     return (
       <div className="flex gap-2 justify-center mb-8">
         {Array.from({ length: TOTAL_STEPS }).map((_, index) => (
           <div
             key={index}
             className={`h-2 w-12 rounded-full transition-all ${
-              index === step
+              index === activeStep
                 ? index === 0
                   ? "bg-gradient-to-r from-teal-500 to-blue-500"
                   : index === 1
@@ -44,7 +43,49 @@ export function OnboardingFlow({ onComplete }: Props) {
     );
   };
 
-  // STEP 0: Eat Anywhere (First onboarding screen after account creation)
+  if (step === -1) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-50 via-background to-blue-50 dark:from-slate-950 dark:via-background dark:to-slate-900" />
+        <div className="absolute -top-24 right-[-4rem] h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
+        <div className="absolute -bottom-24 left-[-4rem] h-56 w-56 rounded-full bg-blue-500/20 blur-3xl" />
+
+        <div className="relative z-10 w-full max-w-md rounded-[2rem] border border-white/40 bg-white/90 p-8 text-center shadow-2xl backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
+          <div className="mx-auto mb-8 flex justify-center">
+            <div className="relative h-24 w-24">
+              <Image
+                src="/logos/seekeatz.png"
+                alt="SeekEatz logo"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+          </div>
+
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-600">
+            Welcome to SeekEatz
+          </p>
+          <h1 className="mt-4 text-3xl font-semibold text-foreground">
+            Find meals that fit your goals before you order.
+          </h1>
+          <p className="mt-4 text-base leading-7 text-muted-foreground">
+            Search restaurant menus with real nutrition data, smarter filters, and AI guidance built for eating out.
+          </p>
+
+          <Button
+            onClick={() => setStep(0)}
+            className="mt-10 h-14 w-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-base font-semibold text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-600 hover:to-blue-700"
+          >
+            Get Started
+            <ChevronRight className="ml-2 h-5 w-5" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // STEP 0: Eat Anywhere (First onboarding screen after welcome)
   if (step === 0) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
@@ -60,10 +101,10 @@ export function OnboardingFlow({ onComplete }: Props) {
 
           <h1 className="text-3xl font-bold text-foreground mb-4">Eat Anywhere</h1>
           <p className="text-muted-foreground text-lg mb-12 leading-relaxed">
-          Whether you're on the go, in a new city, or eating out locally, SeekEatz finds meals that fit your goals.
+          Whether you&apos;re on the go, in a new city, or eating out locally, SeekEatz finds meals that fit your goals.
           </p>
 
-          <ProgressDots />
+          <ProgressDots activeStep={step} />
 
           <div className="flex gap-3">
             <Button
@@ -98,7 +139,7 @@ export function OnboardingFlow({ onComplete }: Props) {
           Our AI scans restaurant menus and highlights the best meals for your calorie and macro goals.
           </p>
 
-          <ProgressDots />
+          <ProgressDots activeStep={step} />
 
           <div className="flex gap-3">
             <Button
@@ -140,7 +181,7 @@ export function OnboardingFlow({ onComplete }: Props) {
           SeekEatz pulls nutrition from real restaurant nutritional menus and databases, eliminating crowdsourced guesses, made up numbers, and AI hallucinations.
           </p>
 
-          <ProgressDots />
+          <ProgressDots activeStep={step} />
 
           <div className="flex gap-3">
             <Button
@@ -163,9 +204,8 @@ export function OnboardingFlow({ onComplete }: Props) {
     );
   }
 
-  // STEP 3: Location Permission (Last step before app access)
-  // For a frictionless experience, we send the user straight to AI chat on "Allow Location"
-  // and set the minimal onboarding flags synchronously so the app treats them as onboarded.
+  // STEP 3: Location Permission (Last step before plan selection)
+  // Once this completes, the app routes into the account / plan selection flow.
   const handleLocationRequest = async () => {
     setLocationError(null);
 
@@ -191,7 +231,7 @@ export function OnboardingFlow({ onComplete }: Props) {
       },
       async (error) => {
         console.error("Location permission error:", error);
-        setLocationError("We couldn’t access your location. You can allow it later in your browser settings.");
+        setLocationError("We couldn't access your location. You can allow it later in your browser settings.");
         setIsRequestingLocation(false);
         await completeOnboarding();
       },
@@ -223,9 +263,12 @@ export function OnboardingFlow({ onComplete }: Props) {
         if (fetchedUser) {
           user = fetchedUser;
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         // AuthSessionMissingError is expected when signed out - treat as no user
-        if (error?.message?.includes('Auth session missing') || error?.name === 'AuthSessionMissingError') {
+        if (
+          error instanceof Error &&
+          (error.message.includes('Auth session missing') || error.name === 'AuthSessionMissingError')
+        ) {
           // This is expected for signed-out users - continue with guest preview
           console.log("No auth session (signed-out preview mode)");
         } else {
@@ -240,9 +283,9 @@ export function OnboardingFlow({ onComplete }: Props) {
       localStorage.setItem("onboardingCompletedTimestamp", now.toString());
       localStorage.removeItem("seekEatz_onboardingQuestionsComplete");
       
-      // Clear any saved last screen so user always goes to chat first after onboarding
-      localStorage.removeItem("seekeatz_current_screen");
-      localStorage.removeItem("seekeatz_nav_history");
+      // Default to home once the app shell is reached after onboarding.
+      localStorage.setItem("seekeatz_current_screen", "home");
+      localStorage.setItem("seekeatz_nav_history", JSON.stringify(["home"]));
 
       // If we have a user, also update database and set user-specific flags
       if (user) {
@@ -259,7 +302,7 @@ export function OnboardingFlow({ onComplete }: Props) {
             console.warn("Failed to parse userProfile from localStorage:", e);
           }
 
-          const profileData: any = {
+          const profileData: Record<string, unknown> = {
             id: user.id,
             has_completed_onboarding: true, // Mark onboarding as complete
             last_login: new Date(now).toISOString(),
@@ -332,7 +375,7 @@ export function OnboardingFlow({ onComplete }: Props) {
 
           <h1 className="text-3xl font-bold text-foreground mb-4">Use your location</h1>
           <p className="text-muted-foreground text-lg mb-12 leading-relaxed">
-            Allow SeekEatz to use your location to find resaurants and menu items nearby.
+            Allow SeekEatz to use your location to find restaurants and menu items nearby.
           </p>
 
           {locationError ? (
@@ -341,7 +384,7 @@ export function OnboardingFlow({ onComplete }: Props) {
             </p>
           ) : null}
 
-          <ProgressDots />
+          <ProgressDots activeStep={step} />
 
           <div className="space-y-3">
             <Button

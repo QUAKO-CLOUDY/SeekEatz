@@ -25,6 +25,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useNutrition } from "../contexts/NutritionContext";
 import type { UserProfile, Meal } from "../types";
 import { useCalorieTracking } from "../hooks/useCalorieTracking";
+import { getRestaurantLogoUrl } from "@/lib/image-utils";
 
 export type LoggedMeal = {
   id: string;
@@ -359,7 +360,10 @@ export function LogScreen({
         )}
 
         {/* Circular Progress */}
-        <div className="flex items-center justify-center mb-6 relative">
+        <div
+          className="flex items-center justify-center mb-6 relative"
+          data-tutorial-target="log-progress-ring"
+        >
           <div className="relative w-48 h-48 transition-all duration-300">
             {/* Calories - Outermost Ring - Pink/Purple (matching macro box: pink-400/rose-500) */}
             <CircularProgress
@@ -588,15 +592,18 @@ export function LogScreen({
                   className="bg-gradient-to-br from-card to-muted border border-border rounded-2xl p-4 group hover:border-cyan-500/50 transition-all"
                 >
                   <div className="flex gap-3">
-                    <img
-                      src={log.meal.image && log.meal.image !== '/placeholder-food.jpg' && log.meal.image !== '' ? log.meal.image : '/logos/default.png'}
-                      alt={log.meal.name}
-                      className="w-20 h-20 rounded-xl object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = '/logos/default.png';
-                        e.currentTarget.onerror = null;
-                      }}
-                    />
+                      <img
+                        src={getRestaurantLogoUrl(
+                          log.meal.restaurant_name || log.meal.restaurant || '',
+                          log.meal.restaurantLogoUrl
+                        )}
+                        alt={log.meal.restaurant || log.meal.restaurant_name || 'Restaurant logo'}
+                        className="w-20 h-20 rounded-xl object-contain bg-white p-2"
+                        onError={(e) => {
+                          e.currentTarget.src = '/logos/default.png';
+                          e.currentTarget.onerror = null;
+                        }}
+                      />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between mb-1">
                         <div className="flex-1">
@@ -734,15 +741,18 @@ export function LogScreen({
                             key={log.id}
                             className="flex gap-3 p-2 rounded-xl hover:bg-muted/50"
                           >
-                            <img
-                              src={log.meal.image && log.meal.image !== '/placeholder-food.jpg' && log.meal.image !== '' ? log.meal.image : '/logos/default.png'}
-                              alt={log.meal.name}
-                              className="w-12 h-12 rounded-lg object-cover"
-                              onError={(e) => {
-                                e.currentTarget.src = '/logos/default.png';
-                                e.currentTarget.onerror = null;
-                              }}
-                            />
+                              <img
+                                src={getRestaurantLogoUrl(
+                                  log.meal.restaurant_name || log.meal.restaurant || '',
+                                  log.meal.restaurantLogoUrl
+                                )}
+                                alt={log.meal.restaurant || log.meal.restaurant_name || 'Restaurant logo'}
+                                className="w-12 h-12 rounded-lg object-contain bg-white p-1.5"
+                                onError={(e) => {
+                                  e.currentTarget.src = '/logos/default.png';
+                                  e.currentTarget.onerror = null;
+                                }}
+                              />
                             <div className="flex-1 min-w-0">
                               <p className="text-card-foreground truncate">
                                 {log.meal.name}

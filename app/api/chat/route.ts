@@ -8,9 +8,36 @@ import { searchHandler } from '@/lib/retrieval/retrieval-engine';
 import { buildSearchParams } from '@/lib/search-utils';
 import { resolveRestaurantFromText, extractRestaurantPhrase, resolveRestaurantUniversal, isRestaurantOnlyQuery } from '@/lib/restaurant-resolver';
 import { extractMacroConstraintsFromText, hasConstraints } from '@/lib/extractMacroConstraintsFromText';
+import { isSmoothieLikeText } from '@/lib/smoothie-search';
 import { hasRemainingUsage, incrementUsageCount } from '@/lib/usage-cookie';
+import { buildEntitlement, FREE_DAILY_QUERY_LIMIT, PROFILE_ENTITLEMENT_SELECT } from '@/lib/entitlements';
 
 export const maxDuration = 30;
+
+function getTodayStartIso() {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return now.toISOString();
+}
+
+async function getMeteredQueryCountForToday(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
+  const { count } = await supabase
+    .from('usage_events')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('event_type', 'metered_query')
+    .gte('created_at', getTodayStartIso());
+
+  return count ?? 0;
+}
+
+async function recordMeteredQuery(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
+  await supabase.from('usage_events').insert({
+    user_id: userId,
+    event_type: 'metered_query',
+    metadata: { source: 'api_chat' },
+  });
+}
 
 /**
  * Helper function to create response headers for tracking LLM router usage
@@ -256,7 +283,7 @@ function hasFoodIntent(message: string): boolean {
     'tofu', 'tuna', 'wings', 'nuggets', 'ribs', 'lamb', 'meatball',
     'grilled', 'fried', 'baked', 'roasted', 'smoked', 'crispy',
     'rice', 'beans', 'avocado', 'cheese', 'egg', 'eggs',
-    'smoothie', 'shake', 'juice', 'acai', 'oatmeal', 'yogurt',
+    'smoothie', 'smoothies', 'shake', 'shakes', 'juice', 'juices', 'acai', 'oatmeal', 'yogurt',
     'fries', 'soup', 'chili', 'nachos', 'quesadilla',
   ];
 
@@ -274,8 +301,13 @@ function hasFoodIntent(message: string): boolean {
     const regex = new RegExp(`\\b${keyword}\\b`, 'i');
     return regex.test(lowerMessage);
   });
+  const hasSmoothieIntent = isSmoothieLikeText(lowerMessage);
 
-  return hasFoodVerb || hasMealTime || hasDishType || hasCuisine || hasMacro || hasFoodItem;
+  return hasFoodVerb || hasMealTime || hasDishType || hasCuisine || hasMacro || hasFoodItem || hasSmoothieIntent;
+}
+
+function hasDirectSmoothieSearchIntent(message: string): boolean {
+  return isSmoothieLikeText(message);
 }
 
 /**
@@ -791,6 +823,13 @@ function preRouterHeuristic(message: string): {
     };
   }
 
+  if (hasDirectSmoothieSearchIntent(message)) {
+    return {
+      skipLLM: true,
+      mode: 'MEAL_SEARCH'
+    };
+  }
+
   // Check if message is ONLY location phrases - treat as generic meal discovery
   if (isLocationOnly(message)) {
     return {
@@ -875,6 +914,8 @@ export async function POST(req: Request) {
 
     // 3. Auth & Usage Check
     let user = null;
+    let shouldRecordMeteredUsage = false;
+    let hasRecordedMeteredUsage = false;
     try {
       const { data } = await supabase.auth.getUser();
       user = data.user;
@@ -882,22 +923,70 @@ export async function POST(req: Request) {
       console.warn('Auth check warning:', authError);
     }
 
-    // If not authenticated, verify usage limit
-    if (!user) {
+    if (user) {
+      const [{ data: profile }, meteredCount] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select(PROFILE_ENTITLEMENT_SELECT)
+          .eq('id', user.id)
+          .maybeSingle(),
+        getMeteredQueryCountForToday(supabase, user.id),
+      ]);
+
+      const entitlement = buildEntitlement({
+        user,
+        profile,
+        queriesUsedToday: meteredCount,
+      });
+
+      if (!entitlement.hasPremiumAccess) {
+        if (meteredCount >= FREE_DAILY_QUERY_LIMIT) {
+          return NextResponse.json({
+            error: true,
+            message: "You've used your 2 free AI searches for today. Upgrade to unlock unlimited access.",
+            mode: "text",
+            answer: "You've used your 2 free AI searches for today. Upgrade to unlock unlimited access.",
+            usageLimit: true
+          }, {
+            status: 403,
+            headers: createResponseHeaders(false, 'ERROR', 'none')
+          });
+        }
+
+        shouldRecordMeteredUsage = true;
+      }
+    } else {
       const allowed = await hasRemainingUsage();
       if (!allowed) {
         return NextResponse.json({
           error: true,
-          message: "You have reached the free usage limit.",
+          message: "You've used your 2 free AI searches for today. Create an account to keep going.",
           mode: "text",
-          answer: "You have reached the free usage limit. Please sign up to continue using SeekEatz.",
+          answer: "You've used your 2 free AI searches for today. Create an account to keep going.",
           usageLimit: true
         }, {
           status: 403,
           headers: createResponseHeaders(false, 'ERROR', 'none')
         });
       }
+
+      shouldRecordMeteredUsage = true;
     }
+
+    const recordUsageIfNeeded = async () => {
+      if (!shouldRecordMeteredUsage || hasRecordedMeteredUsage) {
+        return;
+      }
+
+      hasRecordedMeteredUsage = true;
+
+      if (user) {
+        await recordMeteredQuery(supabase, user.id);
+        return;
+      }
+
+      await incrementUsageCount();
+    };
 
     // 4. PRE-ROUTER HEURISTIC (Skip LLM when possible)
     const heuristic = preRouterHeuristic(message);
@@ -1046,6 +1135,15 @@ export async function POST(req: Request) {
       }
     }
 
+    if (routerResult.mode === 'CLARIFY' && hasDirectSmoothieSearchIntent(message)) {
+      routerResult = {
+        mode: 'MEAL_SEARCH',
+        query: message,
+        constraints: {},
+        structuredIntent: undefined
+      };
+    }
+
     // 5. MANUAL BRANCHING
     if (routerResult.mode === 'MEAL_SEARCH') {
       // PATH A: MEAL SEARCH
@@ -1177,7 +1275,7 @@ export async function POST(req: Request) {
       // Handle NO_MEALS: Restaurant exists but no menu_items found
       if (restaurantMatch.status === 'NO_MEALS' && explicitRestaurantDetected) {
         const canonicalName = restaurantMatch.canonicalName;
-        if (!user) await incrementUsageCount();
+        await recordUsageIfNeeded();
         return NextResponse.json({
           error: false,
           message: `No meals available for ${canonicalName}`,
@@ -1219,7 +1317,7 @@ export async function POST(req: Request) {
           });
         }
 
-        if (!user) await incrementUsageCount();
+        await recordUsageIfNeeded();
         return NextResponse.json({
           error: false,
           message: `Restaurant not found: ${restaurantName}`,
@@ -1233,7 +1331,7 @@ export async function POST(req: Request) {
       // Handle AMBIGUOUS: Ask for disambiguation (only if explicit constraint exists)
       if (restaurantMatch.status === 'AMBIGUOUS' && explicitRestaurantDetected) {
         const candidatesList = restaurantMatch.candidates.slice(0, 5).map(c => c.name).join(', ');
-        if (!user) await incrementUsageCount();
+        await recordUsageIfNeeded();
         return NextResponse.json({
           error: false,
           message: "Ambiguous restaurant match",
@@ -1256,7 +1354,7 @@ export async function POST(req: Request) {
 
       if (hasUnsupportedDietRequest) {
         // Return text-only response for unsupported diet requests
-        if (!user) await incrementUsageCount();
+        await recordUsageIfNeeded();
         return NextResponse.json({
           error: false,
           message: "Diet filter request detected.",
@@ -1701,7 +1799,7 @@ export async function POST(req: Request) {
           restaurantMatchStatus: restaurantMatch.status
         });
 
-        if (!user) await incrementUsageCount();
+        await recordUsageIfNeeded();
         return NextResponse.json(responseData, {
           headers: createResponseHeaders(usedLLMRouter, 'MEAL_SEARCH', heuristicMode || 'none')
         });
@@ -1731,7 +1829,7 @@ export async function POST(req: Request) {
           headers: createResponseHeaders(usedLLMRouter, 'NUTRITION_TEXT', heuristicMode || 'none')
         });
       }
-      if (!user) await incrementUsageCount();
+      await recordUsageIfNeeded();
       return NextResponse.json({
         error: false,
         message: "Nutrition text response.",
@@ -1754,7 +1852,7 @@ export async function POST(req: Request) {
           headers: createResponseHeaders(usedLLMRouter, 'CLARIFY', heuristicMode || 'none')
         });
       }
-      if (!user) await incrementUsageCount();
+      await recordUsageIfNeeded();
       return NextResponse.json({
         error: false,
         message: "Clarification requested.",

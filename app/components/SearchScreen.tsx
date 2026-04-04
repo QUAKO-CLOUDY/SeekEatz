@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Search, Flame, ChevronRight, Sparkles, X, AlertCircle } from 'lucide-react';
 import type { Meal } from '../types';
-import { getMealImageUrl } from '@/lib/image-utils';
+import { getRestaurantLogoUrl } from '@/lib/image-utils';
 import FoodCard from './FoodCard';
 
 type Props = {
@@ -21,11 +21,9 @@ function convertToMeal(item: any): Meal {
   const mealName = item.item_name || item.name || 'Unknown Item';
   const restaurantName = item.restaurant_name || 'Unknown Restaurant';
   
-  // Use getMealImageUrl to ensure we always have a real food image
-  const imageUrl = getMealImageUrl(
-    mealName,
+  const imageUrl = getRestaurantLogoUrl(
     restaurantName,
-    item.image_url || item.image
+    item.restaurantLogoUrl || item.restaurant_logo_url || item.logo_url
   );
 
   // Handle fats - normalize fat/fats consistently
@@ -48,6 +46,7 @@ function convertToMeal(item: any): Meal {
     carbs: item.carbs_g || 0,
     fats: typeof fats === 'number' ? fats : 0,
     image: imageUrl,
+    restaurantLogoUrl: imageUrl,
     price: item.price || null, // Keep null for proper handling
     description: item.description || '',
     category: category,

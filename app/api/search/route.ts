@@ -1,9 +1,16 @@
 import { searchHandler } from '@/lib/retrieval/retrieval-engine';
 import { buildSearchParams } from '@/lib/search-utils';
+import { buildEntitlement, FREE_DAILY_QUERY_LIMIT, PROFILE_ENTITLEMENT_SELECT } from '@/lib/entitlements';
 
 export const dynamic = 'force-dynamic';
 
 const SEARCH_TIMEOUT_MS = 22000; // 22s server timeout (client uses 25s)
+
+function getTodayStartIso() {
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  return now.toISOString();
+}
 
 export async function POST(req: Request) {
   try {
@@ -29,15 +36,51 @@ export async function POST(req: Request) {
     ]);
     const { data: { user } } = await authWithTimeout;
 
-    if (!user) {
+    let shouldRecordMeteredUsage = false;
+
+    if (user) {
+      const [{ data: profile }, usageResult] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select(PROFILE_ENTITLEMENT_SELECT)
+          .eq('id', user.id)
+          .maybeSingle(),
+        supabase
+          .from('usage_events')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('event_type', 'metered_query')
+          .gte('created_at', getTodayStartIso()),
+      ]);
+
+      const entitlement = buildEntitlement({
+        user,
+        profile,
+        queriesUsedToday: usageResult.count ?? 0,
+      });
+
+      if (!entitlement.hasPremiumAccess) {
+        if ((usageResult.count ?? 0) >= FREE_DAILY_QUERY_LIMIT) {
+          return Response.json({
+            error: 'Usage limit reached',
+            message: "You've used your 2 free AI searches for today. Upgrade to unlock unlimited access.",
+            usageLimit: true
+          }, { status: 403 });
+        }
+
+        shouldRecordMeteredUsage = true;
+      }
+    } else {
       const allowed = await hasRemainingUsage();
       if (!allowed) {
         return Response.json({
           error: 'Usage limit reached',
-          message: 'You have reached the free usage limit. Please sign up to continue.',
+          message: "You've used your 2 free AI searches for today. Create an account to keep going.",
           usageLimit: true
         }, { status: 403 });
       }
+
+      shouldRecordMeteredUsage = true;
     }
 
     const result = await Promise.race([
@@ -47,8 +90,16 @@ export async function POST(req: Request) {
       ),
     ]);
 
-    if (!user) {
-      await incrementUsageCount();
+    if (shouldRecordMeteredUsage) {
+      if (user) {
+        await supabase.from('usage_events').insert({
+          user_id: user.id,
+          event_type: 'metered_query',
+          metadata: { source: 'api_search' },
+        });
+      } else {
+        await incrementUsageCount();
+      }
     }
 
     return Response.json(result);

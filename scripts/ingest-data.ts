@@ -39,6 +39,7 @@ dotenv.config({ path: envPath });
 import fs from 'fs';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import { classifyMenuItem } from '../lib/menu-item-classifier';
 
 // 2. CHECK KEYS
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -72,6 +73,215 @@ if (DRY_RUN || SINGLE_RESTAURANT) {
 // 4. SETUP CLIENTS
 const supabase = createClient(supabaseUrl, supabaseKey);
 const openai = new OpenAI({ apiKey: openaiKey });
+
+type RawIngestItem = {
+  name: string;
+  category?: string;
+  price_estimate?: number | string | null;
+  image_url?: string | null;
+  macros?: {
+    calories?: number | string;
+    protein?: number | string;
+    carbs?: number | string;
+    fat?: number | string;
+  };
+};
+
+function buildModifierCollisionName(item: RawIngestItem): string {
+  const category = (item.category || '').toLowerCase();
+  const name = item.name.trim();
+
+  if (/dress|sauce|condiment/.test(category)) {
+    return `Side of ${name}`;
+  }
+
+  return `Add ${name}`;
+}
+
+function canonicalizeWaBaMealName(item: RawIngestItem): string {
+  const name = item.name.trim();
+  const category = (item.category || '').trim();
+
+  switch (category) {
+    case 'BOWLS':
+      return `${name} Bowl`;
+    case 'MINI BOWLS':
+      return `${name} Mini Bowl`;
+    case 'VEGGIE BOWL':
+      return `${name} Veggie Bowl`;
+    case 'PLATES':
+      return `${name} Plate`;
+    case 'TACOS':
+      return `${name} Tacos`;
+    default:
+      return name;
+  }
+}
+
+function preprocessRestaurantItems(
+  restaurantName: string,
+  items: RawIngestItem[]
+): RawIngestItem[] {
+  const normalizedRestaurant = restaurantName.trim().toLowerCase();
+
+  if (normalizedRestaurant === 'waba grill') {
+    return items.map((item) => {
+      const category = (item.category || '').trim();
+      const name = item.name.trim();
+
+      if (['BOWLS', 'MINI BOWLS', 'VEGGIE BOWL', 'PLATES', 'TACOS'].includes(category)) {
+        return {
+          ...item,
+          name: canonicalizeWaBaMealName(item),
+        };
+      }
+
+      if (category === 'FAMILY A LA CARTE') {
+        return {
+          ...item,
+          name: `Add ${name}`,
+        };
+      }
+
+      if (category === 'SIDES' && name.startsWith('Side | ')) {
+        return {
+          ...item,
+          name: `Add ${name.replace(/^Side \|\s*/, '').trim()}`,
+        };
+      }
+
+      return item;
+    });
+  }
+
+  if (normalizedRestaurant === "moe's southwest grill") {
+    return items.map((item) => {
+      const category = (item.category || '').trim();
+      const name = item.name.trim();
+
+      if (category === 'Burritos, Quesadillas, & Stacks') {
+        if (name.includes('Whole Grain')) return { ...item, name: 'Whole Grain Burrito Tortilla' };
+        if (name.includes('Quesadillas')) return { ...item, name: 'Quesadilla Tortilla' };
+        return { ...item, name: 'Burrito Tortilla' };
+      }
+
+      if (category === 'Tacos') {
+        if (name.includes('Crispy')) return { ...item, name: 'Crispy Taco Shell' };
+        if (name.includes('Corn')) return { ...item, name: 'Corn Taco Tortilla' };
+        return { ...item, name: 'Flour Taco Tortilla' };
+      }
+
+      if (category === 'Nachos & Salad') {
+        if (/chips/i.test(name)) return { ...item, name: 'Nacho Chips Base' };
+        if (/salad bowl/i.test(name)) return { ...item, name: 'Salad Bowl Base' };
+      }
+
+      if (category === 'Kids') {
+        if (name.includes('Corn')) return { ...item, name: 'Kids Corn Tortilla' };
+        return { ...item, name: `Kids ${name}` };
+      }
+
+      if (category === 'Fillings' && !/^add /i.test(name)) {
+        return { ...item, name: `Add ${name}` };
+      }
+
+      return item;
+    });
+  }
+
+  return items;
+}
+
+function makeUniqueRestaurantItemName(
+  candidateName: string,
+  category: string | undefined,
+  usedNames: Set<string>
+): string {
+  if (!usedNames.has(candidateName)) {
+    usedNames.add(candidateName);
+    return candidateName;
+  }
+
+  const categorySuffix = category?.trim() ? `${candidateName} (${category.trim()})` : `${candidateName} (Modifier)`;
+  if (!usedNames.has(categorySuffix)) {
+    usedNames.add(categorySuffix);
+    return categorySuffix;
+  }
+
+  let counter = 2;
+  while (true) {
+    const numbered = `${categorySuffix} ${counter}`;
+    if (!usedNames.has(numbered)) {
+      usedNames.add(numbered);
+      return numbered;
+    }
+    counter += 1;
+  }
+}
+
+function disambiguateRestaurantItems(
+  restaurantName: string,
+  items: RawIngestItem[]
+): RawIngestItem[] {
+  const byName = new Map<string, RawIngestItem[]>();
+
+  for (const item of items) {
+    const key = item.name.trim();
+    if (!byName.has(key)) {
+      byName.set(key, []);
+    }
+    byName.get(key)!.push(item);
+  }
+
+  const usedNames = new Set<string>();
+  const prepared: RawIngestItem[] = [];
+  const renamedCollisions: Array<{ from: string; to: string; category?: string }> = [];
+
+  for (const item of items) {
+    const siblings = byName.get(item.name.trim()) || [];
+    const classifications = siblings.map((sibling) => classifyMenuItem({
+      name: sibling.name,
+      category: sibling.category,
+    }));
+
+    const hasDishSibling = classifications.some((classification) => classification.isDish);
+    const hasModifierSibling = classifications.some((classification) => classification.isModifier);
+    const currentClassification = classifyMenuItem({
+      name: item.name,
+      category: item.category,
+    });
+
+    let nextName = item.name.trim();
+
+    if (siblings.length > 1 && hasDishSibling && hasModifierSibling && currentClassification.isModifier) {
+      nextName = buildModifierCollisionName(item);
+    }
+
+    nextName = makeUniqueRestaurantItemName(nextName, item.category, usedNames);
+
+    if (nextName !== item.name.trim()) {
+      renamedCollisions.push({
+        from: item.name.trim(),
+        to: nextName,
+        category: item.category,
+      });
+    }
+
+    prepared.push({
+      ...item,
+      name: nextName,
+    });
+  }
+
+  if (renamedCollisions.length > 0) {
+    console.log(`[ingest] ${restaurantName}: disambiguated ${renamedCollisions.length} colliding item names`);
+    renamedCollisions.slice(0, 10).forEach((collision) => {
+      console.log(`  - ${collision.from} -> ${collision.to} [${collision.category || 'uncategorized'}]`);
+    });
+  }
+
+  return prepared;
+}
 
 async function generateEmbedding(text: string) {
   try {
@@ -229,7 +439,10 @@ async function ingestData() {
     }
 
     const restaurantName = restaurantData.restaurant_name;
-    const items = restaurantData.items || [];
+    const items = disambiguateRestaurantItems(
+      restaurantName,
+      preprocessRestaurantItems(restaurantName, restaurantData.items || [])
+    );
 
     console.log(`\nProcessing ${restaurantName}`);
     console.log(`Items found in JSON: ${items.length}`);

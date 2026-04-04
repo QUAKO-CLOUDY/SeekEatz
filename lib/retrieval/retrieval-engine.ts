@@ -13,6 +13,7 @@ import {
 import { ResponseFormatter } from './response-formatter';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { calculateDistanceMiles } from '@/lib/distance-utils';
+import { hasMacroConstraints, isSmoothieLikeText } from '@/lib/smoothie-search';
 
 const DEFAULT_LIMIT = 5;
 const DEFAULT_OFFSET = 0;
@@ -178,6 +179,7 @@ interface DeterministicSearchTrace {
     | 'search_meals_v2'
     | 'search_menu_items'
     | 'table_breakfast_fallback'
+    | 'table_smoothie_fallback'
     | 'search_menu_items_broadened'
     | 'none';
   modernRpcCount: number;
@@ -238,6 +240,7 @@ interface BreakfastFallbackRow {
   name: string | null;
   restaurant_name: string | null;
   restaurant_id: string | null;
+  category?: string | null;
   macros?: unknown;
   normalized_category?: string | null;
   meal_type?: string | null;
@@ -431,10 +434,16 @@ export async function retrieveMealsWithClient(
     ranked = interleaveByRestaurant(ranked);
   }
 
+  ranked = rotateSmoothieDiscoveryResults(
+    ranked,
+    parsed,
+    buildRotationSeed(searchParams.userContext?.userId, prepared.searchKey)
+  );
+
   ranked = rotateBroadDiscoveryResults(
     ranked,
     parsed,
-    searchParams.userContext?.userId || prepared.searchKey,
+    buildRotationSeed(searchParams.userContext?.userId, prepared.searchKey),
     restaurantVariants
   );
 
@@ -521,6 +530,14 @@ function getRequestedLocation(
   searchParams: SearchParams,
   optionLocation?: { lat: number; lng: number }
 ): RequestedLocation | undefined {
+  const explicitLocationRequested =
+    typeof searchParams.location === 'string' &&
+    searchParams.location.trim().toLowerCase() === 'near me';
+
+  if (!explicitLocationRequested) {
+    return undefined;
+  }
+
   const userContext = searchParams.userContext ?? {};
   const lat = optionLocation?.lat ?? normalizeNumber(userContext.user_location_lat);
   const lng = optionLocation?.lng ?? normalizeNumber(userContext.user_location_lng);
@@ -753,7 +770,7 @@ async function runDeterministicSearch(
 
   const modernRpc = await supabase.rpc('search_meals_v2', params);
   const modernResults = (modernRpc.data ?? []) as RawResult[];
-  if (!modernRpc.error && modernRpc.data) {
+  if (!modernRpc.error && modernResults.length > 0) {
     return {
       results: modernResults,
       trace: {
@@ -808,11 +825,14 @@ async function runDeterministicSearch(
 
   const tableFallbackResults = await runTableCategoryFallback(supabase, parsed, params);
   if (tableFallbackResults.length > 0) {
+    const tableFallbackSource = isSmoothieQuery(parsed)
+      ? 'table_smoothie_fallback'
+      : 'table_breakfast_fallback';
     return {
       results: tableFallbackResults,
       trace: {
         skipped: false,
-        source: 'table_breakfast_fallback',
+        source: tableFallbackSource,
         modernRpcCount: modernResults.length,
         legacyCount: legacyResults.length,
         tableFallbackCount: tableFallbackResults.length,
@@ -840,7 +860,7 @@ async function runDeterministicSearch(
 
   const broadenedLegacy = await supabase.rpc('search_menu_items', toLegacySearchParams(broadenedParams));
   const broadenedResults = (broadenedLegacy.data ?? []) as RawResult[];
-  if (!broadenedLegacy.error && broadenedLegacy.data) {
+  if (!broadenedLegacy.error && broadenedResults.length > 0) {
     return {
       results: broadenedResults,
       trace: {
@@ -875,54 +895,93 @@ async function runTableCategoryFallback(
   parsed: ParsedQuery,
   params: RPCParams
 ): Promise<RawResult[]> {
-  if (parsed.normalizedCategory !== 'breakfast_sandwich') {
-    return [];
+  const baseSelect = [
+    'id',
+    'name',
+    'restaurant_name',
+    'restaurant_id',
+    'category',
+    'macros',
+    'normalized_category',
+    'meal_type',
+    'item_type',
+    'food_tags',
+    'tags',
+    'confidence_score',
+    'description',
+    'description_short',
+    'price_estimate',
+    'image_url',
+    'allergens',
+    'allergen_flags',
+    'aliases',
+    'is_available',
+    'active_status',
+  ].join(', ');
+
+  if (parsed.normalizedCategory === 'breakfast_sandwich') {
+    const { data, error } = await supabase
+      .from('menu_items')
+      .select(baseSelect)
+      .eq('meal_type', 'breakfast')
+      .eq('item_type', 'meal')
+      .or([
+        'normalized_category.eq.breakfast_sandwich',
+        'normalized_category.eq.sandwich',
+        'name.ilike.%breakfast sandwich%',
+        'name.ilike.%breakfast sandwhich%',
+        'name.ilike.%egg sandwich%',
+        'name.ilike.%bagel sandwich%',
+        'name.ilike.%biscuit sandwich%',
+      ].join(', '))
+      .limit(params.p_limit);
+
+    if (error) {
+      console.error('[RetrievalEngine] breakfast_sandwich table fallback error:', error.message);
+      return [];
+    }
+
+    return normalizeTableFallbackRows((data ?? []) as unknown as BreakfastFallbackRow[]);
   }
 
-  const { data, error } = await supabase
-    .from('menu_items')
-    .select([
-      'id',
-      'name',
-      'restaurant_name',
-      'restaurant_id',
-      'macros',
-      'normalized_category',
-      'meal_type',
-      'item_type',
-      'food_tags',
-      'tags',
-      'confidence_score',
-      'description',
-      'description_short',
-      'price_estimate',
-      'image_url',
-      'allergens',
-      'allergen_flags',
-      'aliases',
-      'is_available',
-      'active_status',
-    ].join(', '))
-    .eq('meal_type', 'breakfast')
-    .eq('item_type', 'meal')
-    .or([
-      'normalized_category.eq.breakfast_sandwich',
-      'normalized_category.eq.sandwich',
-      'name.ilike.%breakfast sandwich%',
-      'name.ilike.%breakfast sandwhich%',
-      'name.ilike.%egg sandwich%',
-      'name.ilike.%bagel sandwich%',
-      'name.ilike.%biscuit sandwich%',
-    ].join(', '))
-    .limit(params.p_limit);
+  if (isSmoothieQuery(parsed)) {
+    const smoothieCandidateLimit = Math.max(params.p_limit * 12, 180);
 
-  if (error) {
-    console.error('[RetrievalEngine] breakfast_sandwich table fallback error:', error.message);
-    return [];
+    let query = supabase
+      .from('menu_items')
+      .select(baseSelect)
+      .eq('item_type', 'drink')
+      .not('macros', 'is', null)
+      .or([
+        'normalized_category.ilike.%smoothie%',
+        'category.ilike.%smoothie%',
+        'name.ilike.%smoothie%',
+        'name.ilike.%blend%',
+      ].join(', '))
+      .order('restaurant_name', { ascending: true })
+      .order('id', { ascending: true })
+      .limit(smoothieCandidateLimit);
+
+    if (params.p_restaurant_names?.length) {
+      query = query.in('restaurant_name', params.p_restaurant_names);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('[RetrievalEngine] smoothie table fallback error:', error.message);
+      return [];
+    }
+
+    return normalizeTableFallbackRows((data ?? []) as unknown as BreakfastFallbackRow[])
+      .filter((item) => matchesSmoothieIntent(item))
+      .filter((item) => satisfiesParsedMacroConstraints(item, parsed));
   }
 
-  const rows = (data ?? []) as unknown as BreakfastFallbackRow[];
+  return [];
+}
 
+function normalizeTableFallbackRows(rows: BreakfastFallbackRow[]): RawResult[] {
   return rows
     .filter((item) => item.is_available !== false && item.active_status !== false)
     .map((item) => ({
@@ -931,7 +990,7 @@ async function runTableCategoryFallback(
       restaurant_name: String(item.restaurant_name ?? ''),
       restaurant_id: String(item.restaurant_id ?? ''),
       macros: normalizeMacros(item as unknown as Record<string, unknown>),
-      normalized_category: optionalString(item.normalized_category),
+      normalized_category: optionalString(item.normalized_category ?? item.category),
       meal_type: optionalString(item.meal_type),
       item_type: optionalString(item.item_type),
       food_tags: normalizeTextArray(item.tags) ?? normalizeTextArray(item.food_tags),
@@ -941,6 +1000,24 @@ async function runTableCategoryFallback(
       image_url: optionalString(item.image_url),
       allergens: normalizeTextArray(item.allergen_flags) ?? normalizeTextArray(item.allergens),
     }));
+}
+
+function satisfiesParsedMacroConstraints(item: RawResult, parsed: ParsedQuery): boolean {
+  const calories = item.macros?.calories ?? 0;
+  const protein = item.macros?.protein ?? 0;
+  const carbs = item.macros?.carbs ?? 0;
+  const fat = item.macros?.fat ?? 0;
+
+  if (parsed.minCalories !== undefined && calories < parsed.minCalories) return false;
+  if (parsed.maxCalories !== undefined && calories > parsed.maxCalories) return false;
+  if (parsed.minProtein !== undefined && protein < parsed.minProtein) return false;
+  if (parsed.maxProtein !== undefined && protein > parsed.maxProtein) return false;
+  if (parsed.minCarbs !== undefined && carbs < parsed.minCarbs) return false;
+  if (parsed.maxCarbs !== undefined && carbs > parsed.maxCarbs) return false;
+  if (parsed.minFat !== undefined && fat < parsed.minFat) return false;
+  if (parsed.maxFat !== undefined && fat > parsed.maxFat) return false;
+
+  return true;
 }
 
 function toLegacySearchParams(params: RPCParams) {
@@ -1022,17 +1099,24 @@ function applyPostRetrievalFilters(
   dietaryKeywords?: string[]
 ): RawResult[] {
   let filtered = items;
+  const smoothieQuery = isSmoothieQuery(parsed);
 
   if (dietaryKeywords?.length) {
     filtered = applyDietaryFilter(filtered, dietaryKeywords) as RawResult[];
   }
 
   filtered = filtered.filter((item) => {
-    if (item.item_type && item.item_type !== 'meal') {
+    const smoothieItem = smoothieQuery && matchesSmoothieIntent(item);
+
+    if (smoothieQuery && !smoothieItem) {
       return false;
     }
 
-    if (isLikelyModifierLikeResult(item, parsed)) {
+    if (item.item_type && item.item_type !== 'meal' && !smoothieItem) {
+      return false;
+    }
+
+    if (!smoothieItem && isLikelyModifierLikeResult(item, parsed)) {
       return false;
     }
 
@@ -1063,7 +1147,61 @@ function applyPostRetrievalFilters(
     return true;
   });
 
-  return rankResults(filtered, parsed);
+  const ranked = rankResults(filtered, parsed);
+
+  if (!smoothieQuery) {
+    return ranked;
+  }
+
+  const explicitSmoothies = ranked.filter((item) => hasExplicitSmoothieSignals(item));
+  const inferredSmoothies = ranked.filter((item) => !hasExplicitSmoothieSignals(item));
+
+  return [...explicitSmoothies, ...inferredSmoothies];
+}
+
+function isSmoothieQuery(parsed: ParsedQuery): boolean {
+  return (
+    parsed.normalizedCategory === 'smoothie' ||
+    parsed.categories.includes('smoothie') ||
+    isSmoothieLikeText(parsed.raw)
+  );
+}
+
+function matchesSmoothieIntent(item: RawResult): boolean {
+  const name = (item.name ?? '').toLowerCase();
+  const description = (item.description ?? '').toLowerCase();
+  const normalizedCategory = (item.normalized_category ?? '').toLowerCase();
+  const itemType = (item.item_type ?? '').toLowerCase();
+  const explicitSignals = [name, description].join(' ');
+
+  if (name.includes('bowl') || description.includes('bowl') || normalizedCategory.includes('bowl')) {
+    return false;
+  }
+
+  if (itemType && itemType !== 'drink') {
+    return false;
+  }
+
+  const hasExplicitSmoothieSignal = hasExplicitSmoothieSignals(item);
+  const hasShakeSignal = /\b(shake|shakes|malt|malts)\b/i.test(explicitSignals);
+  const hasSmoothieCategory = normalizedCategory === 'smoothie';
+  const hasMealSignals = /\b(toast|salad|sandwich|wrap|burrito|taco|pizza|pasta|burger|omelet|omelette|eggs?)\b/i.test(explicitSignals);
+  const hasCoffeeSignals = /\b(latte|cold\s+brew|coffee|espresso|americano|cappuccino|macchiato)\b/i.test(explicitSignals);
+
+  if (hasShakeSignal && !hasExplicitSmoothieSignal) {
+    return false;
+  }
+
+  if (hasExplicitSmoothieSignal) {
+    return true;
+  }
+
+  return hasSmoothieCategory && !hasMealSignals && !hasCoffeeSignals;
+}
+
+function hasExplicitSmoothieSignals(item: RawResult): boolean {
+  const explicitSignals = `${item.name ?? ''} ${item.description ?? ''}`;
+  return /\b(smoothie|smoothies|blend|blended)\b/i.test(explicitSignals);
 }
 
 export function applyRetrievalGuardrailsForTesting(
@@ -1230,6 +1368,10 @@ function shouldUseSemanticFallback(
   deterministicCount: number,
   threshold: number
 ): boolean {
+  if (isSmoothieQuery(parsed)) {
+    return false;
+  }
+
   if (deterministicCount >= threshold) {
     return false;
   }
@@ -1335,6 +1477,29 @@ function stableHash(input: string): number {
   return hash;
 }
 
+function buildRotationSeed(userId: string | undefined, searchKey: string): string {
+  return `${userId || 'guest'}|${searchKey}`;
+}
+
+function rotateSmoothieDiscoveryResults(
+  items: RawResult[],
+  parsed: ParsedQuery,
+  seed: string
+): RawResult[] {
+  if (!isSmoothieQuery(parsed) || hasParsedMacroConstraints(parsed) || items.length <= 1) {
+    return items;
+  }
+
+  const maxShiftWindow = Math.min(items.length, 24);
+  const shift = stableHash(`${seed}|smoothie`) % maxShiftWindow;
+
+  if (shift === 0) {
+    return items;
+  }
+
+  return [...items.slice(shift), ...items.slice(0, shift)];
+}
+
 function rotateBroadDiscoveryResults(
   items: RawResult[],
   parsed: ParsedQuery,
@@ -1353,6 +1518,19 @@ function rotateBroadDiscoveryResults(
   }
 
   return [...items.slice(shift), ...items.slice(0, shift)];
+}
+
+function hasParsedMacroConstraints(parsed: ParsedQuery): boolean {
+  return hasMacroConstraints({
+    minCalories: parsed.minCalories,
+    maxCalories: parsed.maxCalories,
+    minProtein: parsed.minProtein,
+    maxProtein: parsed.maxProtein,
+    minCarbs: parsed.minCarbs,
+    maxCarbs: parsed.maxCarbs,
+    minFat: parsed.minFat,
+    maxFat: parsed.maxFat,
+  });
 }
 
 function shouldShortCircuitUnsupportedQuery(parsed: ParsedQuery): boolean {
@@ -1438,8 +1616,19 @@ function prepareSearchContext(searchParams: SearchParams): PreparedSearchContext
     }
   }
 
+  const shouldRandomizeSmoothies =
+    isSmoothieLikeText(searchParams.query ?? '') &&
+    !hasMacroConstraints(searchParams);
+
   const originalParams: SearchParams = {
     ...searchParams,
+    ...(shouldRandomizeSmoothies
+      ? {
+          shuffleNonce:
+            globalThis.crypto?.randomUUID?.() ??
+            `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
+        }
+      : {}),
     offset: DEFAULT_OFFSET,
     limit: searchParams.limit ?? DEFAULT_LIMIT,
     isPagination: false,

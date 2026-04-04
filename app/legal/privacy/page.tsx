@@ -1,34 +1,124 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+
+const sections = [
+  {
+    title: "1. Information We Collect",
+    body: [
+      "Account information, including email address and login details.",
+      "Usage data, including search activity and app interactions.",
+      "Device information, such as device type and operating system.",
+    ],
+  },
+  {
+    title: "2. How We Use Information",
+    body: [
+      "Provide and improve the app.",
+      "Deliver relevant results and experiences.",
+      "Maintain performance, reliability, and security.",
+      "Communicate with users when necessary.",
+    ],
+  },
+  {
+    title: "3. Data Sharing",
+    body: [
+      "We do not sell personal data.",
+      "We may share data with service providers that support hosting, analytics, or infrastructure.",
+      "We may disclose data to legal authorities if required by law.",
+    ],
+  },
+  {
+    title: "4. Data Security",
+    body: [
+      "We implement safeguards and security measures designed to protect your information.",
+    ],
+  },
+  {
+    title: "5. User Control",
+    body: [
+      "You may request account deletion.",
+      "You may stop using the app at any time.",
+    ],
+  },
+  {
+    title: "6. Third-Party Services",
+    body: [
+      "SeekEatz may use third-party tools, including analytics and API providers. Those services have their own privacy policies.",
+    ],
+  },
+  {
+    title: "7. Children’s Privacy",
+    body: [
+      "SeekEatz is not intended for children under 13.",
+    ],
+  },
+  {
+    title: "8. Changes to Policy",
+    body: [
+      "We may update this Privacy Policy periodically. Continued use of the app after updates become effective constitutes acceptance of the revised policy.",
+    ],
+  },
+  {
+    title: "9. Contact",
+    body: [
+      "For privacy-related questions, contact support@seekeatz.com.",
+    ],
+  },
+];
 
 export default function PrivacyPage() {
   const router = useRouter();
-
-  const handleBack = () => {
-    router.push('/settings');
+  const handleBackToSettings = () => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("seekeatz_current_screen", "settings");
+      localStorage.setItem("seekeatz_nav_history", JSON.stringify(["chat", "settings"]));
+    }
+    router.push("/chat");
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      {/* Header with Back Button */}
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border px-4 py-4 flex items-center gap-4">
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="sticky top-0 z-10 flex items-center gap-4 border-b border-border bg-background/80 px-4 py-4 backdrop-blur-md">
         <button
-          onClick={handleBack}
-          className="p-2 hover:bg-muted rounded-lg transition-colors"
+          type="button"
+          onClick={handleBackToSettings}
+          className="rounded-lg p-2 transition-colors hover:bg-muted"
         >
-          <ArrowLeft className="w-5 h-5 text-foreground" />
+          <ArrowLeft className="h-5 w-5 text-foreground" />
         </button>
-        <h1 className="text-xl font-bold text-foreground">Privacy Policy</h1>
+        <div>
+          <h1 className="text-xl font-semibold text-foreground">Privacy Policy</h1>
+          <p className="text-sm text-muted-foreground">Effective Date: April 1, 2026</p>
+        </div>
       </header>
 
-      <div className="flex-1 flex items-center justify-center p-6">
-        <div className="max-w-md w-full text-center">
-          <p className="text-muted-foreground">This section is coming soon.</p>
+      <main className="flex-1 bg-background px-4 py-6 pb-24 sm:px-6">
+        <div className="mx-auto max-w-3xl space-y-5">
+          <section className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm">
+            <p className="text-sm leading-7 text-muted-foreground">
+              SeekEatz respects your privacy and is committed to handling your information responsibly.
+            </p>
+          </section>
+
+          {sections.map((section) => (
+            <section
+              key={section.title}
+              className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm"
+            >
+              <h2 className="text-base font-semibold text-foreground">{section.title}</h2>
+              <div className="mt-3 space-y-2">
+                {section.body.map((paragraph) => (
+                  <p key={paragraph} className="text-sm leading-7 text-muted-foreground">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </section>
+          ))}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
-

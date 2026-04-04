@@ -3,6 +3,8 @@
  * Used by /api/search and swap endpoints to ensure consistency
  */
 
+import { isSmoothieLikeMenuItem } from '@/lib/smoothie-search';
+
 export interface MenuItemClassification {
   isDish: boolean;
   isModifier: boolean;
@@ -15,6 +17,10 @@ export interface MenuItemClassification {
 export function classifyMenuItem(row: any): MenuItemClassification {
   const category = (row.category || '').toLowerCase().trim();
   const name = (row.name || '').toLowerCase().trim();
+
+  if (isSmoothieLikeMenuItem({ category, name })) {
+    return { isDish: true, isModifier: false };
+  }
 
   // 1. DISH ALLOWLIST by category keywords (case-insensitive)
   const dishCategoryKeywords = [

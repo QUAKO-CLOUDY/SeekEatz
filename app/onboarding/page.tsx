@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { OnboardingFlow } from "@/app/components/OnboardingFlow";
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const routeToPlanSelection = useCallback(() => {
+    router.replace("/upgrade?flow=onboarding&tutorial=1");
+  }, [router]);
 
-  // Safety check: If authenticated user has already completed onboarding, redirect to chat
+  // Safety check: If authenticated user has already completed onboarding, redirect to settings
   // Only redirect authenticated users - signed-out users can always access onboarding
   useEffect(() => {
     const checkOnboardingStatus = async () => {
@@ -36,11 +39,10 @@ export default function OnboardingPage() {
           .single();
 
         if (!isDev && profile?.has_completed_onboarding) {
-          // Already completed - redirect to AI chatbot
-          router.replace("/chat");
+          routeToPlanSelection();
           return;
         }
-      } catch (error) {
+      } catch {
         // Profile might not exist yet, or table might not exist
         // Check localStorage as fallback (only for authenticated users)
         if (typeof window !== "undefined") {
@@ -48,8 +50,7 @@ export default function OnboardingPage() {
           const onboardingCompleted = localStorage.getItem("onboardingCompleted") === "true";
 
           if (!isDev && (localStorageFlag === "true" || onboardingCompleted)) {
-            // Completed according to localStorage - redirect to AI chatbot
-            router.replace("/chat");
+            routeToPlanSelection();
             return;
           }
         }
@@ -57,11 +58,10 @@ export default function OnboardingPage() {
     };
 
     checkOnboardingStatus();
-  }, [router]);
+  }, [routeToPlanSelection]);
 
   const handleComplete = () => {
-    // OnboardingFlow handles completion and redirect internally
-    // This is just a placeholder callback
+    routeToPlanSelection();
   };
 
   return (

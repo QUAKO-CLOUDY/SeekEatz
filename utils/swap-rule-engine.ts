@@ -164,6 +164,10 @@ function normalizeSwapText(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9\s]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+function buildAddLabel(name: string): string {
+  return /^add\b/i.test(name) ? name : `Add ${name}`;
+}
+
 function mealMentionsCandidate(mealName: string, candidateName: string): boolean {
   const normalizedMealName = normalizeSwapText(mealName);
   const normalizedCandidateName = normalizeSwapText(candidateName);
@@ -270,9 +274,11 @@ function generateContextualSingleIngredientSwap(
     return null;
   }
 
+  const addLabel = buildAddLabel(bestCandidate.name);
+
   return {
     id: `contextual-add-${bestCandidate.id}`,
-    swapTitle: `Add ${bestCandidate.name}`,
+    swapTitle: addLabel,
     expectedEffect: formatMacroEffect(bestCandidate.macros),
     estimatedDelta: {
       calories: bestCandidate.macros.calories,
@@ -283,7 +289,7 @@ function generateContextualSingleIngredientSwap(
     confidenceLabel: 'Likely available',
     type: 'add',
     swapType: 'neutral',
-    details: `Add ${bestCandidate.name} using the restaurant's real modifier data`,
+    details: `${addLabel} using the restaurant's real modifier data`,
     modifierItemIds: [bestCandidate.id],
     quantityConfig: getCandidateQuantityConfig(bestCandidate),
   };
@@ -399,11 +405,9 @@ function generateHigherProteinSwap(
   }
 
   // Build label
-  let label = `Add ${bestCandidate.name}`;
+  let label = buildAddLabel(bestCandidate.name);
   if (/patty/i.test(bestCandidate.name)) {
     label = 'Add extra patty';
-  } else if (/chicken/i.test(bestCandidate.name)) {
-    label = `Add ${bestCandidate.name}`;
   }
 
   return {
@@ -419,7 +423,7 @@ function generateHigherProteinSwap(
     confidenceLabel: 'Likely available',
     type: 'add',
     swapType: 'higherProtein',
-    details: `Add ${bestCandidate.name} to increase protein`,
+    details: `${label} to increase protein`,
     modifierItemIds: [bestCandidate.id],
     quantityConfig: getCandidateQuantityConfig(bestCandidate),
   };

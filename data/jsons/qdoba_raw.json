@@ -1,126 +1,830 @@
 {
-    "restaurant_name": "QDOBA Mexican Eats",
+    "restaurant_name": "QDOBA MEXICAN EATS",
     "items": [
-        {
-            "name": "Chicken Queso Bowl",
-            "category": "Bowls",
-            "price_estimate": 12.45,
-            "macros": {
-                "calories": 780,
-                "protein": 43,
-                "carbs": 75,
-                "fat": 34
-            }
-        },
-        {
-            "name": "Chicken Queso Burrito",
-            "category": "Bowls",
-            "price_estimate": 12.45,
-            "macros": {
-                "calories": 1080,
-                "protein": 51,
-                "carbs": 127,
-                "fat": 41
-            }
-        },
-        {
-            "name": "Double Protein Bowl - Chicken",
-            "category": "Entree",
-            "price_estimate": null,
-            "macros": {
-                "calories": 610,
-                "protein": 44,
-                "carbs": 48,
-                "fat": 29
-            }
-        },
-        {
-            "name": "Quesabirria Burrito",
-            "category": "Burritos",
-            "price_estimate": 15.35,
-            "macros": {
-                "calories": 1080,
-                "protein": 51,
-                "carbs": 127,
-                "fat": 41
-            }
-        },
-        {
-            "name": "Street Style Chicken Tacos",
-            "category": "Tacos",
-            "price_estimate": 12.45,
-            "macros": {
-                "calories": 520,
-                "protein": 26,
-                "carbs": 52,
-                "fat": 25
-            }
-        },
-        {
-            "name": "Chorizo",
-            "category": "Protein",
-            "price_estimate": null,
-            "macros": {
-                "calories": 210,
-                "protein": 16,
-                "carbs": 6,
-                "fat": 13
-            }
-        },
-        {
-            "name": "Grilled Adobo Chicken",
-            "category": "Protein",
-            "price_estimate": null,
-            "macros": {
-                "calories": 150,
-                "protein": 16,
-                "carbs": 2,
-                "fat": 9
-            }
-        },
-        {
-            "name": "Grilled Steak",
-            "category": "Protein",
-            "price_estimate": null,
-            "macros": {
-                "calories": 230,
-                "protein": 19,
-                "carbs": 4,
-                "fat": 15
-            }
-        },
-        {
-            "name": "Ground Beef",
-            "category": "Protein",
-            "price_estimate": null,
-            "macros": {
-                "calories": 190,
-                "protein": 17,
-                "carbs": 4,
-                "fat": 11
-            }
-        },
-        {
-            "name": "Plant-Based Impossible",
-            "category": "Protein",
-            "price_estimate": null,
-            "macros": {
-                "calories": 180,
-                "protein": 13,
-                "carbs": 9,
-                "fat": 10
-            }
-        },
-        {
-            "name": "Three Cheese Queso",
-            "category": "Chips, Dips & Sides",
-            "price_estimate": 2.5,
-            "macros": {
-                "calories": 190,
-                "protein": 6,
-                "carbs": 6,
-                "fat": 15
-            }
+      {
+        "name": "Bacon (Select Locations) (1 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 9,
+          "carbs": 1,
+          "fat": 8
         }
+      },
+      {
+        "name": "Bacon (Select Locations) (2 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 230,
+          "protein": 19,
+          "carbs": 2,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Black Beans (4 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 9,
+          "carbs": 24,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Brisket Birria (3.5 oz)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 15,
+          "carbs": 3,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Chile Crema (1 oz)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Chile Corn Salsa (1 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 25,
+          "protein": 1,
+          "carbs": 5,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Cholula® Hot & Sweet Chicken (3.5oz)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 16,
+          "carbs": 10,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Chopped Cilantro (.12 oz)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Chorizo (1.5 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 7,
+          "carbs": 2,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Chorizo (3.0 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 260,
+          "protein": 14,
+          "carbs": 5,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Cilantro Lime Rice (4 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 3,
+          "carbs": 38,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Citrus Vinaigrette (1.5 oz.) (CANADA)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Citrus Vinaigrette (1.5 oz.) (US)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 7,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Cotija Cheese (.25 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 25,
+          "protein": 1,
+          "carbs": 0,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Crispy Taco Shell**",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 60,
+          "protein": 1,
+          "carbs": 8,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Crunchy Tortilla Shell",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 390,
+          "protein": 7,
+          "carbs": 41,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Eggs (6 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 230,
+          "protein": 19,
+          "carbs": 2,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Fajita Veggies (2 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 40,
+          "protein": 1,
+          "carbs": 3,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Flour Tortilla (5.5\")",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 2,
+          "carbs": 12,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Flour Tortilla (10\")",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 6,
+          "carbs": 36,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Flour Tortilla (12.5\")",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 8,
+          "carbs": 52,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Grilled Adobo Chicken (3.5 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 19,
+          "carbs": 2,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Grilled Steak (3.5 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 20,
+          "carbs": 5,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Ground Beef (3.5 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 180,
+          "protein": 16,
+          "carbs": 4,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Habanero Salsa (1 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Hand Crafted Guacamole (2 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 1,
+          "carbs": 5,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Hand Crafted Guacamole (4 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 2,
+          "carbs": 9,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Picante Ranch Dressing (1.5 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 1,
+          "carbs": 3,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Pickled Jalapenos (1 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Pickled Red Onion (0.8 oz)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Pico de Gallo (1 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Pinto Beans (4 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 8,
+          "carbs": 23,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Plant-Based Impossible™ (3.1 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 13,
+          "carbs": 8,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Pork Carnitas (3.5 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 14,
+          "carbs": 0,
+          "fat": 4.5
+        }
+      },
+      {
+        "name": "Queso Diablo (2 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 90,
+          "protein": 2,
+          "carbs": 3,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Roasted Tomato Salsa (1 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Romaine Lettuce for Salad (3.5 oz)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 1,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Salsa Roja (1 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Salsa Verde (1 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Seasoned Brown Rice (4 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 4,
+          "carbs": 36,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Seasoned Potatoes (2 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 1,
+          "carbs": 12,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Shredded Cheese (1.0 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 7,
+          "carbs": 1,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Sour Cream, (1 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 1,
+          "carbs": 3,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Three Cheese Queso (2 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 3,
+          "carbs": 3,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Three Cheese Queso (4 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 6,
+          "carbs": 5,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Tortilla Chips (4 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 560,
+          "protein": 7,
+          "carbs": 75,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Tortilla Strips (0.5 oz.)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 1,
+          "carbs": 8,
+          "fat": 4.5
+        }
+      },
+      {
+        "name": "Whole Wheat Flour Tortilla 12.5\" (CANADA only)",
+        "category": "Ingredients for Entrées",
+        "price_estimate": null,
+        "macros": {
+          "calories": 280,
+          "protein": 8,
+          "carbs": 45,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Chicken Queso Bowl",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 750,
+          "protein": 43,
+          "carbs": 74,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Chicken Queso Burrito",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1050,
+          "protein": 51,
+          "carbs": 126,
+          "fat": 40
+        }
+      },
+      {
+        "name": "Cholula® Hot & Sweet Chicken Bowl",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 610,
+          "protein": 31,
+          "carbs": 77,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Cholula® Hot & Sweet Chicken Burrito",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 910,
+          "protein": 39,
+          "carbs": 130,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Citrus Lime Chicken Salad",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 540,
+          "protein": 31,
+          "carbs": 49,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Double Protein Bowl - Chicken",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 700,
+          "protein": 51,
+          "carbs": 41,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Double Protein Bowl - Steak",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1040,
+          "protein": 52,
+          "carbs": 47,
+          "fat": 72
+        }
+      },
+      {
+        "name": "Fajita Vegan Bowl",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 530,
+          "protein": 17,
+          "carbs": 79,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Impossible™ Taco Salad",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 520,
+          "protein": 31,
+          "carbs": 46,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Keto Bowl - Brisket Birria",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 370,
+          "protein": 25,
+          "carbs": 13,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Keto Bowl - Chicken",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 400,
+          "protein": 33,
+          "carbs": 11,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Keto Bowl - Steak",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 490,
+          "protein": 25,
+          "carbs": 13,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Quesabirria Burrito",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 980,
+          "protein": 46,
+          "carbs": 124,
+          "fat": 95
+        }
+      },
+      {
+        "name": "Quesabirria Quesadilla",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1080,
+          "protein": 55,
+          "carbs": 67,
+          "fat": 127
+        }
+      },
+      {
+        "name": "Southwest Steak Burrito",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1220,
+          "protein": 43,
+          "carbs": 134,
+          "fat": 58
+        }
+      },
+      {
+        "name": "Street Style Chicken Tacos (3) Flour",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 550,
+          "protein": 29,
+          "carbs": 46,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Street Style Pork Carnitas Tacos (3) Flour",
+        "category": "Signature Eats®",
+        "price_estimate": null,
+        "macros": {
+          "calories": 370,
+          "protein": 23,
+          "carbs": 38,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Citrus Lime Shrimp - Entrée portion (10 pieces)",
+        "category": "Limited Time Offerings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 14,
+          "carbs": 0,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Surf & Turf - Entrée portion",
+        "category": "Limited Time Offerings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 420,
+          "protein": 31,
+          "carbs": 5,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Tortilla Soup - (4 oz.)",
+        "category": "Limited Time Offerings",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 1,
+          "carbs": 6,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Apple Sauce, Natural",
+        "category": "Ingredients for Kids Items",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 0,
+          "carbs": 13,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Grilled Chicken (1.75 oz.)",
+        "category": "Ingredients for Kids Items",
+        "price_estimate": null,
+        "macros": {
+          "calories": 90,
+          "protein": 10,
+          "carbs": 1,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Grilled Steak (1.75 oz.)",
+        "category": "Ingredients for Kids Items",
+        "price_estimate": null,
+        "macros": {
+          "calories": 180,
+          "protein": 10,
+          "carbs": 2,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Coca Cola (20 fl. oz.)",
+        "category": "Bottled Beverages",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 0,
+          "carbs": 67,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Simply Orange Juice (11.5 fl. oz.)",
+        "category": "Bottled Beverages",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 2,
+          "carbs": 37,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Double Chocolate Brownie (US)",
+        "category": "Dessert",
+        "price_estimate": null,
+        "macros": {
+          "calories": 390,
+          "protein": 6,
+          "carbs": 49,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Chocolate Chunk Cookie (US)",
+        "category": "Dessert",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 3,
+          "carbs": 33,
+          "fat": 12
+        }
+      }
     ]
-}
+  }

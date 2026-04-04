@@ -84,6 +84,7 @@ function matchesAny(value: string, patterns?: RegExp[]): boolean {
 }
 
 function inferMenuItemUpdate(item: MenuItemRow): MenuItemUpdate | null {
+  const restaurant = normalize(item.restaurant_name);
   const category = normalize(item.category);
   const name = normalize(item.name);
 
@@ -93,7 +94,77 @@ function inferMenuItemUpdate(item: MenuItemRow): MenuItemUpdate | null {
     Object.assign(next, patch);
   };
 
-  if (/dressings?/.test(category) || /dressing|vinaigrette|ranch|aioli|mustard|sauce/.test(name)) {
+  if (
+    restaurant === 'pollo tropical' &&
+    (/^desserts$/.test(category) ||
+      /^tropical favorites$/.test(category) ||
+      /^ala carte meat \/ platters$/.test(category) ||
+      (/^soups, salads, sandwiches & wraps$/.test(category) &&
+        /for caesar salad|add protein choice/.test(name)))
+  ) {
+    apply({
+      item_type: /^desserts$/.test(category) || /^tropical favorites$/.test(category) ? 'snack' : 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: /^ala carte meat \/ platters$/.test(category) ? 'portion' : 'side',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 2,
+    });
+  } else if (
+    restaurant === 'el pollo loco' &&
+    (/^drinks$/.test(category) || /^snacks & sweets$/.test(category))
+  ) {
+    apply({
+      item_type: /^drinks$/.test(category) ? 'drink' : 'snack',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: null,
+      modifier_unit_default_qty: null,
+      modifier_unit_max_qty: null,
+    });
+  } else if (
+    restaurant === 'qdoba mexican eats' &&
+    (/^bottled beverages$/.test(category) ||
+      /^dessert$/.test(category) ||
+      (/^limited time offerings$/.test(category) && /portion|\(4 oz\.\)/.test(name)))
+  ) {
+    apply({
+      item_type: /^bottled beverages$/.test(category) ? 'drink' : /^dessert$/.test(category) ? 'snack' : 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: /^limited time offerings$/.test(category) ? 'portion' : null,
+      modifier_unit_default_qty: /^limited time offerings$/.test(category) ? 1 : null,
+      modifier_unit_max_qty: /^limited time offerings$/.test(category) ? 2 : null,
+    });
+  } else if (restaurant === 'waba grill' && /^(family a la carte|sides|sauce \/ dressing)$/.test(category)) {
+    const isSauceLike = /^sauce \/ dressing$/.test(category);
+    const isSideItem = /^sides$/.test(category) && !/^add /.test(name);
+    apply({
+      item_type: isSauceLike ? 'sauce' : isSideItem ? 'side' : 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: isSauceLike ? 'serving' : /^add /.test(name) ? 'portion' : 'side',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: isSauceLike ? 3 : /^add /.test(name) ? 2 : 1,
+    });
+  } else if (
+    restaurant === "moe's southwest grill" &&
+    (/^fillings$/.test(category) ||
+      /^sides$/.test(category) ||
+      /^burritos, quesadillas, & stacks$/.test(category) ||
+      /^tacos$/.test(category) ||
+      /^kids$/.test(category) ||
+      /^nachos & salad$/.test(category))
+  ) {
+    apply({
+      item_type: /^sides$/.test(category) ? 'side' : 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: /^sides$/.test(category) ? 'side' : 'portion',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: /^sides$/.test(category) ? 1 : 2,
+    });
+  } else if (/dressings?/.test(category) || /dressing|vinaigrette|ranch|aioli|mustard|sauce/.test(name)) {
     apply({
       item_type: /sauce/.test(category) ? 'sauce' : 'modifier',
       is_modifier: true,
@@ -111,7 +182,7 @@ function inferMenuItemUpdate(item: MenuItemRow): MenuItemUpdate | null {
       modifier_unit_default_qty: 1,
       modifier_unit_max_qty: 3,
     });
-  } else if (/protein add-on|protein add on|protein|add ons|add-ons|add on|add-on|range-add-ons|mains|bowl add-ons/.test(category)) {
+  } else if (/protein add-on|protein add on|protein|protein plates|add ons|add-ons|add on|add-on|range-add-ons|mains|bowl add-ons|super premium ingredients|premiums/.test(category)) {
     apply({
       item_type: 'modifier',
       is_modifier: true,
@@ -120,12 +191,12 @@ function inferMenuItemUpdate(item: MenuItemRow): MenuItemUpdate | null {
       modifier_unit_default_qty: 1,
       modifier_unit_max_qty: 2,
     });
-  } else if (/dips \+ spreads|toppings|greens \+ grains/.test(category)) {
+  } else if (/dips \+ spreads|toppings|greens \+ grains|topping|vegetable|base/.test(category)) {
     apply({
       item_type: 'modifier',
       is_modifier: true,
       is_searchable: false,
-      modifier_unit_label: /greens \+ grains/.test(category) ? 'base' : 'portion',
+      modifier_unit_label: /greens \+ grains|base/.test(category) ? 'base' : 'portion',
       modifier_unit_default_qty: 1,
       modifier_unit_max_qty: 2,
     });
@@ -154,6 +225,134 @@ function inferMenuItemUpdate(item: MenuItemRow): MenuItemUpdate | null {
       modifier_unit_label: 'side',
       modifier_unit_default_qty: 1,
       modifier_unit_max_qty: 1,
+    });
+  } else if (/pita & veggies options/.test(category)) {
+    apply({
+      item_type: 'side',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'side',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 2,
+    });
+  } else if (/housemade dressings/.test(category)) {
+    apply({
+      item_type: 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'serving',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 3,
+    });
+  } else if (/the goods|grains & beans/.test(category)) {
+    apply({
+      item_type: 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: /grains & beans/.test(category) ? 'base' : 'portion',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 2,
+    });
+  } else if (/sweetfin sauces/.test(category)) {
+    apply({
+      item_type: 'sauce',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'serving',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 3,
+    });
+  } else if (/sweetfin proteins/.test(category)) {
+    apply({
+      item_type: 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'portion',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 2,
+    });
+  } else if (/sweetfin bases|premium add-ons|add-ons crunchy|add-ons herbs & spices|sweetfin fruits & veggies/.test(category)) {
+    apply({
+      item_type: 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: /sweetfin bases/.test(category) ? 'base' : 'portion',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 2,
+    });
+  } else if (/ingredients for entr/.test(category) || /ingredients for kids items/.test(category)) {
+    const isSauceLike = /crema|vinaigrette|queso|guacamole|salsa|sauce/i.test(name);
+    const isStructureLike = /tortilla|shell/i.test(name);
+    apply({
+      item_type: isSauceLike ? 'sauce' : 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: isSauceLike ? 'serving' : isStructureLike ? 'swap' : 'portion',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: isSauceLike ? 3 : isStructureLike ? 1 : 2,
+    });
+  } else if (/optional items/.test(category)) {
+    apply({
+      item_type: 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'portion',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 2,
+    });
+  } else if (/bread options/.test(category)) {
+    apply({
+      item_type: 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'swap',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 1,
+    });
+  } else if (/proteins|cheese|toppings|buns/.test(category)) {
+    apply({
+      item_type: 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: /buns/.test(category) ? 'swap' : 'portion',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 2,
+    });
+  } else if (/tropichop meats|fire-grilled chicken/.test(category)) {
+    apply({
+      item_type: 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'portion',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 2,
+    });
+  } else if (/tropichop rice and veggies|tropichop toppings/.test(category)) {
+    apply({
+      item_type: 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: /rice and veggies/.test(category) ? 'base' : 'portion',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 2,
+    });
+  } else if (/condiments \/ salsa bar|salsas/.test(category)) {
+    apply({
+      item_type: 'sauce',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'serving',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 3,
+    });
+  } else if (/sides & sauces/.test(category)) {
+    apply({
+      item_type: 'side',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'side',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 2,
     });
   } else if (/^other$/.test(category) && /^\d+\s+eggs?\b/.test(name)) {
     const eggCountMatch = name.match(/\b(\d+)\s+eggs?\b/);
@@ -366,6 +565,468 @@ const RESTAURANT_RULES: Record<string, RestaurantRuleSet> = {
         relationType: 'sauce_option',
         groupName: 'Sauces',
         maxQuantity: 2,
+      },
+    ],
+  },
+  Sweetgreen: {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^bowls$/i, /^salads$/i],
+        childCategoryPatterns: [/^super premium ingredients$/i],
+        childNamePatterns: [/chicken|steak|salmon|steelhead|tofu/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^bowls$/i, /^salads$/i, /^protein plates$/i, /^sides$/i],
+        childCategoryPatterns: [/^dressings$/i],
+        relationType: 'sauce_option',
+        groupName: 'Dressings',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^bowls$/i, /^salads$/i],
+        childCategoryPatterns: [/^\+1 toppings$/i, /^toppings$/i, /^premiums$/i, /^bases$/i],
+        relationType: 'add_on',
+        groupName: 'Add-ons',
+        maxQuantity: 2,
+      },
+    ],
+  },
+  'Chopt Creative Salad Co.': {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^salads$/i, /^salad wraps$/i, /^warm bowls$/i],
+        childCategoryPatterns: [/^the goods$/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^salads$/i, /^salad wraps$/i, /^warm bowls$/i],
+        childCategoryPatterns: [/^housemade dressings$/i],
+        relationType: 'dressing_option',
+        groupName: 'Dressings',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^salads$/i, /^warm bowls$/i],
+        childCategoryPatterns: [/^grains & beans$/i],
+        relationType: 'add_on',
+        groupName: 'Base Add-ons',
+        maxQuantity: 2,
+      },
+    ],
+  },
+  "Taziki's Mediterranean Cafe": {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^appetizers$/i],
+        childCategoryPatterns: [/^appetizers - pita & veggies options$/i],
+        relationType: 'side_option',
+        groupName: 'Pita & Veggie Sides',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [
+          /^kypelos bowls$/i,
+          /^greek salads$/i,
+          /^mediterranean salads$/i,
+          /^caesar salads$/i,
+          /^cobb salads$/i,
+          /^watermelon spinach salads$/i,
+          /^pitas & more$/i,
+          /^feasts$/i,
+        ],
+        childCategoryPatterns: [/^salads - protein options$/i, /^extra proteins$/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [
+          /^greek salads$/i,
+          /^mediterranean salads$/i,
+          /^caesar salads$/i,
+          /^cobb salads$/i,
+          /^watermelon spinach salads$/i,
+        ],
+        childCategoryPatterns: [/^salads - dressing options$/i],
+        relationType: 'dressing_option',
+        groupName: 'Dressings',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^kypelos bowls$/i, /^pitas & more$/i, /^feasts$/i],
+        childCategoryPatterns: [/^extra sauces & add-ons$/i],
+        relationType: 'add_on',
+        groupName: 'Sauces & Add-ons',
+        maxQuantity: 2,
+      },
+    ],
+  },
+  'WaBa Grill': {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^bowls$/i, /^mini bowls$/i, /^veggie bowl$/i, /^plates$/i, /^tacos$/i, /^salad entrees$/i],
+        childCategoryPatterns: [/^sides$/i],
+        childNamePatterns: [
+          /chicken/i,
+          /white meat chicken/i,
+          /sweet & spicy chicken/i,
+          /steak/i,
+          /salmon/i,
+          /shrimp/i,
+          /tofu/i,
+          /k-ribs/i,
+        ],
+        childExcludeNamePatterns: [/soup|dumplings|rice|salad|veggies|ocado/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^bowls$/i, /^mini bowls$/i, /^veggie bowl$/i, /^plates$/i, /^tacos$/i, /^salad entrees$/i],
+        childCategoryPatterns: [/^sauce \/ dressing$/i],
+        relationType: 'sauce_option',
+        groupName: 'Sauces',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^bowls$/i, /^mini bowls$/i, /^veggie bowl$/i, /^plates$/i, /^tacos$/i, /^salad entrees$/i],
+        childCategoryPatterns: [/^sides$/i],
+        childNamePatterns: [/rice|veggies|salad|dumplings|ocado/i],
+        relationType: 'side_option',
+        groupName: 'Sides & Bases',
+        maxQuantity: 2,
+      },
+    ],
+  },
+  Sweetfin: {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^sweetfin signature bowls$/i, /^sweetfin chicken bowls$/i, /^sweetbox \/ poke burrito$/i],
+        childCategoryPatterns: [/^sweetfin proteins$/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^sweetfin signature bowls$/i, /^sweetfin chicken bowls$/i, /^sweetbox \/ poke burrito$/i],
+        childCategoryPatterns: [/^sweetfin sauces$/i],
+        relationType: 'sauce_option',
+        groupName: 'Sauces',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^sweetfin signature bowls$/i, /^sweetfin chicken bowls$/i, /^sweetbox \/ poke burrito$/i],
+        childCategoryPatterns: [/^sweetfin bases$/i, /^premium add-ons$/i, /^add-ons crunchy$/i, /^add-ons herbs & spices$/i, /^sweetfin fruits & veggies$/i],
+        relationType: 'add_on',
+        groupName: 'Add-ons',
+        maxQuantity: 2,
+      },
+    ],
+  },
+  'QDOBA Mexican Eats': {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^signature eats/i, /^limited time offerings$/i],
+        childCategoryPatterns: [/^ingredients for entr/i, /^ingredients for kids items$/i],
+        childNamePatterns: [/chicken|steak|brisket|chorizo|shrimp|impossible|beef|pork/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^signature eats/i, /^limited time offerings$/i],
+        childCategoryPatterns: [/^ingredients for entr/i, /^ingredients for kids items$/i],
+        childNamePatterns: [/crema|vinaigrette|queso|guacamole|salsa|sauce/i],
+        relationType: 'sauce_option',
+        groupName: 'Sauces',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^signature eats/i, /^limited time offerings$/i],
+        childCategoryPatterns: [/^ingredients for entr/i, /^ingredients for kids items$/i],
+        childNamePatterns: [/beans|rice|cheese|lettuce|cilantro|tortilla|shell|fajita|jalapeno|pico|corn/i],
+        childExcludeNamePatterns: [/crema|vinaigrette|queso|guacamole|salsa|sauce/i],
+        relationType: 'add_on',
+        groupName: 'Bases & Toppings',
+        maxQuantity: 2,
+      },
+    ],
+  },
+  'QDOBA MEXICAN EATS': {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^signature eats/i, /^limited time offerings$/i],
+        childCategoryPatterns: [/^ingredients for entr/i, /^ingredients for kids items$/i],
+        childNamePatterns: [/chicken|steak|brisket|chorizo|shrimp|impossible|beef|pork/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^signature eats/i, /^limited time offerings$/i],
+        childCategoryPatterns: [/^ingredients for entr/i, /^ingredients for kids items$/i],
+        childNamePatterns: [/crema|vinaigrette|queso|guacamole|salsa|sauce/i],
+        relationType: 'sauce_option',
+        groupName: 'Sauces',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^signature eats/i, /^limited time offerings$/i],
+        childCategoryPatterns: [/^ingredients for entr/i, /^ingredients for kids items$/i],
+        childNamePatterns: [/beans|rice|cheese|lettuce|cilantro|tortilla|shell|fajita|jalapeno|pico|corn/i],
+        childExcludeNamePatterns: [/crema|vinaigrette|queso|guacamole|salsa|sauce/i],
+        relationType: 'add_on',
+        groupName: 'Bases & Toppings',
+        maxQuantity: 2,
+      },
+    ],
+  },
+  "Moe's Southwest Grill": {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^entree$/i],
+        childCategoryPatterns: [/^protein$/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^entree$/i],
+        childCategoryPatterns: [/^base$/i],
+        relationType: 'add_on',
+        groupName: 'Base Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^entree$/i],
+        childCategoryPatterns: [/^topping$/i, /^sides & desserts$/i],
+        relationType: 'add_on',
+        groupName: 'Toppings',
+        maxQuantity: 2,
+      },
+    ],
+  },
+  'El Pollo Loco': {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^curated bowls$/i, /^bowls$/i, /^burritos$/i, /^tacos$/i, /^tostadas & salads$/i],
+        childCategoryPatterns: [/^fire-grilled chicken$/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^curated bowls$/i, /^bowls$/i, /^burritos$/i, /^tacos$/i, /^tostadas & salads$/i],
+        childCategoryPatterns: [/^salsas$/i],
+        relationType: 'sauce_option',
+        groupName: 'Salsas',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^curated bowls$/i, /^bowls$/i, /^burritos$/i, /^tacos$/i, /^tostadas & salads$/i],
+        childCategoryPatterns: [/^sides & sauces$/i],
+        childNamePatterns: [/dressing|sauce|sour cream|guacamole|queso/i],
+        relationType: 'sauce_option',
+        groupName: 'Sauces',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^curated bowls$/i, /^bowls$/i, /^burritos$/i, /^tacos$/i, /^tostadas & salads$/i],
+        childCategoryPatterns: [/^sides & sauces$/i],
+        childExcludeNamePatterns: [/dressing|sauce|sour cream|guacamole|queso/i],
+        relationType: 'side_option',
+        groupName: 'Sides',
+        maxQuantity: 2,
+      },
+    ],
+  },
+  'Pollo Tropical': {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^kids bowls$/i],
+        childCategoryPatterns: [/^tropichop meats$/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^kids bowls$/i],
+        childCategoryPatterns: [/^tropichop rice and veggies$/i],
+        relationType: 'side_option',
+        groupName: 'Base Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^kids bowls$/i],
+        childCategoryPatterns: [/^tropichop toppings$/i],
+        relationType: 'add_on',
+        groupName: 'Toppings',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^kids bowls$/i, /^soups, salads, sandwiches & wraps$/i],
+        childCategoryPatterns: [/^condiments \/ salsa bar$/i],
+        relationType: 'sauce_option',
+        groupName: 'Sauces',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^kids bowls$/i],
+        childCategoryPatterns: [/^sides$/i],
+        relationType: 'side_option',
+        groupName: 'Sides',
+        maxQuantity: 2,
+      },
+    ],
+  },
+  'The Habit Burger & Grill': {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i, /^salads$/i],
+        childCategoryPatterns: [/^optional items$/i],
+        childNamePatterns: [/ahi tuna|beef patty|chicken breast|sirloin steak|veggie patty/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i, /^salads$/i],
+        childCategoryPatterns: [/^dressings & sauces$/i],
+        relationType: 'sauce_option',
+        groupName: 'Sauces',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i, /^salads$/i],
+        childCategoryPatterns: [/^optional items$/i],
+        childExcludeNamePatterns: [/ahi tuna|beef patty|chicken breast|sirloin steak|veggie patty/i],
+        relationType: 'add_on',
+        groupName: 'Toppings',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i],
+        childCategoryPatterns: [/^bread options$/i],
+        relationType: 'swap_candidate',
+        groupName: 'Bread Options',
+        maxQuantity: 1,
+      },
+      {
+        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i, /^salads$/i],
+        childCategoryPatterns: [/^sides$/i],
+        relationType: 'side_option',
+        groupName: 'Sides',
+        maxQuantity: 1,
+      },
+    ],
+  },
+  'Habit Burger & Grill': {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i, /^salads$/i],
+        childCategoryPatterns: [/^optional items$/i],
+        childNamePatterns: [/ahi tuna|beef patty|chicken breast|sirloin steak|veggie patty/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i, /^salads$/i],
+        childCategoryPatterns: [/^dressings & sauces$/i],
+        relationType: 'sauce_option',
+        groupName: 'Sauces',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i, /^salads$/i],
+        childCategoryPatterns: [/^optional items$/i],
+        childExcludeNamePatterns: [/ahi tuna|beef patty|chicken breast|sirloin steak|veggie patty/i],
+        relationType: 'add_on',
+        groupName: 'Toppings',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i],
+        childCategoryPatterns: [/^bread options$/i],
+        relationType: 'swap_candidate',
+        groupName: 'Bread Options',
+        maxQuantity: 1,
+      },
+      {
+        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i, /^salads$/i],
+        childCategoryPatterns: [/^sides$/i],
+        relationType: 'side_option',
+        groupName: 'Sides',
+        maxQuantity: 1,
+      },
+    ],
+  },
+  'Cheba Hut': {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^garlic herb bread nug size/i, /^garlic herb bread pinner size/i, /^garlic herb bread blunt size/i],
+        childCategoryPatterns: [/^sauces & dressings$/i],
+        relationType: 'sauce_option',
+        groupName: 'Sauces',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^garlic herb bread nug size/i, /^garlic herb bread pinner size/i, /^garlic herb bread blunt size/i],
+        childCategoryPatterns: [/^munchies & sides$/i],
+        relationType: 'side_option',
+        groupName: 'Sides',
+        maxQuantity: 1,
+      },
+    ],
+  },
+  Smashburger: {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^sandwiches$/i],
+        childCategoryPatterns: [/^proteins$/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^sandwiches$/i],
+        childCategoryPatterns: [/^cheese$/i],
+        relationType: 'add_on',
+        groupName: 'Cheese Options',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^sandwiches$/i],
+        childCategoryPatterns: [/^sauces$/i],
+        relationType: 'sauce_option',
+        groupName: 'Sauces',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^sandwiches$/i],
+        childCategoryPatterns: [/^toppings$/i],
+        relationType: 'add_on',
+        groupName: 'Toppings',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^sandwiches$/i],
+        childCategoryPatterns: [/^buns$/i],
+        relationType: 'swap_candidate',
+        groupName: 'Bun Options',
+        maxQuantity: 1,
+      },
+      {
+        mealCategoryPatterns: [/^sandwiches$/i],
+        childCategoryPatterns: [/^sides$/i],
+        relationType: 'side_option',
+        groupName: 'Sides',
+        maxQuantity: 1,
       },
     ],
   },

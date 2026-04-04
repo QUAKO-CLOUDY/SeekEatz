@@ -49,6 +49,12 @@ export const DISH_TAXONOMY: Record<string, { keywords: string[] }> = {
     },
     salads: {
         keywords: ['salad', 'salads']
+    },
+    smoothie: {
+        keywords: [
+            'smoothie', 'smoothies', 'shake', 'shakes',
+            'acai', 'pitaya', 'blend', 'blended'
+        ]
     }
 };
 

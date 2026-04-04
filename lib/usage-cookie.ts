@@ -1,131 +1,163 @@
+import { cookies, headers } from "next/headers";
+import { createHmac } from "crypto";
+import { createClient } from "@supabase/supabase-js";
+import { FREE_DAILY_QUERY_LIMIT } from "@/lib/entitlements";
 
-import { cookies, headers } from 'next/headers';
-import { createHmac } from 'crypto';
-import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase admin client if service key is available
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const serviceKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
 const supabase = createClient(supabaseUrl, serviceKey, {
-    auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-    }
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+  },
 });
 
-// Use a secure key if available, fallback to anon key or hardcoded string
-// In production, this should be a robust secret env var
-const SECRET_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'default-secret-key-do-not-use-in-prod';
-const COOKIE_NAME = 'usage_token';
-// Effectively disable the 3-use trial limit by setting a very high max usage.
-// Anonymous/guest users now have full access just like authenticated users.
-const MAX_USAGE = Number.MAX_SAFE_INTEGER;
+const SECRET_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  "default-secret-key-do-not-use-in-prod";
+const COOKIE_NAME = "usage_token";
 
 function sign(value: string) {
-    const hmac = createHmac('sha256', SECRET_KEY);
-    hmac.update(value);
-    return hmac.digest('hex');
+  const hmac = createHmac("sha256", SECRET_KEY);
+  hmac.update(value);
+  return hmac.digest("hex");
+}
+
+function getTodayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function encodeToken(dateKey: string, count: number) {
+  const payload = `${dateKey}:${count}`;
+  return `${payload}.${sign(payload)}`;
+}
+
+function decodeToken(token?: string | null): { dateKey: string; count: number } | null {
+  if (!token) {
+    return null;
+  }
+
+  const [payload, signature] = token.split(".");
+  if (!payload || !signature || sign(payload) !== signature) {
+    return null;
+  }
+
+  const [dateKey, countRaw] = payload.split(":");
+  const count = Number.parseInt(countRaw ?? "0", 10);
+  if (!dateKey || !Number.isFinite(count)) {
+    return null;
+  }
+
+  return { dateKey, count: Math.max(0, count) };
 }
 
 export async function getUsageCount(): Promise<number> {
-    const cookieStore = await cookies();
-    const token = cookieStore.get(COOKIE_NAME)?.value;
-    if (!token) return 0;
+  const cookieStore = await cookies();
+  const token = cookieStore.get(COOKIE_NAME)?.value;
+  const parsed = decodeToken(token);
+  if (!parsed || parsed.dateKey !== getTodayKey()) {
+    return 0;
+  }
 
-    const [countStr, signature] = token.split('.');
-    if (!countStr || !signature) return 0;
-
-    const expectedSignature = sign(countStr);
-    if (signature !== expectedSignature) return 0; // Invalid signature means tampering
-
-    return parseInt(countStr, 10) || 0;
+  return parsed.count;
 }
 
 async function getIpAddress(): Promise<string> {
-    const headersList = await headers();
-    const forwardedFor = headersList.get('x-forwarded-for');
-    if (forwardedFor) {
-        return forwardedFor.split(',')[0].trim();
-    }
-    return 'unknown';
+  const headersList = await headers();
+  const forwardedFor = headersList.get("x-forwarded-for");
+  if (forwardedFor) {
+    return forwardedFor.split(",")[0].trim();
+  }
+
+  return "unknown";
 }
 
 async function getIpUsage(ip: string): Promise<number> {
-    if (ip === 'unknown') return 0;
-    try {
-        const { data, error } = await supabase
-            .from('ip_usage')
-            .select('usage_count')
-            .eq('ip', ip)
-            .single();
+  if (ip === "unknown") {
+    return 0;
+  }
 
-        if (error) return 0;
-        return data?.usage_count || 0;
-    } catch (e) {
-        // Ignore errors (table missing, connection failed, etc.)
-        return 0;
+  try {
+    const { data, error } = await supabase
+      .from("ip_usage")
+      .select("usage_count, updated_at")
+      .eq("ip", ip)
+      .single();
+
+    if (error || !data) {
+      return 0;
     }
+
+    const lastUpdatedDate = String(data.updated_at ?? "").slice(0, 10);
+    if (lastUpdatedDate !== getTodayKey()) {
+      return 0;
+    }
+
+    return Number(data.usage_count ?? 0) || 0;
+  } catch {
+    return 0;
+  }
 }
 
 async function incrementIpUsage(ip: string): Promise<number> {
-    if (ip === 'unknown') return 0;
-    try {
-        // Upsert: increment if exists, insert 1 if not
-        // Note: This is a bit racy without an RPC or explicit transaction, but fine for MVP
-        // Better strategy: fetch, increment, upsert
-        const current = await getIpUsage(ip);
-        const next = current + 1;
+  if (ip === "unknown") {
+    return 0;
+  }
 
-        const { error } = await supabase
-            .from('ip_usage')
-            .upsert({ ip, usage_count: next, updated_at: new Date().toISOString() }, { onConflict: 'ip' });
+  try {
+    const current = await getIpUsage(ip);
+    const next = current + 1;
 
-        if (error) {
-            console.warn('IP usage tracking failed:', error.message);
-            return 0;
-        }
-        return next;
-    } catch (e) {
-        console.warn('IP usage tracking exception:', e);
-        return 0;
+    const { error } = await supabase
+      .from("ip_usage")
+      .upsert(
+        {
+          ip,
+          usage_count: next,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "ip" },
+      );
+
+    if (error) {
+      console.warn("IP usage tracking failed:", error.message);
+      return 0;
     }
+
+    return next;
+  } catch (error) {
+    console.warn("IP usage tracking exception:", error);
+    return 0;
+  }
 }
 
 export async function incrementUsageCount(): Promise<number> {
-    const currentCookie = await getUsageCount();
-    const headersList = await headers();
-    const ip = await getIpAddress();
+  const currentCookieCount = await getUsageCount();
+  const ip = await getIpAddress();
+  const nextCookieCount = currentCookieCount + 1;
+  const nextIpCount = await incrementIpUsage(ip);
+  const next = Math.max(nextCookieCount, nextIpCount);
+  const cookieStore = await cookies();
 
-    // Cookie increment
-    const nextCookie = currentCookie + 1;
+  cookieStore.set(COOKIE_NAME, encodeToken(getTodayKey(), next), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24 * 7,
+    path: "/",
+    sameSite: "lax",
+  });
 
-    // IP increment (fire and forget mostly, but we await to capture the strict limit)
-    const nextIp = await incrementIpUsage(ip);
-
-    // Use the maximum of cookie or IP usage
-    const next = Math.max(nextCookie, nextIp);
-
-    const signature = sign(next.toString());
-    const token = `${next}.${signature}`;
-
-    const cookieStore = await cookies();
-    cookieStore.set(COOKIE_NAME, token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 60 * 24 * 30, // 30 days
-        path: '/',
-        sameSite: 'lax',
-    });
-
-    return next;
+  return next;
 }
 
 export async function hasRemainingUsage(): Promise<boolean> {
-    // With MAX_USAGE set to a very high value, usage gating is effectively disabled.
-    // We keep this function for API compatibility, but it always returns true.
-    return true;
+  const currentCount = Math.max(await getUsageCount(), await getIpUsage(await getIpAddress()));
+  return currentCount < FREE_DAILY_QUERY_LIMIT;
 }
 
 export function getUsageLimit(): number {
-    return MAX_USAGE;
+  return FREE_DAILY_QUERY_LIMIT;
 }

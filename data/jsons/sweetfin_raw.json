@@ -1,690 +1,1446 @@
-
 {
     "restaurant_name": "Sweetfin",
     "items": [
-    {
-    "name": "Sweetbox",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 680,
-    "protein": 29,
-    "carbs": 51,
-    "fat": 41
-    }
-    },
-    {
-    "name": "Brain Booster Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 880,
-    "protein": 29,
-    "carbs": 46,
-    "fat": 70
-    }
-    },
-    {
-    "name": "Brain Booster Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 530,
-    "protein": 19,
-    "carbs": 27,
-    "fat": 41
-    }
-    },
-    {
-    "name": "Classic Tuna Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 520,
-    "protein": 33,
-    "carbs": 23,
-    "fat": 33
-    }
-    },
-    {
-    "name": "Classic Tuna Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 420,
-    "protein": 22,
-    "carbs": 20,
-    "fat": 29
-    }
-    },
-    {
-    "name": "Gochujang Salmon Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 440,
-    "protein": 27,
-    "carbs": 38,
-    "fat": 22
-    }
-    },
-    {
-    "name": "Gochujang Salmon Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 310,
-    "protein": 18,
-    "carbs": 26,
-    "fat": 16
-    }
-    },
-    {
-    "name": "Grasshopper",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 110,
-    "protein": 5,
-    "carbs": 11,
-    "fat": 5
-    }
-    },
-    {
-    "name": "Immunity Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 720,
-    "protein": 38,
-    "carbs": 97,
-    "fat": 19
-    }
-    },
-    {
-    "name": "Immunity Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 460,
-    "protein": 24,
-    "carbs": 65,
-    "fat": 11
-    }
-    },
-    {
-    "name": "Keto Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 750,
-    "protein": 33,
-    "carbs": 22,
-    "fat": 62
-    }
-    },
-    {
-    "name": "Keto Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 430,
-    "protein": 20,
-    "carbs": 13,
-    "fat": 35
-    }
-    },
-    {
-    "name": "Mango Albacore Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 450,
-    "protein": 35,
-    "carbs": 26,
-    "fat": 22
-    }
-    },
-    {
-    "name": "Mango Albacore Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 300,
-    "protein": 23,
-    "carbs": 17,
-    "fat": 15
-    }
-    },
-    {
-    "name": "Miso Eggplant & Mushroom Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 430,
-    "protein": 8,
-    "carbs": 33,
-    "fat": 32
-    }
-    },
-    {
-    "name": "Miso Eggplant & Mushroom Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 300,
-    "protein": 6,
-    "carbs": 22,
-    "fat": 22
-    }
-    },
-    {
-    "name": "Plant Protein Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 710,
-    "protein": 20,
-    "carbs": 113,
-    "fat": 22
-    }
-    },
-    {
-    "name": "Plant Protein Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 420,
-    "protein": 12,
-    "carbs": 69,
-    "fat": 12
-    }
-    },
-    {
-    "name": "Protein Power Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 900,
-    "protein": 42,
-    "carbs": 106,
-    "fat": 40
-    }
-    },
-    {
-    "name": "Protein Power Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 630,
-    "protein": 31,
-    "carbs": 75,
-    "fat": 27
-    }
-    },
-    {
-    "name": "Shiitake Chile Tofu Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 470,
-    "protein": 15,
-    "carbs": 15,
-    "fat": 39
-    }
-    },
-    {
-    "name": "Shiitake Chile Tofu Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 310,
-    "protein": 10,
-    "carbs": 11,
-    "fat": 25
-    }
-    },
-    {
-    "name": "Spicy Tuna Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 600,
-    "protein": 37,
-    "carbs": 22,
-    "fat": 41
-    }
-    },
-    {
-    "name": "Spicy Tuna Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 490,
-    "protein": 25,
-    "carbs": 20,
-    "fat": 35
-    }
-    },
-    {
-    "name": "Sriracha Tuna Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 700,
-    "protein": 38,
-    "carbs": 43,
-    "fat": 46
-    }
-    },
-    {
-    "name": "Sriracha Tuna Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 430,
-    "protein": 25,
-    "carbs": 28,
-    "fat": 27
-    }
-    },
-    {
-    "name": "Superfood Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 740,
-    "protein": 38,
-    "carbs": 86,
-    "fat": 27
-    }
-    },
-    {
-    "name": "Superfood Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 470,
-    "protein": 24,
-    "carbs": 54,
-    "fat": 18
-    }
-    },
-    {
-    "name": "Sweet Potato Ponzu Lime Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 360,
-    "protein": 9,
-    "carbs": 40,
-    "fat": 19
-    }
-    },
-    {
-    "name": "Sweet Potato Ponzu Lime Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 320,
-    "protein": 8,
-    "carbs": 30,
-    "fat": 19
-    }
-    },
-    {
-    "name": "Truffled Yuzu Albacore Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 590,
-    "protein": 33,
-    "carbs": 19,
-    "fat": 45
-    }
-    },
-    {
-    "name": "Truffled Yuzu Albacore Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 450,
-    "protein": 23,
-    "carbs": 17,
-    "fat": 34
-    }
-    },
-    {
-    "name": "Yuzu Salmon Bowl, Large",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 570,
-    "protein": 31,
-    "carbs": 21,
-    "fat": 41
-    }
-    },
-    {
-    "name": "Yuzu Salmon Bowl, Small",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 450,
-    "protein": 21,
-    "carbs": 18,
-    "fat": 34
-    }
-    },
-    {
-    "name": "Sesame Crunch Chicken Salad",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 790,
-    "protein": 35,
-    "carbs": 41,
-    "fat": 55
-    }
-    },
-    {
-    "name": "Cilantro Chopped Chicken Salad",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 520,
-    "protein": 30,
-    "carbs": 18,
-    "fat": 38
-    }
-    },
-    {
-    "name": "Spicy Chicken Rice Bowl",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 740,
-    "protein": 43,
-    "carbs": 101,
-    "fat": 20
-    }
-    },
-    {
-    "name": "Black Garlic Gochujang, Large",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 150,
-    "protein": 1,
-    "carbs": 7,
-    "fat": 14
-    }
-    },
-    {
-    "name": "Black Garlic Gochujang, Small",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 80,
-    "protein": 0,
-    "carbs": 3,
-    "fat": 7
-    }
-    },
-    {
-    "name": "Spicy Mayo, Large",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 130,
-    "protein": 1,
-    "carbs": 2,
-    "fat": 14
-    }
-    },
-    {
-    "name": "Spicy Mayo, Small",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 70,
-    "protein": 1,
-    "carbs": 1,
-    "fat": 7
-    }
-    },
-    {
-    "name": "Miso Sesame Shoyu, Large",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 100,
-    "protein": 0,
-    "carbs": 3,
-    "fat": 9
-    }
-    },
-    {
-    "name": "Miso Sesame Shoyu, Small",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 50,
-    "protein": 0,
-    "carbs": 2,
-    "fat": 5
-    }
-    },
-    {
-    "name": "Ponzu Lime, Large",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 35,
-    "protein": 0,
-    "carbs": 6,
-    "fat": 0
-    }
-    },
-    {
-    "name": "Ponzu Lime, Small",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 15,
-    "protein": 0,
-    "carbs": 3,
-    "fat": 0
-    }
-    },
-    {
-    "name": "Sriracha Ponzu, Large",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 60,
-    "protein": 1,
-    "carbs": 4,
-    "fat": 4
-    }
-    },
-    {
-    "name": "Sriracha Ponzu, Small",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 30,
-    "protein": 0,
-    "carbs": 2,
-    "fat": 2
-    }
-    },
-    {
-    "name": "Yuzu Kosho, Large",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 60,
-    "protein": 1,
-    "carbs": 2,
-    "fat": 5
-    }
-    },
-    {
-    "name": "Yuzu Kosho, Small",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 30,
-    "protein": 0,
-    "carbs": 1,
-    "fat": 3
-    }
-    },
-    {
-    "name": "Cilantro Lime Jalapeno Vinaigrette",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 130,
-    "protein": 0,
-    "carbs": 2,
-    "fat": 14
-    }
-    },
-    {
-    "name": "Sesame Mayo",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 150,
-    "protein": 0,
-    "carbs": 1,
-    "fat": 15
-    }
-    },
-    {
-    "name": "Garlic Lemongrass Ponzu",
-    "category": "Sauce",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 40,
-    "protein": 0,
-    "carbs": 7,
-    "fat": 0
-    }
-    },
-    {
-    "name": "Poke Burrito (High Range)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 990,
-    "protein": 27,
-    "carbs": 80,
-    "fat": 73
-    }
-    },
-    {
-    "name": "Poke Burrito (Low Range)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 850,
-    "protein": 18,
-    "carbs": 65,
-    "fat": 68
-    }
-    },
-    {
-    "name": "Poke Burrito (Signature)",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 910,
-    "protein": 29,
-    "carbs": 78,
-    "fat": 63
-    }
-    },
-    {
-    "name": "Sweetbox, Plant-based",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 530,
-    "protein": 11,
-    "carbs": 76,
-    "fat": 22
-    }
-    },
-    {
-    "name": "Sweetbox, Low Range",
-    "category": "Entree",
-    "price_estimate": null,
-    "image_url": null,
-    "macros": {
-    "calories": 440,
-    "protein": 8,
-    "carbs": 46,
-    "fat": 25
-    }
-    }
+      {
+        "name": "Sweetbox",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 680,
+          "protein": 29,
+          "carbs": 51,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Brain Booster Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 880,
+          "protein": 29,
+          "carbs": 46,
+          "fat": 70
+        }
+      },
+      {
+        "name": "Brain Booster Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 530,
+          "protein": 19,
+          "carbs": 27,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Classic Tuna Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 520,
+          "protein": 33,
+          "carbs": 23,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Classic Tuna Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 420,
+          "protein": 22,
+          "carbs": 20,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Gochujang Salmon Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 440,
+          "protein": 27,
+          "carbs": 38,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Gochujang Salmon Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 310,
+          "protein": 18,
+          "carbs": 26,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Grasshopper",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 5,
+          "carbs": 11,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Immunity Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 720,
+          "protein": 38,
+          "carbs": 97,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Immunity Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 460,
+          "protein": 24,
+          "carbs": 65,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Keto Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 750,
+          "protein": 33,
+          "carbs": 22,
+          "fat": 62
+        }
+      },
+      {
+        "name": "Keto Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 430,
+          "protein": 20,
+          "carbs": 13,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Lil Fish, Salmon",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 12,
+          "carbs": 6,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Lil Fish, Tuna",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 14,
+          "carbs": 6,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Mango Albacore Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 450,
+          "protein": 35,
+          "carbs": 26,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Mango Albacore Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 23,
+          "carbs": 17,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Miso Eggplant & Mushroom Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 430,
+          "protein": 8,
+          "carbs": 33,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Miso Eggplant & Mushroom Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 300,
+          "protein": 6,
+          "carbs": 22,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Plant Protein Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 710,
+          "protein": 20,
+          "carbs": 113,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Plant Protein Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 420,
+          "protein": 12,
+          "carbs": 69,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Protein Power Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 900,
+          "protein": 42,
+          "carbs": 106,
+          "fat": 40
+        }
+      },
+      {
+        "name": "Protein Power Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 630,
+          "protein": 31,
+          "carbs": 75,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Shiitake Chile Tofu Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 470,
+          "protein": 15,
+          "carbs": 15,
+          "fat": 39
+        }
+      },
+      {
+        "name": "Shiitake Chile Tofu Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 310,
+          "protein": 10,
+          "carbs": 11,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Spicy Tuna Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 600,
+          "protein": 37,
+          "carbs": 22,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Spicy Tuna Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 490,
+          "protein": 25,
+          "carbs": 20,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Sriracha Tuna Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 700,
+          "protein": 38,
+          "carbs": 43,
+          "fat": 46
+        }
+      },
+      {
+        "name": "Sriracha Tuna Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 430,
+          "protein": 25,
+          "carbs": 28,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Superfood Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 740,
+          "protein": 38,
+          "carbs": 86,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Superfood Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 470,
+          "protein": 24,
+          "carbs": 54,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Sweet Potato Ponzu Lime Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 360,
+          "protein": 9,
+          "carbs": 40,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Sweet Potato Ponzu Lime Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 320,
+          "protein": 8,
+          "carbs": 30,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Truffled Yuzu Albacore Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 590,
+          "protein": 33,
+          "carbs": 19,
+          "fat": 45
+        }
+      },
+      {
+        "name": "Truffled Yuzu Albacore Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 450,
+          "protein": 23,
+          "carbs": 17,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Yuzu Salmon Bowl, Large",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 570,
+          "protein": 31,
+          "carbs": 21,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Yuzu Salmon Bowl, Small",
+        "category": "Sweetfin Signature Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 450,
+          "protein": 21,
+          "carbs": 18,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Sesame Crunch Chicken Salad",
+        "category": "Sweetfin Chicken Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 790,
+          "protein": 35,
+          "carbs": 41,
+          "fat": 55
+        }
+      },
+      {
+        "name": "Cilantro Chopped Chicken Salad",
+        "category": "Sweetfin Chicken Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 520,
+          "protein": 30,
+          "carbs": 18,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Spicy Chicken Rice Bowl",
+        "category": "Sweetfin Chicken Bowls",
+        "price_estimate": null,
+        "macros": {
+          "calories": 740,
+          "protein": 43,
+          "carbs": 101,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Albacore Tuna, Large",
+        "category": "Sweetfin Proteins",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 28,
+          "carbs": 0,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Albacore Tuna, Small",
+        "category": "Sweetfin Proteins",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 17,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Salmon, Large",
+        "category": "Sweetfin Proteins",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 23,
+          "carbs": 0,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Salmon, Small",
+        "category": "Sweetfin Proteins",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 14,
+          "carbs": 0,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Shrimp, Large",
+        "category": "Sweetfin Proteins",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 26,
+          "carbs": 2,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Shrimp, Small",
+        "category": "Sweetfin Proteins",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 16,
+          "carbs": 1,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Tofu, Large",
+        "category": "Sweetfin Proteins",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 10,
+          "carbs": 4,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Tofu, Small",
+        "category": "Sweetfin Proteins",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 6,
+          "carbs": 2,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Vegetable Poke, Large",
+        "category": "Sweetfin Proteins",
+        "price_estimate": null,
+        "macros": {
+          "calories": 180,
+          "protein": 6,
+          "carbs": 24,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Vegetable Poke, Small",
+        "category": "Sweetfin Proteins",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 4,
+          "carbs": 14,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Yellowfin Tuna, Large",
+        "category": "Sweetfin Proteins",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 28,
+          "carbs": 0,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Yellowfin Tuna, Small",
+        "category": "Sweetfin Proteins",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 17,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Chicken, Large",
+        "category": "Sweetfin Proteins",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 27,
+          "carbs": 0,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Chicken, Small",
+        "category": "Sweetfin Proteins",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 17,
+          "carbs": 0,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Bamboo Rice, Large",
+        "category": "Sweetfin Bases",
+        "price_estimate": null,
+        "macros": {
+          "calories": 290,
+          "protein": 5,
+          "carbs": 65,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Bamboo Rice, Small",
+        "category": "Sweetfin Bases",
+        "price_estimate": null,
+        "macros": {
+          "calories": 220,
+          "protein": 4,
+          "carbs": 49,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Cauliflower Rice, Large",
+        "category": "Sweetfin Bases",
+        "price_estimate": null,
+        "macros": {
+          "calories": 120,
+          "protein": 4,
+          "carbs": 9,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Cauliflower Rice, Small",
+        "category": "Sweetfin Bases",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 2,
+          "carbs": 6,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Citrus Kale Salad, Large",
+        "category": "Sweetfin Bases",
+        "price_estimate": null,
+        "macros": {
+          "calories": 60,
+          "protein": 2,
+          "carbs": 6,
+          "fat": 3.5
+        }
+      },
+      {
+        "name": "Citrus Kale Salad, Small",
+        "category": "Sweetfin Bases",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 1,
+          "carbs": 3,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Forbidden Rice, Large",
+        "category": "Sweetfin Bases",
+        "price_estimate": null,
+        "macros": {
+          "calories": 340,
+          "protein": 10,
+          "carbs": 73,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Forbidden Rice, Small",
+        "category": "Sweetfin Bases",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 8,
+          "carbs": 55,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Kelp Noodle Slaw, Large",
+        "category": "Sweetfin Bases",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 2,
+          "carbs": 10,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Kelp Noodle Slaw, Small",
+        "category": "Sweetfin Bases",
+        "price_estimate": null,
+        "macros": {
+          "calories": 90,
+          "protein": 1,
+          "carbs": 7,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Black Garlic Gochujang, Large",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 1,
+          "carbs": 7,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Black Garlic Gochujang, Small",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Spicy Mayo, Large",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Spicy Mayo, Small",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Miso Sesame Shoyu, Large",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Miso Sesame Shoyu, Small",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 4.5
+        }
+      },
+      {
+        "name": "Ponzu Lime, Large",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 0,
+          "carbs": 6,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Ponzu Lime, Small",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sriracha Ponzu, Large",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 60,
+          "protein": 1,
+          "carbs": 4,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Sriracha Ponzu, Small",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Yuzu Kosho, Large",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 60,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Yuzu Kosho, Small",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Cilantro Lime Jalapeno Vinaigrette",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Sesame Mayo",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Garlic Lemongrass Ponzu",
+        "category": "Sweetfin Sauces",
+        "price_estimate": null,
+        "macros": {
+          "calories": 40,
+          "protein": 0,
+          "carbs": 7,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Almonds",
+        "category": "PREMIUM ADD-ONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 3,
+          "carbs": 3,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Asparagus",
+        "category": "PREMIUM ADD-ONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 3.5
+        }
+      },
+      {
+        "name": "Avocado",
+        "category": "PREMIUM ADD-ONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 1,
+          "carbs": 4,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Blistered Shishito",
+        "category": "PREMIUM ADD-ONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Cashews",
+        "category": "PREMIUM ADD-ONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 3,
+          "carbs": 6,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Macadamia Nuts",
+        "category": "PREMIUM ADD-ONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 60,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Kimchee",
+        "category": "PREMIUM ADD-ONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Pickled Shiitakes",
+        "category": "PREMIUM ADD-ONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Wasabi Tobiko",
+        "category": "PREMIUM ADD-ONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 2,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "White Truffle Oil",
+        "category": "PREMIUM ADD-ONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 45,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Crispy Garlic",
+        "category": "ADD-ONS CRUNCHY",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 1,
+          "carbs": 4,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Crispy Onion",
+        "category": "ADD-ONS CRUNCHY",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Wasabi Furikake",
+        "category": "ADD-ONS CRUNCHY",
+        "price_estimate": null,
+        "macros": {
+          "calories": 25,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Wasabi Peas",
+        "category": "ADD-ONS CRUNCHY",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 1,
+          "carbs": 5,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Wasabi Toasted Coconut",
+        "category": "ADD-ONS CRUNCHY",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Charred Habanero",
+        "category": "ADD-ONS HERBS & SPICES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Chile Oil",
+        "category": "ADD-ONS HERBS & SPICES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Chopped Serrano",
+        "category": "ADD-ONS HERBS & SPICES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Cilantro",
+        "category": "ADD-ONS HERBS & SPICES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Daikon Sprouts",
+        "category": "ADD-ONS HERBS & SPICES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Hijiki",
+        "category": "ADD-ONS HERBS & SPICES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sliced Jalapenos",
+        "category": "ADD-ONS HERBS & SPICES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Pickled Fresno",
+        "category": "ADD-ONS HERBS & SPICES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Shiso",
+        "category": "ADD-ONS HERBS & SPICES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Wasabi Drizzle",
+        "category": "ADD-ONS HERBS & SPICES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 25,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Bean Sprouts, Large",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Bean Sprouts, Small",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Carrots, Large",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Carrots, Small",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Chile Marinated Oranges, Large",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 1,
+          "carbs": 7,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Chile Marinated Oranges, Small",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Chopped Kale, Large",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Cucumber, Large",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Edamame, Large",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 4,
+          "carbs": 3,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Edamame, Small",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 2,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Japanese Eggplant, Large",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Jicama, Large",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Mango, Large",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Mango, Small",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 3,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Rapini, Large",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 40,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Seaweed Salad, Large",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Shimeji Mushrooms, Large",
+        "category": "SWEETFIN FRUITS & VEGGIES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Poke Burrito (Signature)",
+        "category": "SWEETBOX / POKE BURRITO",
+        "price_estimate": null,
+        "macros": {
+          "calories": 910,
+          "protein": 29,
+          "carbs": 78,
+          "fat": 63
+        }
+      },
+      {
+        "name": "Sweetbox Option: Gochujang Salmon",
+        "category": "SWEETBOX / POKE BURRITO",
+        "price_estimate": null,
+        "macros": {
+          "calories": 180,
+          "protein": 10,
+          "carbs": 5,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Sweetbox Option: Spicy Tuna",
+        "category": "SWEETBOX / POKE BURRITO",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 13,
+          "carbs": 7,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Guava Lemonade",
+        "category": "SWEETFIN MISC",
+        "price_estimate": null,
+        "macros": {
+          "calories": 30,
+          "protein": 0,
+          "carbs": 48,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Matcha Pop",
+        "category": "SWEETFIN MISC",
+        "price_estimate": null,
+        "macros": {
+          "calories": 480,
+          "protein": 7,
+          "carbs": 57,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Taro Chips",
+        "category": "SWEETFIN MISC",
+        "price_estimate": null,
+        "macros": {
+          "calories": 138,
+          "protein": 1,
+          "carbs": 18,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Chile Ginger Noodles",
+        "category": "SIDES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 2,
+          "carbs": 25,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Citrus Kale Salad",
+        "category": "SIDES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 9,
+          "carbs": 12,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Kelp Noodle Slaw",
+        "category": "SIDES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 2,
+          "carbs": 8,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Seaweed Salad",
+        "category": "SIDES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 1,
+          "carbs": 20,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Spicy Cucumber Salad",
+        "category": "SIDES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 2,
+          "carbs": 21,
+          "fat": 9
+        }
+      }
     ]
-    }
+  }

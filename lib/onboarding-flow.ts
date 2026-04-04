@@ -1,4 +1,4 @@
-export type SubscriptionTier = 'free' | 'premium';
+export type SubscriptionTier = 'free' | 'premium' | 'lifetime';
 
 export const GUEST_QUERY_LIMIT = 2;
 export const FREE_ACCOUNT_DAILY_QUERY_LIMIT = 3;
@@ -118,7 +118,11 @@ export function getSubscriptionTier(): SubscriptionTier {
   }
 
   const stored = window.localStorage.getItem(SUBSCRIPTION_TIER_KEY);
-  return stored === 'premium' ? 'premium' : 'free';
+  if (stored === 'premium' || stored === 'lifetime') {
+    return stored;
+  }
+
+  return 'free';
 }
 
 export function setSubscriptionTier(tier: SubscriptionTier) {

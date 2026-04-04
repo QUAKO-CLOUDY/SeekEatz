@@ -40,7 +40,7 @@ export default function CTASection() {
                     Join thousands of people eating smarter with AI-powered restaurant
                     recommendations.
                 </p>
-                <Link href="/chat">
+                <Link href="/upgrade">
                     <Button
                         size="lg"
                         className="rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white px-10 py-6 text-lg font-bold shadow-2xl shadow-cyan-500/30 hover:shadow-cyan-500/40 transition-all hover:-translate-y-0.5"

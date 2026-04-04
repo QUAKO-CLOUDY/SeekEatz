@@ -5,7 +5,7 @@ import { Search, Loader2, MapPin } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { MealCard } from "./MealCard";
 import type { UserProfile, Meal } from "../types";
-import { getMealImageUrl } from "@/lib/image-utils";
+import { getRestaurantLogoUrl } from "@/lib/image-utils";
 import { useSessionActivity } from "../hooks/useSessionActivity";
 import { normalizeMacros } from "@/lib/macro-utils";
 import { canUseFeature, incrementUsage } from "@/lib/usage-gate";
@@ -88,12 +88,58 @@ type SearchMealsResponse = {
   searchKey?: string;
   hasMore?: boolean;
   nextOffset?: number;
+  message?: string;
+};
+
+  type ApiMealResult = {
+    id?: string;
+    item_name?: string;
+    name?: string;
+    restaurant_name?: string;
+    category?: string;
+    restaurantLogoUrl?: string;
+    restaurant_logo_url?: string;
+    logo_url?: string;
+  macros?: unknown;
+  calories?: number;
+  protein?: number;
+  protein_g?: number;
+  carbs?: number;
+  carbs_g?: number;
+  fats?: number;
+  fat?: number;
+  fats_g?: number;
+  fat_g?: number;
+  price?: number | null;
+  price_estimate?: number | null;
+  description?: string;
+  dietary_tags?: string[];
+  tags?: string[];
+  rating?: number;
+  distance?: number;
+};
+
+type SearchApiResponse = {
+  meals?: ApiMealResult[];
+  results?: ApiMealResult[];
+  searchKey?: string;
+  hasMore?: boolean;
+  nextOffset?: number;
+  message?: string;
+  usageLimit?: boolean;
 };
 
 const NO_MORE_MEALS_MESSAGE =
   "There are no more meals that fit these constraints in our database. Please change the restrictions to get access to more mealcards.";
-const HOME_MEALS_PAGE_SIZE = 5;
+const HOME_MEALS_PAGE_SIZE = 4;
 const APPENDED_MEALS_DIVIDER_LABEL = "More meals";
+const DEFAULT_HOME_DISTANCE_MILES = 10;
+const DEFAULT_HOME_MACRO_ENABLED: Record<MacroType, boolean> = {
+  calories: true,
+  protein: false,
+  carbs: false,
+  fats: false,
+};
 
 export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite, loggedMeals = [] }: Props) {
   const { updateActivity } = useSessionActivity();
@@ -173,25 +219,25 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     };
   });
 
-  // Initialize enabled state for each macro filter (all enabled by default)
+  // Default to calories only. Daily macro targets are too strict as implicit single-meal filters.
   const [macroEnabled, setMacroEnabled] = useState<Record<MacroType, boolean>>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('seekeatz_macro_enabled');
       if (saved) {
         try {
-          return JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          return {
+            calories: parsed.calories !== false,
+            protein: parsed.protein === true,
+            carbs: parsed.carbs === true,
+            fats: parsed.fats === true,
+          };
         } catch (e) {
           console.error('Failed to parse saved macro enabled state:', e);
         }
       }
     }
-    // Default to all enabled
-    return {
-      calories: true,
-      protein: true,
-      carbs: true,
-      fats: true,
-    };
+    return DEFAULT_HOME_MACRO_ENABLED;
   });
 
   // State for which popover is open
@@ -329,8 +375,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     return null;
   });
 
-  // Get active distance: Home override if set, otherwise Settings default, otherwise 1 mile
-  const activeDistance = homeDistanceOverride ?? userProfile.search_distance_miles ?? 1;
+  // Keep home aligned with the rest of the app when the profile distance is missing.
+  const activeDistance = homeDistanceOverride ?? userProfile.search_distance_miles ?? DEFAULT_HOME_DISTANCE_MILES;
 
   const config = MACRO_CONFIG[macro];
   const currentValue = macroValues[macro];
@@ -382,7 +428,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
 
   // Convert API result to Meal type
   // API returns meals with normalized macros: calories, protein, carbs, fats
-  const convertToMeal = (item: any): Meal => {
+  const convertToMeal = (item: ApiMealResult): Meal => {
     const category = item.category === 'Grocery' || item.category === 'Hot Bar' 
       ? 'grocery' as const 
       : 'restaurant' as const;
@@ -390,11 +436,9 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     const mealName = item.item_name || item.name || 'Unknown Item';
     const restaurantName = item.restaurant_name || 'Unknown Restaurant';
     
-    // Use getMealImageUrl to ensure we always have a real food image
-    const imageUrl = getMealImageUrl(
-      mealName,
+    const imageUrl = getRestaurantLogoUrl(
       restaurantName,
-      item.image_url || item.image
+      item.restaurantLogoUrl || item.restaurant_logo_url || item.logo_url
     );
 
     // Normalize macros from API response
@@ -426,7 +470,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       fats,
       macros: normalizedMacros || undefined, // Include normalized macros object if available
       image: imageUrl,
-      price: item.price ?? item.price_estimate ?? null,
+      restaurantLogoUrl: imageUrl,
+      price: item.price ?? item.price_estimate ?? undefined,
       description: item.description || '',
       category: category,
       dietary_tags: item.dietary_tags || item.tags || [],
@@ -450,7 +495,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
 
   // Diet filtering removed - all diet logic disabled
   // This function is kept for compatibility but returns meals unchanged
-  const filterMealsByProfile = (meals: Meal[], profile: UserProfile): Meal[] => {
+  const filterMealsByProfile = (meals: Meal[], _profile: UserProfile): Meal[] => {
     // All diet filtering removed - return meals unchanged
     return meals;
   };
@@ -462,6 +507,18 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       ? { latitude: stored.latitude, longitude: stored.longitude }
       : null;
   });
+
+  const buildEmptyStateMessage = (distance: number, constraintSummary?: string): string => {
+    if (constraintSummary) {
+      return userLocation
+        ? `No meals found for ${constraintSummary} within ${distance} ${distance === 1 ? 'mile' : 'miles'}. Try relaxing your macros or increasing the radius.`
+        : `No meals found for ${constraintSummary}. Enable location or relax your macros.`;
+    }
+
+    return userLocation
+      ? `No meals found within ${distance} ${distance === 1 ? 'mile' : 'miles'}. Try increasing the radius.`
+      : 'No meals found. Enable location or adjust your search filters.';
+  };
 
   // Request user location on mount
   useEffect(() => {
@@ -485,8 +542,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   const searchMeals = async (
     query: string, 
     distance?: number, 
-    append = false,
-    constraints: any = undefined, // Legacy parameter (deprecated)
+    _append = false,
+    constraints: unknown = undefined, // Legacy parameter (deprecated)
     searchKey?: string,
     nextOffset?: number,
     filters?: {
@@ -520,12 +577,18 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query,
+          ...(distance ? { radius_miles: distance } : {}),
+          ...(userLocation ? { location: 'near me' } : {}),
           filters: filters,
           macroFilters: macroFilters || undefined,
           calorieMode: calorieMode || undefined,
           isHomepage: true,
           limit: 20,
           ...(searchKey ? { searchKey, isPagination: true, offset: nextOffset ?? 0 } : {}),
+          ...(userLocation ? {
+            user_location_lat: userLocation.latitude,
+            user_location_lng: userLocation.longitude,
+          } : {}),
           userContext: {
             ...(distance ? { search_distance_miles: distance } : {}),
             ...(userProfile?.diet_type ? { diet_type: userProfile.diet_type } : {}),
@@ -540,24 +603,29 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       });
 
       clearTimeout(timeoutId);
-      let data: any;
+      let data: SearchApiResponse | ApiMealResult[];
       try {
         data = await res.json();
-      } catch (_) {
+      } catch {
         throw new Error('Invalid response');
       }
 
       if (!res.ok) {
         console.error('Search API error:', res.status, data);
-        const message = (data && typeof data === 'object' && data.message) ? String(data.message) : null;
+        const message = !Array.isArray(data) && data?.message ? String(data.message) : null;
         if (res.status === 504) throw new Error(message || 'Request timed out. Please try again.');
-        if (res.status === 403 && (data as any)?.usageLimit) throw new Error(message || 'You\'ve reached the free usage limit. Sign up to continue.');
+        if (res.status === 403 && !Array.isArray(data) && data?.usageLimit) {
+          const usageError = new Error(message || "You've reached your free usage limit for today.");
+          (usageError as Error & { usageLimit?: boolean }).usageLimit = true;
+          throw usageError;
+        }
         throw new Error(message || 'Search failed. Please try again.');
       }
       
-      let normalizedResults: any[] = [];
+      let normalizedResults: ApiMealResult[] = [];
       let responseSearchKey: string | undefined;
       let hasMore: boolean = false;
+      const responseMessage = !Array.isArray(data) && typeof data?.message === 'string' ? data.message : undefined;
       
       if (Array.isArray(data)) {
         normalizedResults = data;
@@ -584,6 +652,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         searchKey: responseSearchKey,
         hasMore,
         nextOffset: typeof data?.nextOffset === 'number' ? data.nextOffset : undefined,
+        message: responseMessage,
       };
     } catch (error) {
       clearTimeout(timeoutId);
@@ -608,6 +677,9 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         new Promise<boolean>((resolve) => setTimeout(() => resolve(true), 8000)),
       ]);
       if (!canUse) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('seekeatz_force_upgrade_modal', 'true');
+        }
         router.push('/chat');
         return;
       }
@@ -711,6 +783,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       const searchParams = {
         macroValues: { ...macroValues },
         macroDirections: { ...macroDirections },
+        macroEnabled: { ...macroEnabled },
         selectedCuisine,
         distance: activeDistance,
         searchKey: mealsResult.searchKey,
@@ -724,12 +797,27 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         localStorage.setItem('seekeatz_last_search_params', JSON.stringify(searchParams));
       }
 
+      if (newMeals.length === 0) {
+        setSearchError(
+          mealsResult.message ||
+          buildEmptyStateMessage(activeDistance, resultsConstraintSummary || undefined)
+        );
+      }
+
       setTimeout(() => {
         mealsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
     } catch (err) {
       console.error('Find meals error:', err);
       setRecommendedMeals([]);
+      if (err instanceof Error && (err as Error & { usageLimit?: boolean }).usageLimit) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('seekeatz_force_upgrade_modal', 'true');
+        }
+        router.push('/chat');
+        return;
+      }
+
       const message = err instanceof Error && err.message === 'timeout'
         ? 'Request timed out. Please try again.'
         : 'Search failed. Please try again.';
@@ -1167,6 +1255,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           type="button"
           onClick={handleFindMeals}
           disabled={isLoadingMeals}
+          data-tutorial-target="home-find-meals"
           whileHover={!isLoadingMeals ? { scale: 1.02 } : {}}
           whileTap={!isLoadingMeals ? { scale: 0.98 } : {}}
           className="mt-4 sm:mt-5 w-full max-w-md mx-auto h-12 sm:h-14 rounded-2xl bg-gradient-to-r from-[#3A8BFF] to-[#4DDDF9] text-white text-sm sm:text-base font-semibold flex items-center justify-center gap-2 shadow-lg shadow-[#3A8BFF]/30 hover:shadow-[#3A8BFF]/40 hover:opacity-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1292,7 +1381,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           ) : (
             <div className="text-center py-12 px-4 pb-24" style={{ paddingBottom: `calc(3rem + env(safe-area-inset-bottom, 0px))` }}>
               <p className="text-muted-foreground">
-                No meals found within {activeDistance} {activeDistance === 1 ? 'mile' : 'miles'}. Try adjusting your distance or macros.
+                {searchError ?? buildEmptyStateMessage(activeDistance, resultsConstraintSummary || undefined)}
               </p>
             </div>
           )}

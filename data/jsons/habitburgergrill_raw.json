@@ -1,569 +1,1094 @@
 {
-    "restaurant_name": "The Habit Burger & Grill",
+    "restaurant_name": "Habit Burger & Grill",
     "items": [
-        {
-            "name": "Charburger On Seeded Bun",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 500,
-                "protein": 21,
-                "carbs": 32,
-                "fat": 31
-            }
-        },
-        {
-            "name": "Double Charburger On Seeded Bun",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 730,
-                "protein": 37,
-                "carbs": 32,
-                "fat": 49
-            }
-        },
-        {
-            "name": "Teriyaki Char",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 570,
-                "protein": 22,
-                "carbs": 47,
-                "fat": 31
-            }
-        },
-        {
-            "name": "BBQ Bacon Char",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 630,
-                "protein": 27,
-                "carbs": 44,
-                "fat": 37
-            }
-        },
-        {
-            "name": "Portabella Char",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 760,
-                "protein": 24,
-                "carbs": 36,
-                "fat": 56
-            }
-        },
-        {
-            "name": "Santa Barbara Char",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 1210,
-                "protein": 48,
-                "carbs": 48,
-                "fat": 93
-            }
-        },
-        {
-            "name": "Lettuce Wrap Charburger",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 350,
-                "protein": 17,
-                "carbs": 6,
-                "fat": 29
-            }
-        },
-        {
-            "name": "Chicken Sandwich On Ciabatta",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 910,
-                "protein": 45,
-                "carbs": 59,
-                "fat": 57
-            }
-        },
-        {
-            "name": "Chicken Club On Sourdough",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 880,
-                "protein": 47,
-                "carbs": 43,
-                "fat": 59
-            }
-        },
-        {
-            "name": "Ahi Tuna Filet On Seeded Bun",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 430,
-                "protein": 32,
-                "carbs": 45,
-                "fat": 12
-            }
-        },
-        {
-            "name": "Sirloin Steak Sandwich On Ciabatta",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 900,
-                "protein": 38,
-                "carbs": 68,
-                "fat": 58
-            }
-        },
-        {
-            "name": "Crispy Chicken Sandwich On Ciabatta",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 1030,
-                "protein": 36,
-                "carbs": 91,
-                "fat": 60
-            }
-        },
-        {
-            "name": "Veggie Burger On Wheat Bun",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 550,
-                "protein": 21,
-                "carbs": 53,
-                "fat": 30
-            }
-        },
-        {
-            "name": "Garden Ranch Salad",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 410,
-                "protein": 11,
-                "carbs": 21,
-                "fat": 33
-            }
-        },
-        {
-            "name": "Grilled Chicken Caesar",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 610,
-                "protein": 44,
-                "carbs": 28,
-                "fat": 35
-            }
-        },
-        {
-            "name": "Harvest Chopped",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 650,
-                "protein": 38,
-                "carbs": 36,
-                "fat": 39
-            }
-        },
-        {
-            "name": "Mango Miso Crunch",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 650,
-                "protein": 34,
-                "carbs": 40,
-                "fat": 37
-            }
-        },
-        {
-            "name": "Santa Barbara Cobb",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 820,
-                "protein": 50,
-                "carbs": 18,
-                "fat": 62
-            }
-        },
-        {
-            "name": "Crispy Chicken Bite With 2.4 Oz Of Fries",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 380,
-                "protein": 17,
-                "carbs": 51,
-                "fat": 11
-            }
-        },
-        {
-            "name": "Crispy Chicken Bites (5pc)",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 240,
-                "protein": 21,
-                "carbs": 23,
-                "fat": 8
-            }
-        },
-        {
-            "name": "Crispy Chicken Bites (10pc)",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 480,
-                "protein": 43,
-                "carbs": 45,
-                "fat": 15
-            }
-        },
-        {
-            "name": "Charburger With 2.4 Oz Of Fries",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 620,
-                "protein": 22,
-                "carbs": 59,
-                "fat": 32
-            }
-        },
-        {
-            "name": "Grilled Cheese With 2.4 Oz Of Fries",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 690,
-                "protein": 16,
-                "carbs": 58,
-                "fat": 45
-            }
-        },
-        {
-            "name": "Avocado Ranch (2 Oz)",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 190,
-                "protein": 1,
-                "carbs": 2,
-                "fat": 21
-            }
-        },
-        {
-            "name": "Classic Ranch (2 Oz)",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 200,
-                "protein": 1,
-                "carbs": 1,
-                "fat": 23
-            }
-        },
-        {
-            "name": "Spicy Ranch (2 Oz)",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 170,
-                "protein": 1,
-                "carbs": 2,
-                "fat": 19
-            }
-        },
-        {
-            "name": "Fuji Apple Cider Vinaigrette (2 Oz)",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 180,
-                "protein": 0,
-                "carbs": 12,
-                "fat": 14
-            }
-        },
-        {
-            "name": "Lemon Caesar Dressing (2 Oz)",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 150,
-                "protein": 1,
-                "carbs": 1,
-                "fat": 14
-            }
-        },
-        {
-            "name": "Miso Ginger Dressing (2 Oz)",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 260,
-                "protein": 7,
-                "carbs": 12,
-                "fat": 21
-            }
-        },
-        {
-            "name": "House Dressing (2 Oz)",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 280,
-                "protein": 0,
-                "carbs": 8,
-                "fat": 28
-            }
-        },
-        {
-            "name": "Red Vinaigrette (2 Oz)",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 260,
-                "protein": 0,
-                "carbs": 2,
-                "fat": 28
-            }
-        },
-        {
-            "name": "Roasted Garlic Aioli (1 Oz)",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 170,
-                "protein": 0,
-                "carbs": 1,
-                "fat": 19
-            }
-        },
-        {
-            "name": "Spicy Red Pepper Sauce (1 Oz)",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 150,
-                "protein": 0,
-                "carbs": 2,
-                "fat": 16
-            }
-        },
-        {
-            "name": "Sweet Mustard (Vegan) (1 Oz)",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 160,
-                "protein": 0,
-                "carbs": 7,
-                "fat": 15
-            }
-        },
-        {
-            "name": "Tartar (1 Oz)",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 140,
-                "protein": 0,
-                "carbs": 2,
-                "fat": 14
-            }
-        },
-        {
-            "name": "1000 Island (2 Oz)",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 250,
-                "protein": 0,
-                "carbs": 8,
-                "fat": 23
-            }
-        },
-        {
-            "name": "Ahi Tuna",
-            "category": "Protein",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 120,
-                "protein": 26,
-                "carbs": 0,
-                "fat": 1.5
-            }
-        },
-        {
-            "name": "Beef Patty",
-            "category": "Protein",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 230,
-                "protein": 16,
-                "carbs": 0,
-                "fat": 18
-            }
-        },
-        {
-            "name": "Chicken Breast",
-            "category": "Protein",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 220,
-                "protein": 29,
-                "carbs": 2,
-                "fat": 10
-            }
-        },
-        {
-            "name": "Crispy Chicken Filet",
-            "category": "Protein",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 300,
-                "protein": 23,
-                "carbs": 34,
-                "fat": 8
-            }
-        },
-        {
-            "name": "Sirloin Steak",
-            "category": "Protein",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 180,
-                "protein": 23,
-                "carbs": 4,
-                "fat": 9
-            }
-        },
-        {
-            "name": "Veggie Patty",
-            "category": "Protein",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 170,
-                "protein": 14,
-                "carbs": 16,
-                "fat": 6
-            }
-        },
-        {
-            "name": "Avocado Half",
-            "category": "Topping",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 110,
-                "protein": 1,
-                "carbs": 6,
-                "fat": 10
-            }
-        },
-        {
-            "name": "Pecan Nut Mix",
-            "category": "Topping",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 110,
-                "protein": 2,
-                "carbs": 10,
-                "fat": 8
-            }
-        },
-        {
-            "name": "Margarine (2 Tsp)",
-            "category": "Topping",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 120,
-                "protein": 0,
-                "carbs": 0,
-                "fat": 14
-            }
-        },
-        {
-            "name": "Portabella Mushrooms (2 Oz)",
-            "category": "Topping",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 140,
-                "protein": 1,
-                "carbs": 2,
-                "fat": 14
-            }
-        },
-        {
-            "name": "Wonton Almond Mix",
-            "category": "Topping",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 110,
-                "protein": 3,
-                "carbs": 9,
-                "fat": 7
-            }
+      {
+        "name": "Charburger",
+        "category": "CHARBURGERS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 480,
+          "protein": 21,
+          "carbs": 43,
+          "fat": 24
         }
+      },
+      {
+        "name": "Charburger with Cheese",
+        "category": "CHARBURGERS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 540,
+          "protein": 24,
+          "carbs": 45,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Double Charburger",
+        "category": "CHARBURGERS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 630,
+          "protein": 34,
+          "carbs": 44,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Double Char with Cheese",
+        "category": "CHARBURGERS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 750,
+          "protein": 41,
+          "carbs": 47,
+          "fat": 43
+        }
+      },
+      {
+        "name": "Teriyaki Char",
+        "category": "CHARBURGERS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 580,
+          "protein": 25,
+          "carbs": 53,
+          "fat": 29
+        }
+      },
+      {
+        "name": "BBQ Bacon Char",
+        "category": "CHARBURGERS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 650,
+          "protein": 29,
+          "carbs": 51,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Portabella Char",
+        "category": "CHARBURGERS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 700,
+          "protein": 25,
+          "carbs": 47,
+          "fat": 46
+        }
+      },
+      {
+        "name": "Santa Barbara Char",
+        "category": "CHARBURGERS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 1070,
+          "protein": 45,
+          "carbs": 65,
+          "fat": 69
+        }
+      },
+      {
+        "name": "Lettuce Wrap Charburger",
+        "category": "CHARBURGERS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 290,
+          "protein": 15,
+          "carbs": 8,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Grilled Chicken Sandwich on Wheat",
+        "category": "SANDWICHES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 550,
+          "protein": 40,
+          "carbs": 42,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Chicken Club on Sourdough",
+        "category": "SANDWICHES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 900,
+          "protein": 48,
+          "carbs": 57,
+          "fat": 52
+        }
+      },
+      {
+        "name": "Ahi Tuna Filet on Seeded Bun",
+        "category": "SANDWICHES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 400,
+          "protein": 35,
+          "carbs": 43,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Sirloin Steak Sandwich on Sourdough",
+        "category": "SANDWICHES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 760,
+          "protein": 32,
+          "carbs": 65,
+          "fat": 40
+        }
+      },
+      {
+        "name": "Veggie Burger on Wheat Bun with Cheese",
+        "category": "SANDWICHES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 480,
+          "protein": 24,
+          "carbs": 51,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Garden Ranch Salad",
+        "category": "SALADS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 420,
+          "protein": 9,
+          "carbs": 26,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Grilled Chicken Caesar",
+        "category": "SALADS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 580,
+          "protein": 43,
+          "carbs": 25,
+          "fat": 35
+        }
+      },
+      {
+        "name": "BBQ Chicken Salad",
+        "category": "SALADS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 750,
+          "protein": 47,
+          "carbs": 35,
+          "fat": 47
+        }
+      },
+      {
+        "name": "Mango Miso Crunch Salad",
+        "category": "SALADS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 550,
+          "protein": 36,
+          "carbs": 35,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Santa Barbara Cobb",
+        "category": "SALADS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 770,
+          "protein": 51,
+          "carbs": 17,
+          "fat": 54
+        }
+      },
+      {
+        "name": "French Fries",
+        "category": "SIDES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 440,
+          "protein": 4,
+          "carbs": 60,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Onion Rings",
+        "category": "SIDES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 500,
+          "protein": 10,
+          "carbs": 62,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Sweet Potato Fries",
+        "category": "SIDES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 374,
+          "protein": 3,
+          "carbs": 50,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Tempura Green Beans",
+        "category": "SIDES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 250,
+          "protein": 3,
+          "carbs": 34,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Side Garden Ranch Salad",
+        "category": "SIDES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 5,
+          "carbs": 13,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Crispy Chicken Bites (5PC)",
+        "category": "SIDES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 21,
+          "carbs": 23,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Crispy Chicken Bites (10PC)",
+        "category": "SIDES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 480,
+          "protein": 43,
+          "carbs": 45,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Kid's Charburger",
+        "category": "KID'S MEALS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 330,
+          "protein": 19,
+          "carbs": 35,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Kid's Grilled Cheese",
+        "category": "KID'S MEALS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 510,
+          "protein": 15,
+          "carbs": 53,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Kid's Crispy Chicken Bites",
+        "category": "KID'S MEALS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 240,
+          "protein": 21,
+          "carbs": 23,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Kids Fries",
+        "category": "KID'S MEALS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 190,
+          "protein": 2,
+          "carbs": 26,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Vanilla Shake",
+        "category": "DESSERTS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 520,
+          "protein": 12,
+          "carbs": 69,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Chocolate Shake",
+        "category": "DESSERTS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 670,
+          "protein": 12,
+          "carbs": 108,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Strawberry Shake",
+        "category": "DESSERTS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 580,
+          "protein": 11,
+          "carbs": 88,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Mocha Shake",
+        "category": "DESSERTS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 590,
+          "protein": 12,
+          "carbs": 89,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Coffee Shake",
+        "category": "DESSERTS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 500,
+          "protein": 11,
+          "carbs": 68,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Cookies & Cream Shake",
+        "category": "DESSERTS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 670,
+          "protein": 12,
+          "carbs": 94,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Blue Wave Shake",
+        "category": "DESSERTS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 550,
+          "protein": 11,
+          "carbs": 80,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Chocolate Sundae",
+        "category": "DESSERTS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 670,
+          "protein": 12,
+          "carbs": 107,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Strawberry Sundae",
+        "category": "DESSERTS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 580,
+          "protein": 11,
+          "carbs": 87,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Vanilla Sundae",
+        "category": "DESSERTS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 490,
+          "protein": 10,
+          "carbs": 65,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Cone",
+        "category": "DESSERTS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 5,
+          "carbs": 34,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Pepsi (8 oz)",
+        "category": "BEVERAGES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 28,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Starry (8 oz)",
+        "category": "BEVERAGES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 26,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Brisk Iced Tea Raspberry (8 oz)",
+        "category": "BEVERAGES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 45,
+          "protein": 0,
+          "carbs": 12,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Tropicana Fruit Punch (8 oz)",
+        "category": "BEVERAGES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 0,
+          "carbs": 30,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Tropicana Lemonade (8 oz)",
+        "category": "BEVERAGES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 27,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Dr Pepper (8 oz)",
+        "category": "BEVERAGES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 27,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Mountain Dew (8 oz)",
+        "category": "BEVERAGES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 110,
+          "protein": 0,
+          "carbs": 29,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Black Iced Tea (8 oz)",
+        "category": "BEVERAGES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Tropical Tea (8 oz)",
+        "category": "BEVERAGES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Strawberry Limeade (8 oz)",
+        "category": "BEVERAGES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 0,
+          "carbs": 32,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Mug Root Beer (8 oz)",
+        "category": "BEVERAGES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 27,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Tropicana Original Lemonade (8 oz)",
+        "category": "BEVERAGES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 35,
+          "protein": 0,
+          "carbs": 8,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Kids Milk (12 oz)",
+        "category": "BEVERAGES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 11,
+          "carbs": 15,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Seeded Bun",
+        "category": "BREAD OPTIONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 200,
+          "protein": 6,
+          "carbs": 37,
+          "fat": 2.5
+        }
+      },
+      {
+        "name": "Sourdough with Butter",
+        "category": "BREAD OPTIONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 390,
+          "protein": 9,
+          "carbs": 49,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Wheat Bun",
+        "category": "BREAD OPTIONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 5,
+          "carbs": 27,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Plain Bun",
+        "category": "BREAD OPTIONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 5,
+          "carbs": 31,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Iceberg Lettuce",
+        "category": "BREAD OPTIONS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Classic Ranch (1 oz)",
+        "category": "DRESSINGS & SAUCES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Classic Ranch Dressing (2 oz)",
+        "category": "DRESSINGS & SAUCES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Avocado Ranch (1 oz)",
+        "category": "DRESSINGS & SAUCES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Spicy Ranch (1 oz)",
+        "category": "DRESSINGS & SAUCES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 15
+        }
+      },
+      {
+        "name": "BBQ Sauce (1 oz)",
+        "category": "DRESSINGS & SAUCES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 60,
+          "protein": 0,
+          "carbs": 15,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Lemon Caesar Dressing (2 oz)",
+        "category": "DRESSINGS & SAUCES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 200,
+          "protein": 2,
+          "carbs": 5,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Miso Ginger Dressing (2 oz)",
+        "category": "DRESSINGS & SAUCES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 0,
+          "carbs": 9,
+          "fat": 17
+        }
+      },
+      {
+        "name": "House Dressing (2 oz)",
+        "category": "DRESSINGS & SAUCES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 350,
+          "protein": 0,
+          "carbs": 9,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Roasted Garlic Aioli (1 oz)",
+        "category": "DRESSINGS & SAUCES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 170,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Sweet Mustard (Vegan) (1 oz)",
+        "category": "DRESSINGS & SAUCES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 160,
+          "protein": 0,
+          "carbs": 7,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Tartar (1 oz)",
+        "category": "DRESSINGS & SAUCES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Teriyaki Sauce (1 oz)",
+        "category": "DRESSINGS & SAUCES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 2,
+          "carbs": 16,
+          "fat": 0
+        }
+      },
+      {
+        "name": "1000 Island Dressing (2 oz)",
+        "category": "DRESSINGS & SAUCES",
+        "price_estimate": null,
+        "macros": {
+          "calories": 210,
+          "protein": 0,
+          "carbs": 11,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Ahi Tuna (Optional Item)",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 28,
+          "carbs": 0,
+          "fat": 0.5
+        }
+      },
+      {
+        "name": "Beef Patty",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 150,
+          "protein": 14,
+          "carbs": 0,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Chicken Breast",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 180,
+          "protein": 30,
+          "carbs": 1,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Sirloin Steak",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 17,
+          "carbs": 3,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Veggie Patty",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 15,
+          "carbs": 18,
+          "fat": 4
+        }
+      },
+      {
+        "name": "American Cheese (1 Slice)",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 60,
+          "protein": 3,
+          "carbs": 2,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Apple Juice",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 24,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Apple Sauce",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 0,
+          "carbs": 13,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Chunky Avocado (1 Scoop)",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 0,
+          "carbs": 4,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Avocado Half",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 0,
+          "carbs": 4,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Bacon (2 Strips)",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 7,
+          "carbs": 0,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Caramelized Onions (1 oz)",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 25,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Corn & Black Bean Salsa",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 50,
+          "protein": 2,
+          "carbs": 8,
+          "fat": 1.5
+        }
+      },
+      {
+        "name": "Croutons (2 TBS)",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 90,
+          "protein": 2,
+          "carbs": 13,
+          "fat": 3.5
+        }
+      },
+      {
+        "name": "Crumbled Cheddar Cheese (1 Slice)",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 5,
+          "carbs": 0,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Egg, Hardboiled",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 6,
+          "carbs": 0,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Mango Salsa (2 oz)",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 45,
+          "protein": 0,
+          "carbs": 10,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Margarine (2 tsp)",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 140,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Mayo (1 tbsp)",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 100,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Onion Tanglers",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 60,
+          "protein": 0,
+          "carbs": 4,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Pineapple Slice",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 20,
+          "protein": 0,
+          "carbs": 5,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Parmesan Cheese",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 6,
+          "carbs": 0,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Pickled Red Onion",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Portabella Mushrooms (2 oz)",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 130,
+          "protein": 2,
+          "carbs": 2,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Whipped Cream (2 TBS)",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 15,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 1
+        }
+      },
+      {
+        "name": "White American (1 Slice)",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 70,
+          "protein": 3,
+          "carbs": 1,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Wonton Almond Mix",
+        "category": "OPTIONAL ITEMS",
+        "price_estimate": null,
+        "macros": {
+          "calories": 80,
+          "protein": 3,
+          "carbs": 7,
+          "fat": 5
+        }
+      }
     ]
-}
+  }

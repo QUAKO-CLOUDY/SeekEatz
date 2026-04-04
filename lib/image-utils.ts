@@ -1,3 +1,5 @@
+import { getLogo } from '@/utils/logos';
+
 /**
  * Generates a real food image URL based on meal name and restaurant
  * Uses Unsplash Source API (free, no API key required)
@@ -234,4 +236,19 @@ export function getMealImageUrl(
   // Fallback to Unsplash-generated image
   // Note: Unsplash Source API may have rate limits, but provides good quality images
   return generateFoodImageUrl(mealName, restaurant);
+}
+
+export function getRestaurantLogoUrl(
+  restaurant: string = '',
+  logoUrl?: string | null
+): string {
+  if (
+    logoUrl &&
+    logoUrl.startsWith('http') &&
+    !logoUrl.includes('placeholder')
+  ) {
+    return logoUrl;
+  }
+
+  return getLogo(restaurant);
 }

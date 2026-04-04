@@ -443,6 +443,7 @@ const RESTAURANT_LOGO_MAP: Record<string, string> = {
 
   // Protein House variations
   'protein house': 'protein house',
+  'proteinhouse': 'protein house',
 
   // Pura Vida variations
   'pura vida': 'pura vida',

@@ -10,17 +10,10 @@ import { copyToClipboard } from "@/lib/clipboard-utils";
 import { createClient } from "@/utils/supabase/client";
 import { useTheme } from "../contexts/ThemeContext";
 import { useChat } from "../contexts/ChatContext";
-import { getGuestSessionId, getGuestChatMessages, saveGuestChatMessages, touchGuestActivity, getCurrentSessionId, clearGuestSession, clearGuestSessionFull } from "@/lib/guest-session";
+import { getGuestSessionId, getGuestChatMessages, saveGuestChatMessages, touchGuestActivity, clearGuestSession } from "@/lib/guest-session";
+import { getRestaurantLogoUrl } from "@/lib/image-utils";
 import { getStoredLocation, storeLocation } from "@/lib/location";
-import {
-  GUEST_QUERY_LIMIT,
-  getGuestQueryCount,
-  hasCompletedPostValueOnboarding,
-  incrementGuestQueryCount,
-  markPostValueOnboardingComplete,
-} from "@/lib/onboarding-flow";
-import { PostValueOnboarding } from "./PostValueOnboarding";
-import { AuthProviders } from "./AuthProviders";
+import { UpgradeModal } from "./UpgradeModal";
 import {
   diversifyMealsByRestaurant,
   type RestaurantDiversityHistory,
@@ -144,7 +137,14 @@ function mapSearchItemToMeal(item: any): Meal {
     protein: item.protein ?? item.protein_g ?? 0,
     carbs: item.carbs ?? item.carbs_g ?? 0,
     fats: item.fats ?? item.fats_g ?? item.fat_g ?? 0,
-    image: item.image_url || '/placeholder-food.jpg',
+    image: getRestaurantLogoUrl(
+      item.restaurant_name || item.restaurant || '',
+      item.restaurantLogoUrl || item.restaurant_logo_url || item.logo_url
+    ),
+    restaurantLogoUrl: getRestaurantLogoUrl(
+      item.restaurant_name || item.restaurant || '',
+      item.restaurantLogoUrl || item.restaurant_logo_url || item.logo_url
+    ),
     description: item.description || '',
     category: item.category || '',
     dietary_tags: item.dietary_tags || [],
@@ -272,9 +272,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     [currentHour]
   );
   const [isLimitReached, setIsLimitReached] = useState(false); // kept for compatibility, but no longer used for gating
-  const [guestQueryCount, setGuestQueryCount] = useState(0);
-  const [showPostValueOnboarding, setShowPostValueOnboarding] = useState(false);
-  const [showAccountGate, setShowAccountGate] = useState(false);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const activeQuickPromptRef = useRef<ActiveQuickPromptState | null>(null);
 
   // Current session ID (stable per tab)
@@ -289,27 +287,14 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   }, [userId]);
 
   useEffect(() => {
-    setGuestQueryCount(getGuestQueryCount());
-  }, [userId, isSignedIn]);
-
-  useEffect(() => {
     if (isSignedIn) {
-      setShowPostValueOnboarding(false);
-      setShowAccountGate(false);
+      setShowUpgradeModal(false);
       return;
     }
 
-    const reachedGuestGate = getGuestQueryCount() >= GUEST_QUERY_LIMIT;
-    if (!reachedGuestGate) {
-      setShowPostValueOnboarding(false);
-      setShowAccountGate(false);
-      return;
-    }
-
-    if (hasCompletedPostValueOnboarding()) {
-      setShowAccountGate(true);
-    } else {
-      setShowPostValueOnboarding(true);
+    if (typeof window !== 'undefined' && localStorage.getItem('seekeatz_force_upgrade_modal') === 'true') {
+      localStorage.removeItem('seekeatz_force_upgrade_modal');
+      setShowUpgradeModal(true);
     }
   }, [isSignedIn]);
 
@@ -1026,41 +1011,11 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   };
 
   const maybeHandleQueryGate = () => {
-    if (!isSignedIn) {
-      const currentGuestCount = getGuestQueryCount();
-      setGuestQueryCount(currentGuestCount);
-
-      if (showPostValueOnboarding || showAccountGate) {
-        return true;
-      }
-
-      if (currentGuestCount >= GUEST_QUERY_LIMIT) {
-        if (hasCompletedPostValueOnboarding()) {
-          setShowAccountGate(true);
-        } else {
-          setShowPostValueOnboarding(true);
-        }
-        return true;
-      }
-
-      return false;
-    }
-
-    return false;
+    return showUpgradeModal;
   };
 
   const handleSuccessfulQuery = () => {
-    if (!isSignedIn) {
-      const nextGuestCount = incrementGuestQueryCount();
-      setGuestQueryCount(nextGuestCount);
-
-      if (nextGuestCount >= GUEST_QUERY_LIMIT && !hasCompletedPostValueOnboarding()) {
-        setShowPostValueOnboarding(true);
-      }
-
-      return;
-    }
-
+    return;
   };
 
 
@@ -1259,11 +1214,11 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           console.error(`[AIChat] /api/chat failed with status ${response.status}:`, rawResponseText || '(empty response body)');
         }
 
-        // Handle legacy usage limit errors (no longer expected now that gating is disabled)
-        if (isUsageLimitError && !isSignedIn) {
-          // Just surface a generic error instead of showing a trial gate message
-          setError(serverMessage || 'Chat request failed');
+        if (isUsageLimitError) {
           setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
+
+          setShowUpgradeModal(true);
+          setError(serverMessage || "You've used your 2 free AI searches for today. Upgrade to continue.");
           return;
         }
 
@@ -1334,7 +1289,14 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               protein: item.protein ?? item.protein_g ?? 0,
               carbs: item.carbs ?? item.carbs_g ?? 0,
               fats: item.fats ?? item.fats_g ?? item.fat_g ?? 0,
-              image: item.image_url || '/placeholder-food.jpg',
+                image: getRestaurantLogoUrl(
+                  item.restaurant_name || item.restaurant || '',
+                  item.restaurantLogoUrl || item.restaurant_logo_url || item.logo_url
+                ),
+                restaurantLogoUrl: getRestaurantLogoUrl(
+                  item.restaurant_name || item.restaurant || '',
+                  item.restaurantLogoUrl || item.restaurant_logo_url || item.logo_url
+                ),
               description: item.description || '',
               category: item.category || '',
               dietary_tags: item.dietary_tags || [],
@@ -1918,47 +1880,20 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                 <div className="flex flex-col gap-2 justify-start mb-4">
                   <button
                     onClick={() => {
-                      // Clear redirect timer if user clicks button
-                      if ((window as any).__seekeatz_redirectTimer) {
-                        clearTimeout((window as any).__seekeatz_redirectTimer);
-                        delete (window as any).__seekeatz_redirectTimer;
-                      }
-                      // Set flag to indicate signup is from chat gate (to skip onboarding)
-                      if (typeof window !== 'undefined') {
-                        localStorage.setItem('seekeatz_signup_from_chat_gate', 'true');
-                      }
-                      {
-                        const masterQuery =
-                          typeof window !== 'undefined' &&
-                          new URLSearchParams(window.location.search).get('master') === '1'
-                            ? '&master=1'
-                            : '';
-                        router.push(`/auth/signup?redirectTo=%2Fupgrade&switch=1${masterQuery}`);
-                      }
+                      setShowUpgradeModal(true);
                     }}
                     className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm text-center"
                   >
-                    Create account to continue
+                    Upgrade to Premium
                   </button>
                   <button
                     onClick={() => {
-                      // Clear redirect timer if user clicks button
-                      if ((window as any).__seekeatz_redirectTimer) {
-                        clearTimeout((window as any).__seekeatz_redirectTimer);
-                        delete (window as any).__seekeatz_redirectTimer;
-                      }
-                      {
-                        const masterQuery =
-                          typeof window !== 'undefined' &&
-                          new URLSearchParams(window.location.search).get('master') === '1'
-                            ? '&master=1'
-                            : '';
-                        router.push(`/auth/signin?redirectTo=%2Fupgrade&switch=1${masterQuery}`);
-                      }
+                      setError(null);
+                      setMessages((prev) => prev.filter((message) => message.id !== m.id));
                     }}
                     className={`px-4 py-2 border rounded-lg text-sm font-medium transition-all text-center ${isDark ? 'bg-gray-800 border-gray-700 hover:bg-gray-700 text-gray-200' : 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700'}`}
                   >
-                    I already have an account
+                    Wait 24hrs for my free chats
                   </button>
                 </div>
               )}
@@ -1997,22 +1932,22 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       </div>
 
       {/* Quick Prompt Chips */}
-      <div className={`fixed bottom-[calc(var(--app-nav-safe-offset)+var(--app-chat-composer-height)+0.5rem)] left-0 right-0 w-full z-20 pb-2 md:pb-3 transition-all duration-300 ${isDark ? 'bg-gray-900' : 'bg-white'} ${isAtBottom ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}>
+      <div className={`fixed bottom-[calc(var(--app-nav-safe-offset)+var(--app-chat-composer-height)+0.2rem)] left-0 right-0 w-full z-20 pb-1.5 md:pb-2 transition-all duration-300 ${isDark ? 'bg-gray-900' : 'bg-white'} ${isAtBottom ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}>
         <div className="relative w-full max-w-3xl mx-auto px-3 md:px-4">
-          <div className={`rounded-[1.25rem] border px-3 py-2 shadow-lg backdrop-blur-xl ${isDark ? 'border-gray-800 bg-gray-900/92 shadow-black/20' : 'border-gray-200 bg-white/92 shadow-gray-200/80'}`}>
-            <p className={`mb-1 px-1 text-[10px] font-semibold uppercase tracking-[0.12em] ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
+          <div className={`rounded-[1.1rem] border px-2.5 py-1.5 shadow-lg backdrop-blur-xl ${isDark ? 'border-gray-800 bg-gray-900/92 shadow-black/20' : 'border-gray-200 bg-white/92 shadow-gray-200/80'}`}>
+            <p className={`mb-0.5 px-1 text-[9px] font-semibold uppercase tracking-[0.11em] ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
               Try a quick search
             </p>
           <div
-            className="overflow-x-auto scrollbar-hide px-1"
+            className="overflow-x-auto scrollbar-hide px-0.5"
           >
-            <div className="flex w-max min-w-full gap-2 justify-start">
+            <div className="flex w-max min-w-full gap-1.5 justify-start">
               {quickPrompts.map((item, index) => (
                 <button
                   key={index}
                   onClick={() => sendQuickPrompt(item.prompt, item.userVisibleText)}
-                  disabled={isLimitReached && !isSignedIn}
-                  className={`flex-shrink-0 rounded-full border px-3 py-1.5 text-[13px] font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap ${isDark ? 'bg-gray-800 hover:bg-gray-700 active:bg-gray-600 border-gray-700 text-gray-200' : 'bg-gray-50 hover:bg-gray-100 active:bg-gray-200 border-gray-200 text-gray-700'}`}
+                  disabled={showUpgradeModal}
+                  className={`flex-shrink-0 rounded-full border px-2.5 py-1.5 text-[12px] font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap ${isDark ? 'bg-gray-800 hover:bg-gray-700 active:bg-gray-600 border-gray-700 text-gray-200' : 'bg-gray-50 hover:bg-gray-100 active:bg-gray-200 border-gray-200 text-gray-700'}`}
                 >
                   {item.display}
                 </button>
@@ -2028,6 +1963,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         <div className="w-full max-w-3xl px-3 pb-3 md:px-4 md:pb-4">
           <form
             onSubmit={onSubmit}
+            data-tutorial-target="chat-input"
             className={`flex items-center gap-2 rounded-[1.75rem] border px-2 py-2 shadow-xl backdrop-blur-xl ${isDark
               ? 'border-gray-800 bg-gray-900/92 shadow-black/25'
               : 'border-gray-200 bg-white/92 shadow-gray-200/80'
@@ -2056,21 +1992,17 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               className={`flex-1 bg-transparent px-2 py-2 text-[15px] outline-none focus:outline-none ${isDark
                 ? 'text-gray-100 placeholder:text-gray-500'
                 : 'text-gray-800 placeholder:text-gray-400'
-                } ${(isLimitReached && !isSignedIn) || showAccountGate || showPostValueOnboarding ? 'opacity-60 cursor-not-allowed' : ''}`}
+                } ${showUpgradeModal ? 'opacity-60 cursor-not-allowed' : ''}`}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder={showAccountGate
-                ? "Create a free account to keep going."
-                : showPostValueOnboarding
-                  ? "Finish onboarding to keep going."
-                  : chatPlaceholder}
-              disabled={(isLimitReached && !isSignedIn) || showAccountGate || showPostValueOnboarding}
+              placeholder={showUpgradeModal ? "Upgrade to keep searching." : chatPlaceholder}
+              disabled={showUpgradeModal}
               autoComplete="off"
             />
             <button
               type="submit"
-              disabled={!inputText.trim() || (isLimitReached && !isSignedIn) || showAccountGate || showPostValueOnboarding}
-              className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 transition-all hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed ${(isLimitReached && !isSignedIn) || showAccountGate || showPostValueOnboarding ? 'cursor-not-allowed' : ''}`}
+              disabled={!inputText.trim() || showUpgradeModal}
+              className={`flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/20 transition-all hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed ${showUpgradeModal ? 'cursor-not-allowed' : ''}`}
             >
               <Send size={16} className="md:w-[18px] md:h-[18px]" />
             </button>
@@ -2078,56 +2010,14 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         </div>
       </div>
 
-      {showPostValueOnboarding && !isSignedIn && (
-        <PostValueOnboarding
-          onSkip={() => {
-            markPostValueOnboardingComplete();
-            setShowPostValueOnboarding(false);
-            setShowAccountGate(true);
-          }}
-          onComplete={() => {
-            markPostValueOnboardingComplete();
-            setShowPostValueOnboarding(false);
-            setShowAccountGate(true);
-          }}
-        />
-      )}
-
-      {showAccountGate && !isSignedIn && (
-        <div className="fixed inset-0 z-[120] flex items-end justify-center bg-slate-950/75 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-t-[2rem] bg-white p-6 pb-8 shadow-2xl">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-600">
-                  Free account
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold leading-tight text-slate-900">
-                  Create a free account to keep going
-                </h2>
-                <p className="mt-3 text-sm leading-6 text-slate-600">
-                  You’ve already seen the meal search work. Create your account to keep searching and unlock your daily free usage.
-                </p>
-              </div>
-            </div>
-
-            <AuthProviders className="mt-6" />
-            <button
-              type="button"
-              onClick={() => {
-                const masterQuery =
-                  typeof window !== 'undefined' &&
-                  new URLSearchParams(window.location.search).get('master') === '1'
-                    ? '&master=1'
-                    : '';
-                router.push(`/auth/signin?redirectTo=%2Fupgrade&switch=1${masterQuery}`);
-              }}
-              className="mt-4 w-full text-sm font-medium text-slate-500"
-            >
-              I already have an account
-            </button>
-          </div>
-        </div>
-      )}
+      <UpgradeModal
+        open={showUpgradeModal}
+        subtitle="Your free daily chats are up. Upgrade to premium to unlock full access."
+        onClose={() => {
+          setShowUpgradeModal(false);
+          setError(null);
+        }}
+      />
 
     </div>
   );

@@ -24,6 +24,7 @@ export type Meal = {
   name: string;
   restaurant: string;
   restaurant_name?: string; // For MealCard logo logic (matches Supabase column name)
+  restaurantLogoUrl?: string;
   calories: number;
   protein: number;
   carbs: number;
@@ -87,6 +88,7 @@ export interface SearchParams {
   offset?: number;
   limit?: number;
   searchKey?: string;
+  shuffleNonce?: string;
   isPagination?: boolean;
   isHomepage?: boolean;
   calorieMode?: "UNDER" | "OVER";

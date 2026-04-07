@@ -83,6 +83,12 @@ const RESTAURANT_LOGO_MAP: Record<string, string> = {
   'chopt_creative_salad_co': 'chopt_creative_salad',
   'chopt': 'chopt_creative_salad',
 
+  // Cheba Hut variations
+  'cheba hut': 'Cheeba hut',
+  'cheeba hut': 'Cheeba hut',
+  'cheba_hut': 'Cheeba hut',
+  'cheeba_hut': 'Cheeba hut',
+
   // Dig Inn variations
   'dig inn': 'dig_inn',
   'dig_inn': 'dig_inn',

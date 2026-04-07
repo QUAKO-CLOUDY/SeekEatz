@@ -1,6 +1,6 @@
 import { searchHandler } from '@/lib/retrieval/retrieval-engine';
 import { buildSearchParams } from '@/lib/search-utils';
-import { buildEntitlement, FREE_DAILY_QUERY_LIMIT, PROFILE_ENTITLEMENT_SELECT } from '@/lib/entitlements';
+import { buildEntitlement, type EntitlementProfileRow, FREE_DAILY_QUERY_LIMIT, PROFILE_ENTITLEMENT_SELECT } from '@/lib/entitlements';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
 
       const entitlement = buildEntitlement({
         user,
-        profile,
+        profile: profile as EntitlementProfileRow | null,
         queriesUsedToday: usageResult.count ?? 0,
       });
 

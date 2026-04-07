@@ -10,7 +10,7 @@ import { resolveRestaurantFromText, extractRestaurantPhrase, resolveRestaurantUn
 import { extractMacroConstraintsFromText, hasConstraints } from '@/lib/extractMacroConstraintsFromText';
 import { isSmoothieLikeText } from '@/lib/smoothie-search';
 import { hasRemainingUsage, incrementUsageCount } from '@/lib/usage-cookie';
-import { buildEntitlement, FREE_DAILY_QUERY_LIMIT, PROFILE_ENTITLEMENT_SELECT } from '@/lib/entitlements';
+import { buildEntitlement, type EntitlementProfileRow, FREE_DAILY_QUERY_LIMIT, PROFILE_ENTITLEMENT_SELECT } from '@/lib/entitlements';
 
 export const maxDuration = 30;
 
@@ -935,7 +935,7 @@ export async function POST(req: Request) {
 
       const entitlement = buildEntitlement({
         user,
-        profile,
+        profile: profile as EntitlementProfileRow | null,
         queriesUsedToday: meteredCount,
       });
 

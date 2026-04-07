@@ -12,6 +12,8 @@
     "test:retrieval-live": "node scripts/run-ts-script.cjs scripts/test-retrieval-live.ts",
     "backfill:retrieval": "node scripts/run-ts-script.cjs scripts/backfill-retrieval-metadata.ts",
     "audit:restaurant-logos": "node scripts/run-ts-script.cjs scripts/audit-restaurant-logos.ts",
+    "audit:restaurant-search": "node scripts/run-ts-script.cjs scripts/audit-restaurant-search.ts",
+    "audit:retrieval-queries": "node scripts/run-ts-script.cjs scripts/audit-retrieval-queries.ts",
     "sync:restaurant-locations": "node scripts/run-ts-script.cjs scripts/sync-restaurant-locations.ts",
     "ingest-data": "node scripts/run-ts-script.cjs scripts/ingest-data.ts",
     "ingest": "node scripts/run-ts-script.cjs scripts/ingest/index.ts",

@@ -12,6 +12,7 @@ import { getGuestChatForMigration, clearGuestSessionFull } from "@/lib/guest-ses
 import { claimAnonymousData } from "@/lib/claim-anon-data";
 import { AuthProviders } from "@/app/components/AuthProviders";
 import { bootstrapAccount } from "@/lib/bootstrap-account";
+import type { UserProfile } from "@/app/types";
 
 const THIRTY_MINUTES = 30 * 60 * 1000;
 const EMAIL_OTP_LENGTH = 8;
@@ -351,7 +352,7 @@ export default function SignupPage() {
 
       try {
         const bootstrapResult = await bootstrapAccount({
-          profile,
+          profile: profile as Partial<UserProfile> | null,
           hasCompletedOnboarding: true,
         });
 

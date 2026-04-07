@@ -448,14 +448,21 @@ async function ingestData() {
     console.log(`Items found in JSON: ${items.length}`);
 
     for (const item of items) {
+      const macros = item.macros ?? {
+        calories: 0,
+        protein: 0,
+        carbs: 0,
+        fat: 0,
+      };
+
       // Create the searchable string
       const metadataString = `
         ${restaurantName} - ${item.name}
         Category: ${item.category}
-        Protein: ${item.macros.protein}g
-        Calories: ${item.macros.calories}
-        Carbs: ${item.macros.carbs}g
-        Fat: ${item.macros.fat}g
+        Protein: ${macros.protein}g
+        Calories: ${macros.calories}
+        Carbs: ${macros.carbs}g
+        Fat: ${macros.fat}g
       `.trim();
 
       // Generate Vector
@@ -482,7 +489,7 @@ async function ingestData() {
           category: item.category,
           image_url: item.image_url || null,
           price_estimate: item.price_estimate || null,
-          macros: item.macros, 
+          macros,
           embedding: embedding,
           import_batch_id: importBatchId  // ALWAYS SET - never null
         }, {

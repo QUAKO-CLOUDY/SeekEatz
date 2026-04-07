@@ -65,7 +65,7 @@ const DIETARY_KEYWORDS: Record<string, string[]> = {
   vegetarian: [
     'vegetarian', 'veggie', 'vegan', 'plant-based', 'meatless',
     'tofu', 'tempeh', 'falafel', 'beyond', 'impossible', 'meat-free',
-    'egg', 'cheese', 'bean', 'lentil',
+    'bean', 'lentil',
   ],
   gluten_free: ['gluten-free', 'gluten free', 'gf'],
   dairy_free: ['dairy-free', 'dairy free', 'no dairy', 'non-dairy'],
@@ -263,9 +263,24 @@ export function applyDietaryFilter(
 ): any[] {
   if (!dietaryKeywords || dietaryKeywords.length === 0) return items;
   const lower = dietaryKeywords.map(k => k.toLowerCase());
+  const vegetarianFilter = lower.includes('vegetarian') || lower.includes('veggie');
+  const veganFilter = lower.includes('vegan');
+  const meatPattern = /\b(chicken|steak|beef|pork|turkey|salmon|shrimp|fish|bacon|sausage|ham|lamb|meatballs?|pepperoni|prosciutto|tuna|crab|lobster)\b/i;
+  const animalProductPattern = /\b(cheese|egg|eggs|dairy|cream|butter|milk|whey|yogurt|honey)\b/i;
+
   return items.filter(item => {
     const name = (item.name || '').toLowerCase();
     const desc = (item.description || '').toLowerCase();
+    const haystack = `${name} ${desc}`;
+
+    if ((vegetarianFilter || veganFilter) && meatPattern.test(haystack)) {
+      return false;
+    }
+
+    if (veganFilter && animalProductPattern.test(haystack)) {
+      return false;
+    }
+
     return lower.some(kw => name.includes(kw) || desc.includes(kw));
   });
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import {
   buildEntitlement,
+  type EntitlementProfileRow,
   GUEST_ENTITLEMENT,
   PROFILE_ENTITLEMENT_SELECT,
 } from "@/lib/entitlements";
@@ -39,7 +40,7 @@ export async function GET() {
 
     const entitlement = buildEntitlement({
       user,
-      profile,
+      profile: profile as EntitlementProfileRow | null,
       queriesUsedToday: usageResult.count ?? 0,
     });
 

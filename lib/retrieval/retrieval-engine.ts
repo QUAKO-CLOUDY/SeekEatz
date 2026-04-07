@@ -152,6 +152,7 @@ export interface RetrievalDebugInfo {
   };
   results: {
     rankedCount: number;
+    rankedRestaurantNames?: string[];
     returnedCount: number;
     returnedMealIds: string[];
     returnedRestaurantNames: string[];
@@ -266,6 +267,7 @@ export async function retrieveMeals(
   options: {
     includeDebug?: boolean;
     userLocation?: { lat: number; lng: number };
+    disableSemanticFallback?: boolean;
   } = {}
 ): Promise<RetrievalResult> {
   const prepared = prepareSearchContext(rawSearchParams);
@@ -281,6 +283,7 @@ export async function retrieveMealsWithClient(
   options: {
     includeDebug?: boolean;
     userLocation?: { lat: number; lng: number };
+    disableSemanticFallback?: boolean;
   } = {}
 ): Promise<RetrievalResult> {
   const formatter = new ResponseFormatter(supabase);
@@ -395,7 +398,7 @@ export async function retrieveMealsWithClient(
       restaurantNames: filterResult.resolvedRestaurantNames,
     }
   );
-  const deterministicFiltered = applyPostRetrievalFilters(
+  let deterministicFiltered = applyPostRetrievalFilters(
     deterministicResults,
     parsed,
     filterResult.dietaryKeywords
@@ -408,7 +411,38 @@ export async function retrieveMealsWithClient(
   let vectorResults: RawResult[] = [];
   let usedVector = false;
 
-  if (shouldUseSemanticFallback(parsed, deterministicFiltered.length, deterministicThreshold)) {
+  if (filterResult.dietaryKeywords?.length && deterministicFiltered.length < deterministicThreshold) {
+    const dietaryFallbackResults = await runTableDietaryFallback(
+      supabase,
+      parsed,
+      filterResult.params,
+      filterResult.dietaryKeywords
+    );
+    const dietaryFallbackFiltered = applyPostRetrievalFilters(
+      applyResolvedRestaurantFilter(
+        applyNearbyRestaurantFilter(dietaryFallbackResults, nearbyFilter),
+        {
+          restaurantId: searchParams.restaurantId,
+          restaurantNames: filterResult.resolvedRestaurantNames,
+        }
+      ),
+      parsed,
+      filterResult.dietaryKeywords
+    );
+
+    deterministicFiltered = mergeAndDeduplicate(
+      deterministicFiltered,
+      dietaryFallbackFiltered,
+      parsed,
+      undefined
+    );
+  }
+
+  const semanticFallbackTriggered =
+    !options.disableSemanticFallback &&
+    shouldUseSemanticFallback(parsed, deterministicFiltered.length, deterministicThreshold);
+
+  if (semanticFallbackTriggered) {
     vectorResults = await runVectorSearch(supabase, parsed);
     vectorResults = applyResolvedRestaurantFilter(
       applyNearbyRestaurantFilter(vectorResults, nearbyFilter),
@@ -488,10 +522,11 @@ export async function retrieveMealsWithClient(
           deterministicCount: deterministicResults.length,
           deterministicAfterPostFilter: deterministicFiltered.length,
           vectorCount: vectorResults.length,
-          semanticTriggered: shouldUseSemanticFallback(parsed, deterministicFiltered.length, deterministicThreshold),
+          semanticTriggered: semanticFallbackTriggered,
         },
         results: {
           rankedCount: ranked.length,
+          rankedRestaurantNames: ranked.map((meal) => meal.restaurant_name),
           returnedCount: meals.length,
           returnedMealIds: meals.map((meal) => meal.id),
           returnedRestaurantNames: meals.map((meal) => meal.restaurant),
@@ -897,29 +932,7 @@ async function runTableCategoryFallback(
   parsed: ParsedQuery,
   params: RPCParams
 ): Promise<RawResult[]> {
-  const baseSelect = [
-    'id',
-    'name',
-    'restaurant_name',
-    'restaurant_id',
-    'category',
-    'macros',
-    'normalized_category',
-    'meal_type',
-    'item_type',
-    'food_tags',
-    'tags',
-    'confidence_score',
-    'description',
-    'description_short',
-    'price_estimate',
-    'image_url',
-    'allergens',
-    'allergen_flags',
-    'aliases',
-    'is_available',
-    'active_status',
-  ].join(', ');
+  const baseSelect = getMenuItemFallbackSelect();
 
   if (parsed.normalizedCategory === 'breakfast_sandwich') {
     const { data, error } = await supabase
@@ -981,6 +994,79 @@ async function runTableCategoryFallback(
   }
 
   return [];
+}
+
+async function runTableDietaryFallback(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  parsed: ParsedQuery,
+  params: RPCParams,
+  dietaryKeywords: string[]
+): Promise<RawResult[]> {
+  const keywordClauses = dietaryKeywords
+    .flatMap((keyword) => {
+      const escaped = keyword.replace(/,/g, ' ').trim();
+      if (!escaped) {
+        return [];
+      }
+      return [
+        `name.ilike.%${escaped}%`,
+        `description.ilike.%${escaped}%`,
+        `description_short.ilike.%${escaped}%`,
+      ];
+    });
+
+  if (keywordClauses.length === 0) {
+    return [];
+  }
+
+  let query = supabase
+    .from('menu_items')
+    .select(getMenuItemFallbackSelect())
+    .eq('item_type', 'meal')
+    .not('macros', 'is', null)
+    .or(keywordClauses.join(', '))
+    .order('restaurant_name', { ascending: true })
+    .order('id', { ascending: true })
+    .limit(Math.max(params.p_limit * 2, 240));
+
+  if (params.p_restaurant_names?.length) {
+    query = query.in('restaurant_name', params.p_restaurant_names);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error('[RetrievalEngine] dietary table fallback error:', error.message);
+    return [];
+  }
+
+  return normalizeTableFallbackRows((data ?? []) as unknown as BreakfastFallbackRow[])
+    .filter((item) => satisfiesParsedMacroConstraints(item, parsed));
+}
+
+function getMenuItemFallbackSelect(): string {
+  return [
+    'id',
+    'name',
+    'restaurant_name',
+    'restaurant_id',
+    'category',
+    'macros',
+    'normalized_category',
+    'meal_type',
+    'item_type',
+    'food_tags',
+    'tags',
+    'confidence_score',
+    'description',
+    'description_short',
+    'price_estimate',
+    'image_url',
+    'allergens',
+    'allergen_flags',
+    'aliases',
+    'is_available',
+    'active_status',
+  ].join(', ');
 }
 
 function normalizeTableFallbackRows(rows: BreakfastFallbackRow[]): RawResult[] {

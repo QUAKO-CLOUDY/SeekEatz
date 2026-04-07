@@ -21,10 +21,6 @@ const RESTAURANT_STOPWORDS = new Set([
     'co',
     'company',
     'restaurant',
-    'grill',
-    'cafe',
-    'bar',
-    'kitchen',
 ]);
 
 const SINGLE_TOKEN_FOOD_TERMS = new Set([
@@ -54,12 +50,31 @@ const SINGLE_TOKEN_FOOD_TERMS = new Set([
     'sushi',
 ]);
 
+const GENERIC_DISCOVERY_TERMS = new Set([
+    ...SINGLE_TOKEN_FOOD_TERMS,
+    'american',
+    'asian',
+    'barbecue',
+    'bbq',
+    'breakfast',
+    'dinner',
+    'gluten',
+    'healthy',
+    'italian',
+    'lunch',
+    'mediterranean',
+    'mexican',
+    'vegan',
+    'vegetarian',
+]);
+
 function normalizeRestaurantLookup(value: string): string {
     return value
         .toLowerCase()
         .trim()
         .replace(/&/g, 'and')
-        .replace(/['.,\-]/g, '')
+        .replace(/-/g, ' ')
+        .replace(/['.,]/g, '')
         .replace(/\s+/g, ' ')
         .trim();
 }
@@ -75,9 +90,14 @@ function extractBareRestaurantCandidateText(queryText: string): string {
         .replace(/\b(under|below|less\s+than|at\s+most|max(?:imum)?|over|above|more\s+than|at\s+least|min(?:imum)?)\s+\d+\s*(?:calories?|cal|kcal|g|grams?|protein|pro|carbs?|carbohydrates?|fat|fats?)\b/gi, ' ')
         .replace(/\b\d+\s*(?:g|grams?)\s+(?:protein|pro|carbs?|fat|fats?)\b/gi, ' ')
         .replace(/\b\d+\s*(?:calories?|cal|kcal)\b/gi, ' ')
+        .replace(/\b(?:high|low)\s+(?:protein|carb|carbs|calorie|calories|fat|fats)\b/gi, ' ')
         .replace(/\b(?:show|find|get|give|recommend|suggest|search|me|some|meals?|food|options?|items?|menu|from|at|for|with|please)\b/gi, ' ')
         .replace(/\s+/g, ' ')
         .trim();
+}
+
+function compactRestaurantLookup(value: string): string {
+    return normalizeRestaurantLookup(value).replace(/\s+/g, '');
 }
 
 async function resolveBareRestaurantFromDatabase(queryText: string): Promise<BareRestaurantResolution | undefined> {
@@ -88,7 +108,7 @@ async function resolveBareRestaurantFromDatabase(queryText: string): Promise<Bar
         return undefined;
     }
 
-    if (queryTokens.length === 1 && SINGLE_TOKEN_FOOD_TERMS.has(queryTokens[0])) {
+    if (queryTokens.length === 1 && GENERIC_DISCOVERY_TERMS.has(queryTokens[0])) {
         return undefined;
     }
 
@@ -119,6 +139,7 @@ async function resolveBareRestaurantFromDatabase(queryText: string): Promise<Bar
     };
 
     const queryNorm = normalizeRestaurantLookup(candidateText);
+    const queryCompact = compactRestaurantLookup(candidateText);
     const candidates: Candidate[] = [];
 
     for (const restaurant of restaurants as Array<{ id?: string; name?: string; aliases?: string[] | null }>) {
@@ -131,10 +152,21 @@ async function resolveBareRestaurantFromDatabase(queryText: string): Promise<Bar
 
         for (const candidateName of candidateNames) {
             const candidateNorm = normalizeRestaurantLookup(candidateName);
+            const candidateCompact = compactRestaurantLookup(candidateName);
             const candidateTokens = restaurantTokens(candidateName);
 
             if (candidateNorm === queryNorm) {
                 bestScore = Math.max(bestScore, 1);
+                continue;
+            }
+
+            if (
+                candidateCompact.length >= 3 &&
+                (candidateCompact === queryCompact ||
+                    queryCompact.includes(candidateCompact) ||
+                    candidateCompact.includes(queryCompact))
+            ) {
+                bestScore = Math.max(bestScore, 0.98);
                 continue;
             }
 
@@ -145,6 +177,15 @@ async function resolveBareRestaurantFromDatabase(queryText: string): Promise<Bar
             if (allQueryTokensMatch) {
                 const scoreBase = queryTokens.length === 1 ? 0.82 : 0.9;
                 bestScore = Math.max(bestScore, scoreBase + 0.1 * (queryTokens.length / Math.max(candidateTokens.length, 1)));
+            }
+
+            const allCandidateTokensMatch =
+                candidateTokens.length > 0 &&
+                candidateTokens.every((candidateToken) => queryTokens.includes(candidateToken));
+
+            if (allCandidateTokensMatch) {
+                const extraQueryTokens = Math.max(queryTokens.length - candidateTokens.length, 0);
+                bestScore = Math.max(bestScore, 0.94 - Math.min(extraQueryTokens * 0.03, 0.15));
             }
         }
 

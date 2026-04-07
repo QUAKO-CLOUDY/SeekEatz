@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { createAdminClient } from "@/utils/supabase/admin";
 import {
   buildEntitlement,
+  type EntitlementProfileRow,
   normalizeEmail,
   PROFILE_ENTITLEMENT_SELECT,
   WAITLIST_TRIAL_DAYS,
@@ -21,6 +22,15 @@ type BootstrapBody = {
     search_distance_miles?: number;
   } | null;
   hasCompletedOnboarding?: boolean;
+};
+
+type UntypedSupabaseClient = {
+  from: (table: string) => any;
+};
+
+type WaitlistFreeMonthRow = {
+  id: string;
+  is_free_month: boolean | null;
 };
 
 function addDaysIso(days: number) {
@@ -86,14 +96,16 @@ export async function POST(request: Request) {
     }
 
     const admin = createAdminClient();
+    const adminDb = admin as UntypedSupabaseClient;
     const normalizedEmail = normalizeEmail(user.email);
     const nowIso = new Date().toISOString();
 
-    const { data: currentProfile } = await admin
+    const { data: currentProfile } = await adminDb
       .from("profiles")
       .select(PROFILE_ENTITLEMENT_SELECT)
       .eq("id", user.id)
       .maybeSingle();
+    const typedCurrentProfile = currentProfile as EntitlementProfileRow | null;
 
     const profileUpdate: Record<string, unknown> = {
       id: user.id,
@@ -109,18 +121,19 @@ export async function POST(request: Request) {
 
     let waitlistGrantApplied = false;
 
-    if (normalizedEmail && !currentProfile?.waitlist_free_month_redeemed_at) {
-      const { data: waitlistEntry } = await admin
+    if (normalizedEmail && !typedCurrentProfile?.waitlist_free_month_redeemed_at) {
+      const { data: waitlistEntry } = await adminDb
         .from("waitlist_signups")
         .select("id, is_free_month")
         .eq("email", normalizedEmail)
         .maybeSingle();
+      const typedWaitlistEntry = waitlistEntry as WaitlistFreeMonthRow | null;
 
       const alreadyPremium =
-        currentProfile?.subscription_status === "active" ||
-        currentProfile?.subscription_status === "trialing";
+        typedCurrentProfile?.subscription_status === "active" ||
+        typedCurrentProfile?.subscription_status === "trialing";
 
-      if (waitlistEntry?.is_free_month && !alreadyPremium) {
+      if (typedWaitlistEntry?.is_free_month && !alreadyPremium) {
         profileUpdate.subscription_tier = "monthly";
         profileUpdate.subscription_status = "trialing";
         profileUpdate.trial_source = "waitlist";
@@ -129,19 +142,19 @@ export async function POST(request: Request) {
         profileUpdate.waitlist_free_month_email = normalizedEmail;
         waitlistGrantApplied = true;
 
-        await admin
+        await adminDb
           .from("waitlist_signups")
           .update({
             redeemed_at: nowIso,
             redeemed_by_user_id: user.id,
           })
-          .eq("id", waitlistEntry.id);
+          .eq("id", typedWaitlistEntry.id);
       }
     }
 
-    await admin.from("profiles").upsert(profileUpdate, { onConflict: "id" });
+    await adminDb.from("profiles").upsert(profileUpdate, { onConflict: "id" });
 
-    const { data: refreshedProfile } = await admin
+    const { data: refreshedProfile } = await adminDb
       .from("profiles")
       .select(PROFILE_ENTITLEMENT_SELECT)
       .eq("id", user.id)
@@ -149,7 +162,7 @@ export async function POST(request: Request) {
 
     const entitlement = buildEntitlement({
       user,
-      profile: refreshedProfile,
+      profile: refreshedProfile as EntitlementProfileRow | null,
     });
 
     return NextResponse.json(

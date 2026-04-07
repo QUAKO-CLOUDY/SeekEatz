@@ -610,7 +610,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     }
   }, [isSignedIn, userId, currentSessionId, ensureChatSessionOwned]);
 
-  const logUsageEvent = useCallback(async (eventType: 'chat_submit' | 'chat_response' | 'limit_hit', metadata?: any) => {
+  const logUsageEvent = useCallback(async (eventType: 'chat_submit' | 'chat_response' | 'limit_hit', metadata?: Record<string, unknown>) => {
     if (!isSignedIn || !userId) return;
 
     try {
@@ -1055,7 +1055,11 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
     // Log chat submit event (fire-and-forget — NEVER block the send flow)
     if (isSignedIn) {
-      logUsageEvent('chat_submit', { message: trimmedText }).catch(() => { });
+      logUsageEvent('chat_submit', {
+        source: 'chat_composer',
+        queryLength: trimmedText.length,
+        isMealIntent: isMealIntentQuery(trimmedText),
+      }).catch(() => { });
     }
 
     // Cancel any existing request
@@ -1527,7 +1531,11 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
     if (isSignedIn) {
       logChatMessage('user', promptText).catch(() => {});
-      logUsageEvent('chat_submit', { message: promptText, repeatedQuickPrompt: true }).catch(() => {});
+      logUsageEvent('chat_submit', {
+        source: 'quick_prompt',
+        queryLength: promptText.length,
+        repeatedQuickPrompt: true,
+      }).catch(() => {});
     }
 
     setMessages((prev) => [...prev, userMessage]);

@@ -626,6 +626,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       let responseSearchKey: string | undefined;
       let hasMore: boolean = false;
       const responseMessage = !Array.isArray(data) && typeof data?.message === 'string' ? data.message : undefined;
+      const responseNextOffset = !Array.isArray(data) && typeof data?.nextOffset === 'number' ? data.nextOffset : undefined;
       
       if (Array.isArray(data)) {
         normalizedResults = data;
@@ -651,7 +652,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         meals: fullMeals,
         searchKey: responseSearchKey,
         hasMore,
-        nextOffset: typeof data?.nextOffset === 'number' ? data.nextOffset : undefined,
+        nextOffset: responseNextOffset,
         message: responseMessage,
       };
     } catch (error) {

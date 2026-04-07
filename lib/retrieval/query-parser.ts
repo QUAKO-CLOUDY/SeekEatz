@@ -94,6 +94,8 @@ const NON_CUISINE_PROXY_TERMS = new Set([
   'burger',
   'burgers',
   'pizza',
+  'pasta',
+  'pastas',
   'smoothie',
   'bagel',
   'taco',

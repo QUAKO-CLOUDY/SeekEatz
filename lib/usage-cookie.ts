@@ -1,27 +1,79 @@
 import { cookies, headers } from "next/headers";
 import { createHmac } from "crypto";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { FREE_DAILY_QUERY_LIMIT } from "@/lib/entitlements";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const serviceKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-const supabase = createClient(supabaseUrl, serviceKey, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-  },
-});
-
-const SECRET_KEY =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  "default-secret-key-do-not-use-in-prod";
 const COOKIE_NAME = "usage_token";
 
+type UsageDatabase = {
+  public: {
+    Tables: {
+      ip_usage: {
+        Row: {
+          ip: string;
+          usage_count: number | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          ip: string;
+          usage_count?: number | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          ip?: string;
+          usage_count?: number | null;
+          updated_at?: string | null;
+        };
+        Relationships: [];
+      };
+    };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
+  };
+};
+
+let usageSupabase: SupabaseClient<UsageDatabase> | null = null;
+
+function getUsageTokenSecret() {
+  const secret = process.env.USAGE_TOKEN_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (secret) {
+    return secret;
+  }
+
+  throw new Error("Missing env: USAGE_TOKEN_SECRET or SUPABASE_SERVICE_ROLE_KEY");
+}
+
+function getUsageSupabase() {
+  if (usageSupabase) {
+    return usageSupabase;
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Missing env: NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
+    }
+
+    return null;
+  }
+
+  usageSupabase = createClient<UsageDatabase>(supabaseUrl, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
+
+  return usageSupabase;
+}
+
 function sign(value: string) {
-  const hmac = createHmac("sha256", SECRET_KEY);
+  const hmac = createHmac("sha256", getUsageTokenSecret());
   hmac.update(value);
   return hmac.digest("hex");
 }
@@ -81,6 +133,11 @@ async function getIpUsage(ip: string): Promise<number> {
   }
 
   try {
+    const supabase = getUsageSupabase();
+    if (!supabase) {
+      return 0;
+    }
+
     const { data, error } = await supabase
       .from("ip_usage")
       .select("usage_count, updated_at")
@@ -108,6 +165,11 @@ async function incrementIpUsage(ip: string): Promise<number> {
   }
 
   try {
+    const supabase = getUsageSupabase();
+    if (!supabase) {
+      return 0;
+    }
+
     const current = await getIpUsage(ip);
     const next = current + 1;
 

@@ -141,7 +141,15 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
     category === 'Grocery' ||
     category === 'Hot Bar';
   const compactMetricCardBase = "min-w-0 rounded-xl border px-1.5 py-1.5 text-center shadow-sm";
-  const regularMetricCardBase = "rounded-xl border p-2 text-center shadow-sm";
+  const remainingCaloriesLabel = remainingCalories === null
+    ? null
+    : remainingCalories >= 0
+      ? `Leaves ${remainingCalories} cal`
+      : `Over by ${Math.abs(remainingCalories)} cal`;
+  const remainingStatusClasses = remainingCalories !== null && remainingCalories >= 0
+    ? "border-emerald-400/25 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300"
+    : "border-red-400/25 bg-red-500/10 text-red-600 dark:text-red-300";
+  const regularMetricCardBase = "rounded-lg border p-2 text-center shadow-sm";
 
   // Compact mode: horizontal layout matching reference image (340px × 75px)
   if (compact) {
@@ -266,88 +274,60 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
   return (
     <div
       onClick={onClick}
-      className={`h-full flex flex-col bg-gradient-to-br from-card to-muted dark:from-gray-900 dark:to-gray-800 rounded-3xl shadow-xl hover:shadow-2xl transition-all cursor-pointer overflow-hidden hover:border-cyan-500/50 hover:scale-[1.02] group relative w-full ${isGrocery
+      className={`group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-xl bg-card shadow-md transition-all hover:border-cyan-500/40 hover:shadow-lg ${isGrocery
         ? 'border-2 border-green-500/30'
         : 'border border-border'
         }`}
     >
-      {/* Image Container */}
-      <div
-        className="relative w-full overflow-hidden rounded-t-3xl bg-gradient-to-br from-muted to-muted/50"
-        style={{
-          aspectRatio: '16 / 9',
-          padding: '16px'
-        }}
-      >
-        {/* Restaurant Logo - Fills entire image area */}
-        <div className="w-full h-full flex items-center justify-center">
-          <img
-            src={logoSrcWithCacheBust}
-            alt={restaurantName}
-            className="w-full h-full object-contain object-center"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-              objectPosition: 'center',
-              display: 'block',
-              maxWidth: '100%',
-              maxHeight: '100%'
-            }}
-            onError={(e) => {
-              const fallbackSrc = `/logos/default.png?v=${meal.id}`;
-              if (e.currentTarget.src.includes('/logos/default.png')) {
-                e.currentTarget.style.display = 'none';
-                return;
-              }
-
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = fallbackSrc;
-            }}
-          />
-        </div>
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background dark:from-gray-950 via-background/20 dark:via-gray-950/20 to-transparent pointer-events-none" />
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleFavorite?.();
-          }}
-          className="absolute top-2 right-2 bg-background/80 dark:bg-gray-900/80 backdrop-blur-md rounded-full p-2 border border-border z-10 hover:bg-muted/90 dark:hover:bg-gray-800/90 transition-colors"
-        >
-          <Heart
-            className={`w-5 h-5 transition-colors ${isFavorite ? "fill-pink-500 text-pink-500" : "text-muted-foreground"
-              }`}
-          />
-        </button>
-
-        {meal.rating && (
-          <div className="absolute bottom-3 left-3 flex items-center gap-2 z-10">
-            <div className="bg-cyan-500/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1">
-              <Star className="w-3 h-3 text-white fill-white" />
-              <span className="text-white text-xs font-bold">{meal.rating}</span>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="p-3 sm:p-4 flex flex-col flex-1">
-        <div className="flex items-start mb-3 gap-3">
+      <div className="flex flex-1 flex-col p-3 sm:p-4">
+        <div className="mb-3 flex items-start gap-3">
+          {onToggleFavorite && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleFavorite?.();
+              }}
+              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-border bg-background/80 text-muted-foreground transition-colors hover:bg-muted/90 dark:bg-gray-900/80 dark:hover:bg-gray-800/90"
+              aria-label={isFavorite ? "Remove from favorites" : "Save meal"}
+            >
+              <Heart
+                className={`h-4 w-4 transition-colors ${isFavorite ? "fill-pink-500 text-pink-500" : ""}`}
+              />
+            </button>
+          )}
           <div className="flex-1 min-w-0">
-            <p className="text-muted-foreground text-sm sm:text-base truncate mb-1">
+            <p className="mb-1 truncate text-xs font-medium text-muted-foreground sm:text-sm">
               {restaurantName}
             </p>
-            <h3 className="text-foreground mt-0.5 font-semibold line-clamp-2 break-words text-base sm:text-lg">
+            <h3 className="mt-0.5 line-clamp-2 break-words text-base font-semibold leading-snug text-foreground sm:text-lg">
               {meal.name}
             </h3>
-            {meal.distance !== undefined && meal.distance !== null && (
-              <p className="text-muted-foreground mt-0.5 text-xs">{meal.distance.toFixed(1)} miles away</p>
-            )}
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              {meal.distance !== undefined && meal.distance !== null ? (
+                <span>{meal.distance.toFixed(1)} mi</span>
+              ) : null}
+              {meal.rating ? (
+                <span className="flex items-center gap-1">
+                  <Star className="h-3 w-3 fill-cyan-400 text-cyan-400" />
+                  {meal.rating}
+                </span>
+              ) : null}
+            </div>
           </div>
         </div>
 
-        <div className="mt-auto ml-0.5 grid grid-cols-4 gap-1.5 sm:ml-1 sm:gap-2 text-[10px] sm:text-xs">
+        {remainingCaloriesLabel ? (
+          <div className={`mb-3 rounded-lg border px-3 py-2 ${remainingStatusClasses}`}>
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[11px] font-semibold uppercase text-muted-foreground">
+                After this meal
+              </p>
+              <p className="text-sm font-bold">{remainingCaloriesLabel}</p>
+            </div>
+          </div>
+        ) : null}
+
+        <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
           <div className={`${regularMetricCardBase} border-pink-200/80 bg-pink-50/90 dark:border-pink-500/20 dark:bg-pink-500/10`}>
             <div className="flex items-center justify-center mb-1">
               <Flame className="w-3 h-3 text-pink-500 dark:text-pink-300" />
@@ -356,13 +336,6 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             <p className="text-pink-600 dark:text-pink-300/70 text-[10px]">cal</p>
             {!logReady ? (
               <p className="text-[9px] mt-0.5 text-muted-foreground">—</p>
-            ) : remainingCalories !== null ? (
-              <p className={`text-[9px] mt-0.5 ${remainingCalories >= 0
-                ? 'text-green-600 dark:text-green-400'
-                : 'text-red-600 dark:text-red-400'
-                }`}>
-                {remainingCalories >= 0 ? '+' : ''}{remainingCalories} left
-              </p>
             ) : null}
           </div>
           <div className="rounded-md border border-cyan-400/30 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 p-2 text-center">

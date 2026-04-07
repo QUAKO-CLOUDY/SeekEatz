@@ -981,7 +981,9 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
             favoriteMeals={favoriteMeals}
             favoriteMealsData={favoriteMealsData}
             loggedMeals={loggedMeals}
+            userProfile={userProfile}
             onMealSelect={handleMealSelect}
+            onLogMeal={handleLogMeal}
             onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
           />
         )}

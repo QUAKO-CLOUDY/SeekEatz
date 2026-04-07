@@ -1,14 +1,24 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { OnboardingFlow } from "@/app/components/OnboardingFlow";
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isPostSignupFlow = searchParams.get("afterSignup") === "1";
   const routeToPlanSelection = useCallback(() => {
     router.replace("/upgrade?flow=onboarding&tutorial=1");
+  }, [router]);
+  const routeToAppTutorial = useCallback(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("seekeatz_start_app_tutorial", "true");
+      localStorage.removeItem("seekeatz_current_screen");
+      localStorage.removeItem("seekeatz_nav_history");
+    }
+    router.replace("/chat");
   }, [router]);
 
   // Safety check: If authenticated user has already completed onboarding, redirect to settings
@@ -21,6 +31,10 @@ export default function OnboardingPage() {
       // Only check and redirect if user is authenticated
       if (!user) {
         // Signed-out users can access onboarding - no redirect
+        return;
+      }
+
+      if (isPostSignupFlow) {
         return;
       }
 
@@ -58,15 +72,20 @@ export default function OnboardingPage() {
     };
 
     checkOnboardingStatus();
-  }, [routeToPlanSelection]);
+  }, [isPostSignupFlow, routeToPlanSelection]);
 
   const handleComplete = () => {
+    if (isPostSignupFlow) {
+      routeToAppTutorial();
+      return;
+    }
+
     routeToPlanSelection();
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <OnboardingFlow onComplete={handleComplete} />
+      <OnboardingFlow onComplete={handleComplete} initialStep={isPostSignupFlow ? 0 : -1} />
     </div>
   );
 }

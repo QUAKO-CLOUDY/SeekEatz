@@ -166,7 +166,7 @@ export function AppTutorialOverlay({ step, stepIndex, totalSteps, onNext }: Prop
 
       <div
         ref={cardRef}
-        className="absolute w-[min(360px,calc(100vw-2rem))] rounded-[1.75rem] border border-white/15 bg-slate-950/88 p-5 text-white shadow-2xl"
+        className="absolute w-[min(360px,calc(100vw-2rem))] rounded-[1.75rem] border border-slate-200 bg-white p-5 text-black shadow-2xl"
         style={{
           top: layout.cardTop,
           left: layout.cardLeft,
@@ -174,7 +174,7 @@ export function AppTutorialOverlay({ step, stepIndex, totalSteps, onNext }: Prop
       >
         {layout.arrow ? (
           <div
-            className="absolute h-4 w-4 rotate-45 border border-white/15 bg-slate-950/96"
+            className="absolute h-4 w-4 rotate-45 border border-slate-200 bg-white"
             style={{
               left: layout.arrow.left,
               top: layout.arrow.top,
@@ -186,11 +186,11 @@ export function AppTutorialOverlay({ step, stepIndex, totalSteps, onNext }: Prop
           />
         ) : null}
 
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-300">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-cyan-600">
           Tutorial {stepIndex + 1} of {totalSteps}
         </p>
         <h2 className="mt-3 text-xl font-semibold leading-tight">{step.title}</h2>
-        <p className="mt-3 text-sm leading-6 text-slate-300">{step.body}</p>
+        <p className="mt-3 text-sm leading-6 text-black">{step.body}</p>
 
         <button
           type="button"

@@ -140,7 +140,7 @@ const CATEGORY_MAP: Array<[RegExp, string]> = [
   [BREAKFAST_SANDWICH_REGEX, 'breakfast_sandwich'],
   [/\bbreakfast burrito\b/, 'burrito'],
   [/\burger\b|\bcheeseburger\b|\bpatty\b/, 'burger'],
-  [/\bpizza\b|\bpie\b|\bslice\b/, 'pizza'],
+  [/\bpizza\b|\bflatbread\b|\bcalzone\b|\bstromboli\b/, 'pizza'],
   [/\bsalad.*bowl\b|\bbowl.*salad\b|\bgrain bowl\b/, 'bowl'],
   [/\bsalad\b/, 'salad'],
   [/\bburrito\b/, 'burrito'],

@@ -51,10 +51,12 @@ export default function UpgradePage() {
   const { entitlement, refresh } = useAccountEntitlement(true);
   const isMasterMode = searchParams.get("master") === "1";
   const shouldStartTutorial = searchParams.get("tutorial") === "1";
+  const postSignupOnboardingPath = "/onboarding?afterSignup=1";
   const postAuthRedirect = shouldStartTutorial ? "/chat" : "/upgrade";
   const encodedPostAuthRedirect = encodeURIComponent(postAuthRedirect);
+  const encodedPostSignupOnboardingPath = encodeURIComponent(postSignupOnboardingPath);
   const signInHref = `/auth/signin?redirectTo=${encodedPostAuthRedirect}&switch=1${shouldStartTutorial ? "&tutorial=1" : ""}${isMasterMode ? "&master=1" : ""}`;
-  const signUpHref = `/auth/signup?redirectTo=${encodedPostAuthRedirect}&switch=1${shouldStartTutorial ? "&tutorial=1" : ""}${isMasterMode ? "&master=1" : ""}`;
+  const signUpHref = `/auth/signup?redirectTo=${encodedPostSignupOnboardingPath}&switch=1&tutorial=1${isMasterMode ? "&master=1" : ""}`;
 
   const getOnboardingFlag = useCallback(
     () =>
@@ -189,7 +191,7 @@ export default function UpgradePage() {
                     onClick={() => {
                       if (plan.id === "free") {
                         router.push(
-                          `/auth/signup?redirectTo=${encodedPostAuthRedirect}&switch=1${shouldStartTutorial ? "&tutorial=1" : ""}&plan=free&method=email${isMasterMode ? "&master=1" : ""}`,
+                          `/auth/signup?redirectTo=${encodedPostSignupOnboardingPath}&switch=1&tutorial=1&plan=free&method=email${isMasterMode ? "&master=1" : ""}`,
                         );
                         return;
                       }
@@ -221,9 +223,9 @@ export default function UpgradePage() {
                 <AuthProviders
                   className="mt-2"
                   emailHref={signUpHref}
-                  oauthRedirectPath={postAuthRedirect}
+                  oauthRedirectPath={postSignupOnboardingPath}
                   onBeforeRedirect={() => {
-                    if (shouldStartTutorial && typeof window !== "undefined") {
+                    if (typeof window !== "undefined") {
                       localStorage.setItem("seekeatz_start_app_tutorial", "true");
                     }
                   }}

@@ -9,13 +9,14 @@ import { storeLocation } from "@/lib/location";
 
 type Props = {
   onComplete: () => void;
+  initialStep?: number;
 };
 
 const TOTAL_STEPS = 4;
 
-export function OnboardingFlow({ onComplete }: Props) {
+export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
   const supabase = createClient();
-  const [step, setStep] = useState(-1); // -1 = Welcome, 0-3 = onboarding slides
+  const [step, setStep] = useState(initialStep); // -1 = Welcome, 0-3 = onboarding slides
   const [isRequestingLocation, setIsRequestingLocation] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
 

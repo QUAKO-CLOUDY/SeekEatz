@@ -122,7 +122,7 @@ export async function buildFilters(
 
   // ── Dish / protein keyword (name-based SQL filter) ────────────────────────
   // e.g. "steak dinner" → p_name_keyword = 'steak' so SQL filters name ILIKE '%steak%'
-  if (parsed.dishKeywords && parsed.dishKeywords.length > 0) {
+  if (!parsed.normalizedCategory && parsed.dishKeywords && parsed.dishKeywords.length > 0) {
     params.p_name_keyword = parsed.dishKeywords[0];
   }
 

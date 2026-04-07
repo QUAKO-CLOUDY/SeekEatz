@@ -23,6 +23,7 @@ type MenuItemRow = {
   restaurant_name: string;
   name: string;
   category: string | null;
+  normalized_category: string | null;
   item_type: string | null;
   is_modifier: boolean | null;
   is_searchable: boolean | null;
@@ -135,6 +136,26 @@ function inferMenuItemUpdate(item: MenuItemRow): MenuItemUpdate | null {
       modifier_unit_label: /^limited time offerings$/.test(category) ? 'portion' : null,
       modifier_unit_default_qty: /^limited time offerings$/.test(category) ? 1 : null,
       modifier_unit_max_qty: /^limited time offerings$/.test(category) ? 2 : null,
+    });
+  } else if (
+    restaurant === 'chopt creative salad co.' &&
+    /^(salads|salad wraps|warm bowls|soups|sandwiches)$/.test(category)
+  ) {
+    const normalizedCategory =
+      category === 'salads' ? 'salad' :
+      category === 'salad wraps' ? 'wrap' :
+      category === 'warm bowls' ? 'bowl' :
+      category === 'sandwiches' ? 'sandwich' :
+      'entree';
+
+    apply({
+      normalized_category: normalizedCategory,
+      item_type: 'meal',
+      is_modifier: false,
+      is_searchable: true,
+      modifier_unit_label: null,
+      modifier_unit_default_qty: null,
+      modifier_unit_max_qty: null,
     });
   } else if (restaurant === 'waba grill' && /^(family a la carte|sides|sauce \/ dressing)$/.test(category)) {
     const isSauceLike = /^sauce \/ dressing$/.test(category);
@@ -379,6 +400,7 @@ function inferMenuItemUpdate(item: MenuItemRow): MenuItemUpdate | null {
     item.item_type !== (next.item_type ?? item.item_type) ||
     item.is_modifier !== (next.is_modifier ?? item.is_modifier) ||
     item.is_searchable !== (next.is_searchable ?? item.is_searchable) ||
+    item.normalized_category !== (next.normalized_category ?? item.normalized_category) ||
     item.modifier_unit_label !== (next.modifier_unit_label ?? item.modifier_unit_label) ||
     item.modifier_unit_default_qty !== (next.modifier_unit_default_qty ?? item.modifier_unit_default_qty) ||
     item.modifier_unit_max_qty !== (next.modifier_unit_max_qty ?? item.modifier_unit_max_qty)
@@ -597,14 +619,14 @@ const RESTAURANT_RULES: Record<string, RestaurantRuleSet> = {
   'Chopt Creative Salad Co.': {
     relationTemplates: [
       {
-        mealCategoryPatterns: [/^salads$/i, /^salad wraps$/i, /^warm bowls$/i],
+        mealCategoryPatterns: [/^salads$/i, /^salad wraps$/i, /^warm bowls$/i, /^sandwiches$/i],
         childCategoryPatterns: [/^the goods$/i],
         relationType: 'protein_option',
         groupName: 'Protein Options',
         maxQuantity: 2,
       },
       {
-        mealCategoryPatterns: [/^salads$/i, /^salad wraps$/i, /^warm bowls$/i],
+        mealCategoryPatterns: [/^salads$/i, /^salad wraps$/i, /^warm bowls$/i, /^sandwiches$/i],
         childCategoryPatterns: [/^housemade dressings$/i],
         relationType: 'dressing_option',
         groupName: 'Dressings',
@@ -757,35 +779,6 @@ const RESTAURANT_RULES: Record<string, RestaurantRuleSet> = {
       },
     ],
   },
-  'QDOBA MEXICAN EATS': {
-    relationTemplates: [
-      {
-        mealCategoryPatterns: [/^signature eats/i, /^limited time offerings$/i],
-        childCategoryPatterns: [/^ingredients for entr/i, /^ingredients for kids items$/i],
-        childNamePatterns: [/chicken|steak|brisket|chorizo|shrimp|impossible|beef|pork/i],
-        relationType: 'protein_option',
-        groupName: 'Protein Options',
-        maxQuantity: 2,
-      },
-      {
-        mealCategoryPatterns: [/^signature eats/i, /^limited time offerings$/i],
-        childCategoryPatterns: [/^ingredients for entr/i, /^ingredients for kids items$/i],
-        childNamePatterns: [/crema|vinaigrette|queso|guacamole|salsa|sauce/i],
-        relationType: 'sauce_option',
-        groupName: 'Sauces',
-        maxQuantity: 3,
-      },
-      {
-        mealCategoryPatterns: [/^signature eats/i, /^limited time offerings$/i],
-        childCategoryPatterns: [/^ingredients for entr/i, /^ingredients for kids items$/i],
-        childNamePatterns: [/beans|rice|cheese|lettuce|cilantro|tortilla|shell|fajita|jalapeno|pico|corn/i],
-        childExcludeNamePatterns: [/crema|vinaigrette|queso|guacamole|salsa|sauce/i],
-        relationType: 'add_on',
-        groupName: 'Bases & Toppings',
-        maxQuantity: 2,
-      },
-    ],
-  },
   "Moe's Southwest Grill": {
     relationTemplates: [
       {
@@ -885,47 +878,6 @@ const RESTAURANT_RULES: Record<string, RestaurantRuleSet> = {
     ],
   },
   'The Habit Burger & Grill': {
-    relationTemplates: [
-      {
-        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i, /^salads$/i],
-        childCategoryPatterns: [/^optional items$/i],
-        childNamePatterns: [/ahi tuna|beef patty|chicken breast|sirloin steak|veggie patty/i],
-        relationType: 'protein_option',
-        groupName: 'Protein Options',
-        maxQuantity: 2,
-      },
-      {
-        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i, /^salads$/i],
-        childCategoryPatterns: [/^dressings & sauces$/i],
-        relationType: 'sauce_option',
-        groupName: 'Sauces',
-        maxQuantity: 3,
-      },
-      {
-        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i, /^salads$/i],
-        childCategoryPatterns: [/^optional items$/i],
-        childExcludeNamePatterns: [/ahi tuna|beef patty|chicken breast|sirloin steak|veggie patty/i],
-        relationType: 'add_on',
-        groupName: 'Toppings',
-        maxQuantity: 2,
-      },
-      {
-        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i],
-        childCategoryPatterns: [/^bread options$/i],
-        relationType: 'swap_candidate',
-        groupName: 'Bread Options',
-        maxQuantity: 1,
-      },
-      {
-        mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i, /^salads$/i],
-        childCategoryPatterns: [/^sides$/i],
-        relationType: 'side_option',
-        groupName: 'Sides',
-        maxQuantity: 1,
-      },
-    ],
-  },
-  'Habit Burger & Grill': {
     relationTemplates: [
       {
         mealCategoryPatterns: [/^charburgers$/i, /^sandwiches$/i, /^salads$/i],
@@ -1111,6 +1063,7 @@ async function fetchRestaurantItems(restaurantName: string): Promise<MenuItemRow
       restaurant_name,
       name,
       category,
+      normalized_category,
       item_type,
       is_modifier,
       is_searchable,
@@ -1144,6 +1097,10 @@ async function upsertMenuItemUpdates(
       modifier_unit_default_qty: update.modifier_unit_default_qty,
       modifier_unit_max_qty: update.modifier_unit_max_qty,
     };
+
+    if (Object.prototype.hasOwnProperty.call(update, 'normalized_category')) {
+      Object.assign(payload, { normalized_category: update.normalized_category });
+    }
 
     const { error } = await supabase
       .from('menu_items')

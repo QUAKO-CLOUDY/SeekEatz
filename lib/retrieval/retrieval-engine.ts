@@ -24,6 +24,8 @@ const VECTOR_MATCH_COUNT = 25;
 const VECTOR_THRESHOLD = 0.25;
 const CUISINE_DISCOVERY_LIMIT = 80;
 const CUISINE_DISCOVERY_TARGET = 40;
+const CATEGORY_DISCOVERY_LIMIT = 140;
+const CATEGORY_DISCOVERY_TARGET = 80;
 const BROAD_CALORIE_DISCOVERY_LIMIT = 120;
 const BROAD_CALORIE_DISCOVERY_TARGET = 60;
 const BROAD_DISCOVERY_LIMIT = 180;
@@ -1416,6 +1418,18 @@ function isBroadCalorieCapDiscoveryQuery(parsed: ParsedQuery): boolean {
   );
 }
 
+function isCategoryDiscoveryQuery(
+  parsed: ParsedQuery,
+  restaurantVariants?: string[]
+): boolean {
+  return Boolean(
+    parsed.categories.length > 0 &&
+    !parsed.restaurantQuery &&
+    !(restaurantVariants?.length) &&
+    parsed.cuisineOrStyle.length === 0
+  );
+}
+
 function isBroadDiscoveryQuery(
   parsed: ParsedQuery,
   restaurantVariants?: string[]
@@ -1442,6 +1456,10 @@ function getCandidateLimit(
     return Math.max(limit * 12, BROAD_CALORIE_DISCOVERY_LIMIT);
   }
 
+  if (isCategoryDiscoveryQuery(parsed, restaurantVariants)) {
+    return Math.max(limit * 14, CATEGORY_DISCOVERY_LIMIT);
+  }
+
   if (isBroadDiscoveryQuery(parsed, restaurantVariants)) {
     return Math.max(limit * 18, BROAD_DISCOVERY_LIMIT);
   }
@@ -1460,6 +1478,10 @@ function getTargetResultWindow(
 
   if (isBroadCalorieCapDiscoveryQuery(parsed)) {
     return Math.max(offset + limit + 30, BROAD_CALORIE_DISCOVERY_TARGET);
+  }
+
+  if (isCategoryDiscoveryQuery(parsed)) {
+    return Math.max(offset + limit + 30, CATEGORY_DISCOVERY_TARGET);
   }
 
   if (isBroadDiscoveryQuery(parsed)) {

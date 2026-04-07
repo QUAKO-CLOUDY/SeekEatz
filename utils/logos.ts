@@ -77,11 +77,11 @@ const RESTAURANT_LOGO_MAP: Record<string, string> = {
   'just_salad': 'just_salad',
 
   // Chopt Creative Salad Co. variations
-  'chopt creative salad co': 'chopt',
-  'chopt creative salad co.': 'chopt',
-  'chopt creative salad company': 'chopt',
-  'chopt_creative_salad_co': 'chopt',
-  'chopt': 'chopt',
+  'chopt creative salad co': 'chopt_creative_salad',
+  'chopt creative salad co.': 'chopt_creative_salad',
+  'chopt creative salad company': 'chopt_creative_salad',
+  'chopt_creative_salad_co': 'chopt_creative_salad',
+  'chopt': 'chopt_creative_salad',
 
   // Dig Inn variations
   'dig inn': 'dig_inn',
@@ -217,9 +217,9 @@ const RESTAURANT_LOGO_MAP: Record<string, string> = {
   // Wingstop variations
   'wingstop': 'wingstop',
 
-  // Shake Shack - no logo available, use default
-  'shake shack': 'default',
-  'shake_shack': 'default',
+  // Shake Shack variations
+  'shake shack': 'shakeshack',
+  'shake_shack': 'shakeshack',
 
   // 3 Natives variations
   '3 natives': '3 natives',
@@ -230,12 +230,12 @@ const RESTAURANT_LOGO_MAP: Record<string, string> = {
   'another broken egg': 'Another Broken Egg Cafe',
 
   // BJ\'s Restaurant variations
-  'bj\'s restaurant & brewhouse': 'BJs',
-  'bj\'s restaurant and brewhouse': 'BJs',
-  'bj\'s brewhouse': 'BJs',
-  'bjs restaurant': 'BJs',
-  'bj\'s': 'BJs',
-  'bjs': 'BJs',
+  'bj\'s restaurant & brewhouse': 'BJ\'s_Restaurant_&_Brewhouse',
+  'bj\'s restaurant and brewhouse': 'BJ\'s_Restaurant_&_Brewhouse',
+  'bj\'s brewhouse': 'BJ\'s_Restaurant_&_Brewhouse',
+  'bjs restaurant': 'BJ\'s_Restaurant_&_Brewhouse',
+  'bj\'s': 'BJ\'s_Restaurant_&_Brewhouse',
+  'bjs': 'BJ\'s_Restaurant_&_Brewhouse',
 
   // Bertucci\'s variations
   'bertucci\'s': 'Bertuccis',
@@ -372,6 +372,10 @@ const RESTAURANT_LOGO_MAP: Record<string, string> = {
   'gregory\'s': 'gregorys coffee',
 
   // Huey Magoo\'s variations
+  'magoo\'s chicken & tenders': 'huey magoos',
+  'magoo\'s chicken and tenders': 'huey magoos',
+  'magoos chicken and tenders': 'huey magoos',
+  'magoos_chicken_and_tenders': 'huey magoos',
   'huey magoo\'s chicken tenders': 'huey magoos',
   'huey magoos chicken tenders': 'huey magoos',
   'huey magoo\'s': 'huey magoos',
@@ -394,6 +398,8 @@ const RESTAURANT_LOGO_MAP: Record<string, string> = {
   'longhornsteakhouse': 'longhorn steakhouse',
 
   // Margaritaville variations
+  'jimmy buffett\'s margaritaville orlando': 'margaritaville',
+  'jimmy buffetts margaritaville orlando': 'margaritaville',
   'margaritaville': 'margaritaville',
   'margaritaville restaurant': 'margaritaville',
 
@@ -407,7 +413,9 @@ const RESTAURANT_LOGO_MAP: Record<string, string> = {
   'native grill and wings': 'native grill and wings',
   'native grill': 'native grill and wings',
 
-  // Nektar Juice Bar variations
+  // Nekter Juice Bar variations
+  'nekter juice bar': 'nektar juice bar',
+  'nekter': 'nektar juice bar',
   'nektar juice bar': 'nektar juice bar',
   'nektar': 'nektar juice bar',
 
@@ -446,6 +454,8 @@ const RESTAURANT_LOGO_MAP: Record<string, string> = {
   'proteinhouse': 'protein house',
 
   // Pura Vida variations
+  'pura vida miami (south florida)': 'pura vida',
+  'pura vida miami south florida': 'pura vida',
   'pura vida': 'pura vida',
   'pura vida restaurants': 'pura vida',
 

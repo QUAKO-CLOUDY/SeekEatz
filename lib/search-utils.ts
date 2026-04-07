@@ -4,6 +4,201 @@
  */
 
 import type { SearchParams } from '@/app/types';
+import { createClient } from '@supabase/supabase-js';
+
+type BareRestaurantResolution = {
+    canonicalName: string;
+    restaurantId?: string;
+    variants: string[];
+};
+
+const RESTAURANT_STOPWORDS = new Set([
+    'the',
+    'a',
+    'an',
+    'and',
+    'of',
+    'co',
+    'company',
+    'restaurant',
+    'grill',
+    'cafe',
+    'bar',
+    'kitchen',
+]);
+
+const SINGLE_TOKEN_FOOD_TERMS = new Set([
+    'burger',
+    'burgers',
+    'burrito',
+    'burritos',
+    'pizza',
+    'pizzas',
+    'taco',
+    'tacos',
+    'salad',
+    'salads',
+    'sandwich',
+    'sandwiches',
+    'smoothie',
+    'smoothies',
+    'bowl',
+    'bowls',
+    'wrap',
+    'wraps',
+    'chicken',
+    'steak',
+    'soup',
+    'soups',
+    'pasta',
+    'sushi',
+]);
+
+function normalizeRestaurantLookup(value: string): string {
+    return value
+        .toLowerCase()
+        .trim()
+        .replace(/&/g, 'and')
+        .replace(/['.,\-]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function restaurantTokens(value: string): string[] {
+    return normalizeRestaurantLookup(value)
+        .split(/\s+/)
+        .filter((token) => token.length > 0 && !RESTAURANT_STOPWORDS.has(token));
+}
+
+function extractBareRestaurantCandidateText(queryText: string): string {
+    return queryText
+        .replace(/\b(under|below|less\s+than|at\s+most|max(?:imum)?|over|above|more\s+than|at\s+least|min(?:imum)?)\s+\d+\s*(?:calories?|cal|kcal|g|grams?|protein|pro|carbs?|carbohydrates?|fat|fats?)\b/gi, ' ')
+        .replace(/\b\d+\s*(?:g|grams?)\s+(?:protein|pro|carbs?|fat|fats?)\b/gi, ' ')
+        .replace(/\b\d+\s*(?:calories?|cal|kcal)\b/gi, ' ')
+        .replace(/\b(?:show|find|get|give|recommend|suggest|search|me|some|meals?|food|options?|items?|menu|from|at|for|with|please)\b/gi, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+async function resolveBareRestaurantFromDatabase(queryText: string): Promise<BareRestaurantResolution | undefined> {
+    const candidateText = extractBareRestaurantCandidateText(queryText);
+    const queryTokens = restaurantTokens(candidateText);
+
+    if (queryTokens.length === 0) {
+        return undefined;
+    }
+
+    if (queryTokens.length === 1 && SINGLE_TOKEN_FOOD_TERMS.has(queryTokens[0])) {
+        return undefined;
+    }
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+        return undefined;
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+        auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    const { data: restaurants, error } = await supabase
+        .from('restaurants')
+        .select('id, name, aliases')
+        .not('name', 'is', null);
+
+    if (error || !restaurants?.length) {
+        return undefined;
+    }
+
+    type Candidate = {
+        id: string;
+        name: string;
+        score: number;
+    };
+
+    const queryNorm = normalizeRestaurantLookup(candidateText);
+    const candidates: Candidate[] = [];
+
+    for (const restaurant of restaurants as Array<{ id?: string; name?: string; aliases?: string[] | null }>) {
+        if (!restaurant.name) {
+            continue;
+        }
+
+        const candidateNames = [restaurant.name, ...(restaurant.aliases ?? [])].filter(Boolean);
+        let bestScore = 0;
+
+        for (const candidateName of candidateNames) {
+            const candidateNorm = normalizeRestaurantLookup(candidateName);
+            const candidateTokens = restaurantTokens(candidateName);
+
+            if (candidateNorm === queryNorm) {
+                bestScore = Math.max(bestScore, 1);
+                continue;
+            }
+
+            const allQueryTokensMatch =
+                queryTokens.length > 0 &&
+                queryTokens.every((queryToken) => candidateTokens.includes(queryToken));
+
+            if (allQueryTokensMatch) {
+                const scoreBase = queryTokens.length === 1 ? 0.82 : 0.9;
+                bestScore = Math.max(bestScore, scoreBase + 0.1 * (queryTokens.length / Math.max(candidateTokens.length, 1)));
+            }
+        }
+
+        if (bestScore > 0) {
+            candidates.push({
+                id: restaurant.id ?? '',
+                name: restaurant.name,
+                score: bestScore,
+            });
+        }
+    }
+
+    candidates.sort((a, b) => b.score - a.score || a.name.length - b.name.length);
+    const match = candidates[0];
+
+    if (!match) {
+        return undefined;
+    }
+
+    const { data: menuNames } = await supabase
+        .from('menu_items')
+        .select('restaurant_name')
+        .ilike('restaurant_name', `%${queryTokens[0]}%`)
+        .limit(100);
+
+    const canonicalNorm = normalizeRestaurantLookup(match.name);
+    const canonicalTokens = restaurantTokens(match.name);
+    const variants = new Set<string>([match.name]);
+
+    for (const row of (menuNames ?? []) as Array<{ restaurant_name?: string | null }>) {
+        const value = row.restaurant_name;
+        if (!value) {
+            continue;
+        }
+
+        const valueNorm = normalizeRestaurantLookup(value);
+        const valueTokens = restaurantTokens(value);
+
+        const exact = valueNorm === canonicalNorm;
+        const tokenSubset =
+            canonicalTokens.length > 0 &&
+            canonicalTokens.every((token) => valueTokens.includes(token));
+
+        if (exact || tokenSubset) {
+            variants.add(value);
+        }
+    }
+
+    return {
+        canonicalName: match.name,
+        restaurantId: match.id || undefined,
+        variants: Array.from(variants),
+    };
+}
 
 export interface SearchInput {
     // Query fields
@@ -87,6 +282,26 @@ export async function buildSearchParams(input: SearchInput): Promise<SearchParam
     const { extractExplicitRestaurant, extractMacroFilters } = await import('@/lib/search/intent');
     const { restaurantQuery } = extractExplicitRestaurant(queryText);
     const macroFilters = extractMacroFilters(queryText);
+    const bareRestaurantCandidateText = extractBareRestaurantCandidateText(queryText);
+    const shouldTryBareRestaurantResolution =
+        !input.searchKey &&
+        !input.restaurant &&
+        !input.restaurantId &&
+        !restaurantQuery &&
+        bareRestaurantCandidateText.length >= 3 &&
+        bareRestaurantCandidateText.split(/\s+/).filter(Boolean).length <= 8;
+
+    let resolvedBareRestaurant:
+        | {
+            canonicalName: string;
+            restaurantId?: string;
+            variants: string[];
+        }
+        | undefined;
+
+    if (shouldTryBareRestaurantResolution) {
+        resolvedBareRestaurant = await resolveBareRestaurantFromDatabase(queryText);
+    }
 
     // CRITICAL: Only set explicitRestaurantQuery if it exists AND searchKey is not present
     // If searchKey exists (pagination), preserve any prior explicit restaurant constraint encoded in searchKey
@@ -186,7 +401,7 @@ export async function buildSearchParams(input: SearchInput): Promise<SearchParam
     // CRITICAL: Do NOT set restaurant/restaurantId unless explicitRestaurantQuery exists
     // (or if searchKey is present, preserve prior restaurant constraint from searchKey)
     const params: SearchParams = {
-        query: queryText,
+        query: resolvedBareRestaurant ? 'find meals' : queryText,
         calorieCap: input.calorieCap, // Legacy support
         minCalories: mergedMacroFilters?.caloriesMin ?? input.minCalories,
         maxCalories: mergedMacroFilters?.caloriesMax ?? input.maxCalories ?? input.calorieCap, // Support legacy calorieCap
@@ -198,9 +413,9 @@ export async function buildSearchParams(input: SearchInput): Promise<SearchParam
         maxFat: mergedMacroFilters?.fatsMax ?? input.maxFat, // Legacy support
         minFats: mergedMacroFilters?.fatsMin ?? input.minFats ?? input.minFat, // Support legacy minFat
         maxFats: mergedMacroFilters?.fatsMax ?? input.maxFats ?? input.maxFat, // Support legacy maxFat
-        restaurant: input.restaurant, // Only set if explicitly provided (from searchKey or prior resolution)
-        restaurantId: input.restaurantId, // Only set if explicitly provided
-        restaurantVariants: input.restaurantVariants, // Only set if explicitly provided
+        restaurant: input.restaurant ?? resolvedBareRestaurant?.canonicalName, // Explicit input or resolved bare restaurant name
+        restaurantId: input.restaurantId ?? resolvedBareRestaurant?.restaurantId,
+        restaurantVariants: input.restaurantVariants ?? resolvedBareRestaurant?.variants,
         explicitRestaurantQuery, // Raw restaurant query from user (e.g., "cava")
         macroFilters: mergedMacroFilters,
         location: location,

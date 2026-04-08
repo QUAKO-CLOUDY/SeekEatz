@@ -1134,7 +1134,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           transition={{ duration: 0.4, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           className="w-full flex justify-center items-center pt-4 pb-4 sm:pt-5 sm:pb-5"
         >
-          <div className="relative overflow-visible p-3" data-tutorial-target="home-plate-ui">
+          <div className="relative overflow-visible p-3">
             <PlateSelector
               macro={macro}
               value={currentValue}
@@ -1149,7 +1149,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.2 }}
-          className="flex gap-2 sm:gap-4 flex-wrap justify-center"
+          data-tutorial-target="home-macro-tabs"
+          className="mx-auto flex w-fit max-w-full flex-wrap justify-center gap-2 sm:gap-4"
         >
           {(["calories", "protein", "carbs", "fats"] as MacroType[]).map(
             (type) => {
@@ -1401,7 +1402,9 @@ type PlateSelectorProps = {
 function PlateSelector({ macro, value, config, isLoading = false }: PlateSelectorProps) {
   return (
     <div className="mt-0 sm:mt-1 relative">
-      <div className="relative h-40 w-40 sm:h-52 sm:w-52 mx-auto flex items-center justify-center">
+      <div
+        className="relative h-40 w-40 sm:h-52 sm:w-52 mx-auto flex items-center justify-center"
+      >
         <motion.div
           animate={isLoading ? { rotate: 360 } : { rotate: 0 }}
           transition={isLoading ? { duration: 1.15, repeat: Infinity, ease: "linear" } : { duration: 0.35, ease: "easeOut" }}

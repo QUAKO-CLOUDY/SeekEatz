@@ -14,6 +14,12 @@
     "audit:restaurant-logos": "node scripts/run-ts-script.cjs scripts/audit-restaurant-logos.ts",
     "audit:restaurant-search": "node scripts/run-ts-script.cjs scripts/audit-restaurant-search.ts",
     "audit:retrieval-queries": "node scripts/run-ts-script.cjs scripts/audit-retrieval-queries.ts",
+    "audit:chat-routing": "node scripts/run-ts-script.cjs scripts/audit-chat-routing.ts",
+    "audit:swap-relations": "node scripts/run-ts-script.cjs scripts/audit-swap-relations.ts",
+    "audit:db-quality": "node scripts/run-ts-script.cjs scripts/audit-db-quality.ts",
+    "audit:searchable-non-cards": "node scripts/run-ts-script.cjs scripts/audit-searchable-non-card-rows.ts",
+    "cleanup:searchable-non-cards": "node scripts/run-ts-script.cjs scripts/cleanup-searchable-non-card-rows.ts",
+    "cleanup:ambiguous-searchable-rows": "node scripts/run-ts-script.cjs scripts/cleanup-ambiguous-searchable-rows.ts",
     "sync:restaurant-locations": "node scripts/run-ts-script.cjs scripts/sync-restaurant-locations.ts",
     "ingest-data": "node scripts/run-ts-script.cjs scripts/ingest-data.ts",
     "ingest": "node scripts/run-ts-script.cjs scripts/ingest/index.ts",
@@ -94,6 +100,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
     "postcss": "^8.5.6",
+    "supabase": "^2.87.2",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
   }

@@ -15,7 +15,7 @@ import { bootstrapAccount } from "@/lib/bootstrap-account";
 import type { UserProfile } from "@/app/types";
 
 const THIRTY_MINUTES = 30 * 60 * 1000;
-const EMAIL_OTP_LENGTH = 8;
+const EMAIL_OTP_LENGTH = 6;
 
 type PendingOnboardingProfile = {
   goal?: string;
@@ -405,13 +405,13 @@ export default function SignupPage() {
   // OTP Verification Screen
   if (showOtpScreen) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center p-6">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+      <div className="min-h-[100dvh] overflow-y-auto bg-white px-4 py-[calc(1.5rem+env(safe-area-inset-top,0px))] sm:flex sm:items-center sm:justify-center sm:p-6">
+        <div className="mx-auto flex min-h-[calc(100dvh-3rem-env(safe-area-inset-top,0px))] w-full max-w-md flex-col justify-center sm:min-h-0">
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Mail className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-black mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-black mb-2">
               Verify Your Email
             </h1>
             <p className="text-gray-600">
@@ -421,7 +421,7 @@ export default function SignupPage() {
           </div>
 
           {/* OTP Input */}
-          <div className="flex justify-center gap-3 mb-6">
+          <div className="grid grid-cols-6 gap-2.5 sm:gap-3 mb-6">
             {otpDigits.map((digit, index) => (
               <input
                 key={index}
@@ -433,7 +433,7 @@ export default function SignupPage() {
                 onChange={(e) => handleOtpChange(index, e.target.value)}
                 onKeyDown={(e) => handleOtpKeyDown(index, e)}
                 onFocus={(e) => e.target.select()}
-                className="w-12 h-14 text-center text-xl font-bold rounded-xl border-2 border-gray-300 bg-gray-50 text-black focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none transition-colors"
+                className="h-12 min-w-0 rounded-xl border-2 border-gray-300 bg-gray-50 text-center text-lg font-bold text-black transition-colors focus:border-cyan-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 sm:h-14 sm:text-xl"
                 autoFocus={index === 0}
               />
             ))}

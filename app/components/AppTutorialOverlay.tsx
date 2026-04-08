@@ -9,6 +9,9 @@ export type AppTutorialStep = {
   body: string;
   target: string;
   buttonLabel: string;
+  placement?: "auto" | "above" | "below" | "center-below";
+  spotlightShape?: "rounded" | "circle";
+  cardOffset?: number;
 };
 
 type Props = {
@@ -102,6 +105,9 @@ export function AppTutorialOverlay({ step, stepIndex, totalSteps, onNext }: Prop
     const viewportHeight = window.innerHeight;
     const horizontalPadding = 16;
     const spotlightPadding = 10;
+    const requestedPlacement = step.placement ?? "auto";
+    const cardOffset = step.cardOffset ?? 22;
+    const spotlightShape = step.spotlightShape ?? "rounded";
 
     if (!targetRect) {
       return {
@@ -112,18 +118,32 @@ export function AppTutorialOverlay({ step, stepIndex, totalSteps, onNext }: Prop
       };
     }
 
-    const spotlight = {
-      top: Math.max(12, targetRect.top - spotlightPadding),
-      left: Math.max(12, targetRect.left - spotlightPadding),
-      width: targetRect.width + spotlightPadding * 2,
-      height: targetRect.height + spotlightPadding * 2,
-    };
+    const spotlightSize = Math.max(targetRect.width, targetRect.height) + spotlightPadding * 2;
+    const spotlight = spotlightShape === "circle"
+      ? {
+        top: Math.max(12, targetRect.top + targetRect.height / 2 - spotlightSize / 2),
+        left: Math.max(12, targetRect.left + targetRect.width / 2 - spotlightSize / 2),
+        width: spotlightSize,
+        height: spotlightSize,
+      }
+      : {
+        top: Math.max(12, targetRect.top - spotlightPadding),
+        left: Math.max(12, targetRect.left - spotlightPadding),
+        width: targetRect.width + spotlightPadding * 2,
+        height: targetRect.height + spotlightPadding * 2,
+      };
 
     const cardWidth = Math.min(360, viewportWidth - horizontalPadding * 2);
-    const placeAbove = targetRect.top > viewportHeight * 0.55;
+    const placeAbove = requestedPlacement === "above"
+      ? true
+      : requestedPlacement === "below" || requestedPlacement === "center-below"
+        ? false
+        : targetRect.top > viewportHeight * 0.55;
     const cardTop = placeAbove
-      ? clamp(targetRect.top - cardHeight - 22, 20, viewportHeight - cardHeight - 20)
-      : clamp(targetRect.top + targetRect.height + 22, 20, viewportHeight - cardHeight - 20);
+      ? clamp(spotlight.top - cardHeight - cardOffset, 20, viewportHeight - cardHeight - 20)
+      : requestedPlacement === "center-below"
+        ? clamp(spotlight.top + spotlight.height + cardOffset, 20, viewportHeight - cardHeight - 20)
+        : clamp(spotlight.top + spotlight.height + cardOffset, 20, viewportHeight - cardHeight - 20);
     const cardLeft = clamp(
       targetRect.left + targetRect.width / 2 - cardWidth / 2,
       horizontalPadding,
@@ -146,7 +166,7 @@ export function AppTutorialOverlay({ step, stepIndex, totalSteps, onNext }: Prop
         direction: placeAbove ? "down" : "up",
       },
     };
-  }, [cardHeight, targetRect]);
+  }, [cardHeight, step.cardOffset, step.placement, step.spotlightShape, targetRect]);
 
   return (
     <div className="pointer-events-auto fixed inset-0 z-[180]">
@@ -154,7 +174,9 @@ export function AppTutorialOverlay({ step, stepIndex, totalSteps, onNext }: Prop
 
       {layout.spotlight ? (
         <div
-          className="absolute rounded-[1.4rem] border-2 border-cyan-300 shadow-[0_0_0_9999px_rgba(2,6,23,0.14),0_0_28px_rgba(34,211,238,0.28)] transition-all duration-300"
+          className={`absolute border-2 border-cyan-300 shadow-[0_0_0_9999px_rgba(2,6,23,0.14),0_0_28px_rgba(34,211,238,0.28)] transition-all duration-300 ${
+            step.spotlightShape === "circle" ? "rounded-full" : "rounded-[1.4rem]"
+          }`}
           style={{
             top: layout.spotlight.top,
             left: layout.spotlight.left,

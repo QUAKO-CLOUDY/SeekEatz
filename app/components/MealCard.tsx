@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Star, Heart, Flame, Zap, TrendingUp } from "lucide-react";
+import { Star, Heart, Flame, Beef, Wheat, Droplets } from "lucide-react";
 import type { Meal, UserProfile } from "../types"; // Use shared types
 import type { LoggedMeal } from "./LogScreen";
 import { useNutrition } from "../contexts/NutritionContext";
@@ -92,7 +92,6 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
 
     return remainingIfEat;
   }, [logReady, caloriesRemainingFromLog, meal.calories, meal.name]);
-
   // Removed useEffect - using derived values only (no state updates based on dependencies)
   // Extract restaurant name (handle both restaurant_name from Supabase and restaurant from Meal type)
   const restaurantName = meal.restaurant_name || meal.restaurant || "Unknown";
@@ -141,15 +140,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
     category === 'Grocery' ||
     category === 'Hot Bar';
   const compactMetricCardBase = "min-w-0 rounded-xl border px-1.5 py-1.5 text-center shadow-sm";
-  const remainingCaloriesLabel = remainingCalories === null
-    ? null
-    : remainingCalories >= 0
-      ? `Leaves ${remainingCalories} cal`
-      : `Over by ${Math.abs(remainingCalories)} cal`;
-  const remainingStatusClasses = remainingCalories !== null && remainingCalories >= 0
-    ? "border-emerald-400/25 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300"
-    : "border-red-400/25 bg-red-500/10 text-red-600 dark:text-red-300";
-  const regularMetricCardBase = "rounded-lg border p-2 text-center shadow-sm";
+  const regularMetricCardBase = "min-w-0 rounded-lg border p-1.5 text-center shadow-sm sm:rounded-xl sm:p-2";
 
   // Compact mode: horizontal layout matching reference image (340px × 75px)
   if (compact) {
@@ -197,11 +188,11 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
               {/* Right - Nutritional Boxes */}
               <div className="grid grid-cols-4 gap-1.5">
             {/* Calories */}
-            <div className={`${compactMetricCardBase} border-pink-200 bg-pink-50/95 dark:border-pink-500/20 dark:bg-pink-500/10`}>
-              <p className="text-pink-600 dark:text-pink-300 font-bold text-[10px] leading-tight">
+            <div className={`${compactMetricCardBase} border-pink-400/70 bg-gradient-to-br from-pink-300 to-rose-300 dark:border-pink-500/30 dark:from-pink-500/20 dark:to-rose-500/20`}>
+              <p className="text-black dark:text-pink-100 font-bold text-[10px] leading-tight">
                 {meal.calories}
               </p>
-              <p className="text-pink-500 dark:text-pink-300/80 text-[8px] leading-tight">
+              <p className="text-black dark:text-pink-100/80 text-[8px] leading-tight">
                 cal
               </p>
               {!logReady ? (
@@ -217,31 +208,31 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             </div>
 
             {/* Protein */}
-            <div className="min-w-0 rounded-lg bg-blue-100 px-1.5 py-1 text-center dark:bg-blue-900/30">
-              <p className="text-blue-600 dark:text-blue-400 font-bold text-[10px] leading-tight">
+            <div className="min-w-0 rounded-lg border border-cyan-400/70 bg-gradient-to-br from-cyan-300 to-blue-300 px-1.5 py-1 text-center dark:border-cyan-400/30 dark:from-cyan-400/20 dark:to-blue-500/20">
+              <p className="text-black dark:text-cyan-100 font-bold text-[10px] leading-tight">
                 {meal.protein}g
               </p>
-              <p className="text-blue-500 dark:text-blue-400 text-[8px] leading-tight">
+              <p className="text-black dark:text-cyan-100/80 text-[8px] leading-tight">
                 pro
               </p>
             </div>
 
             {/* Carbs */}
-            <div className="min-w-0 rounded-lg bg-green-100 px-1.5 py-1 text-center dark:bg-green-900/30">
-              <p className="text-green-600 dark:text-green-400 font-bold text-[10px] leading-tight">
+            <div className="min-w-0 rounded-lg border border-green-400/70 bg-gradient-to-br from-green-300 to-emerald-300 px-1.5 py-1 text-center dark:border-green-400/30 dark:from-green-400/20 dark:to-emerald-500/20">
+              <p className="text-black dark:text-green-100 font-bold text-[10px] leading-tight">
                 {meal.carbs}g
               </p>
-              <p className="text-green-500 dark:text-green-400 text-[8px] leading-tight">
+              <p className="text-black dark:text-green-100/80 text-[8px] leading-tight">
                 carb
               </p>
             </div>
 
             {/* Fat */}
-            <div className="min-w-0 rounded-lg bg-orange-100 px-1.5 py-1 text-center dark:bg-orange-900/30">
-              <p className="text-orange-600 dark:text-orange-400 font-bold text-[10px] leading-tight">
+            <div className="min-w-0 rounded-lg border border-amber-400/70 bg-gradient-to-br from-amber-300 to-orange-300 px-1.5 py-1 text-center dark:border-amber-400/30 dark:from-amber-400/20 dark:to-orange-500/20">
+              <p className="text-black dark:text-amber-100 font-bold text-[10px] leading-tight">
                 {meal.fats}g
               </p>
-              <p className="text-orange-500 dark:text-orange-400 text-[8px] leading-tight">
+              <p className="text-black dark:text-amber-100/80 text-[8px] leading-tight">
                 fat
               </p>
             </div>
@@ -274,90 +265,125 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
   return (
     <div
       onClick={onClick}
-      className={`group relative flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-xl bg-card shadow-md transition-all hover:border-cyan-500/40 hover:shadow-lg ${isGrocery
+      className={`h-full flex flex-col bg-gradient-to-br from-card to-muted dark:from-gray-900 dark:to-gray-800 rounded-3xl shadow-xl hover:shadow-2xl transition-all cursor-pointer overflow-hidden hover:border-cyan-500/50 hover:scale-[1.02] group relative w-full ${isGrocery
         ? 'border-2 border-green-500/30'
         : 'border border-border'
         }`}
     >
-      <div className="flex flex-1 flex-col p-3 sm:p-4">
-        <div className="mb-3 flex items-start gap-3">
+      {/* Image Container */}
+      <div
+        className="relative w-full overflow-hidden rounded-t-3xl border-b border-border/60 bg-card"
+        style={{
+          aspectRatio: '16 / 9',
+          padding: '16px'
+        }}
+      >
+        {/* Restaurant Logo - Fills entire image area */}
+        <div className="flex h-full w-full items-center justify-center rounded-2xl border border-border/70 bg-white p-3 shadow-sm dark:bg-gray-900">
+          <img
+            src={logoSrcWithCacheBust}
+            alt={restaurantName}
+            className="h-full w-full object-contain object-center"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              objectPosition: 'center',
+              display: 'block',
+              maxWidth: '100%',
+              maxHeight: '100%'
+            }}
+            onError={(e) => {
+              const fallbackSrc = `/logos/default.png?v=${meal.id}`;
+              if (e.currentTarget.src.includes('/logos/default.png')) {
+                e.currentTarget.style.display = 'none';
+                return;
+              }
+
+              e.currentTarget.onerror = null;
+              e.currentTarget.src = fallbackSrc;
+            }}
+          />
+        </div>
+
+        {meal.rating && (
+          <div className="absolute bottom-3 left-3 flex items-center gap-2 z-10">
+            <div className="bg-cyan-500/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1">
+              <Star className="w-3 h-3 text-white fill-white" />
+              <span className="text-white text-xs font-bold">{meal.rating}</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-1 flex-col p-2.5 sm:p-4">
+        <div className="mb-2.5 flex items-start gap-2 sm:mb-3 sm:gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="mb-1 truncate text-[11px] font-medium leading-tight text-muted-foreground sm:text-base">
+              {restaurantName}
+            </p>
+            <h3 className="mt-0.5 line-clamp-2 break-words text-sm font-semibold leading-tight text-foreground sm:text-lg">
+              {meal.name}
+            </h3>
+            {meal.distance !== undefined && meal.distance !== null && (
+              <p className="mt-0.5 text-[10px] leading-tight text-muted-foreground sm:text-xs">{meal.distance.toFixed(1)} miles away</p>
+            )}
+          </div>
           {onToggleFavorite && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleFavorite?.();
               }}
-              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-border bg-background/80 text-muted-foreground transition-colors hover:bg-muted/90 dark:bg-gray-900/80 dark:hover:bg-gray-800/90"
+              className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-border bg-background/90 text-muted-foreground transition-colors hover:bg-muted/90 dark:bg-gray-900/90 dark:hover:bg-gray-800/90 sm:h-8 sm:w-8"
               aria-label={isFavorite ? "Remove from favorites" : "Save meal"}
             >
               <Heart
-                className={`h-4 w-4 transition-colors ${isFavorite ? "fill-pink-500 text-pink-500" : ""}`}
+                className={`h-3.5 w-3.5 transition-colors sm:h-4 sm:w-4 ${isFavorite ? "fill-pink-500 text-pink-500" : ""}`}
               />
             </button>
           )}
-          <div className="flex-1 min-w-0">
-            <p className="mb-1 truncate text-xs font-medium text-muted-foreground sm:text-sm">
-              {restaurantName}
-            </p>
-            <h3 className="mt-0.5 line-clamp-2 break-words text-base font-semibold leading-snug text-foreground sm:text-lg">
-              {meal.name}
-            </h3>
-            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-              {meal.distance !== undefined && meal.distance !== null ? (
-                <span>{meal.distance.toFixed(1)} mi</span>
-              ) : null}
-              {meal.rating ? (
-                <span className="flex items-center gap-1">
-                  <Star className="h-3 w-3 fill-cyan-400 text-cyan-400" />
-                  {meal.rating}
-                </span>
-              ) : null}
-            </div>
-          </div>
         </div>
 
-        {remainingCaloriesLabel ? (
-          <div className={`mb-3 rounded-lg border px-3 py-2 ${remainingStatusClasses}`}>
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-[11px] font-semibold uppercase text-muted-foreground">
-                After this meal
-              </p>
-              <p className="text-sm font-bold">{remainingCaloriesLabel}</p>
+        <div className="mt-auto grid grid-cols-2 gap-1.5 text-[10px] min-[520px]:grid-cols-4 sm:ml-1 sm:gap-2 sm:text-xs">
+          <div className={`${regularMetricCardBase} border-pink-400/70 bg-gradient-to-br from-pink-300 to-rose-300 dark:border-pink-500/30 dark:from-pink-500/20 dark:to-rose-500/20`}>
+            <div className="mb-0.5 flex items-center justify-center sm:mb-1">
+              <Flame className="h-2.5 w-2.5 text-black dark:text-pink-400 sm:h-3 sm:w-3" />
             </div>
-          </div>
-        ) : null}
-
-        <div className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
-          <div className={`${regularMetricCardBase} border-pink-200/80 bg-pink-50/90 dark:border-pink-500/20 dark:bg-pink-500/10`}>
-            <div className="flex items-center justify-center mb-1">
-              <Flame className="w-3 h-3 text-pink-500 dark:text-pink-300" />
-            </div>
-            <p className="text-foreground font-bold">{meal.calories}</p>
-            <p className="text-pink-600 dark:text-pink-300/70 text-[10px]">cal</p>
+            <p className="truncate text-[11px] font-bold leading-tight text-foreground sm:text-xs">{meal.calories}</p>
+            <p className="text-[9px] leading-tight text-black dark:text-pink-100/80 sm:text-[10px]">cal</p>
             {!logReady ? (
-              <p className="text-[9px] mt-0.5 text-muted-foreground">—</p>
+              <p className="mt-0.5 text-[8px] leading-tight text-muted-foreground sm:text-[9px]">-</p>
+            ) : remainingCalories !== null ? (
+              <p className={`mt-0.5 truncate text-[8px] leading-tight sm:text-[9px] ${remainingCalories >= 0
+                ? 'text-green-600 dark:text-green-400'
+                : 'text-red-600 dark:text-red-400'
+                }`}>
+                <span className="sm:hidden">{remainingCalories >= 0 ? '+' : ''}{remainingCalories}</span>
+                <span className="hidden sm:inline">{remainingCalories >= 0 ? '+' : ''}{remainingCalories} left</span>
+              </p>
             ) : null}
           </div>
-          <div className="rounded-md border border-cyan-400/30 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 p-2 text-center">
-            <div className="flex items-center justify-center mb-1">
-              <Zap className="w-3 h-3 text-cyan-400" />
+          <div className="min-w-0 rounded-lg border border-cyan-400/70 bg-gradient-to-br from-cyan-300 to-blue-300 p-1.5 text-center dark:border-cyan-400/30 dark:from-cyan-400/20 dark:to-blue-500/20 sm:rounded-md sm:p-2">
+            <div className="mb-0.5 flex items-center justify-center sm:mb-1">
+              <Beef className="h-2.5 w-2.5 text-black dark:text-cyan-400 sm:h-3 sm:w-3" />
             </div>
-            <p className="text-foreground font-bold">{meal.protein}g</p>
-            <p className="text-cyan-600 dark:text-cyan-300/70 text-[10px]">pro</p>
+            <p className="truncate text-[11px] font-bold leading-tight text-foreground sm:text-xs">{meal.protein}g</p>
+            <p className="text-[9px] leading-tight text-black dark:text-cyan-100/80 sm:text-[10px]">pro</p>
           </div>
-          <div className="rounded-md border border-green-400/30 bg-gradient-to-br from-green-400/20 to-emerald-500/20 p-2 text-center">
-            <div className="flex items-center justify-center mb-1">
-              <TrendingUp className="w-3 h-3 text-green-400" />
+          <div className="min-w-0 rounded-lg border border-green-400/70 bg-gradient-to-br from-green-300 to-emerald-300 p-1.5 text-center dark:border-green-400/30 dark:from-green-400/20 dark:to-emerald-500/20 sm:rounded-md sm:p-2">
+            <div className="mb-0.5 flex items-center justify-center sm:mb-1">
+              <Wheat className="h-2.5 w-2.5 text-black dark:text-green-400 sm:h-3 sm:w-3" />
             </div>
-            <p className="text-foreground font-bold">{meal.carbs}g</p>
-            <p className="text-green-600 dark:text-green-300/70 text-[10px]">carb</p>
+            <p className="truncate text-[11px] font-bold leading-tight text-foreground sm:text-xs">{meal.carbs}g</p>
+            <p className="text-[9px] leading-tight text-black dark:text-green-100/80 sm:text-[10px]">carb</p>
           </div>
-          <div className="rounded-md border border-amber-400/30 bg-gradient-to-br from-amber-400/20 to-orange-500/20 p-2 text-center">
-            <div className="flex items-center justify-center mb-1">
-              <div className="h-3 w-3 rounded-full bg-amber-400" />
+          <div className="min-w-0 rounded-lg border border-amber-400/70 bg-gradient-to-br from-amber-300 to-orange-300 p-1.5 text-center dark:border-amber-400/30 dark:from-amber-400/20 dark:to-orange-500/20 sm:rounded-md sm:p-2">
+            <div className="mb-0.5 flex items-center justify-center sm:mb-1">
+              <Droplets className="h-2.5 w-2.5 text-black dark:text-amber-400 sm:h-3 sm:w-3" />
             </div>
-            <p className="text-foreground font-bold">{meal.fats}g</p>
-            <p className="text-amber-600 dark:text-amber-300/70 text-[10px]">fat</p>
+            <p className="truncate text-[11px] font-bold leading-tight text-foreground sm:text-xs">{meal.fats}g</p>
+            <p className="text-[9px] leading-tight text-black dark:text-amber-100/80 sm:text-[10px]">fat</p>
           </div>
         </div>
       </div>

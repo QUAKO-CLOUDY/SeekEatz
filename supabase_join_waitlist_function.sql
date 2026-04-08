@@ -80,9 +80,11 @@ EXCEPTION
 END;
 $$;
 
--- Grant execute permission to authenticated and anon users
-GRANT EXECUTE ON FUNCTION public.join_waitlist(TEXT) TO anon;
-GRANT EXECUTE ON FUNCTION public.join_waitlist(TEXT) TO authenticated;
+-- Only the server-side API route should call this function with the service role.
+-- Public clients should post to /api/waitlist instead of calling the RPC directly.
+REVOKE EXECUTE ON FUNCTION public.join_waitlist(TEXT) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.join_waitlist(TEXT) FROM authenticated;
+GRANT EXECUTE ON FUNCTION public.join_waitlist(TEXT) TO service_role;
 
 -- Test the function (optional - comment out after testing)
 -- SELECT public.join_waitlist('test@example.com');

@@ -136,9 +136,9 @@ const APPENDED_MEALS_DIVIDER_LABEL = "More meals";
 const DEFAULT_HOME_DISTANCE_MILES = 10;
 const DEFAULT_HOME_MACRO_ENABLED: Record<MacroType, boolean> = {
   calories: true,
-  protein: false,
-  carbs: false,
-  fats: false,
+  protein: true,
+  carbs: true,
+  fats: true,
 };
 
 export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite, loggedMeals = [] }: Props) {
@@ -219,7 +219,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     };
   });
 
-  // Default to calories only. Daily macro targets are too strict as implicit single-meal filters.
+  // Include all macro filters by default. User exclusions are still persisted once changed.
   const [macroEnabled, setMacroEnabled] = useState<Record<MacroType, boolean>>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('seekeatz_macro_enabled');
@@ -228,9 +228,9 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           const parsed = JSON.parse(saved);
           return {
             calories: parsed.calories !== false,
-            protein: parsed.protein === true,
-            carbs: parsed.carbs === true,
-            fats: parsed.fats === true,
+            protein: parsed.protein !== false,
+            carbs: parsed.carbs !== false,
+            fats: parsed.fats !== false,
           };
         } catch (e) {
           console.error('Failed to parse saved macro enabled state:', e);
@@ -1134,7 +1134,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           transition={{ duration: 0.4, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           className="w-full flex justify-center items-center pt-4 pb-4 sm:pt-5 sm:pb-5"
         >
-          <div className="relative overflow-visible">
+          <div className="relative overflow-visible p-3" data-tutorial-target="home-plate-ui">
             <PlateSelector
               macro={macro}
               value={currentValue}
@@ -1179,7 +1179,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
                           ? "bg-gradient-to-r from-[#3A8BFF] to-[#4DDDF9] text-white shadow-md shadow-[#3A8BFF]/30"
                           : !isEnabled
                           ? "bg-slate-200/60 dark:bg-slate-700/40 text-muted-foreground border border-border/50 opacity-60"
-                          : "bg-cyan-500/15 dark:bg-cyan-500/20 text-foreground border border-cyan-400/40 dark:border-cyan-400/30 hover:bg-cyan-500/25"
+                          : "bg-gradient-to-r from-[#3A8BFF]/85 to-[#4DDDF9]/85 text-white border border-cyan-300/70 shadow-sm shadow-[#3A8BFF]/20 hover:from-[#3A8BFF] hover:to-[#4DDDF9]"
                       }`}
                     >
                       {MACRO_CONFIG[type].label}
@@ -1256,7 +1256,6 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           type="button"
           onClick={handleFindMeals}
           disabled={isLoadingMeals}
-          data-tutorial-target="home-find-meals"
           whileHover={!isLoadingMeals ? { scale: 1.02 } : {}}
           whileTap={!isLoadingMeals ? { scale: 0.98 } : {}}
           className="mt-4 sm:mt-5 w-full max-w-md mx-auto h-12 sm:h-14 rounded-2xl bg-gradient-to-r from-[#3A8BFF] to-[#4DDDF9] text-white text-sm sm:text-base font-semibold flex items-center justify-center gap-2 shadow-lg shadow-[#3A8BFF]/30 hover:shadow-[#3A8BFF]/40 hover:opacity-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1318,7 +1317,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
             </div>
           ) : recommendedMeals.length > 0 ? (
             <>
-              <div className="grid grid-cols-1 gap-4 px-1 min-[560px]:grid-cols-2 sm:gap-5 sm:px-4">
+              <div className="grid grid-cols-2 gap-3 px-2 sm:gap-5 sm:px-4">
                 {recommendedMeals.map((meal, index) => (
                   <React.Fragment key={meal.id}>
                     {index === HOME_MEALS_PAGE_SIZE && (

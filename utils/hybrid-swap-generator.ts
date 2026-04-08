@@ -257,7 +257,7 @@ export async function generateHybridSwaps(
 
     if (totalSwaps < targetSwapCount) {
         // Guarantee at least 2 swaps total: LLM fallback
-        if (process.env.ENABLE_SWAP_LLM_FALLBACK !== 'false') {
+        if (process.env.ENABLE_SWAP_LLM_FALLBACK === 'true') {
             const neededSwaps = Math.min(targetSwapCount - totalSwaps, maxSwapCount - totalSwaps);
             llmSwaps = await generateLLMSwaps(mealName, restaurantName, mealMacros, neededSwaps);
         }

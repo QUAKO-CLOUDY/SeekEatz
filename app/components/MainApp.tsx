@@ -65,10 +65,10 @@ const APP_TUTORIAL_STEPS: AppTutorialStep[] = [
     screen: 'favorites',
     title: 'Remember your favorites',
     body: 'Save meals you enjoy to come back to in the future.',
-    target: 'favorites-heart',
+    target: 'favorites-empty-state',
     buttonLabel: 'Next',
-    placement: 'center-below',
-    cardOffset: 220,
+    placement: 'below',
+    cardOffset: 24,
   },
   {
     screen: 'settings',

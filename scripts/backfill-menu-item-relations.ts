@@ -96,6 +96,116 @@ function inferMenuItemUpdate(item: MenuItemRow): MenuItemUpdate | null {
   };
 
   if (
+    restaurant === 'chick-fil-a' &&
+    /^breakfast$/.test(category) &&
+    /hash browns|parfait|fruit cup/i.test(name)
+  ) {
+    apply({
+      item_type: 'side',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'side',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 1,
+    });
+  } else if (
+    restaurant === 'chick-fil-a' &&
+    /^(breakfast|entrées|entrees|salads)$/.test(category)
+  ) {
+    apply({
+      normalized_category:
+        /^breakfast$/.test(category) ? 'breakfast' :
+        /^salads$/.test(category) ? 'salad' :
+        'entree',
+      item_type: 'meal',
+      is_modifier: false,
+      is_searchable: true,
+      modifier_unit_label: null,
+      modifier_unit_default_qty: null,
+      modifier_unit_max_qty: null,
+    });
+  } else if (
+    restaurant === 'chick-fil-a' &&
+    /^(sauce|dressing|buns|proteins|sandwich toppings|sides|treats)$/.test(category)
+  ) {
+    const isSauceLike = /^(sauce|dressing)$/.test(category);
+    const isProteinLike = /^proteins$/.test(category);
+    apply({
+      item_type:
+        isSauceLike ? 'sauce' :
+        isProteinLike || /^buns$/.test(category) || /^sandwich toppings$/.test(category) ? 'modifier' :
+        /^sides$/.test(category) ? 'side' :
+        'snack',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label:
+        isSauceLike ? 'serving' :
+        isProteinLike || /^sandwich toppings$/.test(category) ? 'portion' :
+        /^buns$/.test(category) ? 'swap' :
+        /^sides$/.test(category) ? 'side' :
+        null,
+      modifier_unit_default_qty: isSauceLike || isProteinLike || /^buns$/.test(category) || /^sandwich toppings$/.test(category) || /^sides$/.test(category) ? 1 : null,
+      modifier_unit_max_qty: isSauceLike ? 3 : isProteinLike || /^sandwich toppings$/.test(category) ? 2 : /^buns$/.test(category) || /^sides$/.test(category) ? 1 : null,
+    });
+  } else if (
+    restaurant === "zaxby's" &&
+    /^kids meals$/.test(category) &&
+    /crinkle fries/i.test(name)
+  ) {
+    apply({
+      item_type: 'side',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'side',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 1,
+    });
+  } else if (
+    restaurant === "zaxby's" &&
+    (/^(zalads|salads|most popular|kids meals)$/.test(category) ||
+      (/^sandwiches$/.test(category) && !/^add /i.test(name)) ||
+      (/^protein$/.test(category) && /(wings|finger)/i.test(name)))
+  ) {
+    apply({
+      normalized_category:
+        /zalad|salad/.test(category) ? 'salad' :
+        /^kids meals$/.test(category) ? 'entree' :
+        /^sandwiches$/.test(category) ? 'sandwich' :
+        /^protein$/.test(category) ? 'entree' :
+        'entree',
+      item_type: 'meal',
+      is_modifier: false,
+      is_searchable: true,
+      modifier_unit_label: null,
+      modifier_unit_default_qty: null,
+      modifier_unit_max_qty: null,
+    });
+  } else if (
+    restaurant === "zaxby's" &&
+    (/^(sauce|dressing)$/.test(category) || (/^sandwiches$/.test(category) && /^add /i.test(name)))
+  ) {
+    const isSauceLike = /^(sauce|dressing)$/.test(category);
+    apply({
+      item_type: isSauceLike ? 'sauce' : 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: isSauceLike ? 'serving' : 'portion',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: isSauceLike ? 3 : 2,
+    });
+  } else if (
+    restaurant === "zaxby's" &&
+    /^(sides|treats|drinks)$/.test(category)
+  ) {
+    apply({
+      item_type: /^drinks$/.test(category) ? 'drink' : /^treats$/.test(category) ? 'snack' : 'side',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: /^sides$/.test(category) ? 'side' : null,
+      modifier_unit_default_qty: /^sides$/.test(category) ? 1 : null,
+      modifier_unit_max_qty: /^sides$/.test(category) ? 1 : null,
+    });
+  } else if (
     restaurant === 'pollo tropical' &&
     (/^desserts$/.test(category) ||
       /^tropical favorites$/.test(category) ||
@@ -979,6 +1089,77 @@ const RESTAURANT_RULES: Record<string, RestaurantRuleSet> = {
         relationType: 'side_option',
         groupName: 'Sides',
         maxQuantity: 1,
+      },
+    ],
+  },
+  'Chick-fil-A': {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^entrées$/i, /^entrees$/i, /^breakfast$/i],
+        mealNamePatterns: [/^(?!.*(?:hash browns|parfait|fruit cup))/i],
+        childCategoryPatterns: [/^sauce$/i],
+        relationType: 'sauce_option',
+        groupName: 'Sauces',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^salads$/i],
+        childCategoryPatterns: [/^dressing$/i],
+        relationType: 'dressing_option',
+        groupName: 'Dressings',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^breakfast$/i],
+        mealNamePatterns: [/^(?!.*(?:hash browns|parfait|fruit cup))/i],
+        childCategoryPatterns: [/^proteins$/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Add-ons',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^entrées$/i, /^entrees$/i],
+        mealNamePatterns: [/sandwich|wrap/i],
+        childCategoryPatterns: [/^sandwich toppings$/i],
+        relationType: 'add_on',
+        groupName: 'Sandwich Toppings',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^entrées$/i, /^entrees$/i],
+        mealNamePatterns: [/sandwich|wrap/i],
+        childCategoryPatterns: [/^buns$/i],
+        relationType: 'swap_candidate',
+        groupName: 'Bun Options',
+        maxQuantity: 1,
+      },
+    ],
+  },
+  "Zaxby's": {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^most popular$/i, /^sandwiches$/i, /^kids meals$/i, /^protein$/i],
+        mealNamePatterns: [/^(?!add\s)(?!.*crinkle fries)/i],
+        childCategoryPatterns: [/^sauce$/i],
+        relationType: 'sauce_option',
+        groupName: 'Sauces',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^zalads$/i],
+        childCategoryPatterns: [/^dressing$/i],
+        relationType: 'dressing_option',
+        groupName: 'Dressings',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^sandwiches$/i],
+        mealNamePatterns: [/sandwich|nibbler/i],
+        childCategoryPatterns: [/^sandwiches$/i],
+        childNamePatterns: [/^add /i],
+        relationType: 'add_on',
+        groupName: 'Sandwich Add-ons',
+        maxQuantity: 2,
       },
     ],
   },

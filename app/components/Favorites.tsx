@@ -207,7 +207,10 @@ export function Favorites({
       })}
     </div>
   ) : (
-    <div className="text-center py-12 border-2 border-dashed rounded-3xl bg-muted/30">
+    <div
+      className="text-center py-12 border-2 border-dashed rounded-3xl bg-muted/30"
+      data-tutorial-target="favorites-empty-state"
+    >
       <Heart className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-50" />
       <p className="text-muted-foreground font-medium">No saved meals yet</p>
       <p className="text-xs text-muted-foreground/60 mt-1">Start saving meals you love</p>

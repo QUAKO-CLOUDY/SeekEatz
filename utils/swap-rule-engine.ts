@@ -330,6 +330,12 @@ function generateHigherProteinSwap(
   const rejectedCandidates: Array<{ name: string; reason: string }> = [];
 
   for (const candidate of proteinCandidates) {
+    // Explicit relation templates are curated per restaurant/meal, so trust them over generic dish heuristics.
+    if (candidate.relationType === 'protein_option') {
+      compatibleCandidates.push(candidate);
+      continue;
+    }
+
     const { type: ingredientType, confidence } = inferIngredientType(candidate.name);
     
     // Check compatibility

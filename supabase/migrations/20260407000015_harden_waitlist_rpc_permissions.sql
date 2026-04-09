@@ -4,4 +4,5 @@
 
 REVOKE EXECUTE ON FUNCTION public.join_waitlist(TEXT) FROM anon;
 REVOKE EXECUTE ON FUNCTION public.join_waitlist(TEXT) FROM authenticated;
+REVOKE EXECUTE ON FUNCTION public.join_waitlist(TEXT) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.join_waitlist(TEXT) TO service_role;

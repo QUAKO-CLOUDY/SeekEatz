@@ -1,214 +1,1109 @@
 {
-    "restaurant_name": "Zaxby's",
-    "items": [
-      
-      
-      
-      {
-        "name": "Asian Zensation Zalad",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 640,
-          "protein": 35,
-          "carbs": 62,
-          "fat": 29
-        }
-      },
-      {
-        "name": "Blue Zalad",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 680,
-          "protein": 39,
-          "carbs": 43,
-          "fat": 39
-        }
-      },
-      
-      {
-        "name": "Chicken Finger Plate",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 1110,
-          "protein": 45,
-          "carbs": 98,
-          "fat": 60
-        }
-      },
-      {
-        "name": "Big Zax Snak Meal",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 890,
-          "protein": 36,
-          "carbs": 80,
-          "fat": 48
-        }
-      },
-      
-      {
-        "name": "Boneless Wings Meal 5 ",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 1040,
-          "protein": 34,
-          "carbs": 92,
-          "fat": 60
-        }
-      },
-      {
-        "name": "Traditional Wings Meal 5 ",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 1030,
-          "protein": 51,
-          "carbs": 70,
-          "fat": 61
-        }
-      },
-      
-      {
-        "name": "Kickin Chicken Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 690,
-          "protein": 34,
-          "carbs": 51,
-          "fat": 39
-        }
-      },
-      
-      
-      
-      {
-        "name": "Catering Grilled Chicken Sandwich",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 560,
-          "protein": 38,
-          "carbs": 36,
-          "fat": 29
-        }
-      },
-      
-      
-      {
-        "name": " Nibblerz",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 960,
-          "protein": 38,
-          "carbs": 76,
-          "fat": 56
-        }
-      },
-      {
-        "name": "Chicken Bacon Ranch Loaded Fries",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 1270,
-          "protein": 61,
-          "carbs": 88,
-          "fat": 78
-        }
-      },
-      {
-        "name": "Chicken Fingerz with Zax Sauce",
-        "category": "Protein",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 320,
-          "protein": 19,
-          "carbs": 11,
-          "fat": 23
-        }
-      },
-  
-      {
-        "name": "Ranch Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 190,
-          "protein":150,
-          "carbs": 2,
-          "fat":16
-        }
-      },
-      
-      {
-        "name": "Zax Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 150,
-          "protein": 0,
-          "carbs": 4,
-          "fat":15
-        }
-      },
-      {
-        "name": "Spicy Zax Sauce",
-        "category": "Sauce",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 170,
-          "protein": 1,
-          "carbs": 5,
-          "fat": 16
-        }
-      },
-  
-      {
-        "name": "Chicken Fingerz Zax Packz",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 320,
-          "protein": 19,
-          "carbs":11,
-          "fat": 23
-        }
-      },
-    
-     
-      {
-        "name": "Zaxby's Signature Sandwichh",
-        "category": "Entree",
-        "price_estimate": null,
-        "image_url": null,
-        "macros": {
-          "calories": 820,
-          "protein":31,
-          "carbs":52,
-          "fat": 53
-        }
-  
+  "restaurant_name": "Zaxby's",
+  "items": [
+    {
+      "name": "The Grilled House Zalad",
+      "category": "Zalads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 560,
+        "protein": 48,
+        "carbs": 34,
+        "fat": 27
       }
-    ]
-  }
+    },
+    {
+      "name": "The Fried House Zalad",
+      "category": "Zalads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 660,
+        "protein": 44,
+        "carbs": 42,
+        "fat": 37
+      }
+    },
+    {
+      "name": "The Garden House Zalad",
+      "category": "Zalads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 410,
+        "protein": 17,
+        "carbs": 33,
+        "fat": 25
+      }
+    },
+    {
+      "name": "The Grilled Cobb Zalad",
+      "category": "Zalads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 680,
+        "protein": 58,
+        "carbs": 35,
+        "fat": 35
+      }
+    },
+    {
+      "name": "The Fried Cobb Zalad",
+      "category": "Zalads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 780,
+        "protein": 55,
+        "carbs": 43,
+        "fat": 45
+      }
+    },
+    {
+      "name": "The Garden Cobb Zalad",
+      "category": "Zalads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 530,
+        "protein": 27,
+        "carbs": 34,
+        "fat": 34
+      }
+    },
+    {
+      "name": "The Grilled Asian Zensation Zalad",
+      "category": "Zalads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 530,
+        "protein": 39,
+        "carbs": 54,
+        "fat": 19
+      }
+    },
+    {
+      "name": "The Fried Asian Zensation Zalad",
+      "category": "Zalads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 640,
+        "protein": 35,
+        "carbs": 62,
+        "fat": 29
+      }
+    },
+    {
+      "name": "The Garden Asian Zensation Zalad",
+      "category": "Zalads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 390,
+        "protein": 8,
+        "carbs": 53,
+        "fat": 17
+      }
+    },
+    {
+      "name": "The Grilled Blue Zalad",
+      "category": "Zalads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 510,
+        "protein": 43,
+        "carbs": 34,
+        "fat": 24
+      }
+    },
+    {
+      "name": "The Fried Blue Zalad",
+      "category": "Zalads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 680,
+        "protein": 39,
+        "carbs": 43,
+        "fat": 39
+      }
+    },
+    {
+      "name": "The Garden Blue Zalad",
+      "category": "Zalads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 370,
+        "protein": 12,
+        "carbs": 32,
+        "fat": 22
+      }
+    },
+    {
+      "name": "Kickin’ Chicken Sandwich Only",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 690,
+        "protein": 34,
+        "carbs": 51,
+        "fat": 39
+      }
+    },
+    {
+      "name": "Grilled Chicken Sandwich Only",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 620,
+        "protein": 38,
+        "carbs": 35,
+        "fat": 20
+      }
+    },
+    {
+      "name": "Nibblerz™ Only",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 960,
+        "protein": 38,
+        "carbs": 76,
+        "fat": 56
+      }
+    },
+    {
+      "name": "Signature Sandwich Only with Zax Sauce",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 600,
+        "protein": 31,
+        "carbs": 45,
+        "fat": 32
+      }
+    },
+    {
+      "name": "Signature Sandwich Only with Spicy Zax Sauce",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 590,
+        "protein": 31,
+        "carbs": 45,
+        "fat": 31
+      }
+    },
+    {
+      "name": "Add Cheese (1 Slice)",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 50,
+        "protein": 3,
+        "carbs": 1,
+        "fat": 4.5
+      }
+    },
+    {
+      "name": "Add Bacon (2 Slices)",
+      "category": "Sandwiches",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 60,
+        "protein": 6,
+        "carbs": 0,
+        "fat": 4.5
+      }
+    },
+    {
+      "name": "Chicken Finger Plate (4)",
+      "category": "Most Popular",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1110,
+        "protein": 45,
+        "carbs": 98,
+        "fat": 60
+      }
+    },
+    {
+      "name": "Chicken Finger Plate (5)",
+      "category": "Most Popular",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1190,
+        "protein": 54,
+        "carbs": 101,
+        "fat": 64
+      }
+    },
+    {
+      "name": "Chicken Finger Plate (6)",
+      "category": "Most Popular",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1430,
+        "protein": 64,
+        "carbs": 109,
+        "fat": 83
+      }
+    },
+    {
+      "name": "Buffalo Chicken Finger Plate (4)",
+      "category": "Most Popular",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1130,
+        "protein": 46,
+        "carbs": 98,
+        "fat": 62
+      }
+    },
+    {
+      "name": "Buffalo Chicken Finger Plate (5)",
+      "category": "Most Popular",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1220,
+        "protein": 55,
+        "carbs": 102,
+        "fat": 66
+      }
+    },
+    {
+      "name": "Buffalo Chicken Finger Plate (6)",
+      "category": "Most Popular",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1460,
+        "protein": 65,
+        "carbs": 108,
+        "fat": 86
+      }
+    },
+    {
+      "name": "Boneless Wings & Things",
+      "category": "Most Popular",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1450,
+        "protein": 62,
+        "carbs": 108,
+        "fat": 87
+      }
+    },
+    {
+      "name": "Buffalo Boneless Wings & Things",
+      "category": "Most Popular",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1460,
+        "protein": 63,
+        "carbs": 106,
+        "fat": 88
+      }
+    },
+    {
+      "name": "Traditional Wings & Things",
+      "category": "Most Popular",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1440,
+        "protein": 79,
+        "carbs": 84,
+        "fat": 88
+      }
+    },
+    {
+      "name": "Buffalo Traditional Wings & Things",
+      "category": "Most Popular",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1450,
+        "protein": 79,
+        "carbs": 83,
+        "fat": 89
+      }
+    },
+    {
+      "name": "Boneless Wings Meal (5)",
+      "category": "Most Popular",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1040,
+        "protein": 34,
+        "carbs": 92,
+        "fat": 60
+      }
+    },
+    {
+      "name": "Traditional Wings Meal (5)",
+      "category": "Most Popular",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1030,
+        "protein": 51,
+        "carbs": 70,
+        "fat": 61
+      }
+    },
+    {
+      "name": "Big Zax Snak Meal",
+      "category": "Most Popular",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 890,
+        "protein": 36,
+        "carbs": 80,
+        "fat": 48
+      }
+    },
+    {
+      "name": "Buffalo Big Zax Snak Meal",
+      "category": "Most Popular",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 900,
+        "protein": 36,
+        "carbs": 79,
+        "fat": 50
+      }
+    },
+    {
+      "name": "Boneless Wings (5) - No Sauce",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 390,
+        "protein": 22,
+        "carbs": 22,
+        "fat": 22
+      }
+    },
+    {
+      "name": "Boneless Wings (5) - Wimpy",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 410,
+        "protein": 22,
+        "carbs": 26,
+        "fat": 22
+      }
+    },
+    {
+      "name": "Boneless Wings (5) - Tongue Torch",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 400,
+        "protein": 23,
+        "carbs": 24,
+        "fat": 23
+      }
+    },
+    {
+      "name": "Boneless Wings (5) - Nuclear",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 400,
+        "protein": 23,
+        "carbs": 24,
+        "fat": 23
+      }
+    },
+    {
+      "name": "Boneless Wings (5) - Buffalo Garlic Blaze",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 450,
+        "protein": 29,
+        "carbs": 23,
+        "fat": 29
+      }
+    },
+    {
+      "name": "Boneless Wings (5) - HHM",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 480,
+        "protein": 30,
+        "carbs": 28,
+        "fat": 30
+      }
+    },
+    {
+      "name": "Boneless Wings (5) - Sweet & Spicy",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 450,
+        "protein": 23,
+        "carbs": 35,
+        "fat": 23
+      }
+    },
+    {
+      "name": "Boneless Wings (5) - Teriyaki",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 430,
+        "protein": 23,
+        "carbs": 31,
+        "fat": 23
+      }
+    },
+    {
+      "name": "Boneless Wings (5) - BBQ",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 450,
+        "protein": 22,
+        "carbs": 36,
+        "fat": 22
+      }
+    },
+    {
+      "name": "Traditional Wings (5) - No Sauce",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 380,
+        "protein": 42,
+        "carbs": 0,
+        "fat": 23
+      }
+    },
+    {
+      "name": "Traditional Wings (5) - Wimpy",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 400,
+        "protein": 43,
+        "carbs": 3,
+        "fat": 24
+      }
+    },
+    {
+      "name": "Traditional Wings (5) - Tongue Torch",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 390,
+        "protein": 43,
+        "carbs": 2,
+        "fat": 24
+      }
+    },
+    {
+      "name": "Traditional Wings (5) - Nuclear",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 400,
+        "protein": 43,
+        "carbs": 2,
+        "fat": 24
+      }
+    },
+    {
+      "name": "Traditional Wings (5) - Buffalo Garlic Blaze",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 440,
+        "protein": 43,
+        "carbs": 2,
+        "fat": 29
+      }
+    },
+    {
+      "name": "Traditional Wings (5) - HHM",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 480,
+        "protein": 43,
+        "carbs": 6,
+        "fat": 31
+      }
+    },
+    {
+      "name": "Traditional Wings (5) - Sweet & Spicy",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 440,
+        "protein": 43,
+        "carbs": 13,
+        "fat": 24
+      }
+    },
+    {
+      "name": "Traditional Wings (5) - Teriyaki",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 430,
+        "protein": 43,
+        "carbs": 10,
+        "fat": 24
+      }
+    },
+    {
+      "name": "Traditional Wings (5) - BBQ",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 440,
+        "protein": 43,
+        "carbs": 14,
+        "fat": 23
+      }
+    },
+    {
+      "name": "Chicken Finger (5) - No Sauce",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 420,
+        "protein": 45,
+        "carbs": 11,
+        "fat": 20
+      }
+    },
+    {
+      "name": "Chicken Finger (5) - Wimpy",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 450,
+        "protein": 46,
+        "carbs": 17,
+        "fat": 20
+      }
+    },
+    {
+      "name": "Chicken Finger (5) - Tongue Torch",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 440,
+        "protein": 46,
+        "carbs": 16,
+        "fat": 20
+      }
+    },
+    {
+      "name": "Chicken Finger (5) - Nuclear",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 440,
+        "protein": 46,
+        "carbs": 16,
+        "fat": 20
+      }
+    },
+    {
+      "name": "Chicken Finger (5) - Buffalo Garlic Blaze",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 510,
+        "protein": 46,
+        "carbs": 16,
+        "fat": 28
+      }
+    },
+    {
+      "name": "Chicken Finger (5) - HHM",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 570,
+        "protein": 46,
+        "carbs": 19,
+        "fat": 32
+      }
+    },
+    {
+      "name": "Chicken Finger (5) - Sweet & Spicy",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 510,
+        "protein": 46,
+        "carbs": 35,
+        "fat": 21
+      }
+    },
+    {
+      "name": "Chicken Finger (5) - Teriyaki",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 510,
+        "protein": 47,
+        "carbs": 31,
+        "fat": 20
+      }
+    },
+    {
+      "name": "Chicken Finger (5) - BBQ",
+      "category": "Protein",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 520,
+        "protein": 46,
+        "carbs": 36,
+        "fat": 20
+      }
+    },
+    {
+      "name": "Chocolate Chip Cookie",
+      "category": "Treats",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 170,
+        "protein": 2,
+        "carbs": 24,
+        "fat": 8
+      }
+    },
+    {
+      "name": "Fried Cheesecake Bites",
+      "category": "Treats",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 520,
+        "protein": 7,
+        "carbs": 53,
+        "fat": 31
+      }
+    },
+    {
+      "name": "Handcrafted Vanilla Milkshake",
+      "category": "Treats",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 570,
+        "protein": 12,
+        "carbs": 69,
+        "fat": 23
+      }
+    },
+    {
+      "name": "Honey Mustard",
+      "category": "Sauce",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 130,
+        "protein": 0,
+        "carbs": 7,
+        "fat": 11
+      }
+    },
+    {
+      "name": "Ranch Sauce",
+      "category": "Sauce",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 150,
+        "protein": 1,
+        "carbs": 2,
+        "fat": 16
+      }
+    },
+    {
+      "name": "Zax Sauce®",
+      "category": "Sauce",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 150,
+        "protein": 0,
+        "carbs": 4,
+        "fat": 15
+      }
+    },
+    {
+      "name": "Spicy Zax Sauce®",
+      "category": "Sauce",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 170,
+        "protein": 1,
+        "carbs": 5,
+        "fat": 16
+      }
+    },
+    {
+      "name": "Tongue Torch®",
+      "category": "Sauce",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 20,
+        "protein": 0,
+        "carbs": 4,
+        "fat": 0.5
+      }
+    },
+    {
+      "name": "BBQ Sauce",
+      "category": "Sauce",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 60,
+        "protein": 0,
+        "carbs": 15,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Sweet & Spicy Sauce",
+      "category": "Sauce",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 90,
+        "protein": 0,
+        "carbs": 22,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Blue Cheese",
+      "category": "Dressing",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 140,
+        "protein": 1,
+        "carbs": 2,
+        "fat": 15
+      }
+    },
+    {
+      "name": "Honey Mustard Dressing",
+      "category": "Dressing",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 110,
+        "protein": 0,
+        "carbs": 6,
+        "fat": 9
+      }
+    },
+    {
+      "name": "Lite Vinaigrette",
+      "category": "Dressing",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 20,
+        "protein": 0,
+        "carbs": 6,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Citrus Vinaigrette",
+      "category": "Dressing",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 120,
+        "protein": 0,
+        "carbs": 1,
+        "fat": 13
+      }
+    },
+    {
+      "name": "Chicken Bacon Ranch Loaded Fries",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1270,
+        "protein": 61,
+        "carbs": 88,
+        "fat": 78
+      }
+    },
+    {
+      "name": "Fried White Cheddar Bites",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 700,
+        "protein": 27,
+        "carbs": 46,
+        "fat": 46
+      }
+    },
+    {
+      "name": "Crinkle Fries - Regular",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 330,
+        "protein": 5,
+        "carbs": 47,
+        "fat": 14
+      }
+    },
+    {
+      "name": "Crinkle Fries - Large",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 530,
+        "protein": 8,
+        "carbs": 75,
+        "fat": 23
+      }
+    },
+    {
+      "name": "Tater Chips - Basket",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 880,
+        "protein": 13,
+        "carbs": 66,
+        "fat": 62
+      }
+    },
+    {
+      "name": "Cole Slaw - side",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 140,
+        "protein": 1,
+        "carbs": 13,
+        "fat": 9
+      }
+    },
+    {
+      "name": "Texas Toast - 1 slice",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 150,
+        "protein": 5,
+        "carbs": 19,
+        "fat": 6
+      }
+    },
+    {
+      "name": "Fried Pickles",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 470,
+        "protein": 8,
+        "carbs": 39,
+        "fat": 31
+      }
+    },
+    {
+      "name": "Chicken Fingerz with Zax Sauce",
+      "category": "Kids Meals",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 320,
+        "protein": 19,
+        "carbs": 11,
+        "fat": 21
+      }
+    },
+    {
+      "name": "Grilled Cheese Sandwich Only",
+      "category": "Kids Meals",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 410,
+        "protein": 11,
+        "carbs": 39,
+        "fat": 23
+      }
+    },
+    {
+      "name": "Kid's Crinkle Fries",
+      "category": "Kids Meals",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 200,
+        "protein": 3,
+        "carbs": 28,
+        "fat": 8
+      }
+    },
+    {
+      "name": "Sweet Tea (Small)",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 270,
+        "protein": 0,
+        "carbs": 68,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Sweet Tea (Large)",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 550,
+        "protein": 0,
+        "carbs": 137,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Unsweet Tea (Any Size)",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 0,
+        "protein": 0,
+        "carbs": 0,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Coca-Cola (Small)",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 270,
+        "protein": 0,
+        "carbs": 67,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Diet Coke (Small)",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 0,
+        "protein": 0,
+        "carbs": 0,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Handcrafted Lemonade (Small)",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 350,
+        "protein": 0,
+        "carbs": 91,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Frozen Lemonade (Small)",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 430,
+        "protein": 0,
+        "carbs": 110,
+        "fat": 0
+      }
+    }
+  ]
+}

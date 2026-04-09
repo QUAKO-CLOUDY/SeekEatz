@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { Suspense, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { OnboardingFlow } from "@/app/components/OnboardingFlow";
 
-export default function OnboardingPage() {
+function OnboardingPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isPostSignupFlow = searchParams.get("afterSignup") === "1";
@@ -87,6 +87,14 @@ export default function OnboardingPage() {
     <div className="min-h-screen bg-background">
       <OnboardingFlow onComplete={handleComplete} initialStep={isPostSignupFlow ? 0 : -1} />
     </div>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense fallback={null}>
+      <OnboardingPageContent />
+    </Suspense>
   );
 }
 

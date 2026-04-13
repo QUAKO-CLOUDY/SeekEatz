@@ -16,11 +16,6 @@ import { bootstrapAccount } from "@/lib/bootstrap-account";
 function SignInPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const redirectTo = searchParams.get("redirectTo") || "/chat";
   const isMasterMode = searchParams.get("master") === "1";
   const isSwitchAccountMode = searchParams.get("switch") === "1";
@@ -29,14 +24,13 @@ function SignInPageContent() {
     process.env.NEXT_PUBLIC_ENABLE_MASTER_LOGIN === "true"
       ? process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL ?? ""
       : "";
+  const [email, setEmail] = useState(() => devMasterEmail);
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const encodedRedirectTo = encodeURIComponent(redirectTo);
   const upgradeHref = `/upgrade?redirectTo=${encodedRedirectTo}${shouldStartTutorial ? "&tutorial=1" : ""}${isMasterMode ? "&master=1" : ""}`;
-
-  useEffect(() => {
-    if (!email && devMasterEmail) {
-      setEmail(devMasterEmail);
-    }
-  }, [devMasterEmail, email]);
 
   // Check if user is already authenticated - if so, redirect to chat
   // Also listen for auth state changes to redirect immediately on sign-in
@@ -166,7 +160,7 @@ function SignInPageContent() {
 
         // Update profile in database - ensure profile row exists with all required fields
         try {
-          const profileData: any = {
+          const profileData: Record<string, unknown> = {
             id: userId,
             email: data.user.email, // Include email field
             last_login: new Date(now).toISOString(),
@@ -329,7 +323,7 @@ function SignInPageContent() {
         </form>
 
         <p className="text-black text-sm text-center mt-6">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <button
             onClick={() => router.push(upgradeHref)}
             className="text-cyan-600 hover:text-cyan-700 font-medium"

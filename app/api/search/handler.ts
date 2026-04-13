@@ -15,6 +15,103 @@ import { DISH_TAXONOMY } from '@/lib/taxonomy';
 // Dev-only counter for hard guard exclusions (tracks first 10)
 let hardGuardExclusionCount = 0;
 
+type SearchItemMacros = {
+  calories?: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+  fats?: number;
+};
+
+type SearchMenuItem = {
+  id?: string | number;
+  name?: string | null;
+  item_name?: string | null;
+  restaurant_name?: string | null;
+  restaurant?: string | null;
+  category?: string | null;
+  image_url?: string | null;
+  price_estimate?: number | null;
+  price?: number | null;
+  macros?: SearchItemMacros | null;
+  dietary_tags?: unknown;
+  tags?: unknown;
+  normalized_tags?: string[];
+  items?: Array<{ dietary_tags?: unknown }>;
+  calories?: number | string | null;
+  protein?: number | string | null;
+  carbs?: number | string | null;
+  fats?: number | string | null;
+  fat?: number | string | null;
+  protein_g?: number | null;
+  carbs_g?: number | null;
+  fats_g?: number | null;
+  fat_g?: number | null;
+};
+
+type NormalizedSearchMeal = SearchMenuItem & {
+  id: string | number | undefined;
+  restaurant_name: string | null;
+  name: string | null;
+  category: string;
+  image_url: string | null;
+  price_estimate: number | null;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fats: number;
+  protein_g: number;
+  carbs_g: number;
+  fats_g: number;
+  fat: number;
+  fat_g: number;
+  price: number | null;
+  restaurant: string | null;
+  item_name: string | null;
+  normalized_tags: string[];
+  dietary_tags: string[];
+};
+
+type FinalSearchMeal = {
+  id: string | number | undefined;
+  name: string | null;
+  restaurant: string | null;
+  restaurant_name: string | null;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fats: number;
+  image: string;
+  restaurantLogoUrl: string;
+  description: string;
+  category: string;
+  dietary_tags: string[];
+  price: number | null;
+};
+
+type SearchKeyData = {
+  q: string;
+  calMin?: number;
+  calMax?: number;
+  proMin?: number;
+  proMax?: number;
+  carbMin?: number;
+  carbMax?: number;
+  fatMin?: number;
+  fatMax?: number;
+  dishType?: string | null;
+  rest?: string;
+  shuffleNonce?: string;
+};
+
+function getItemName(item: SearchMenuItem): string {
+  return (item.name || item.item_name || '').toLowerCase();
+}
+
+function getRestaurantName(item: SearchMenuItem): string {
+  return (item.restaurant_name || item.restaurant || '').trim();
+}
+
 /**
  * Dish taxonomy mapping: dishType → { keywords[] }
  * Maps dish types to name keywords for filtering
@@ -78,12 +175,12 @@ function extractDietaryIntent(query: string): string | null {
  * Applies dietary filter — keeps only items whose name contains dietary keywords
  * Used when user explicitly requests vegetarian/vegan meals
  */
-function applyDietaryFilter(items: any[], dietaryType: string): any[] {
+function applyDietaryFilter(items: SearchMenuItem[], dietaryType: string): SearchMenuItem[] {
   const keywords = DIETARY_NAME_KEYWORDS[dietaryType];
   if (!keywords || keywords.length === 0) return items;
 
-  return items.filter((item: any) => {
-    const itemName = (item.name || item.item_name || '').toLowerCase();
+  return items.filter((item: SearchMenuItem) => {
+    const itemName = getItemName(item);
 
     // Check if item name contains any dietary keyword
     return keywords.some(keyword => {
@@ -143,7 +240,7 @@ function extractProteinKeyword(query: string): string | null {
  * Keeps only items where menu name contains the protein keyword
  * Applied after normalization to filter on meal names
  */
-function applyProteinFilter(items: any[], proteinKeyword: string): any[] {
+function applyProteinFilter(items: SearchMenuItem[], proteinKeyword: string): SearchMenuItem[] {
   if (!proteinKeyword || !PROTEIN_KEYWORDS[proteinKeyword]) {
     return items; // No protein constraint
   }
@@ -151,8 +248,8 @@ function applyProteinFilter(items: any[], proteinKeyword: string): any[] {
   const keywords = PROTEIN_KEYWORDS[proteinKeyword];
   const lowerKeywords = keywords.map(k => k.toLowerCase());
 
-  return items.filter((item: any) => {
-    const itemName = (item.name || item.item_name || '').toLowerCase();
+  return items.filter((item: SearchMenuItem) => {
+    const itemName = getItemName(item);
 
     // Check if name contains any protein keyword (word boundary to avoid partial matches)
     const nameMatches = lowerKeywords.some(keyword => {
@@ -261,11 +358,11 @@ function extractExcludedKeywords(query: string): string[] {
  * Applies exclusion filter — removes items whose name contains any excluded keyword
  * Used when user says "not chicken", "without beef", etc.
  */
-function applyExclusionFilter(items: any[], excludedKeywords: string[]): any[] {
+function applyExclusionFilter(items: SearchMenuItem[], excludedKeywords: string[]): SearchMenuItem[] {
   if (!excludedKeywords || excludedKeywords.length === 0) return items;
 
-  return items.filter((item: any) => {
-    const itemName = (item.name || item.item_name || '').toLowerCase();
+  return items.filter((item: SearchMenuItem) => {
+    const itemName = getItemName(item);
 
     // Check if name contains any excluded keyword
     const isExcluded = excludedKeywords.some(keyword => {
@@ -283,7 +380,7 @@ function applyExclusionFilter(items: any[], excludedKeywords: string[]): any[] {
  * Keeps only items where name matches keywords (category not used - menu_items doesn't have reliable category)
  * Applied BEFORE macro filtering per requirements
  */
-function applyDishTypeFilter(items: any[], dishType: string): any[] {
+function applyDishTypeFilter(items: SearchMenuItem[], dishType: string): SearchMenuItem[] {
   if (!dishType || !DISH_TAXONOMY[dishType]) {
     return items; // No dish type constraint
   }
@@ -291,8 +388,8 @@ function applyDishTypeFilter(items: any[], dishType: string): any[] {
   const { keywords } = DISH_TAXONOMY[dishType];
   const lowerKeywords = keywords.map(k => k.toLowerCase());
 
-  return items.filter((item: any) => {
-    const itemName = (item.name || item.item_name || '').toLowerCase();
+  return items.filter((item: SearchMenuItem) => {
+    const itemName = getItemName(item);
 
     // Check if name matches any keyword (word boundary to avoid partial matches)
     const nameMatches = lowerKeywords.some(keyword => {
@@ -314,7 +411,7 @@ function applyDishTypeFilter(items: any[], dishType: string): any[] {
  * @param dishType - Optional dish type (e.g., 'burritos', 'burgers'). If provided and item name matches dishType keywords, include it even if category might suggest otherwise
  * @returns true if item is a dish, false if it's an ingredient/modifier
  */
-function isDishItem(menuItem: any, dishType?: string | null): boolean {
+function isDishItem(menuItem: SearchMenuItem, dishType?: string | null): boolean {
   const category = (menuItem.category || '').toLowerCase().trim();
   const name = (menuItem.name || menuItem.item_name || '').toLowerCase().trim();
   const words = name.split(/\s+/).filter((w: string) => w.length > 0);
@@ -776,13 +873,13 @@ function isDishItem(menuItem: any, dishType?: string | null): boolean {
  * @param items - Array of menu items to filter
  * @param dishType - Optional dish type. If provided, items matching dishType keywords are prioritized for inclusion
  */
-function filterToDishes(items: any[], dishType?: string | null): any[] {
+function filterToDishes(items: SearchMenuItem[], dishType?: string | null): SearchMenuItem[] {
   if (!items || items.length === 0) return [];
 
   const beforeCount = items.length;
   const excluded: Array<{ name: string; category: string; reason: string }> = [];
 
-  const filtered = items.filter((item: any): boolean => {
+  const filtered = items.filter((item: SearchMenuItem): boolean => {
     const isDish = isDishItem(item, dishType);
 
     if (!isDish) {
@@ -952,7 +1049,7 @@ function normalizeItemName(name: string): string {
  * Creates a stable dedupe key for a meal item
  * Prefers id if present, otherwise uses (restaurant_name + normalized_item_name)
  */
-function getDedupeKey(item: any): string {
+function getDedupeKey(item: SearchMenuItem): string {
   // Prefer id if present
   if (item.id) {
     return `id:${String(item.id)}`;
@@ -1024,7 +1121,7 @@ function hasStructuredConstraints(params: SearchParams): boolean {
  * Normalizes dietary tags to a consistent lowercase format with synonym handling
  * Handles dietary_tags, tags, and items[].dietary_tags
  */
-function normalizeDietaryTags(tags: any): string[] {
+function normalizeDietaryTags(tags: unknown): string[] {
   if (!tags) return [];
 
   // Handle array of strings
@@ -1048,7 +1145,7 @@ function normalizeDietaryTags(tags: any): string[] {
 function normalizeDietaryTag(tag: string): string {
   if (!tag || typeof tag !== 'string') return '';
 
-  let normalized = tag.toLowerCase().trim();
+  const normalized = tag.toLowerCase().trim();
 
   // Handle synonyms
   const synonyms: Record<string, string> = {
@@ -1118,7 +1215,7 @@ function nameHasBreakfast(name: unknown): boolean {
  * - Item name contains "breakfast", OR
  * - Item is from Starbucks (Starbucks items are considered breakfast items)
  */
-function isBreakfastItem(item: any): boolean {
+function isBreakfastItem(item: SearchMenuItem): boolean {
   // Check if name contains "breakfast"
   if (nameHasBreakfast(item.name)) {
     return true;
@@ -1153,7 +1250,7 @@ function extractDietaryConstraints(params: SearchParams): { requiredTags: string
  * Extracts data from real schema columns and macros jsonb ONLY
  * STRICT: Discards items if macros missing or calories/protein/carbs/fat missing or not numeric
  */
-function normalizeMeal(item: any): any | null {
+function normalizeMeal(item: SearchMenuItem): NormalizedSearchMeal | null {
   // Extract from real schema columns (guaranteed to exist)
   const restaurantName = item.restaurant_name || null;
   const itemName = item.name || null;
@@ -1299,14 +1396,14 @@ function generateShuffleSeed(searchKey: string, userId?: string, dayOfYear?: num
  * - Subsequent items continue diversity but allow more per restaurant
  */
 function applyRestaurantDiversity(
-  items: any[],
+  items: NormalizedSearchMeal[],
   searchKey: string,
   userId?: string
-): any[] {
+): NormalizedSearchMeal[] {
   if (!items || items.length === 0) return [];
 
   // Group items by restaurant
-  const restaurantGroups = new Map<string, any[]>();
+  const restaurantGroups = new Map<string, NormalizedSearchMeal[]>();
   for (const item of items) {
     const restaurant = item.restaurant_name || 'unknown';
     if (!restaurantGroups.has(restaurant)) {
@@ -1331,7 +1428,7 @@ function applyRestaurantDiversity(
   const shuffledRestaurants = deterministicShuffle(uniqueRestaurants, seed);
 
   // Shuffle items within each restaurant deterministically
-  const shuffledRestaurantGroups = new Map<string, any[]>();
+  const shuffledRestaurantGroups = new Map<string, NormalizedSearchMeal[]>();
   for (const restaurant of shuffledRestaurants) {
     const restaurantItems = restaurantGroups.get(restaurant) || [];
     const restaurantSeed = generateShuffleSeed(`${searchKey}|${restaurant}`, userId, dayOfYear);
@@ -1340,7 +1437,7 @@ function applyRestaurantDiversity(
 
   // Round-robin interleaving: take 1 from each restaurant in turn
   // This creates a diverse ordering where first 5 items come from 5 different restaurants
-  const diverseItems: any[] = [];
+  const diverseItems: NormalizedSearchMeal[] = [];
   const maxPerRestaurantFirstPass = totalRestaurants >= 5 ? 1 : 2; // Max 1 if 5+ restaurants, else max 2
 
   // First pass: interleave up to maxPerRestaurantFirstPass items from each restaurant
@@ -1402,10 +1499,10 @@ function applyRestaurantDiversity(
  * Applies restaurant filter only
  * Dish filtering is handled separately by filterToDishes() which is called earlier
  */
-function applyRestaurantFilter(items: any[], restaurantFilter?: string): any[] {
+function applyRestaurantFilter(items: NormalizedSearchMeal[], restaurantFilter?: string): NormalizedSearchMeal[] {
   if (!restaurantFilter) return items;
 
-  return items.filter((item: any) => {
+  return items.filter((item: NormalizedSearchMeal) => {
     return item.restaurant_name === restaurantFilter;
   });
 }
@@ -1446,7 +1543,7 @@ export async function searchHandler(params: SearchParams) {
   const supabase = await createClient();
 
   // Defensive check to ensure Supabase client is properly initialized
-  if (!supabase || typeof (supabase as any).rpc !== "function") {
+  if (!supabase || typeof supabase.rpc !== "function") {
     throw new Error("Supabase client missing rpc(). Did you forget to await createClient()?");
   }
 
@@ -1796,7 +1893,7 @@ export async function searchHandler(params: SearchParams) {
       }
     });
 
-    const searchKeyData: any = {
+    const searchKeyData: SearchKeyData = {
       q: effectiveQuery.toLowerCase() || '',
       calMin: effectiveMinCalories,
       calMax: effectiveMaxCalories,
@@ -1971,7 +2068,7 @@ export async function searchHandler(params: SearchParams) {
     effectiveMinFats !== undefined ||
     effectiveMaxFats !== undefined;
 
-  let allItems: any[] = [];
+  let allItems: SearchMenuItem[] = [];
   let retrievalStrategy: 'RESTAURANT_BROWSE' | 'DB_FILTERED' | 'DB_GENERIC' | 'VECTOR' | 'VECTOR_FALLBACK' = 'DB_GENERIC';
   let retrievalReason = '';
   const candidatesBeforeFiltering = 0; // Will be set after retrieval
@@ -2389,7 +2486,7 @@ export async function searchHandler(params: SearchParams) {
 
   if (isSmoothieSearch) {
     const beforeSmoothieCount = dishFilteredItems.length;
-    dishTypeFilteredItems = dishFilteredItems.filter((item: any) => isSmoothieLikeMenuItem(item));
+    dishTypeFilteredItems = dishFilteredItems.filter((item: SearchMenuItem) => isSmoothieLikeMenuItem(item));
     const afterSmoothieCount = dishTypeFilteredItems.length;
 
     if (beforeSmoothieCount > afterSmoothieCount) {
@@ -2416,8 +2513,8 @@ export async function searchHandler(params: SearchParams) {
 
     // Debug: Log excluded examples for dishType searches
     if (beforeDishTypeCount > afterDishTypeCount) {
-      const excludedItems = dishFilteredItems.filter((item: any) => {
-        const itemName = (item.name || item.item_name || '').toLowerCase();
+      const excludedItems = dishFilteredItems.filter((item: SearchMenuItem) => {
+        const itemName = getItemName(item);
         const { keywords } = DISH_TAXONOMY[dishType];
         const lowerKeywords = keywords.map(k => k.toLowerCase());
         const nameMatches = lowerKeywords.some(keyword => {
@@ -2429,7 +2526,7 @@ export async function searchHandler(params: SearchParams) {
       });
 
       // Log up to 5 excluded examples with reasons
-      const excludedExamples = excludedItems.slice(0, 5).map((item: any) => {
+      const excludedExamples = excludedItems.slice(0, 5).map((item: SearchMenuItem) => {
         const itemName = item.name || item.item_name || 'unknown';
         const itemCategory = item.category || 'unknown';
         return {
@@ -2463,8 +2560,8 @@ export async function searchHandler(params: SearchParams) {
   // This converts raw items to canonical meal objects and discards items with missing/invalid macros
   // STRICT: Discards items if macros missing or calories/protein/carbs/fat missing or not numeric
   const normalizedItems = dishTypeFilteredItems
-    .map((item: any) => normalizeMeal(item))
-    .filter((item): item is any => item !== null); // Remove null items (discarded due to missing/invalid macros)
+    .map((item: SearchMenuItem) => normalizeMeal(item))
+    .filter((item): item is NormalizedSearchMeal => item !== null); // Remove null items (discarded due to missing/invalid macros)
 
   const candidatesAfterNormalization = normalizedItems.length;
   console.log(`[searchHandler] Normalized ${normalizedItems.length} items (discarded ${dishTypeFilteredItems.length - normalizedItems.length} items with missing/invalid macros)`);
@@ -2477,10 +2574,10 @@ export async function searchHandler(params: SearchParams) {
 
   if (mealTime === "dinner") {
     // Exclude items whose name contains "breakfast"
-    mealTimeFilteredItems = normalizedItems.filter((item: any) => !nameHasBreakfast(item.name));
+    mealTimeFilteredItems = normalizedItems.filter((item: NormalizedSearchMeal) => !nameHasBreakfast(item.name ?? ''));
   } else if (mealTime === "breakfast") {
     // Keep items whose name contains "breakfast" OR items from Starbucks
-    mealTimeFilteredItems = normalizedItems.filter((item: any) => isBreakfastItem(item));
+    mealTimeFilteredItems = normalizedItems.filter((item: NormalizedSearchMeal) => isBreakfastItem(item));
   }
 
   const candidatesAfterMealTimeFilter = mealTimeFilteredItems.length;
@@ -2532,7 +2629,7 @@ export async function searchHandler(params: SearchParams) {
   // Support both min (>=) and max (<=) constraints for each macro
   const itemsBeforeMacroFilter = proteinFilteredItems.length;
 
-  const macroFilteredItems = proteinFilteredItems.filter((item: any) => {
+  const macroFilteredItems = proteinFilteredItems.filter((item: NormalizedSearchMeal) => {
     // Ensure item macros are numbers (should already be normalized, but double-check)
     const itemCalories = typeof item.calories === 'number' ? item.calories : parseFloat(item.calories) || 0;
     const itemProtein = typeof item.protein === 'number' ? item.protein : parseFloat(item.protein) || 0;
@@ -2579,13 +2676,13 @@ export async function searchHandler(params: SearchParams) {
 
   // HOMEPAGE STRICT FILTERING (no fallback - filters must ALWAYS be satisfied)
   // Ensure dish-only filtering is applied for homepage requests
-  let finalMacroFilteredItems: any[] = macroFilteredItems;
+  let finalMacroFilteredItems: NormalizedSearchMeal[] = macroFilteredItems;
 
   // For homepage: ensure dish-only filtering (items should already be dish-only, but double-check for strictness)
   if (params.isHomepage && !params.isPagination) {
     // Apply dish-only filter (items should already be filtered, but ensure strictness)
     const afterMacroFilter = finalMacroFilteredItems.length;
-    finalMacroFilteredItems = finalMacroFilteredItems.filter((item: any) => isDishItem(item, dishType));
+    finalMacroFilteredItems = finalMacroFilteredItems.filter((item: NormalizedSearchMeal) => isDishItem(item, dishType));
     const afterDishFilter = finalMacroFilteredItems.length;
 
     // Log filters applied and counts
@@ -2609,7 +2706,7 @@ export async function searchHandler(params: SearchParams) {
   if (process.env.NODE_ENV === 'development' && macroFilteredItems.length > 0) {
     try {
       const { assertMealsSatisfyConstraints } = await import('@/lib/macro-utils');
-      const mealsWithMacros = macroFilteredItems.map((item: any) => ({
+      const mealsWithMacros = macroFilteredItems.map((item: NormalizedSearchMeal) => ({
         macros: {
           calories: item.calories,
           protein: item.protein,
@@ -2681,7 +2778,7 @@ export async function searchHandler(params: SearchParams) {
   const uniqueRestaurantNames = [
     ...new Set(
       diverseItems
-        .map((item: any) => item.restaurant_name)
+        .map((item: NormalizedSearchMeal) => item.restaurant_name)
         .filter((name: string | null | undefined): name is string => Boolean(name?.trim()))
     ),
   ];
@@ -2708,7 +2805,7 @@ export async function searchHandler(params: SearchParams) {
 
   // 15. CONVERT TO FINAL MEAL FORMAT (for UI compatibility)
   // Use normalized canonical object directly - it already has all fields from schema
-  const finalMeals = diverseItems.map((item: any) => {
+  const finalMeals: FinalSearchMeal[] = diverseItems.map((item: NormalizedSearchMeal) => {
     const restaurantName = item.restaurant_name;
     const restaurantAssets = restaurantAssetMap.get(restaurantName?.trim().toLowerCase());
     const restaurantLogoUrl = getRestaurantLogoUrl(restaurantName, restaurantAssets?.logo_url);
@@ -2734,14 +2831,14 @@ export async function searchHandler(params: SearchParams) {
   // STRICT RESTAURANT ENFORCEMENT: Dev assertion
   // If restaurant filter is active, ensure ALL returned meals are from that restaurant
   if (process.env.NODE_ENV === 'development' && restaurantFilter) {
-    const violations = finalMeals.filter((meal: any) => {
+    const violations = finalMeals.filter((meal: FinalSearchMeal) => {
       const mealRestaurant = meal.restaurant_name || meal.restaurant;
       return mealRestaurant !== restaurantFilter;
     });
 
     if (violations.length > 0) {
       const errorMsg = `[searchHandler] CRITICAL: ${violations.length} meal(s) violate restaurant constraint! ` +
-        `Expected: ${restaurantFilter}, but found: ${violations.slice(0, 3).map((v: any) => `${v.name} (${v.restaurant_name || v.restaurant})`).join(', ')}`;
+        `Expected: ${restaurantFilter}, but found: ${violations.slice(0, 3).map((v: FinalSearchMeal) => `${v.name} (${v.restaurant_name || v.restaurant})`).join(', ')}`;
       console.error(errorMsg);
       throw new Error(errorMsg);
     }
@@ -2751,7 +2848,7 @@ export async function searchHandler(params: SearchParams) {
 
   // 11. DEDUPLICATE RESULTS (before pagination)
   // Use stable dedupe key: restaurant_name + name (case-insensitive)
-  const dedupeMap = new Map<string, any>();
+  const dedupeMap = new Map<string, FinalSearchMeal>();
   const itemsBeforeDedupe = finalMeals.length;
 
   for (const item of finalMeals) {

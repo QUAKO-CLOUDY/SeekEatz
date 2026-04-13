@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Flame, ChevronRight, Sparkles, X, AlertCircle } from 'lucide-react';
+import { ChevronRight, Sparkles, X } from 'lucide-react';
 import type { Meal } from '../types';
 import { getRestaurantLogoUrl } from '@/lib/image-utils';
 import FoodCard from './FoodCard';
@@ -11,8 +11,40 @@ type Props = {
   onBack?: () => void;
 };
 
+type SearchResultItem = {
+  id?: string | number;
+  category?: string;
+  item_name?: string;
+  name?: string;
+  restaurant_name?: string;
+  restaurantLogoUrl?: string;
+  restaurant_logo_url?: string;
+  logo_url?: string;
+  fat?: number;
+  fats?: number;
+  fat_g?: number;
+  fats_g?: number;
+  nutrition_info?: {
+    fat?: number;
+    fats?: number;
+    fat_g?: number;
+    fats_g?: number;
+  };
+  calories?: number;
+  protein_g?: number;
+  carbs_g?: number;
+  price?: number | null;
+  description?: string;
+  dietary_tags?: string[];
+  tags?: string[];
+};
+
+type SearchResponse =
+  | SearchResultItem[]
+  | { meals?: SearchResultItem[]; results?: SearchResultItem[] };
+
 // Convert API result to Meal type
-function convertToMeal(item: any): Meal {
+function convertToMeal(item: SearchResultItem): Meal {
   // Determine category from item data
   const category = item.category === 'Grocery' || item.category === 'Hot Bar' 
     ? 'grocery' as const 
@@ -57,9 +89,8 @@ function convertToMeal(item: any): Meal {
 export function SearchScreen({ onMealSelect, onBack }: Props) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Meal[]>([]);
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
   async function handleSearch(e?: React.FormEvent) {
@@ -76,11 +107,11 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
         body: JSON.stringify({ query }),
       });
       
-      const data = await res.json();
+      const data: SearchResponse = await res.json();
       console.log("Search API response:", data);
       
       // Normalize API response to always be an array
-      let normalizedResults: any[] = [];
+      let normalizedResults: SearchResultItem[] = [];
       
       if (Array.isArray(data)) {
         normalizedResults = data;
@@ -104,7 +135,6 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
       setSearchResults([]);
     } finally {
       setLoading(false);
-      setIsSearchOpen(false);
     }
   }
 
@@ -195,7 +225,6 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search meals, restaurants, or preferences..."
                 className="w-full bg-muted border-none rounded-xl py-3 pl-4 pr-12 text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-cyan-500 outline-none"
-                onFocus={() => setIsSearchOpen(true)}
               />
               <button 
                 type="submit"

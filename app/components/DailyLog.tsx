@@ -1,11 +1,18 @@
+import type { Meal, UserProfile } from '../types';
+
 export type LoggedMeal = {
   id: string;
-  meal: any;
+  meal: Meal;
   timestamp: Date;
   date: string;
 };
 
-// We add ': any' here so it accepts the props from page.tsx
-export function DailyLog({ userProfile, loggedMeals, onRemoveMeal }: any) {
+type DailyLogProps = {
+  userProfile?: UserProfile;
+  loggedMeals?: LoggedMeal[];
+  onRemoveMeal?: (mealId: string) => void;
+};
+
+export function DailyLog(_props: DailyLogProps) {
   return <div className="p-10 text-white">Daily Log Screen</div>;
 }

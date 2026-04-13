@@ -5,7 +5,6 @@ import { Send, Mic, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Card } from "./ui/card";
-import { MealCard } from "./MealCard";
 // import { mockMeals } from "@/data/mockData"; // We will create this next
 // import { useTheme } from "@/contexts/ThemeContext"; // We will create this next
 // import { MACRO_COLORS } from "@/lib/themeColors"; // We will create this next
@@ -74,7 +73,7 @@ const MOCK_MEALS: Meal[] = [
   },
 ];
 
-export function EnhancedAIChat({ userProfile, onMealSelect }: Props) {
+export function EnhancedAIChat({ userProfile: _userProfile, onMealSelect }: Props) {
   // Temporary theme mock until we install the context
   const resolvedTheme: string = "light"; 
 const isDark = resolvedTheme === "dark";
@@ -101,7 +100,7 @@ const isDark = resolvedTheme === "dark";
 
   const generateAIResponse = (
     userMessage: string,
-  ): { content: string; meals?: Meal[]; macroSuggestion?: any } => {
+  ): { content: string; meals?: Meal[]; macroSuggestion?: Message["macroSuggestion"] } => {
     const lowerMessage = userMessage.toLowerCase();
     let filteredMeals = [...MOCK_MEALS]; // Using local mock for now
 

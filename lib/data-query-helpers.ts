@@ -3,7 +3,6 @@
  * Handles both authenticated (user_id) and anonymous (device_id) queries
  */
 
-import { createClient } from '@/utils/supabase/client';
 import { getDeviceId } from './deviceId';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
@@ -49,12 +48,12 @@ export async function getDataQueryFilter<T>(
 export async function insertDataWithOwnership<T>(
   supabase: SupabaseClient,
   tableName: 'saved_meals' | 'daily_logs' | 'user_favorites',
-  data: any
+  data: Record<string, unknown>
 ) {
   // Check if user is authenticated
   const { data: { user } } = await supabase.auth.getUser();
   
-  const insertData: any = { ...data };
+  const insertData: Record<string, unknown> = { ...data };
   
   if (user) {
     // Authenticated: use user_id

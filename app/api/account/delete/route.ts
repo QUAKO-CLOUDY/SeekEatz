@@ -2,15 +2,6 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { createAdminClient } from "@/utils/supabase/admin";
 
-type UntypedSupabaseClient = {
-  from: (table: string) => any;
-  auth: {
-    admin: {
-      deleteUser: (userId: string, shouldSoftDelete?: boolean) => Promise<{ error: unknown | null }>;
-    };
-  };
-};
-
 const USER_OWNED_TABLES = [
   "usage_events",
   "saved_meals",
@@ -33,7 +24,7 @@ function isMissingTableError(error: unknown): boolean {
 }
 
 async function deleteRowsIfPresent(
-  admin: UntypedSupabaseClient,
+  admin: ReturnType<typeof createAdminClient>,
   table: string,
   column: string,
   value: string,
@@ -66,7 +57,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const admin = createAdminClient() as UntypedSupabaseClient;
+    const admin = createAdminClient();
 
     for (const table of USER_OWNED_TABLES) {
       await deleteRowsIfPresent(admin, table, "user_id", user.id);

@@ -32,6 +32,7 @@ export function MacroPreferencesChat({
   userProfile = { full_name: "Guest", target_calories: 1800, target_protein_g: 140, target_carbs_g: 100, target_fats_g: 60 }, 
   onComplete 
 }: Props) {
+  const messageIdRef = useRef(3);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -58,6 +59,12 @@ export function MacroPreferencesChat({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const createMessageId = () => {
+    const nextId = messageIdRef.current;
+    messageIdRef.current += 1;
+    return String(nextId);
+  };
 
   const generateAIResponse = (userMessage: string): { content: string; suggestions?: string[] } => {
     const lowerMessage = userMessage.toLowerCase();
@@ -105,7 +112,7 @@ export function MacroPreferencesChat({
     if (!messageText) return;
 
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: createMessageId(),
       type: 'user',
       content: messageText,
       timestamp: new Date(),
@@ -119,7 +126,7 @@ export function MacroPreferencesChat({
     setTimeout(() => {
       const { content, suggestions } = generateAIResponse(messageText);
       const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: createMessageId(),
         type: 'ai',
         content,
         suggestions,
@@ -147,7 +154,7 @@ export function MacroPreferencesChat({
             </div>
             <div className="flex-1">
               <h1 className="text-white font-bold text-xl mb-0.5">Tell Me Your Preferences</h1>
-              <p className="text-white/90 text-sm">Let's customize your meal recommendations</p>
+              <p className="text-white/90 text-sm">Let&apos;s customize your meal recommendations</p>
             </div>
           </div>
 

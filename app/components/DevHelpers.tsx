@@ -2,6 +2,12 @@
 
 import { useEffect } from "react";
 
+declare global {
+  interface Window {
+    resetOnboarding?: () => void;
+  }
+}
+
 /**
  * Development-only helper utilities attached to window
  * Only available in development mode for testing/debugging
@@ -10,7 +16,7 @@ export function DevHelpers() {
   useEffect(() => {
     if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
       // Reset onboarding completion flags and reload
-      (window as any).resetOnboarding = () => {
+      window.resetOnboarding = () => {
         localStorage.removeItem("onboardingCompleted");
         localStorage.removeItem("hasCompletedOnboarding");
         
@@ -37,7 +43,7 @@ export function DevHelpers() {
     // Cleanup on unmount (development only)
     return () => {
       if (typeof window !== "undefined" && process.env.NODE_ENV === "development") {
-        delete (window as any).resetOnboarding;
+        delete window.resetOnboarding;
       }
     };
   }, []);

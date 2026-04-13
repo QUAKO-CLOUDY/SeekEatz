@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { X, Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -16,24 +16,22 @@ type Props = {
   onUpdateMeal?: (logId: string, meal: Meal) => void;
 };
 
+function getInitialFieldValue(value?: string | number | null): string {
+  if (value === undefined || value === null) {
+    return "";
+  }
+
+  return String(value);
+}
+
 export function ManualMealEntry({ onAddMeal, onClose, editLogId, initialMeal, onUpdateMeal }: Props) {
-  const [mealName, setMealName] = useState("");
-  const [calories, setCalories] = useState("");
-  const [protein, setProtein] = useState("");
-  const [carbs, setCarbs] = useState("");
-  const [fats, setFats] = useState("");
+  const [mealName, setMealName] = useState(() => getInitialFieldValue(initialMeal?.name));
+  const [calories, setCalories] = useState(() => getInitialFieldValue(initialMeal?.calories));
+  const [protein, setProtein] = useState(() => getInitialFieldValue(initialMeal?.protein));
+  const [carbs, setCarbs] = useState(() => getInitialFieldValue(initialMeal?.carbs));
+  const [fats, setFats] = useState(() => getInitialFieldValue(initialMeal?.fats));
 
   const isEdit = Boolean(editLogId && initialMeal && onUpdateMeal);
-
-  useEffect(() => {
-    if (initialMeal) {
-      setMealName(initialMeal.name);
-      setCalories(String(initialMeal.calories ?? ""));
-      setProtein(String(initialMeal.protein ?? ""));
-      setCarbs(String(initialMeal.carbs ?? ""));
-      setFats(String(initialMeal.fats ?? ""));
-    }
-  }, [initialMeal]);
 
   const handleSubmit = () => {
     if (!mealName || !calories || !protein || !carbs || !fats) return;

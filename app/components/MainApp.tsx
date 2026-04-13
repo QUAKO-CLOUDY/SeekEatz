@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, startTransition } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { Navigation, type Screen } from './Navigation';
@@ -168,12 +168,16 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
   // Hydration fix: Mark component as mounted on client
   useEffect(() => {
-    setIsMounted(true);
+    startTransition(() => {
+      setIsMounted(true);
+    });
   }, []);
 
   useEffect(() => {
     if (!isMounted) return;
-    setDevFullAccessState(hasDevFullAccess());
+    startTransition(() => {
+      setDevFullAccessState(hasDevFullAccess());
+    });
   }, [isMounted, currentUserId]);
 
   useEffect(() => {
@@ -206,7 +210,9 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     if (!isMounted) return;
     if (isMasterAccount) {
       setDevFullAccess(true);
-      setDevFullAccessState(true);
+      startTransition(() => {
+        setDevFullAccessState(true);
+      });
     }
   }, [isMasterAccount, isMounted]);
 
@@ -218,8 +224,10 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       return;
     }
 
-    setIsTutorialActive(true);
-    setTutorialStepIndex(0);
+    startTransition(() => {
+      setIsTutorialActive(true);
+      setTutorialStepIndex(0);
+    });
   }, [appState, currentUserId, isMounted]);
 
   useEffect(() => {
@@ -228,12 +236,16 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     const nextStep = APP_TUTORIAL_STEPS[tutorialStepIndex];
     if (!nextStep) return;
 
-    setCurrentView('main');
-    setSelectedMeal(null);
+    startTransition(() => {
+      setCurrentView('main');
+      setSelectedMeal(null);
+    });
 
     if (currentScreen !== nextStep.screen) {
-      setCurrentScreen(nextStep.screen);
-      setNavHistory([nextStep.screen]);
+      startTransition(() => {
+        setCurrentScreen(nextStep.screen);
+        setNavHistory([nextStep.screen]);
+      });
 
       if (typeof window !== 'undefined') {
         localStorage.setItem('seekeatz_current_screen', nextStep.screen);
@@ -260,15 +272,19 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           ) as Screen[];
 
           if (filteredHistory.length > 0) {
-            setNavHistory(filteredHistory);
-            setCurrentScreen(filteredHistory[filteredHistory.length - 1]);
+            startTransition(() => {
+              setNavHistory(filteredHistory);
+              setCurrentScreen(filteredHistory[filteredHistory.length - 1]);
+            });
           }
         }
       } else {
         // Fallback to saved screen if no history
         const saved = localStorage.getItem('seekeatz_current_screen');
         if (saved && ['home', 'log', 'chat', 'favorites', 'settings'].includes(saved)) {
-          setCurrentScreen(saved as Screen);
+          startTransition(() => {
+            setCurrentScreen(saved as Screen);
+          });
         }
       }
     } catch (e) {
@@ -281,7 +297,9 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          setFavoriteMeals(parsed);
+          startTransition(() => {
+            setFavoriteMeals(parsed);
+          });
         }
       }
     } catch (e) {
@@ -294,7 +312,9 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (typeof parsed === 'object' && parsed !== null) {
-          setFavoriteMealsData(parsed);
+          startTransition(() => {
+            setFavoriteMealsData(parsed);
+          });
         }
       }
     } catch (e) {
@@ -307,7 +327,9 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (typeof parsed === 'object' && parsed !== null) {
-          setUserProfile(parsed);
+          startTransition(() => {
+            setUserProfile(parsed);
+          });
         }
       }
     } catch (e) {
@@ -332,12 +354,16 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
               // Keep meals from dates before today (historical)
               return log.date < todayStr;
             });
-            applyLoggedMeals(filteredMeals);
+            startTransition(() => {
+              applyLoggedMeals(filteredMeals);
+            });
             // Update last reset date to today
             localStorage.setItem('seekeatz_last_reset_date', todayStr);
           } else {
             // Same day or first time - keep all meals including today's
-            applyLoggedMeals(parsed);
+            startTransition(() => {
+              applyLoggedMeals(parsed);
+            });
             // Set last reset date if not set
             if (!lastResetDate) {
               localStorage.setItem('seekeatz_last_reset_date', todayStr);
@@ -398,9 +424,12 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           if (!fetchedUser && retries < 2) {
             await new Promise(resolve => setTimeout(resolve, 200));
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           // AuthSessionMissingError is expected when signed out - treat as no user
-          if (error?.message?.includes('Auth session missing') || error?.name === 'AuthSessionMissingError') {
+          if (
+            error instanceof Error &&
+            (error.message.includes('Auth session missing') || error.name === 'AuthSessionMissingError')
+          ) {
             // This is expected for signed-out users - break and continue with user = null
             break;
           }
@@ -481,7 +510,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
                       setAppState('app');
                     }
                   }
-                } catch (error: any) {
+                } catch {
                   setAppState('auth');
                 }
               }, 1000);
@@ -594,14 +623,6 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     };
   }, [supabase, isClient, refreshEntitlement]);
 
-  // Safety guard: If on chat route, never allow appState to be 'auth'
-  useEffect(() => {
-    if (isChatRoute && appState === 'auth') {
-      // Force app state for chat preview access
-      setAppState('app');
-    }
-  }, [isChatRoute, appState]);
-
   useEffect(() => {
     console.log('MainApp mounted, current screen:', currentScreen);
   }, [currentScreen]);
@@ -709,8 +730,10 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     );
   }
 
+  const renderedAppState: AppState = isChatRoute && appState === 'auth' ? 'app' : appState;
+
   // Show loading state
-  if (appState === 'loading') {
+  if (renderedAppState === 'loading') {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center">
         <div className="text-cyan-400 text-lg">Loading...</div>
@@ -719,7 +742,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   }
 
   // Show onboarding
-  if (appState === 'onboarding') {
+  if (renderedAppState === 'onboarding') {
     return (
       <div className="min-h-screen bg-background">
         <OnboardingFlow onComplete={handleOnboardingComplete} />
@@ -728,7 +751,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   }
 
   // Show auth screen (but NEVER on /chat route - always show app for preview)
-  if (appState === 'auth' && !isChatRoute) {
+  if (renderedAppState === 'auth' && !isChatRoute) {
     return <AuthScreen onSuccess={handleAuthSuccess} />;
   }
 

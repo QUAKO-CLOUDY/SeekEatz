@@ -11,10 +11,6 @@ import {
   getBillingTierFromAppleProductId,
 } from "@/lib/billing/app-store-sync";
 
-type UntypedSupabaseClient = {
-  from: (table: string) => any;
-};
-
 function isValidStatus(status: string): status is AppStoreSyncPayload["status"] {
   return ["inactive", "trialing", "active", "canceled", "past_due"].includes(status);
 }
@@ -70,7 +66,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const admin = createAdminClient() as UntypedSupabaseClient;
+    const admin = createAdminClient();
     const nowIso = new Date().toISOString();
     const billingTier = getBillingTierFromAppleProductId(payload.productId);
 

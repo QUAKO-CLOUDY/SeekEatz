@@ -10,6 +10,18 @@ export type Macros = {
   fats: number;
 };
 
+type MacroInputShape = {
+  calories?: unknown;
+  protein?: unknown;
+  protein_g?: unknown;
+  carbs?: unknown;
+  carbs_g?: unknown;
+  fat?: unknown;
+  fats?: unknown;
+  fat_g?: unknown;
+  fats_g?: unknown;
+};
+
 /**
  * Normalizes macro data from various input formats
  * Handles:
@@ -21,7 +33,7 @@ export type Macros = {
  * @param input - Macro data in any format
  * @returns Normalized Macros object or null if invalid
  */
-export function normalizeMacros(input: any): Macros | null {
+export function normalizeMacros(input: unknown): Macros | null {
   if (!input) {
     if (process.env.NODE_ENV === 'development') {
       console.warn('[normalizeMacros] Input is null/undefined');
@@ -30,7 +42,7 @@ export function normalizeMacros(input: any): Macros | null {
   }
 
   // Handle stringified JSON
-  let parsed: any = input;
+  let parsed: unknown = input;
   if (typeof input === 'string') {
     try {
       parsed = JSON.parse(input);
@@ -50,48 +62,50 @@ export function normalizeMacros(input: any): Macros | null {
     return null;
   }
 
+  const macroInput = parsed as MacroInputShape;
+
   // Extract calories - required, must be > 0
-  const calories = coerceToNumber(parsed.calories);
+  const calories = coerceToNumber(macroInput.calories);
   if (calories === null || calories <= 0 || isNaN(calories)) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn('[normalizeMacros] Invalid calories:', parsed.calories);
+      console.warn('[normalizeMacros] Invalid calories:', macroInput.calories);
     }
     return null;
   }
 
   // Extract protein - required, must be >= 0
-  const protein = coerceToNumber(parsed.protein ?? parsed.protein_g);
+  const protein = coerceToNumber(macroInput.protein ?? macroInput.protein_g);
   if (protein === null || isNaN(protein) || protein < 0) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn('[normalizeMacros] Invalid protein:', parsed.protein, parsed.protein_g);
+      console.warn('[normalizeMacros] Invalid protein:', macroInput.protein, macroInput.protein_g);
     }
     return null;
   }
 
   // Extract carbs - required, must be >= 0
-  const carbs = coerceToNumber(parsed.carbs ?? parsed.carbs_g);
+  const carbs = coerceToNumber(macroInput.carbs ?? macroInput.carbs_g);
   if (carbs === null || isNaN(carbs) || carbs < 0) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn('[normalizeMacros] Invalid carbs:', parsed.carbs, parsed.carbs_g);
+      console.warn('[normalizeMacros] Invalid carbs:', macroInput.carbs, macroInput.carbs_g);
     }
     return null;
   }
 
   // Extract fats - prefer "fats" (plural), fallback to "fat" (singular)
   // Support: fats, fat, fats_g, fat_g
-  const fatsValue = parsed.fats ?? parsed.fat ?? parsed.fats_g ?? parsed.fat_g;
+  const fatsValue = macroInput.fats ?? macroInput.fat ?? macroInput.fats_g ?? macroInput.fat_g;
   const fats = coerceToNumber(fatsValue);
   if (fats === null || isNaN(fats) || fats < 0) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn('[normalizeMacros] Invalid fats:', parsed.fats, parsed.fat, parsed.fats_g, parsed.fat_g);
+      console.warn('[normalizeMacros] Invalid fats:', macroInput.fats, macroInput.fat, macroInput.fats_g, macroInput.fat_g);
     }
     return null;
   }
 
   // Warn if both fat and fats exist with different values (data inconsistency)
-  if (typeof parsed.fat === 'number' && typeof parsed.fats === 'number' && parsed.fat !== parsed.fats) {
+  if (typeof macroInput.fat === 'number' && typeof macroInput.fats === 'number' && macroInput.fat !== macroInput.fats) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn('[normalizeMacros] Macro mismatch: fat=', parsed.fat, 'fats=', parsed.fats, '. Using fats (plural) value.');
+      console.warn('[normalizeMacros] Macro mismatch: fat=', macroInput.fat, 'fats=', macroInput.fats, '. Using fats (plural) value.');
     }
   }
 
@@ -107,7 +121,7 @@ export function normalizeMacros(input: any): Macros | null {
  * Coerces a value to a number, handling strings and null/undefined
  * Returns null if value cannot be coerced to a valid number
  */
-function coerceToNumber(value: any): number | null {
+function coerceToNumber(value: unknown): number | null {
   if (value === null || value === undefined) {
     return null;
   }
@@ -190,7 +204,7 @@ export function assertMealsSatisfyConstraints(
     return; // Only run in development
   }
 
-  const violations: Array<{ meal: any; reason: string }> = [];
+  const violations: Array<{ meal: { macros: Macros }; reason: string }> = [];
 
   for (const meal of meals) {
     if (!satisfiesMacroConstraints(meal.macros, constraints)) {

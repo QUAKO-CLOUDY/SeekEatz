@@ -80,13 +80,19 @@ export async function copyToClipboard(text: string, showUserMessage: boolean = t
         showToast('Copied to clipboard!', 'success');
       }
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Check if it's a permission error
-      if (error.name === 'NotAllowedError' || error.name === 'SecurityError') {
+      if (
+        error instanceof DOMException &&
+        (error.name === 'NotAllowedError' || error.name === 'SecurityError')
+      ) {
         console.warn('⚠️ Clipboard: Permission denied. Copy requires HTTPS or user permission.');
         // Fall through to fallback method
       } else {
-        console.warn('⚠️ Clipboard: Modern API failed, trying fallback:', error.message);
+        console.warn(
+          '⚠️ Clipboard: Modern API failed, trying fallback:',
+          error instanceof Error ? error.message : error
+        );
         // Fall through to fallback method
       }
     }
@@ -132,11 +138,14 @@ export async function copyToClipboard(text: string, showUserMessage: boolean = t
       console.warn('⚠️ Clipboard: Fallback method failed. Copy may not be available due to non-HTTPS or permissions.');
       return false;
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (showUserMessage) {
       showToast('Copy failed — please copy manually.', 'error');
     }
-    console.warn('⚠️ Clipboard: All copy methods failed:', error.message);
+    console.warn(
+      '⚠️ Clipboard: All copy methods failed:',
+      error instanceof Error ? error.message : error
+    );
     console.warn('⚠️ Clipboard: Copy may not be available due to non-HTTPS or permissions.');
     return false;
   }

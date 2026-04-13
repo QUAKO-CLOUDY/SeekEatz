@@ -7,7 +7,7 @@ const STORAGE_KEY = 'seekEatz.aiChat.v1';
 const DEBOUNCE_MS = 300;
 
 interface StoredChatState {
-  messages: any[];
+  messages: unknown[];
   visibleMealsCount: Record<string, number>;
   lastActiveAt: number;
 }

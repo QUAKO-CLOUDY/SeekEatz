@@ -2,7 +2,21 @@
 
 import { useTheme } from '../contexts/ThemeContext';
 
-export function CircularProgress({ percentage, colorStart, colorEnd, size, strokeWidth }: any) {
+type CircularProgressProps = {
+  percentage: number;
+  colorStart?: string;
+  colorEnd?: string;
+  size: number;
+  strokeWidth: number;
+};
+
+export function CircularProgress({
+  percentage,
+  colorStart,
+  colorEnd,
+  size,
+  strokeWidth,
+}: CircularProgressProps) {
   const { resolvedTheme } = useTheme();
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;

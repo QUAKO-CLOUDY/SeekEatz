@@ -28,7 +28,11 @@ export function getUserScopedKey(key: string, userId: string | null | undefined)
 /**
  * Set a user-scoped localStorage item
  */
-export function setUserItem(key: string, userId: string | null | undefined, value: any): void {
+export function setUserItem(
+  key: string,
+  userId: string | null | undefined,
+  value: unknown
+): void {
   if (typeof window === 'undefined') return;
   
   try {
@@ -43,7 +47,7 @@ export function setUserItem(key: string, userId: string | null | undefined, valu
 /**
  * Get a user-scoped localStorage item
  */
-export function getUserItem<T = any>(key: string, userId: string | null | undefined): T | null {
+export function getUserItem<T = unknown>(key: string, userId: string | null | undefined): T | null {
   if (typeof window === 'undefined') return null;
   
   try {

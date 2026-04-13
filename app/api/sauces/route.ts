@@ -6,6 +6,23 @@ export const dynamic = 'force-dynamic';
 
 type SauceMacros = { calories: number; protein: number; carbs: number; fat: number };
 export type SauceItem = { id: string; name: string; macros: SauceMacros };
+type RawSauceMacros = Partial<Record<keyof SauceMacros | 'fats', number | string | null | undefined>>;
+type RawSauceEntry = {
+  id?: string;
+  name?: string;
+  macros?: RawSauceMacros | null;
+  category?: string;
+  calories?: number | string | null;
+  protein_g?: number | string | null;
+  carbs_g?: number | string | null;
+  fat_g?: number | string | null;
+  fats_g?: number | string | null;
+};
+type SauceSourceFile = {
+  restaurant_name?: string;
+  sauces?: RawSauceEntry[];
+  items?: RawSauceEntry[];
+};
 
 function normalizeRestaurantForMatch(name: string): string {
   return (name || '').toLowerCase().trim();
@@ -45,7 +62,7 @@ export async function GET(req: NextRequest) {
       } catch {
         continue;
       }
-      let data: { restaurant_name?: string; sauces?: any[]; items?: any[] };
+      let data: SauceSourceFile;
       try {
         data = JSON.parse(raw);
       } catch {
@@ -59,7 +76,7 @@ export async function GET(req: NextRequest) {
       // Prefer top-level sauces array; fallback to items with category "Sauce"
       let sauces: SauceItem[] = [];
       if (Array.isArray(data.sauces) && data.sauces.length > 0) {
-        sauces = data.sauces.map((s: any, i: number) => {
+        sauces = data.sauces.map((s: RawSauceEntry, i: number) => {
           const macros = s.macros || {};
           return {
             id: s.id || `sauce-${i}-${(s.name || '').replace(/\s+/g, '-').toLowerCase()}`,
@@ -74,12 +91,12 @@ export async function GET(req: NextRequest) {
         });
       } else if (Array.isArray(data.items)) {
         const sauceItems = data.items.filter(
-          (i: any) =>
+          (i: RawSauceEntry) =>
             (i.category || '').toLowerCase() === 'sauce' &&
             i.name &&
             (i.macros || i.calories != null)
         );
-        sauces = sauceItems.map((s: any, i: number) => {
+        sauces = sauceItems.map((s: RawSauceEntry, i: number) => {
           const macros = s.macros || {};
           const cal = Number(macros.calories ?? s.calories) || 0;
           const protein = Number(macros.protein ?? s.protein_g) || 0;

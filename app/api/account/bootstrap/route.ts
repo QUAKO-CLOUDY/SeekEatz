@@ -24,10 +24,6 @@ type BootstrapBody = {
   hasCompletedOnboarding?: boolean;
 };
 
-type UntypedSupabaseClient = {
-  from: (table: string) => any;
-};
-
 type WaitlistFreeMonthRow = {
   id: string;
   is_free_month: boolean | null;
@@ -96,7 +92,7 @@ export async function POST(request: Request) {
     }
 
     const admin = createAdminClient();
-    const adminDb = admin as UntypedSupabaseClient;
+    const adminDb = admin;
     const normalizedEmail = normalizeEmail(user.email);
     const nowIso = new Date().toISOString();
 

@@ -54,10 +54,13 @@ export async function POST(request: Request) {
       message: 'Anonymous data claimed successfully',
       claimed: data, // May be null or a count depending on your function implementation
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Unexpected error in claim-anon-data:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
+      {
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
       { status: 500 }
     );
   }

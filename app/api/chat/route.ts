@@ -4,13 +4,14 @@ import { openai } from '@ai-sdk/openai';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { ROUTER_SYSTEM_PROMPT } from '@/lib/chat-prompts';
-import { searchHandler } from '@/lib/retrieval/retrieval-engine';
+import { searchHandler, type RetrievalResult } from '@/lib/retrieval/retrieval-engine';
 import { buildSearchParams } from '@/lib/search-utils';
 import { resolveRestaurantFromText, extractRestaurantPhrase, resolveRestaurantUniversal, isRestaurantOnlyQuery } from '@/lib/restaurant-resolver';
 import { extractMacroConstraintsFromText, hasConstraints } from '@/lib/extractMacroConstraintsFromText';
 import { isSmoothieLikeText } from '@/lib/smoothie-search';
 import { hasRemainingUsage, incrementUsageCount } from '@/lib/usage-cookie';
 import { buildEntitlement, type EntitlementProfileRow, FREE_DAILY_QUERY_LIMIT, PROFILE_ENTITLEMENT_SELECT } from '@/lib/entitlements';
+import type { Meal } from '@/app/types';
 
 export const maxDuration = 30;
 
@@ -133,7 +134,20 @@ function mergeStructuredIntent(
   const base = constraints || {};
   if (!structuredIntent) return base;
 
-  const merged: any = { ...base };
+  const merged: {
+    calorieCap?: number;
+    minProtein?: number;
+    maxCarbs?: number;
+    maxFat?: number;
+    minCalories?: number;
+    diet?: string;
+    restaurant?: string;
+    nearMe?: boolean;
+    sortingIntent?: string;
+    excludedIngredients?: string[];
+    mealType?: string;
+    cuisineType?: string;
+  } = { ...base };
 
   // Macro constraints from structuredIntent take priority
   if (structuredIntent.maxCalories != null) {
@@ -1209,7 +1223,6 @@ export async function POST(req: Request) {
         : extractedRestaurantQuery; // Only use extracted query, ignore routerResult
 
       // STEP 1: Restaurant resolution (ONLY if explicit constraint detected)
-      let resolvedCandidates: any[] = [];
       if (forcedRestaurantMatch) {
         restaurantMatch = forcedRestaurantMatch;
       } else if (!explicitRestaurantDetected) {
@@ -1240,11 +1253,6 @@ export async function POST(req: Request) {
             candidates: restaurantMatch.status === 'AMBIGUOUS' ? restaurantMatch.candidates : undefined,
           });
         }
-
-        // Store candidates for logging (empty array for non-AMBIGUOUS status)
-        resolvedCandidates = restaurantMatch.status === 'AMBIGUOUS'
-          ? restaurantMatch.candidates.map(c => ({ name: c.name, score: c.score }))
-          : [];
       }
 
       // STEP 2.5: Determine if this is a restaurant-only query (should use generic search query)
@@ -1696,18 +1704,18 @@ export async function POST(req: Request) {
         // SUPERLATIVE POST-PROCESSING: Sort by the correct macro and take top 1
         const superlativeSort = detectSuperlativeSort(message);
         if (superlativeSort && result.meals && result.meals.length > 0) {
-          const getMacro = (m: any, field: string) => {
+          const getMacro = (meal: Meal, field: 'protein' | 'calories' | 'carbs' | 'fats') => {
             // Try direct field, then nested macros object
-            if (m[field] !== undefined && m[field] !== null) return Number(m[field]) || 0;
-            if (m.macros && typeof m.macros === 'object') {
+            if (meal[field] !== undefined && meal[field] !== null) return Number(meal[field]) || 0;
+            if (meal.macros && typeof meal.macros === 'object') {
               // Handle macros as JSON object
-              const macros = typeof m.macros === 'string' ? JSON.parse(m.macros) : m.macros;
+              const macros = meal.macros;
               return Number(macros[field]) || 0;
             }
             return 0;
           };
 
-          result.meals.sort((a: any, b: any) => {
+          result.meals.sort((a: Meal, b: Meal) => {
             switch (superlativeSort) {
               case 'HIGHEST_PROTEIN':
                 return getMacro(b, 'protein') - getMacro(a, 'protein');
@@ -1752,14 +1760,14 @@ export async function POST(req: Request) {
         // If restaurantMatch is MATCH, ensure ALL returned meals are from that restaurant
         if (process.env.NODE_ENV === 'development' && restaurantMatch.status === 'MATCH') {
           const canonicalRestaurant = restaurantMatch.canonicalName;
-          const violations = (result.meals || []).filter((meal: any) => {
+          const violations = (result.meals || []).filter((meal: Meal) => {
             const mealRestaurant = meal.restaurant_name || meal.restaurant;
             return mealRestaurant !== canonicalRestaurant;
           });
 
           if (violations.length > 0) {
             const errorMsg = `[api/chat] CRITICAL: ${violations.length} meal(s) violate restaurant constraint! ` +
-              `Expected: ${canonicalRestaurant}, but found: ${violations.slice(0, 3).map((v: any) => `${v.name} (${v.restaurant_name || v.restaurant})`).join(', ')}`;
+              `Expected: ${canonicalRestaurant}, but found: ${violations.slice(0, 3).map((v: Meal) => `${v.name} (${v.restaurant_name || v.restaurant})`).join(', ')}`;
             console.error(errorMsg);
             throw new Error(errorMsg);
           }
@@ -1769,7 +1777,7 @@ export async function POST(req: Request) {
 
         // Standardize response shape: add mode field for meal results
         // Include restaurant metadata if restaurantMatch is MATCH
-        const responseData: any = {
+        const responseData: RetrievalResult & { mode: 'meals'; restaurant?: string } = {
           mode: 'meals',
           ...result,
           // Prepend location message if present (MVP v1 behavior)

@@ -5,7 +5,7 @@ import ReactMarkdown from "react-markdown";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { MealCard } from "./MealCard";
-import type { Meal } from "../types";
+import type { Meal, UserProfile } from "../types";
 import { copyToClipboard } from "@/lib/clipboard-utils";
 import { createClient } from "@/utils/supabase/client";
 import { useTheme } from "../contexts/ThemeContext";
@@ -21,29 +21,75 @@ import {
 
 interface AIChatProps {
   userId?: string;
-  userProfile?: any;
-  favoriteMeals?: any[];
-  onMealSelect?: (meal: any) => void;
-  onToggleFavorite?: (mealId: string, meal?: any) => void;
+  userProfile?: UserProfile;
+  favoriteMeals?: string[];
+  onMealSelect?: (meal: Meal) => void;
+  onToggleFavorite?: (mealId: string, meal?: Meal) => void;
   onSignInRequest?: () => void; // Callback to trigger sign-in flow
 }
+
+type PaginationFilters = Record<string, unknown>;
+
+type MealSearchContext = {
+  searchKey: string;
+  nextOffset: number;
+  hasMore: boolean;
+  originalQuery?: string;
+  filters?: PaginationFilters;
+};
 
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   meals?: Meal[]; // Parsed meals from <MEAL_CARDS>
-  mealSearchContext?: {
-    searchKey: string;
-    nextOffset: number;
-    hasMore: boolean;
-    originalQuery?: string; // Store original query for pagination
-    filters?: { [key: string]: any }; // Store original filters for pagination
-  };
+  mealSearchContext?: MealSearchContext;
   isGateMessage?: boolean; // Flag for gate messages that need buttons
 }
 
 type QuickPromptSearchContext = NonNullable<ChatMessage['mealSearchContext']>;
+
+type SearchResultItem = {
+  id: string;
+  item_name?: string;
+  name?: string;
+  restaurant_name?: string;
+  restaurant?: string;
+  calories?: number | null;
+  protein?: number | null;
+  protein_g?: number | null;
+  carbs?: number | null;
+  carbs_g?: number | null;
+  fats?: number | null;
+  fats_g?: number | null;
+  fat_g?: number | null;
+  image?: string;
+  restaurantLogoUrl?: string;
+  restaurant_logo_url?: string;
+  logo_url?: string;
+  description?: string | null;
+  category?: string;
+  dietary_tags?: string[] | null;
+  price?: number | null;
+  distance?: number;
+  latitude?: number;
+  longitude?: number;
+};
+
+type SearchApiResponse = {
+  meals?: SearchResultItem[];
+  hasMore?: boolean;
+  nextOffset?: number;
+  searchKey?: string;
+  summary?: string;
+  message?: string;
+  debugInfo?: unknown;
+  error?: boolean | string;
+  answer?: string;
+};
+
+type AuthUserResponse = Awaited<ReturnType<ReturnType<typeof createClient>["auth"]["getUser"]>>;
+type AuthTimeoutResponse = AuthUserResponse | { data: { user: null }; error: null };
 
 interface ActiveQuickPromptState {
   promptText: string;
@@ -127,7 +173,7 @@ function buildInputPlaceholder(now: Date = new Date()): string {
   return options[promptIndex];
 }
 
-function mapSearchItemToMeal(item: any): Meal {
+function mapSearchItemToMeal(item: SearchResultItem): Meal {
   return {
     id: item.id,
     name: item.item_name || item.name,
@@ -323,8 +369,13 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       try {
         const supabase = createClient();
         // Retry logic for auth check — capped at 2 retries, 100ms delay, with per-call timeout
-        const withAuthTimeout = (promise: Promise<any>, ms: number) =>
-          Promise.race([promise, new Promise<any>(resolve => setTimeout(() => resolve({ data: { user: null }, error: null }), ms))]);
+        const withAuthTimeout = (promise: Promise<AuthUserResponse>, ms: number): Promise<AuthTimeoutResponse> =>
+          Promise.race([
+            promise,
+            new Promise<{ data: { user: null }; error: null }>((resolve) =>
+              setTimeout(() => resolve({ data: { user: null }, error: null }), ms)
+            ),
+          ]);
 
         let retries = 0;
         let user = null;
@@ -352,12 +403,8 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         if (!user) {
           setIsSignedIn(false);
         }
-      } catch (error: any) {
-        if (error?.message?.includes('Auth session missing') || error?.name === 'AuthSessionMissingError') {
-          setIsSignedIn(false);
-        } else {
-          setIsSignedIn(false);
-        }
+      } catch {
+        setIsSignedIn(false);
       }
     };
     checkAuth();
@@ -577,38 +624,46 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   }, [setMessages]);
 
   // Log to Supabase (only for authenticated users)
-  const logChatMessage = useCallback(async (role: 'user' | 'assistant', content: string, meals?: any[], mealSearchContext?: any) => {
-    if (!isSignedIn || !userId || !currentSessionId || !supabaseChatAvailable.current) return;
+  const logChatMessage = useCallback(
+    async (
+      role: 'user' | 'assistant',
+      content: string,
+      meals?: Meal[],
+      mealSearchContext?: MealSearchContext
+    ) => {
+      if (!isSignedIn || !userId || !currentSessionId || !supabaseChatAvailable.current) return;
 
-    try {
-      // Ensure session is owned
-      await ensureChatSessionOwned(userId, currentSessionId);
-      if (!supabaseChatAvailable.current) return; // May have been disabled by ensureChatSessionOwned
+      try {
+        // Ensure session is owned
+        await ensureChatSessionOwned(userId, currentSessionId);
+        if (!supabaseChatAvailable.current) return; // May have been disabled by ensureChatSessionOwned
 
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('messages')
-        .insert({
-          session_id: currentSessionId,
-          role,
-          content,
-          meal_data: meals ? JSON.parse(JSON.stringify(meals)) : null,
-          meal_search_context: mealSearchContext ? JSON.parse(JSON.stringify(mealSearchContext)) : null,
-        });
+        const supabase = createClient();
+        const { error } = await supabase
+          .from('messages')
+          .insert({
+            session_id: currentSessionId,
+            role,
+            content,
+            meal_data: meals ? JSON.parse(JSON.stringify(meals)) : null,
+            meal_search_context: mealSearchContext ? JSON.parse(JSON.stringify(mealSearchContext)) : null,
+          });
 
-      if (error) {
-        console.warn('Chat message logging skipped (RLS policy may be missing).');
-      } else {
-        // Update chat_sessions updated_at timestamp
-        await supabase
-          .from('chat_sessions')
-          .update({ updated_at: new Date().toISOString() })
-          .eq('session_id', currentSessionId);
+        if (error) {
+          console.warn('Chat message logging skipped (RLS policy may be missing).');
+        } else {
+          // Update chat_sessions updated_at timestamp
+          await supabase
+            .from('chat_sessions')
+            .update({ updated_at: new Date().toISOString() })
+            .eq('session_id', currentSessionId);
+        }
+      } catch (e) {
+        console.warn('Chat message logging unavailable:', e);
       }
-    } catch (e) {
-      console.warn('Chat message logging unavailable:', e);
-    }
-  }, [isSignedIn, userId, currentSessionId, ensureChatSessionOwned]);
+    },
+    [isSignedIn, userId, currentSessionId, ensureChatSessionOwned]
+  );
 
   const logUsageEvent = useCallback(async (eventType: 'chat_submit' | 'chat_response' | 'limit_hit', metadata?: Record<string, unknown>) => {
     if (!isSignedIn || !userId) return;
@@ -1133,7 +1188,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           }),
           signal: abortController.signal,
         });
-      } catch (fetchError: any) {
+      } catch (fetchError: unknown) {
         // Handle abort
         if (abortController.signal.aborted) {
           console.log('Request was aborted');
@@ -1258,7 +1313,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         }
 
         try {
-          const jsonData = JSON.parse(rawResponseText);
+          const jsonData: SearchApiResponse = JSON.parse(rawResponseText);
 
           // Check for error flag or error field in response
           if (jsonData.error === true || jsonData.error) {
@@ -1285,27 +1340,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             const { meals: mealItems = [], hasMore, nextOffset, searchKey: responseSearchKey, summary: serverSummary, message } = jsonData;
 
             // Convert to Meal format (prefer flattened fields from backend)
-            const parsedMeals: Meal[] = (mealItems || []).map((item: any) => ({
-              id: item.id,
-              name: item.item_name || item.name,
-              restaurant: item.restaurant_name,
-              calories: item.calories ?? 0,
-              protein: item.protein ?? item.protein_g ?? 0,
-              carbs: item.carbs ?? item.carbs_g ?? 0,
-              fats: item.fats ?? item.fats_g ?? item.fat_g ?? 0,
-                image: getRestaurantLogoUrl(
-                  item.restaurant_name || item.restaurant || '',
-                  item.restaurantLogoUrl || item.restaurant_logo_url || item.logo_url
-                ),
-                restaurantLogoUrl: getRestaurantLogoUrl(
-                  item.restaurant_name || item.restaurant || '',
-                  item.restaurantLogoUrl || item.restaurant_logo_url || item.logo_url
-                ),
-              description: item.description || '',
-              category: item.category || '',
-              dietary_tags: item.dietary_tags || [],
-              price: item.price || null,
-            }));
+            const parsedMeals: Meal[] = mealItems.map(mapSearchItemToMeal);
 
             if (parsedMeals.length > 0) {
               console.log('[AIChat] First meal from /api/chat:', parsedMeals[0]);
@@ -1658,7 +1693,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   };
 
   // Load more meals for pagination
-  const loadMoreMeals = async (messageId: string, context: { searchKey: string; nextOffset: number; hasMore: boolean; originalQuery?: string; filters?: { [key: string]: any } }) => {
+  const loadMoreMeals = async (messageId: string, context: MealSearchContext) => {
     if (isLoading || !context.hasMore) return;
 
     // Record activity when user loads more meals

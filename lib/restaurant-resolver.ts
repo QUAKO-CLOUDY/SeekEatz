@@ -12,6 +12,8 @@
 
 import { createClient } from '@/utils/supabase/server';
 
+type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>;
+
 /**
  * Generic food term guard list - prevents misclassification of dish terms as restaurants
  * Normalized versions (lowercase, no punctuation)
@@ -213,7 +215,7 @@ export function extractRestaurantPhrase(message: string): string | null {
     const m = s.match(p);
     if (m?.[1]) {
       // clean trailing punctuation / filler words
-      let phrase = m[1]
+      const phrase = m[1]
         .replace(/[?.!,;:]+$/g, "")
         .replace(/\b(please|today|tonight|now)\b/g, "")
         .trim();
@@ -832,50 +834,6 @@ export async function resolveRestaurantFromText(
 }
 
 /**
- * Verifies that a restaurant name exists in menu_items table
- * Returns true if any restaurant_name variant normalizes to the given canonical name
- */
-async function verifyRestaurantAvailability(canonicalName: string): Promise<boolean> {
-  try {
-    const supabase = await createClient();
-    const normalizedTarget = normalizeRestaurantName(canonicalName);
-
-    // Fetch distinct restaurant names from menu_items
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select('restaurant_name')
-      .not('restaurant_name', 'is', null)
-      .limit(1000); // Reasonable limit
-
-    if (error) {
-      console.error('[restaurantResolver] Error verifying restaurant availability:', error);
-      return false;
-    }
-
-    if (!data || data.length === 0) {
-      return false;
-    }
-
-    // Check if any restaurant_name normalizes to the target
-    const uniqueNames = Array.from(new Set(
-      data.map(item => item.restaurant_name).filter((name): name is string => typeof name === 'string')
-    ));
-
-    for (const name of uniqueNames) {
-      const normalized = normalizeRestaurantName(name);
-      if (normalized === normalizedTarget) {
-        return true;
-      }
-    }
-
-    return false;
-  } catch (error) {
-    console.error('[restaurantResolver] Exception verifying restaurant availability:', error);
-    return false;
-  }
-}
-
-/**
  * Stopwords to exclude from token matching
  */
 const STOPWORDS = new Set(['the', 'a', 'an', 'and', 'of', 'co', 'company', 'restaurant', 'grill', 'cafe', 'bar', 'kitchen']);
@@ -995,7 +953,6 @@ export async function resolveRestaurantUniversal(
     return { status: 'NOT_FOUND', missingRestaurantQuery: restaurantQuery };
   }
 
-  const isDev = process.env.NODE_ENV === 'development';
   console.log('[restaurantResolver] Universal resolver starting:', {
     restaurantQuery,
     qNorm,
@@ -1256,7 +1213,7 @@ export async function resolveRestaurantUniversal(
  */
 async function buildRestaurantVariants(
   canonicalName: string,
-  supabase: any
+  supabase: ServerSupabaseClient
 ): Promise<string[]> {
   try {
     const canonicalNorm = normalizeRestaurantName(canonicalName);

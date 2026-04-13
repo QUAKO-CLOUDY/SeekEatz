@@ -5,6 +5,7 @@
 
 import type { SearchParams } from '@/app/types';
 import { createClient } from '@supabase/supabase-js';
+import { normalizeSearchText } from '@/lib/query-normalization';
 
 type BareRestaurantResolution = {
     canonicalName: string;
@@ -48,6 +49,25 @@ const SINGLE_TOKEN_FOOD_TERMS = new Set([
     'soups',
     'pasta',
     'sushi',
+    'egg',
+    'eggs',
+    'fish',
+    'salmon',
+    'shrimp',
+    'tuna',
+    'cod',
+    'tilapia',
+    'mahi',
+    'lobster',
+    'crab',
+    'tofu',
+    'pork',
+    'beef',
+    'turkey',
+    'omelet',
+    'omelette',
+    'bagel',
+    'biscuit',
 ]);
 
 const GENERIC_DISCOVERY_TERMS = new Set([
@@ -64,6 +84,21 @@ const GENERIC_DISCOVERY_TERMS = new Set([
     'lunch',
     'mediterranean',
     'mexican',
+    'protein',
+    'calorie',
+    'calories',
+    'carb',
+    'carbs',
+    'fat',
+    'fats',
+    'coffee',
+    'drink',
+    'drinks',
+    'beverage',
+    'beverages',
+    'juice',
+    'macro',
+    'macros',
     'vegan',
     'vegetarian',
 ]);
@@ -102,7 +137,9 @@ function compactRestaurantLookup(value: string): string {
 
 async function resolveBareRestaurantFromDatabase(queryText: string): Promise<BareRestaurantResolution | undefined> {
     const candidateText = extractBareRestaurantCandidateText(queryText);
-    const queryTokens = restaurantTokens(candidateText);
+    const queryTokens = restaurantTokens(candidateText).filter(
+        (token) => !GENERIC_DISCOVERY_TERMS.has(token)
+    );
 
     if (queryTokens.length === 0) {
         return undefined;
@@ -314,7 +351,8 @@ export interface SearchInput {
 export async function buildSearchParams(input: SearchInput): Promise<SearchParams> {
     // Normalize query: prefer 'query', fallback to 'message'
     const query = input.query || input.message || '';
-    const queryText = query.trim();
+    const normalizedQuery = normalizeSearchText(query);
+    const queryText = normalizedQuery.text.trim();
     const userContext = input.userContext || {};
 
     // Extract explicit restaurant query and macro filters from query text

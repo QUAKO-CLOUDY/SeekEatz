@@ -91,6 +91,7 @@ export function rankResults(
 function computeScore(item: RawResult, parsed: ParsedQuery): { score: number; reasons: string[] } {
   const cal = Number(item.macros?.calories ?? 0);
   const pro = Number(item.macros?.protein  ?? 0);
+  const fat = Number(item.macros?.fat ?? 0);
   const name = item.name.toLowerCase();
   const description = (item.description ?? '').toLowerCase();
   const tags = item.food_tags?.map(tag => tag.toLowerCase()) ?? [];
@@ -179,6 +180,33 @@ function computeScore(item: RawResult, parsed: ParsedQuery): { score: number; re
   }
 
   // ── Vector similarity (optional) ──────────────────────────────────────────
+  if (parsed.includeTags.includes('healthy') || parsed.intentLabel === 'healthy') {
+    const proteinToFatRatio = fat > 0 ? pro / fat : (pro > 0 ? pro : 0);
+    const proteinDensity = cal > 0 ? (pro / cal) * 100 : 0;
+    const ratioScore = Math.min(proteinToFatRatio / 2.5, 1);
+    const densityScore = Math.min(proteinDensity / 5, 1);
+    const calorieModerationScore =
+      cal <= 650 ? 1 :
+      cal <= 850 ? 0.8 :
+      cal <= 1100 ? 0.45 :
+      0.15;
+
+    score += (
+      ratioScore * 0.45 +
+      densityScore * 0.35 +
+      calorieModerationScore * 0.20
+    ) * 18;
+    reasons.push('healthy_macro_profile');
+
+    if (fat <= 20) {
+      score += 4;
+      reasons.push('low_fat');
+    } else if (fat <= 30) {
+      score += 2;
+      reasons.push('moderate_fat');
+    }
+  }
+
   if (item.similarity !== undefined) {
     score += item.similarity * 100 * WEIGHTS.vectorSimilarity;
     reasons.push('semantic_similarity');
@@ -230,7 +258,7 @@ export function interleaveByRestaurant(items: RawResult[]): RawResult[] {
 
   // Round-robin: pick one from each group in turn until exhausted
   const result: RawResult[] = [];
-  let pointers = sortedGroups.map(() => 0);
+  const pointers = sortedGroups.map(() => 0);
   let added = true;
   while (added) {
     added = false;

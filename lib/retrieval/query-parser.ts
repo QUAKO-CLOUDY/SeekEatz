@@ -7,6 +7,7 @@ import {
   detectExplicitRestaurantConstraint,
   detectMacroConstraints,
 } from '@/lib/intent-detection';
+import { normalizeSearchText } from '@/lib/query-normalization';
 import { parsedSearchQuerySchema, type ParsedSearchQuery } from './types';
 import { ALIAS_GROUPS, CATEGORY_ENUM, CUISINE_STYLE_ENUM } from './ontology';
 
@@ -112,6 +113,9 @@ const NON_CUISINE_PROXY_TERMS = new Set([
   'grain bowl',
   'power bowl',
   'acai',
+  'acai bowl',
+  'pitaya bowl',
+  'smoothie bowl',
   'fish',
   'shrimp',
   'salmon',
@@ -123,45 +127,65 @@ const NON_CUISINE_PROXY_TERMS = new Set([
 export type ParsedQuery = ParsedSearchQuery;
 
 export function parseQuery(raw: string): ParsedQuery {
-  const query = raw.trim();
-  const lower = query.toLowerCase();
+  const normalizedQuery = normalizeSearchText(raw);
+  const query = normalizedQuery.text.trim();
 
   const restaurantResult = detectExplicitRestaurantConstraint(query);
   const macroResult = detectMacroConstraints(query);
+  const contentQuery = stripRestaurantConstraintForContent(query, restaurantResult.restaurantQuery);
+  const lowerContent = contentQuery.toLowerCase();
 
-  const categories = detectCategories(lower);
-  const mealTypes = dedupe<string>(MEAL_TYPE_PATTERNS.filter(([pattern]) => pattern.test(lower)).map(([, type]) => type));
-  if (mealTypes.includes('breakfast') && /\bbreakfast\s+sandw(?:ich|hich)\b/i.test(lower)) {
+  const categories = prioritizeSpecificCategories(detectCategories(lowerContent));
+  if (/\b(acai|pitaya|smoothie)\s+bowl\b/i.test(lowerContent)) {
+    const bowlOnlyCategories = categories.filter((category) => category !== 'smoothie' && category !== 'entree');
+    bowlOnlyCategories.unshift('bowl');
+    categories.splice(0, categories.length, ...dedupe(bowlOnlyCategories));
+  }
+  const mealTypes = dedupe<string>(MEAL_TYPE_PATTERNS.filter(([pattern]) => pattern.test(lowerContent)).map(([, type]) => type));
+  if (!mealTypes.includes('breakfast') && /\begg\b/i.test(lowerContent) && /\b(wrap|sandw(?:ich|hich)|bagel|biscuit)\b/i.test(lowerContent)) {
+    mealTypes.unshift('breakfast');
+  }
+  if (mealTypes.includes('breakfast') && /\bbreakfast\s+sandw(?:ich|hich)\b/i.test(lowerContent)) {
     categories.unshift('breakfast_sandwich');
     const entreeIndex = categories.indexOf('entree');
     if (entreeIndex >= 0) {
       categories.splice(entreeIndex, 1);
     }
   }
-  if (mealTypes.includes('breakfast') && /\bbreakfast\s+burrito\b/i.test(lower)) {
+  if (mealTypes.includes('breakfast') && /\bbreakfast\s+burrito\b/i.test(lowerContent)) {
     categories.unshift('burrito');
     const entreeIndex = categories.indexOf('entree');
     if (entreeIndex >= 0) {
       categories.splice(entreeIndex, 1);
     }
   }
-  if ((/\bsteak\s+salad\b/i.test(lower) || /\bsalad\s+with\s+steak\b/i.test(lower)) && categories.includes('entree')) {
+  if (mealTypes.includes('breakfast') && /\bbreakfast\s+wrap\b/i.test(lowerContent)) {
+    categories.unshift('wrap');
+    const entreeIndex = categories.indexOf('entree');
+    if (entreeIndex >= 0) {
+      categories.splice(entreeIndex, 1);
+    }
+  }
+  if (mealTypes.includes('breakfast') && categories.length === 1 && categories[0] === 'entree') {
+    categories.length = 0;
+  }
+  if ((/\bsteak\s+salad\b/i.test(lowerContent) || /\bsalad\s+with\s+steak\b/i.test(lowerContent)) && categories.includes('entree')) {
     categories.unshift('salad');
     const entreeIndex = categories.indexOf('entree');
     if (entreeIndex >= 0) {
       categories.splice(entreeIndex, 1);
     }
   }
-  const cuisineOrStyle = detectCuisineOrStyle(lower);
-  const proteinPreference = dedupe<string>(PROTEIN_PATTERNS.filter(([pattern]) => pattern.test(lower)).map(([, value]) => value));
-  const locationHints = dedupe<string>(LOCATION_PATTERNS.filter(([pattern]) => pattern.test(lower)).map(([, value]) => value));
+  const cuisineOrStyle = detectCuisineOrStyle(lowerContent);
+  const proteinPreference = dedupe<string>(PROTEIN_PATTERNS.filter(([pattern]) => pattern.test(lowerContent)).map(([, value]) => value));
+  const locationHints = dedupe<string>(LOCATION_PATTERNS.filter(([pattern]) => pattern.test(lowerContent)).map(([, value]) => value));
 
   const includeTags: string[] = [];
   const cravingTerms: string[] = [];
   const sortPriority = new Set<ParsedQuery['sortPriority'][number]>(['calorie_match']);
 
   for (const [pattern, tag, priority] of TAG_PATTERNS) {
-    if (pattern.test(lower)) {
+    if (pattern.test(lowerContent)) {
       includeTags.push(tag);
       cravingTerms.push(tag.replace(/_/g, ' '));
       if (priority) sortPriority.add(priority);
@@ -171,13 +195,13 @@ export function parseQuery(raw: string): ParsedQuery {
   const dietaryFlags: string[] = [];
   let dietType: string | undefined;
   for (const [pattern, detectedDiet, flag] of DIETARY_PATTERNS) {
-    if (pattern.test(lower)) {
+    if (pattern.test(lowerContent)) {
       dietType = detectedDiet;
       if (flag) dietaryFlags.push(flag);
     }
   }
 
-  const intentSignal = detectIntentSignal(lower);
+  const intentSignal = detectIntentSignal(lowerContent);
   const normalizedCategory = categories[0] ?? undefined;
   const dishKeywords = normalizedCategory ? DISH_TAXONOMY[normalizedCategory]?.keywords?.slice(0, 3) : undefined;
   const mealType = mealTypes[0] ?? undefined;
@@ -196,7 +220,7 @@ export function parseQuery(raw: string): ParsedQuery {
     hasMacros: macroResult.hasMacroConstraints,
   });
 
-  applyIntentFilters(lower, macroResult);
+  applyIntentFilters(lowerContent, macroResult);
 
   const hasStructuredFilters = Boolean(
     restaurantResult.restaurantQuery ||
@@ -262,11 +286,25 @@ export function parseQuery(raw: string): ParsedQuery {
     cuisineType,
     dietType,
     intentLabel: intentSignal,
-    excludeLargePortions: !LARGE_PORTION_PATTERNS.test(lower),
+    excludeLargePortions: !LARGE_PORTION_PATTERNS.test(lowerContent),
     hasStructuredFilters,
   });
 
   return parsed;
+}
+
+function stripRestaurantConstraintForContent(query: string, restaurantQuery?: string): string {
+  if (!restaurantQuery) {
+    return query;
+  }
+
+  const escapedRestaurant = restaurantQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+  return query
+    .replace(new RegExp(`\\b(from|at)\\s+${escapedRestaurant}\\b`, 'gi'), ' ')
+    .replace(new RegExp(`\\b${escapedRestaurant}\\b`, 'gi'), ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
 }
 
 export function isSQLSufficient(parsed: ParsedQuery): boolean {
@@ -315,6 +353,19 @@ function detectCategories(lower: string): string[] {
   }
 
   return dedupe(matches);
+}
+
+function prioritizeSpecificCategories(categories: string[]): string[] {
+  if (!categories.includes('entree')) {
+    return categories;
+  }
+
+  const specificCategories = categories.filter((category) => category !== 'entree');
+  if (specificCategories.length === 0) {
+    return categories;
+  }
+
+  return [...specificCategories, 'entree'];
 }
 
 function detectCuisineOrStyle(lower: string): string[] {
@@ -391,6 +442,11 @@ function normalizeCuisineValue(value: string, phrase?: string): string | undefin
   const normalizedPhrase = phrase?.toLowerCase().replace(/\s+/g, '_');
   const allowed = new Set<string>(CUISINE_STYLE_ENUM);
 
+  if (normalizedPhrase === 'greek') return 'greek';
+  if (normalizedPhrase === 'sushi') return 'sushi';
+  if (normalizedPhrase === 'southern') return 'southern';
+  if (normalizedPhrase === 'seafood') return 'seafood';
+
   if (allowed.has(normalized)) {
     return normalized;
   }
@@ -400,10 +456,6 @@ function normalizeCuisineValue(value: string, phrase?: string): string | undefin
   if (normalized === 'sandwiches') return 'american';
   if (normalized === 'smoothie_juice') return 'healthy';
   if (normalized === 'breakfast') return 'american';
-  if (normalizedPhrase === 'greek') return 'greek';
-  if (normalizedPhrase === 'sushi') return 'sushi';
-  if (normalizedPhrase === 'southern') return 'southern';
-  if (normalizedPhrase === 'seafood') return 'seafood';
   if (normalizedPhrase === 'healthy') return 'healthy';
   if (normalizedPhrase === 'barbecue' || normalizedPhrase === 'bbq' || normalizedPhrase === 'smoked') {
     return 'barbecue';
@@ -520,6 +572,9 @@ function buildConfidenceNotes(input: {
   if (hasUnsupportedTerms(input)) {
     notes.push('unsupported_terms_detected');
   }
+  if (hasConflictingCategorySignals(input.categories)) {
+    notes.push('conflicting_categories');
+  }
   return notes;
 }
 
@@ -603,4 +658,17 @@ function hasUnsupportedTerms(input: {
   });
 
   return unknownTokens.length >= 2;
+}
+
+function hasConflictingCategorySignals(categories: string[]): boolean {
+  if (categories.length < 2) {
+    return false;
+  }
+
+  const uniqueCategories = new Set(categories);
+  if (!uniqueCategories.has('smoothie')) {
+    return false;
+  }
+
+  return Array.from(uniqueCategories).some((category) => category !== 'smoothie');
 }

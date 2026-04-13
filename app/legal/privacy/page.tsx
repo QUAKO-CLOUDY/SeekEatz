@@ -7,17 +7,20 @@ const sections = [
   {
     title: "1. Information We Collect",
     body: [
-      "Account information, including email address and login details.",
-      "Usage data, including search activity and app interactions.",
-      "Device information, such as device type and operating system.",
+      "Account information, including your email address, authentication details, and profile preferences.",
+      "Usage data, including searches, saved meals, logs, favorites, and interactions with core app features.",
+      "Device and technical information, such as device type, operating system, and app performance diagnostics.",
+      "Optional location data when you allow location access so we can show nearby restaurants and meal options.",
+      "Subscription and billing status from Apple and our billing providers so premium access can be activated, restored, and managed.",
     ],
   },
   {
     title: "2. How We Use Information",
     body: [
       "Provide and improve the app.",
-      "Deliver relevant results and experiences.",
+      "Deliver relevant meal results, nearby restaurant experiences, and personalized recommendations.",
       "Maintain performance, reliability, and security.",
+      "Authenticate accounts, sync app state across devices, and restore subscription access.",
       "Communicate with users when necessary.",
     ],
   },
@@ -25,7 +28,7 @@ const sections = [
     title: "3. Data Sharing",
     body: [
       "We do not sell personal data.",
-      "We may share data with service providers that support hosting, analytics, or infrastructure.",
+      "We may share data with service providers that support authentication, hosting, search, billing, analytics, or infrastructure.",
       "We may disclose data to legal authorities if required by law.",
     ],
   },
@@ -38,18 +41,20 @@ const sections = [
   {
     title: "5. User Control",
     body: [
-      "You may request account deletion.",
+      "You may delete your account and associated in-app data from the account settings screen.",
+      "You may disable location access at any time through your device settings.",
+      "If you subscribe through Apple, subscription cancellation and billing changes are managed through your Apple account.",
       "You may stop using the app at any time.",
     ],
   },
   {
     title: "6. Third-Party Services",
     body: [
-      "SeekEatz may use third-party tools, including analytics and API providers. Those services have their own privacy policies.",
+      "SeekEatz uses third-party services for authentication, data storage, billing, and AI-powered features. Those services operate under their own terms and privacy policies.",
     ],
   },
   {
-    title: "7. Children’s Privacy",
+    title: "7. Children's Privacy",
     body: [
       "SeekEatz is not intended for children under 13.",
     ],

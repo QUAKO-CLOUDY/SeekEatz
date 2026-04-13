@@ -70,6 +70,12 @@ export interface NormalizedMenuItem {
   name:                 string;
   import_batch_id:      string;
 
+  // scalar nutrition columns
+  calories:             number;
+  protein_g:            number;
+  carbs_g:              number;
+  fat_g:                number;
+
   // macros jsonb
   macros: {
     calories: number;

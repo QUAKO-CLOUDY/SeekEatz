@@ -119,6 +119,9 @@ const CASES: LiveCase[] = [
   { group: 'Restaurant', query: 'give me a healthy breakfast from First Watch', expectedMealType: 'breakfast', minResults: 1 },
   { group: 'Restaurant', query: 'something hearty from Chipotle', minResults: 1 },
   { group: 'Restaurant', query: 'fish tacos from Sweetgreen', expectedCategory: 'tacos', minResults: 1, warnIfTopMealMissingAny: ['fish', 'taco'] },
+  { group: 'Restaurant', query: 'healthy options at Nekter Juice Bar', minResults: 1, requireValidMealCards: true, requireNoDuplicateIds: true },
+  { group: 'Restaurant', query: 'healthy options at Jersey Mike\'s Subs', minResults: 1, requireValidMealCards: true, requireNoDuplicateIds: true },
+  { group: 'Restaurant', query: 'healthy options at Raising Cane\'s', minResults: 1, requireValidMealCards: true, requireNoDuplicateIds: true },
 
   { group: 'Negative', query: 'unicorn lasagna smoothie', maxResults: 0 },
   { group: 'Negative', query: 'volcanic moon burger without oxygen', maxResults: 0 },

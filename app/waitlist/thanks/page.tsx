@@ -31,13 +31,13 @@ export default function WaitlistThanksPage() {
           </div>
           
           <h1 className="text-3xl sm:text-4xl font-semibold text-gray-900">
-            You're on the waitlist!
+            You&apos;re on the waitlist!
           </h1>
           
           <p className="text-base sm:text-lg text-gray-600 max-w-md mx-auto leading-relaxed">
             Thanks for signing up for SeekEatz.
             The first 100 people to join will receive first month free when we launch.
-            We'll email you as soon as the app is ready, keep an eye on your inbox.
+            We&apos;ll email you as soon as the app is ready, keep an eye on your inbox.
           </p>
 
           <Link

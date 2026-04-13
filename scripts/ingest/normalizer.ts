@@ -175,7 +175,7 @@ export function normalizeItem(
 
   // ── Other classifications ─────────────────────────────────────────────────────
   const meal_type           = detectMealType(name, description, raw.rawMealType, rawCategory);
-  const normalized_category = detectNormalizedCategory(name, description, rawCategory);
+  const normalized_category = detectNormalizedCategory(name, description, rawCategory, raw.restaurantName);
   const cuisine_type        = detectCuisineType(classificationText);
   const protein_source      = detectProteinSource(classificationText);
   const cooking_method      = detectCookingMethod(classificationText);
@@ -209,6 +209,10 @@ export function normalizeItem(
     restaurant_name:    raw.restaurantName,
     name,
     import_batch_id,
+    calories:           macros.calories,
+    protein_g:          macros.protein,
+    carbs_g:            macros.carbs,
+    fat_g:              macros.fat,
     macros,
     fiber_g:            safeNum(raw.fiber_g),
     sugar_g:            safeNum(raw.sugar_g),

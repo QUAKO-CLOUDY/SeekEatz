@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 import { ChevronRight, Target, Check } from 'lucide-react';
 import type { UserProfile } from '../types';
@@ -8,9 +9,6 @@ import type { UserProfile } from '../types';
 type Props = {
   onComplete: (profile: UserProfile) => void;
 };
-
-// Define valid goal types based on your UserProfile interface
-type GoalType = "lose-fat" | "build-muscle" | "maintain";
 
 // Data for the requested UI with IDs matching your types
 const goals = [
@@ -21,20 +19,13 @@ const goals = [
 ];
 
 export function SimplifiedOnboarding({ onComplete }: Props) {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [goal, setGoal] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Logic to finish onboarding
   const handleFinish = async () => {
     setIsSubmitting(true);
-    
-    // Map the selected goal to a valid GoalType
-    // If 'performance' is selected, we default to 'build-muscle' for the backend type
-    let finalGoal: GoalType = 'maintain';
-    if (goal === 'lose-fat') finalGoal = 'lose-fat';
-    if (goal === 'build-muscle' || goal === 'performance') finalGoal = 'build-muscle';
-    if (goal === 'maintain') finalGoal = 'maintain';
 
     const profile: UserProfile = {
       target_calories: 2000,
@@ -56,9 +47,10 @@ export function SimplifiedOnboarding({ onComplete }: Props) {
     // Reset loading state
     setIsSubmitting(false);
 
-    // Redirect to home - use window.location for reliable redirect
+    // Redirect with app navigation so the native shell stays in control
     setTimeout(() => {
-      window.location.href = "/chat";
+      router.replace("/chat");
+      router.refresh();
     }, 100);
   };
 
@@ -71,7 +63,7 @@ export function SimplifiedOnboarding({ onComplete }: Props) {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-500 to-blue-600 rounded-3xl mb-4 shadow-lg shadow-teal-500/50">
               <Target className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-white mb-2 text-2xl font-bold">What's your main goal?</h1>
+            <h1 className="text-white mb-2 text-2xl font-bold">What&apos;s your main goal?</h1>
             <p className="text-gray-400">This helps us find meals that match your needs.</p>
           </div>
 
@@ -135,7 +127,7 @@ export function SimplifiedOnboarding({ onComplete }: Props) {
               <Target className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-white mb-2 text-2xl font-bold">Almost there!</h1>
-            <p className="text-gray-400">We're setting up your personalized meal recommendations.</p>
+            <p className="text-gray-400">We&apos;re setting up your personalized meal recommendations.</p>
           </div>
 
           <div className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700 rounded-2xl p-6 mb-6">
@@ -191,6 +183,6 @@ export function SimplifiedOnboarding({ onComplete }: Props) {
     );
   }
 
-  // Fallback (shouldn't reach here)
+  // Fallback (shouldn&apos;t reach here)
   return null;
 }

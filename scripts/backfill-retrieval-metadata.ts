@@ -107,7 +107,7 @@ function toRawIngestionItem(row: MenuItemRow): RawIngestionItem {
     cholesterol_mg: row.macros?.cholesterol,
     saturated_fat_g: row.macros?.saturated_fat,
     rawCategory: row.category ?? undefined,
-    rawMealType: row.meal_type ?? undefined,
+    rawMealType: undefined,
     price: row.price_estimate ?? undefined,
     imageUrl: row.image_url ?? undefined,
     allergens: row.allergens ?? undefined,
@@ -118,7 +118,7 @@ function toRawIngestionItem(row: MenuItemRow): RawIngestionItem {
 async function fetchRestaurants(supabase: SupabaseClient): Promise<RestaurantRow[]> {
   const { data, error } = await supabase
     .from('restaurants')
-    .select('id, name');
+    .select('id, name, canonical_name, aliases, cuisine_types, brand_tags, active_status, last_verified_at');
 
   if (error) {
     throw new Error(`Failed to fetch restaurants: ${error.message}`);
@@ -157,6 +157,8 @@ async function fetchMenuItems(
       'price_estimate',
       'allergens',
       'confidence_score',
+      'source_url',
+      'source_type',
       'macros',
     ].join(', '))
     .order('id', { ascending: true })
@@ -302,7 +304,7 @@ async function main() {
         protein_g: normalized.macros.protein,
         carbs_g: normalized.macros.carbs,
         fat_g: normalized.macros.fat,
-        normalized_category: normalized.normalized_category ?? row.category ?? null,
+        normalized_category: normalized.normalized_category ?? null,
         meal_type: normalized.meal_type,
         item_type: normalized.item_type,
         food_tags: normalized.food_tags ?? null,

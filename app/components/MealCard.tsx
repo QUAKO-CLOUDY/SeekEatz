@@ -97,38 +97,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
   const restaurantName = meal.restaurant_name || meal.restaurant || "Unknown";
   const compactRestaurantLabel = useMemo(() => {
     const normalized = restaurantName.replace(/\s+/g, ' ').trim();
-    if (!normalized) {
-      return { firstLine: "Unknown", secondLine: null as string | null };
-    }
-
-    const maxCharsPerLine = 12;
-
-    if (normalized.length <= maxCharsPerLine) {
-      return { firstLine: normalized, secondLine: null as string | null };
-    }
-
-    const words = normalized.split(' ');
-    if (words.length === 1) {
-      return { firstLine: normalized, secondLine: null as string | null };
-    }
-
-    let firstLine = "";
-    let secondLine = "";
-
-    for (const word of words) {
-      const nextFirstLine = firstLine ? `${firstLine} ${word}` : word;
-      if (nextFirstLine.length <= maxCharsPerLine || !firstLine) {
-        firstLine = nextFirstLine;
-        continue;
-      }
-
-      secondLine = secondLine ? `${secondLine} ${word}` : word;
-    }
-
-    return {
-      firstLine,
-      secondLine: secondLine || null,
-    };
+    return normalized || "Unknown";
   }, [restaurantName]);
 
   const logoSrc = getRestaurantLogoUrl(restaurantName, meal.restaurantLogoUrl);
@@ -139,7 +108,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
   const isGrocery = category === 'grocery' ||
     category === 'Grocery' ||
     category === 'Hot Bar';
-  const compactMetricCardBase = "min-w-0 rounded-xl border px-1.5 py-1.5 text-center shadow-sm";
+  const compactMetricCardBase = "flex h-[52px] min-w-0 flex-col items-center justify-center rounded-xl border px-1 py-1.5 text-center shadow-sm";
   const regularMetricCardBase = "min-w-0 rounded-lg border p-1.5 text-center shadow-sm sm:rounded-xl sm:p-2";
 
   // Compact mode: horizontal layout matching reference image (340px × 75px)
@@ -174,19 +143,16 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
               />
             </div>
 
-            <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+            <div className="grid min-w-0 w-full grid-cols-[96px_minmax(0,1fr)] items-center gap-2.5">
               {/* Restaurant */}
-              <div className="w-[84px] flex-shrink-0">
-                <p className={`text-[10px] font-medium leading-[1.1] tracking-[0.01em] text-slate-500 dark:text-slate-400 ${compactRestaurantLabel.secondLine ? '' : 'text-center'}`}>
-                  <span className="block whitespace-normal break-normal">{compactRestaurantLabel.firstLine}</span>
-                  {compactRestaurantLabel.secondLine && (
-                    <span className="mt-0.5 block whitespace-normal break-normal">{compactRestaurantLabel.secondLine}</span>
-                  )}
+              <div className="flex h-[30px] w-[96px] flex-shrink-0 items-center justify-center">
+                <p className="line-clamp-2 text-center text-[11px] font-medium leading-[1.15] tracking-[0.01em] text-slate-600 dark:text-slate-300">
+                  {compactRestaurantLabel}
                 </p>
               </div>
 
               {/* Right - Nutritional Boxes */}
-              <div className="grid grid-cols-4 gap-1.5">
+              <div className="grid w-full grid-cols-4 gap-1.5">
             {/* Calories */}
             <div className={`${compactMetricCardBase} border-pink-400/70 bg-gradient-to-br from-pink-300 to-rose-300 dark:border-pink-500/30 dark:from-pink-500/20 dark:to-rose-500/20`}>
               <p className="text-black dark:text-pink-100 font-bold text-[10px] leading-tight">
@@ -208,7 +174,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             </div>
 
             {/* Protein */}
-            <div className="min-w-0 rounded-lg border border-cyan-400/70 bg-gradient-to-br from-cyan-300 to-blue-300 px-1.5 py-1 text-center dark:border-cyan-400/30 dark:from-cyan-400/20 dark:to-blue-500/20">
+            <div className={`${compactMetricCardBase} border-cyan-400/70 bg-gradient-to-br from-cyan-300 to-blue-300 dark:border-cyan-400/30 dark:from-cyan-400/20 dark:to-blue-500/20`}>
               <p className="text-black dark:text-cyan-100 font-bold text-[10px] leading-tight">
                 {meal.protein}g
               </p>
@@ -218,7 +184,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             </div>
 
             {/* Carbs */}
-            <div className="min-w-0 rounded-lg border border-green-400/70 bg-gradient-to-br from-green-300 to-emerald-300 px-1.5 py-1 text-center dark:border-green-400/30 dark:from-green-400/20 dark:to-emerald-500/20">
+            <div className={`${compactMetricCardBase} border-green-400/70 bg-gradient-to-br from-green-300 to-emerald-300 dark:border-green-400/30 dark:from-green-400/20 dark:to-emerald-500/20`}>
               <p className="text-black dark:text-green-100 font-bold text-[10px] leading-tight">
                 {meal.carbs}g
               </p>
@@ -228,7 +194,7 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
             </div>
 
             {/* Fat */}
-            <div className="min-w-0 rounded-lg border border-amber-400/70 bg-gradient-to-br from-amber-300 to-orange-300 px-1.5 py-1 text-center dark:border-amber-400/30 dark:from-amber-400/20 dark:to-orange-500/20">
+            <div className={`${compactMetricCardBase} border-amber-400/70 bg-gradient-to-br from-amber-300 to-orange-300 dark:border-amber-400/30 dark:from-amber-400/20 dark:to-orange-500/20`}>
               <p className="text-black dark:text-amber-100 font-bold text-[10px] leading-tight">
                 {meal.fats}g
               </p>

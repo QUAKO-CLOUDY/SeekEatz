@@ -8,6 +8,12 @@ import { AuthProviders } from "@/app/components/AuthProviders";
 import { MONTHLY_PLAN_PRICE, YEARLY_PLAN_PRICE, getEntitlementPlanLabel } from "@/lib/entitlements";
 import { useAccountEntitlement } from "@/app/hooks/useAccountEntitlement";
 import { bootstrapAccount } from "@/lib/bootstrap-account";
+import { isRevenueCatConfigured } from "@/lib/billing/apple-products";
+import {
+  purchaseRevenueCatTier,
+  restoreRevenueCatPurchases,
+} from "@/lib/billing/revenuecat-client";
+import { isNativeApp } from "@/lib/native-runtime";
 
 const premiumBenefits = [
   "Unlimited searches",
@@ -48,6 +54,11 @@ function UpgradePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [authUserId, setAuthUserId] = useState<string | null>(null);
+  const [authEmail, setAuthEmail] = useState<string | null>(null);
+  const [billingError, setBillingError] = useState<string | null>(null);
+  const [pendingPlanId, setPendingPlanId] = useState<string | null>(null);
+  const [isRestoringPurchases, setIsRestoringPurchases] = useState(false);
   const { entitlement, refresh } = useAccountEntitlement(true);
   const isMasterMode = searchParams.get("master") === "1";
   const shouldStartTutorial = searchParams.get("tutorial") === "1";
@@ -72,6 +83,8 @@ function UpgradePageContent() {
     const loadUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setIsSignedIn(!!user);
+      setAuthUserId(user?.id ?? null);
+      setAuthEmail(user?.email ?? null);
       if (user) {
         try {
           await bootstrapAccount({ hasCompletedOnboarding: getOnboardingFlag() });
@@ -86,6 +99,8 @@ function UpgradePageContent() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsSignedIn(!!session?.user);
+      setAuthUserId(session?.user?.id ?? null);
+      setAuthEmail(session?.user?.email ?? null);
       if (session?.user) {
         void bootstrapAccount({ hasCompletedOnboarding: getOnboardingFlag() }).catch((error) => {
           console.warn("Upgrade bootstrap skipped:", error);
@@ -96,7 +111,55 @@ function UpgradePageContent() {
 
     return () => subscription.unsubscribe();
   }, [getOnboardingFlag, refresh]);
-  const iapReady = process.env.NEXT_PUBLIC_APPLE_IAP_READY === "true";
+  const iapReady = isRevenueCatConfigured();
+
+  const handlePurchase = useCallback(
+    async (planId: "monthly" | "yearly") => {
+      if (!authUserId) {
+        return;
+      }
+
+      try {
+        setBillingError(null);
+        setPendingPlanId(planId);
+        await purchaseRevenueCatTier({
+          tier: planId,
+          appUserID: authUserId,
+          email: authEmail,
+        });
+        await refresh();
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Purchase could not be completed.";
+        setBillingError(message);
+      } finally {
+        setPendingPlanId(null);
+      }
+    },
+    [authEmail, authUserId, refresh],
+  );
+
+  const handleRestorePurchases = useCallback(async () => {
+    if (!authUserId) {
+      return;
+    }
+
+    try {
+      setBillingError(null);
+      setIsRestoringPurchases(true);
+      await restoreRevenueCatPurchases({
+        appUserID: authUserId,
+        email: authEmail,
+      });
+      await refresh();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Restore purchases failed.";
+      setBillingError(message);
+    } finally {
+      setIsRestoringPurchases(false);
+    }
+  }, [authEmail, authUserId, refresh]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -185,7 +248,10 @@ function UpgradePageContent() {
                       plan.id === "free"
                         ? false
                         : isSignedIn
-                          ? !iapReady || entitlement.hasPremiumAccess
+                          ? !iapReady ||
+                            !isNativeApp() ||
+                            entitlement.hasPremiumAccess ||
+                            pendingPlanId !== null
                           : false
                     }
                     onClick={() => {
@@ -198,6 +264,11 @@ function UpgradePageContent() {
 
                       if (!isSignedIn) {
                         router.push(`${signUpHref}&plan=${plan.id}`);
+                        return;
+                      }
+
+                      if (plan.id === "monthly" || plan.id === "yearly") {
+                        void handlePurchase(plan.id);
                       }
                     }}
                     className={`w-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-4 text-base font-semibold text-white shadow-lg shadow-cyan-500/25 disabled:cursor-not-allowed disabled:opacity-50 ${
@@ -210,9 +281,11 @@ function UpgradePageContent() {
                       ? "Current plan active"
                       : !isSignedIn
                         ? plan.cta
-                        : iapReady
+                        : pendingPlanId === plan.id
+                          ? "Processing..."
+                          : iapReady && isNativeApp()
                           ? plan.cta
-                          : "Apple billing connects in the iOS build"}
+                          : "Finish purchase in the iOS app"}
                   </button>
                 </div>
               ))}
@@ -240,9 +313,32 @@ function UpgradePageContent() {
               </>
             ) : null}
 
+            {isSignedIn && isNativeApp() && iapReady && !entitlement.hasPremiumAccess ? (
+              <button
+                type="button"
+                onClick={() => void handleRestorePurchases()}
+                disabled={isRestoringPurchases || pendingPlanId !== null}
+                className="w-full rounded-full border border-border bg-background px-5 py-4 text-base font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isRestoringPurchases ? "Restoring purchases..." : "Restore purchases"}
+              </button>
+            ) : null}
+
+            {billingError ? (
+              <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                {billingError}
+              </div>
+            ) : null}
+
             {!iapReady && (
               <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                Apple IAP is the next integration point. This screen is now wired for the correct plans, waitlist trial messaging, and account state.
+                Apple billing is not fully configured yet. Add the RevenueCat public SDK key and App Store product ids before enabling purchases.
+              </div>
+            )}
+
+            {iapReady && !isNativeApp() && (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                Purchases run inside the iOS app shell. The web app keeps the upgrade UI and account state in sync, but billing is completed natively.
               </div>
             )}
           </div>

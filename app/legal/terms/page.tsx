@@ -27,7 +27,7 @@ const sections = [
   {
     title: "5. Subscription and Payments",
     body:
-      "Certain features may require a paid subscription. Billing and subscription management are handled through the App Store. All purchases are subject to Apple’s terms and policies.",
+        "Certain features may require a paid subscription. Billing and subscription management are handled through the App Store. All purchases are subject to Apple's terms and policies.",
   },
   {
     title: "6. Limitation of Liability",

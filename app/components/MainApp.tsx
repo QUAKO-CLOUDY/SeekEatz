@@ -36,7 +36,7 @@ const APP_TUTORIAL_STEPS: AppTutorialStep[] = [
   {
     screen: 'home',
     title: 'Find meals fast that fit',
-    body: 'Set your calories and macros. We’ll show meals that match.',
+    body: "Set your calories and macros. We'll show meals that match.",
     target: 'home-macro-tabs',
     buttonLabel: 'Next',
     placement: 'above',
@@ -55,8 +55,8 @@ const APP_TUTORIAL_STEPS: AppTutorialStep[] = [
   },
   {
     screen: 'chat',
-    title: 'Chat with our AI conceirge',
-    body: 'Tell us what you want and we’ll find the best options near you.',
+    title: 'Chat with our AI concierge',
+    body: "Tell us what you want and we'll find the best options near you.",
     target: 'chat-input',
     buttonLabel: 'Next',
     spotlightPadding: 0,
@@ -728,15 +728,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   }
 
   // Show auth screen (but NEVER on /chat route - always show app for preview)
-  if (appState === 'auth') {
-    // If we're on the /chat route, force app state to allow preview access
-    // This should never happen due to logic above, but add safety check
-    if (isChatRoute) {
-      // Force app state for chat preview
-      setAppState('app');
-      // Return null briefly while state updates, then will render app
-      return null;
-    }
+  if (appState === 'auth' && !isChatRoute) {
     return <AuthScreen onSuccess={handleAuthSuccess} />;
   }
 

@@ -21,7 +21,7 @@ declare const expect: {
 };
 
 declare const jest: {
-  fn: <T extends (...args: any[]) => any = (...args: any[]) => any>(impl?: T) => T;
+  fn: <T extends (...args: unknown[]) => unknown = (...args: unknown[]) => unknown>(impl?: T) => T;
   mock: (moduleName: string, factory?: () => unknown) => void;
   requireActual: <T = unknown>(moduleName: string) => T;
 };

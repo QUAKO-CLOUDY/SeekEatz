@@ -1135,8 +1135,9 @@ export function MealDetail({
                         key={similar.id}
                         className="bg-gradient-to-br from-card to-muted dark:from-gray-900 dark:to-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all cursor-pointer overflow-hidden hover:border-cyan-500/50 hover:scale-[1.02] group relative border border-border"
                         onClick={() => {
-                          // Navigate to meal detail - would need to be handled by parent
-                          window.location.href = `#meal-${similar.id}`;
+                          if (typeof window !== 'undefined') {
+                            window.location.hash = `meal-${similar.id}`;
+                          }
                         }}
                       >
                         {/* Image Container */}

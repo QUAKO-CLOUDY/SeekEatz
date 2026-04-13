@@ -1186,6 +1186,42 @@ function applyPostRetrievalFilters(
   parsed: ParsedQuery,
   dietaryKeywords?: string[]
 ): RawResult[] {
+  let filtered = applyPostRetrievalFiltersInternal(items, parsed, dietaryKeywords, false);
+
+  if (
+    filtered.length === 0 &&
+    shouldRelaxRestaurantMealType(parsed)
+  ) {
+    filtered = applyPostRetrievalFiltersInternal(items, parsed, dietaryKeywords, true);
+  }
+
+  if (
+    filtered.length === 0 &&
+    shouldRelaxSpecificMealType(parsed)
+  ) {
+    filtered = applyPostRetrievalFiltersInternal(items, parsed, dietaryKeywords, true);
+  }
+
+  const smoothieQuery = isSmoothieQuery(parsed);
+
+  const ranked = rankResults(filtered, parsed);
+
+  if (!smoothieQuery) {
+    return ranked;
+  }
+
+  const explicitSmoothies = ranked.filter((item) => hasExplicitSmoothieSignals(item));
+  const inferredSmoothies = ranked.filter((item) => !hasExplicitSmoothieSignals(item));
+
+  return [...explicitSmoothies, ...inferredSmoothies];
+}
+
+function applyPostRetrievalFiltersInternal(
+  items: RawResult[],
+  parsed: ParsedQuery,
+  dietaryKeywords: string[] | undefined,
+  relaxMealType: boolean
+): RawResult[] {
   let filtered = items;
   const smoothieQuery = isSmoothieQuery(parsed);
 
@@ -1212,11 +1248,23 @@ function applyPostRetrievalFilters(
       return false;
     }
 
-    if (!matchesMealType(item, parsed)) {
+    if (!matchesMealType(item, parsed, relaxMealType)) {
       return false;
     }
 
     if (requiresStrictBreakfastFoodFiltering(parsed) && !looksLikeBreakfastFood(item)) {
+      return false;
+    }
+
+    if (!satisfiesParsedMacroConstraints(item, parsed)) {
+      return false;
+    }
+
+    if (!matchesRequestedCategory(item, parsed)) {
+      return false;
+    }
+
+    if (!matchesSpecificDishAnchors(item, parsed)) {
       return false;
     }
 
@@ -1234,20 +1282,14 @@ function applyPostRetrievalFilters(
 
     return true;
   });
-
-  const ranked = rankResults(filtered, parsed);
-
-  if (!smoothieQuery) {
-    return ranked;
-  }
-
-  const explicitSmoothies = ranked.filter((item) => hasExplicitSmoothieSignals(item));
-  const inferredSmoothies = ranked.filter((item) => !hasExplicitSmoothieSignals(item));
-
-  return [...explicitSmoothies, ...inferredSmoothies];
+  return filtered;
 }
 
 function isSmoothieQuery(parsed: ParsedQuery): boolean {
+  if (isAcaiBowlQuery(parsed)) {
+    return false;
+  }
+
   return (
     parsed.normalizedCategory === 'smoothie' ||
     parsed.categories.includes('smoothie') ||
@@ -1300,21 +1342,30 @@ export function applyRetrievalGuardrailsForTesting(
   return applyPostRetrievalFilters(items, parsed, dietaryKeywords);
 }
 
-function matchesMealType(item: RawResult, parsed: ParsedQuery): boolean {
+function matchesMealType(item: RawResult, parsed: ParsedQuery, relaxMealType = false): boolean {
   if (!parsed.mealTypes.length) {
     return true;
   }
 
   const itemMealType = (item.meal_type ?? '').toLowerCase();
   if (!itemMealType) {
+    if (parsed.mealTypes.some((value) => value.toLowerCase() === 'drink')) {
+      return looksLikeDrinkItem(item);
+    }
     return true;
   }
 
   if (itemMealType === 'all_day') {
+    if (parsed.mealTypes.some((value) => value.toLowerCase() === 'drink')) {
+      return looksLikeDrinkItem(item);
+    }
     return true;
   }
 
   const requested = new Set(parsed.mealTypes.map((value) => value.toLowerCase()));
+  if (requested.has('drink')) {
+    return looksLikeDrinkItem(item);
+  }
   if (requested.has(itemMealType)) {
     return true;
   }
@@ -1331,6 +1382,25 @@ function matchesMealType(item: RawResult, parsed: ParsedQuery): boolean {
     return true;
   }
 
+  if (
+    relaxMealType &&
+    parsed.restaurantQuery &&
+    !requested.has('breakfast') &&
+    (itemMealType === 'breakfast' || itemMealType === 'brunch')
+  ) {
+    return true;
+  }
+
+  if (relaxMealType && hasSpecificDishSignals(parsed)) {
+    if (requested.has('lunch') && (itemMealType === 'dinner' || itemMealType === 'brunch')) {
+      return true;
+    }
+
+    if (requested.has('dinner') && (itemMealType === 'lunch' || itemMealType === 'brunch')) {
+      return true;
+    }
+  }
+
   return false;
 }
 
@@ -1341,15 +1411,119 @@ function looksLikeBreakfastFood(item: RawResult): boolean {
   }
 
   const category = (item.normalized_category ?? '').toLowerCase();
-  return category === 'breakfast_sandwich';
+  return (
+    category === 'breakfast_sandwich' ||
+    ((/\b(acai|pitaya|smoothie)\b/i.test(haystack) || /\bbowl\b/i.test(haystack)) &&
+      /\bbowl\b/i.test(haystack) &&
+      /\b(acai|pitaya|smoothie)\b/i.test(haystack))
+  );
+}
+
+function looksLikeDrinkItem(item: RawResult): boolean {
+  const haystack = buildHaystack(item);
+  const normalizedCategory = (item.normalized_category ?? '').toLowerCase();
+  const itemType = (item.item_type ?? '').toLowerCase();
+
+  if (
+    /\b(platter|sandwich|burger|taco|burrito|salad|pasta|wings|omelette|omelet|waffle|pancake|soup)\b/i.test(haystack)
+  ) {
+    return false;
+  }
+
+  if (normalizedCategory === 'smoothie' || normalizedCategory === 'coffee') {
+    return true;
+  }
+
+  if (
+    /\b(coffee|latte|espresso|americano|cappuccino|macchiato|mocha|matcha|cold brew|tea|juice|smoothie|shake|lemonade|refresher)\b/i.test(haystack)
+  ) {
+    return true;
+  }
+
+  return itemType === 'drink' && /\b(oz|iced|hot|brew)\b/i.test(haystack);
+}
+
+function isAcaiBowlQuery(parsed: ParsedQuery): boolean {
+  const raw = parsed.raw.toLowerCase();
+  return parsed.normalizedCategory === 'bowl' && /\b(acai|pitaya|smoothie)\s+bowl\b/i.test(raw);
+}
+
+function shouldRelaxRestaurantMealType(parsed: ParsedQuery): boolean {
+  if (!parsed.restaurantQuery || !parsed.mealTypes.length) {
+    return false;
+  }
+
+  return !parsed.mealTypes.every((mealType) => mealType.toLowerCase() === 'breakfast');
+}
+
+function shouldRelaxSpecificMealType(parsed: ParsedQuery): boolean {
+  if (!parsed.mealTypes.length) {
+    return false;
+  }
+
+  if (parsed.mealTypes.every((mealType) => mealType.toLowerCase() === 'breakfast')) {
+    return false;
+  }
+
+  return hasSpecificDishSignals(parsed);
+}
+
+function hasSpecificDishSignals(parsed: ParsedQuery): boolean {
+  return Boolean(
+    parsed.normalizedCategory ||
+    parsed.proteinPreference.length > 0 ||
+    parsed.cuisineOrStyle.length > 0 ||
+    parsed.includeTags.includes('post_workout') ||
+    parsed.includeTags.includes('pre_workout')
+  );
 }
 
 function requiresStrictBreakfastFoodFiltering(parsed: ParsedQuery): boolean {
   return (
-    !parsed.restaurantQuery &&
     parsed.mealTypes.length > 0 &&
     parsed.mealTypes.every((mealType) => mealType.toLowerCase() === 'breakfast')
   );
+}
+
+function matchesRequestedCategory(item: RawResult, parsed: ParsedQuery): boolean {
+  if (!parsed.normalizedCategory || parsed.normalizedCategory === 'entree') {
+    return true;
+  }
+
+  const category = (item.normalized_category ?? '').toLowerCase();
+  const haystack = buildHaystack(item);
+
+  if (parsed.normalizedCategory === 'breakfast_sandwich') {
+    return category === 'breakfast_sandwich' || category === 'sandwich' || looksLikeBreakfastFood(item);
+  }
+
+  if (parsed.normalizedCategory === 'tacos') {
+    return category === 'tacos' || category === 'taco' || /\btacos?\b/i.test(haystack);
+  }
+
+  if (category === parsed.normalizedCategory) {
+    return true;
+  }
+
+  return (parsed.dishKeywords ?? []).some((keyword) => {
+    const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`\\b${escaped}\\b`, 'i').test(haystack);
+  });
+}
+
+function matchesSpecificDishAnchors(item: RawResult, parsed: ParsedQuery): boolean {
+  const haystack = buildHaystack(item);
+  const raw = parsed.raw.toLowerCase();
+
+  if (/\bacai\b/.test(raw) && !/\bacai\b/.test(haystack)) {
+    return false;
+  }
+
+  if (/\bpitaya\b/.test(raw) && !/\bpitaya\b/.test(haystack)) {
+    return false;
+  }
+
+  return true;
 }
 
 function matchesCuisineOrStyle(item: RawResult, parsed: ParsedQuery): boolean {
@@ -1362,8 +1536,7 @@ function matchesCuisineOrStyle(item: RawResult, parsed: ParsedQuery): boolean {
 
   if (parsed.cuisineOrStyle.length) {
     const hasCuisineMatch = parsed.cuisineOrStyle.some((term) => {
-      const normalized = term.replace(/_/g, ' ').toLowerCase();
-      return haystack.includes(normalized) || normalizedCategory === normalized;
+      return getCuisineAliases(term).some((alias) => haystack.includes(alias) || normalizedCategory === alias);
     });
 
     if (!hasCuisineMatch) {
@@ -1380,7 +1553,9 @@ function matchesProteinPreference(item: RawResult, parsed: ParsedQuery): boolean
   }
 
   const haystack = buildHaystack(item);
-  return parsed.proteinPreference.some((term) => haystack.includes(term.toLowerCase()));
+  return parsed.proteinPreference.some((term) =>
+    getProteinAliases(term).some((alias) => haystack.includes(alias))
+  );
 }
 
 function matchesExcludedTerms(item: RawResult, parsed: ParsedQuery): boolean {
@@ -1460,6 +1635,10 @@ function shouldUseSemanticFallback(
     return false;
   }
 
+  if (hasStrictDishAnchor(parsed) && deterministicCount > 0) {
+    return false;
+  }
+
   if (deterministicCount >= threshold) {
     return false;
   }
@@ -1470,6 +1649,10 @@ function shouldUseSemanticFallback(
   }
 
   return true;
+}
+
+function hasStrictDishAnchor(parsed: ParsedQuery): boolean {
+  return /\b(acai|pitaya)\b/i.test(parsed.raw);
 }
 
 function isCuisineDiscoveryQuery(
@@ -1642,15 +1825,37 @@ function hasParsedMacroConstraints(parsed: ParsedQuery): boolean {
 }
 
 function shouldShortCircuitUnsupportedQuery(parsed: ParsedQuery): boolean {
-  if (!parsed.confidenceNotes.includes('unsupported_terms_detected')) {
+  const hasUnsupportedTerms = parsed.confidenceNotes.includes('unsupported_terms_detected');
+  const hasConflictingCategories = parsed.confidenceNotes.includes('conflicting_categories');
+
+  if (!hasUnsupportedTerms && !hasConflictingCategories) {
     return false;
+  }
+
+  if (parsed.restaurantQuery) {
+    return false;
+  }
+
+  if (hasConflictingCategories) {
+    return true;
   }
 
   if (parsed.cuisineOrStyle.length > 0) {
     return false;
   }
 
-  if (parsed.restaurantQuery || parsed.mealTypes.length > 0 || parsed.maxCalories !== undefined || parsed.minCalories !== undefined) {
+  if (parsed.mealTypes.length > 0 || parsed.maxCalories !== undefined || parsed.minCalories !== undefined) {
+    return false;
+  }
+
+  if (
+    parsed.minProtein !== undefined ||
+    parsed.maxProtein !== undefined ||
+    parsed.minCarbs !== undefined ||
+    parsed.maxCarbs !== undefined ||
+    parsed.minFat !== undefined ||
+    parsed.maxFat !== undefined
+  ) {
     return false;
   }
 
@@ -1666,6 +1871,47 @@ function shouldShortCircuitUnsupportedQuery(parsed: ParsedQuery): boolean {
   }
 
   return parsed.parserConfidence < 0.55 && structuredSignalCount <= 2;
+}
+
+function getProteinAliases(term: string): string[] {
+  const normalized = term.toLowerCase();
+
+  if (normalized === 'fish') {
+    return [
+      'fish',
+      'salmon',
+      'tuna',
+      'cod',
+      'tilapia',
+      'mahi',
+      'mahi mahi',
+      'steelhead',
+      'trout',
+      'halibut',
+      'snapper',
+      'sea bass',
+    ];
+  }
+
+  return [normalized];
+}
+
+function getCuisineAliases(term: string): string[] {
+  const normalized = term.replace(/_/g, ' ').toLowerCase();
+
+  if (normalized === 'mediterranean') {
+    return ['mediterranean', 'greek', 'falafel', 'shawarma', 'gyro', 'hummus', 'pita', 'kebab'];
+  }
+
+  if (normalized === 'asian') {
+    return ['asian', 'chinese', 'japanese', 'thai', 'korean', 'vietnamese', 'sushi', 'ramen', 'pho'];
+  }
+
+  if (normalized === 'sushi') {
+    return ['sushi', 'maki', 'nigiri', 'sashimi', 'roll'];
+  }
+
+  return [normalized];
 }
 
 function buildBroadenedParams(params: RPCParams, parsed: ParsedQuery): RPCParams | null {

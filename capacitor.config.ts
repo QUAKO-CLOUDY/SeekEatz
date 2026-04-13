@@ -7,16 +7,15 @@ const config: CapacitorConfig = {
   appId: "com.seekeatz.app",
   appName: "SeekEatz",
   webDir: "out",
-  bundledWebRuntime: false,
-  server: devServerUrl
+  ...(devServerUrl
     ? {
-        url: devServerUrl,
-        cleartext: isLocalDevServer,
-        allowNavigation: ["*"],
+        server: {
+          url: devServerUrl,
+          cleartext: isLocalDevServer,
+          allowNavigation: ["*"],
+        },
       }
-    : {
-        url: "https://seekeatz.com",
-      },
+    : {}),
   ios: {
     contentInset: "always",
     limitsNavigationsToAppBoundDomains: true,

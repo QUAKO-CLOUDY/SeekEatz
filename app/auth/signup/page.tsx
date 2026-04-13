@@ -368,8 +368,9 @@ function SignupPageContent() {
       router.refresh();
       await new Promise(resolve => setTimeout(resolve, 300));
 
-      // Redirect to chat with full access
-      window.location.href = redirectTo;
+      // Navigate with the app router so native shells keep control.
+      router.replace(redirectTo);
+      router.refresh();
     } catch (err: unknown) {
       setOtpError(getErrorMessage(err, "Verification failed. Please try again."));
       setIsLoading(false);
@@ -400,7 +401,7 @@ function SignupPageContent() {
     }
   };
 
-  // ⬇️ Everything below is *inside* the function now
+  // Everything below stays inside the page component.
 
   // OTP Verification Screen
   if (showOtpScreen) {
@@ -481,7 +482,7 @@ function SignupPageContent() {
             }}
             className="text-gray-500 hover:text-gray-700 text-sm text-center w-full mt-4 transition-colors"
           >
-            ← Back to signup
+            Back to signup
           </button>
         </div>
       </div>
@@ -599,7 +600,7 @@ function SignupPageContent() {
                   onClick={() => router.push(`/auth/signin?redirectTo=${encodeURIComponent(redirectTo)}&switch=1${isMasterMode ? "&master=1" : ""}`)}
                   className="text-cyan-600 hover:text-cyan-700 font-medium underline mt-2"
                 >
-                  Go to Sign In →
+                  Go to Sign In
                 </button>
               )}
             </div>

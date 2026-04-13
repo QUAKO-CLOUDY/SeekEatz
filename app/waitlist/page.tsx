@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { openExternalUrl } from '@/lib/native-runtime';
 
 export default function WaitlistPage() {
   const router = useRouter();
@@ -65,6 +66,10 @@ export default function WaitlistPage() {
     await navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleOpenShareLink = async (url: string) => {
+    await openExternalUrl(url);
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -324,9 +329,9 @@ export default function WaitlistPage() {
                 href={`https://wa.me/?text=${encodeURIComponent(shareText + ' https://seekeatz.com/waitlist')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.preventDefault();
-                  window.open(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + getShareUrl())}`, '_blank');
+                  await handleOpenShareLink(`https://wa.me/?text=${encodeURIComponent(shareText + ' ' + getShareUrl())}`);
                 }}
                 className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#25D366] text-white font-medium rounded-xl hover:bg-[#1fb855] transition-all text-sm"
               >
@@ -339,9 +344,9 @@ export default function WaitlistPage() {
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent('https://seekeatz.com/waitlist')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.preventDefault();
-                  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(getShareUrl())}`, '_blank');
+                  await handleOpenShareLink(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(getShareUrl())}`);
                 }}
                 className="inline-flex items-center gap-2 px-4 py-2.5 bg-black text-white font-medium rounded-xl hover:bg-gray-800 transition-all text-sm"
               >
@@ -354,9 +359,9 @@ export default function WaitlistPage() {
                 href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://seekeatz.com/waitlist')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.preventDefault();
-                  window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getShareUrl())}`, '_blank', 'width=600,height=400');
+                  await handleOpenShareLink(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getShareUrl())}`);
                 }}
                 className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1877F2] text-white font-medium rounded-xl hover:bg-[#166fe5] transition-all text-sm"
               >
@@ -369,9 +374,9 @@ export default function WaitlistPage() {
                 href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://seekeatz.com/waitlist')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.preventDefault();
-                  window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(getShareUrl())}`, '_blank', 'width=600,height=400');
+                  await handleOpenShareLink(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(getShareUrl())}`);
                 }}
                 className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#0A66C2] text-white font-medium rounded-xl hover:bg-[#0958a8] transition-all text-sm"
               >
@@ -384,9 +389,9 @@ export default function WaitlistPage() {
                 href={`https://www.reddit.com/submit?url=${encodeURIComponent('https://seekeatz.com/waitlist')}&title=${encodeURIComponent('SeekEatz - AI-powered meal recommendations that fit your macros')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => {
+                onClick={async (e) => {
                   e.preventDefault();
-                  window.open(`https://www.reddit.com/submit?url=${encodeURIComponent(getShareUrl())}&title=${encodeURIComponent('SeekEatz - AI-powered meal recommendations that fit your macros')}`, '_blank');
+                  await handleOpenShareLink(`https://www.reddit.com/submit?url=${encodeURIComponent(getShareUrl())}&title=${encodeURIComponent('SeekEatz - AI-powered meal recommendations that fit your macros')}`);
                 }}
                 className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#FF4500] text-white font-medium rounded-xl hover:bg-[#e63e00] transition-all text-sm"
               >

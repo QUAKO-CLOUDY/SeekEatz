@@ -202,15 +202,15 @@ export const INTENT_FILTERS: Record<string, {
   // Workout
   'pre-workout':  { minProtein: 25, minCarbs: 30,      label: 'pre-workout' },
   'pre workout':  { minProtein: 25, minCarbs: 30,      label: 'pre-workout' },
-  'post-workout': { minProtein: 35, maxFat: 15,        label: 'post-workout' },
-  'post workout': { minProtein: 35, maxFat: 15,        label: 'post-workout' },
+  'post-workout': { minProtein: 30,                    label: 'post-workout' },
+  'post workout': { minProtein: 30,                    label: 'post-workout' },
   'gains':        { minProtein: 40, minCalories: 600,  label: 'gains' },
 
   // Misc
   'indulgent':    { minCalories: 700,                  label: 'indulgent' },
   'cheat':        { minCalories: 700,                  label: 'cheat meal' },
   'comfort':      { minCalories: 600,                  label: 'comfort food' },
-  'healthy':      { maxCalories: 600, minProtein: 20, maxFat: 25, label: 'healthy' },
+  'healthy':      { maxCalories: 850, minProtein: 15, label: 'healthy' },
 };
 
 // ─── Dish Taxonomy (item name → normalized_category) ─────────────────────────

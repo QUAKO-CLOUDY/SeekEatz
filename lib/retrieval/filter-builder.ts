@@ -118,11 +118,14 @@ export async function buildFilters(
 
   // ── Category / meal type ──────────────────────────────────────────────────
   if (parsed.normalizedCategory) params.p_normalized_category = parsed.normalizedCategory;
-  if (parsed.mealType)           params.p_meal_type           = parsed.mealType;
+  if (parsed.mealType === 'breakfast') params.p_meal_type = parsed.mealType;
 
   // ── Dish / protein keyword (name-based SQL filter) ────────────────────────
   // e.g. "steak dinner" → p_name_keyword = 'steak' so SQL filters name ILIKE '%steak%'
-  if (!parsed.normalizedCategory && parsed.dishKeywords && parsed.dishKeywords.length > 0) {
+  const explicitDishKeyword = getExplicitDishKeyword(parsed);
+  if (explicitDishKeyword) {
+    params.p_name_keyword = explicitDishKeyword;
+  } else if (!parsed.normalizedCategory && parsed.dishKeywords && parsed.dishKeywords.length > 0) {
     params.p_name_keyword = parsed.dishKeywords[0];
   }
 
@@ -183,6 +186,66 @@ interface ResolvedRestaurants {
   names: string[];
 }
 
+function normalizeRestaurantLookup(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, 'and')
+    .replace(/-/g, ' ')
+    .replace(/['.,]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function compactRestaurantLookup(value: string): string {
+  return normalizeRestaurantLookup(value).replace(/\s+/g, '');
+}
+
+function restaurantTokens(value: string): string[] {
+  return normalizeRestaurantLookup(value)
+    .split(/\s+/)
+    .filter((token) => token.length > 0 && !STOPWORDS.has(token));
+}
+
+const STOPWORDS = new Set([
+  'the',
+  'a',
+  'an',
+  'and',
+  'of',
+  'co',
+  'company',
+  'restaurant',
+  'grill',
+  'cafe',
+  'bar',
+  'kitchen',
+]);
+
+async function buildRestaurantNameVariants(
+  supabase: SupabaseClient,
+  seeds: string[]
+): Promise<string[]> {
+  const uniqueSeeds = [...new Set(seeds.map((seed) => seed.trim()).filter(Boolean))];
+  const variantSet = new Set<string>(uniqueSeeds);
+
+  for (const seed of uniqueSeeds) {
+    const { data } = await supabase
+      .from('menu_items')
+      .select('restaurant_name')
+      .ilike('restaurant_name', `%${seed}%`)
+      .limit(50);
+
+    for (const row of (data ?? []) as Array<{ restaurant_name?: string | null }>) {
+      if (row.restaurant_name) {
+        variantSet.add(row.restaurant_name);
+      }
+    }
+  }
+
+  return [...variantSet];
+}
+
 async function resolveRestaurantNames(
   supabase: SupabaseClient,
   parsed: ParsedQuery
@@ -192,40 +255,95 @@ async function resolveRestaurantNames(
   // Case 1: Specific restaurant query (e.g. "from chipotle", "only qdoba")
   if (parsed.restaurantQuery) {
     const q = parsed.restaurantQuery.trim();
+    const qNorm = normalizeRestaurantLookup(q);
+    const qCompact = compactRestaurantLookup(q);
+    const qTokens = restaurantTokens(q);
 
-    // Fetch matching restaurant names from the restaurants table
     const { data: restaurants } = await supabase
       .from('restaurants')
-      .select('name')
-      .ilike('name', `%${q}%`)
-      .limit(5);
+      .select('name, aliases')
+      .not('name', 'is', null);
 
     if (restaurants && restaurants.length > 0) {
-      return { names: restaurants.map((r: any) => r.name as string) };
-    }
+      type Candidate = { name: string; aliases: string[]; score: number };
+      const candidates: Candidate[] = [];
 
-    // Fuzzy fallback: try matching each significant word individually
-    const words = q.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-    for (const word of words) {
-      const { data: fuzzy } = await supabase
-        .from('restaurants')
-        .select('name')
-        .ilike('name', `%${word}%`)
-        .limit(5);
-      if (fuzzy && fuzzy.length > 0) {
-        return { names: fuzzy.map((r: any) => r.name as string) };
+      for (const restaurant of restaurants as Array<{ name?: string | null; aliases?: string[] | null }>) {
+        if (!restaurant.name) {
+          continue;
+        }
+
+        const candidateNames = [restaurant.name, ...(restaurant.aliases ?? [])].filter(Boolean) as string[];
+        let bestScore = 0;
+
+        for (const candidateName of candidateNames) {
+          const candidateNorm = normalizeRestaurantLookup(candidateName);
+          const candidateCompact = compactRestaurantLookup(candidateName);
+          const candidateTokens = restaurantTokens(candidateName);
+
+          if (candidateNorm === qNorm) {
+            bestScore = Math.max(bestScore, 1);
+            continue;
+          }
+
+          if (
+            candidateCompact.length >= 3 &&
+            (candidateCompact === qCompact ||
+              candidateCompact.includes(qCompact) ||
+              qCompact.includes(candidateCompact))
+          ) {
+            bestScore = Math.max(bestScore, 0.98);
+            continue;
+          }
+
+          const allQueryTokensMatch =
+            qTokens.length > 0 &&
+            qTokens.every((queryToken) => candidateTokens.includes(queryToken));
+
+          if (allQueryTokensMatch) {
+            bestScore = Math.max(bestScore, qTokens.length === 1 ? 0.84 : 0.92);
+            continue;
+          }
+
+          const allCandidateTokensMatch =
+            candidateTokens.length > 0 &&
+            candidateTokens.every((candidateToken) => qTokens.includes(candidateToken));
+
+          if (allCandidateTokensMatch) {
+            bestScore = Math.max(bestScore, 0.88);
+          }
+        }
+
+        if (bestScore > 0) {
+          candidates.push({
+            name: restaurant.name,
+            aliases: restaurant.aliases ?? [],
+            score: bestScore,
+          });
+        }
+      }
+
+      candidates.sort((a, b) => b.score - a.score || a.name.length - b.name.length);
+      const best = candidates[0];
+      if (best) {
+        const variants = await buildRestaurantNameVariants(
+          supabase,
+          [best.name, ...best.aliases, q]
+        );
+        return { names: variants };
       }
     }
 
-    // Last resort: also search menu_items.restaurant_name directly
-    // (handles cases where the restaurants table doesn't have the entry)
     const { data: menuNames } = await supabase
       .from('menu_items')
       .select('restaurant_name')
       .ilike('restaurant_name', `%${q}%`)
-      .limit(1);
+      .limit(25);
     if (menuNames && menuNames.length > 0) {
-      return { names: [menuNames[0].restaurant_name as string] };
+      const names = menuNames
+        .map((row: any) => row.restaurant_name as string)
+        .filter(Boolean);
+      return { names: [...new Set(names)] };
     }
 
     return empty;
@@ -249,6 +367,22 @@ async function resolveRestaurantNames(
 
 function shouldResolveCuisineRestaurants(rawQuery: string): boolean {
   return /\b(place|restaurant|spot|joint|cafe|grill|diner|from\s+a[n]?)\b/i.test(rawQuery);
+}
+
+function getExplicitDishKeyword(parsed: ParsedQuery): string | undefined {
+  const raw = parsed.raw.toLowerCase();
+  if (/\bacai\b/.test(raw)) return 'acai';
+  if (/\bpitaya\b/.test(raw)) return 'pitaya';
+  if (/\bsalmon\b/.test(raw)) return 'salmon';
+  if (/\btuna\b/.test(raw)) return 'tuna';
+  if (/\bcod\b/.test(raw)) return 'cod';
+  if (/\btilapia\b/.test(raw)) return 'tilapia';
+  if (/\bmahi(?:[\s-]?mahi)?\b/.test(raw)) return 'mahi';
+  if (/\bcold\s+brew\b/.test(raw)) return 'cold brew';
+  if (/\blatte\b/.test(raw)) return 'latte';
+  if (/\bespresso\b/.test(raw)) return 'espresso';
+  if (/\bmatcha\b/.test(raw)) return 'matcha';
+  return undefined;
 }
 
 // ─── Post-filter helpers ──────────────────────────────────────────────────────

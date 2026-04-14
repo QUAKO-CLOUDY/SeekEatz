@@ -16,7 +16,7 @@ import Footer from './landing/Footer';
 
 export default function LandingPage() {
     return (
-        <div className="bg-[#f0f4f8]">
+        <div className="overflow-x-hidden bg-[#f0f4f8]">
             {/* ── Fixed top navigation ── */}
             <NavBar />
 

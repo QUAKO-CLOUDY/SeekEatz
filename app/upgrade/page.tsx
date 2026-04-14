@@ -16,7 +16,7 @@ import {
 import { isNativeApp } from "@/lib/native-runtime";
 
 const premiumBenefits = [
-  "Unlimited searches",
+  "Unlimited home search and AI chat",
   "Smarter, goal-based results",
   "Access to full database",
   "AI-powered swaps",
@@ -28,8 +28,9 @@ const planCards = [
     id: "free",
     name: "Free",
     price: "$0",
-    description: "2 free chats a day.",
-    details: "Includes only 2 AI searches a day with no access to any of the premium features.",
+    description: "",
+    details:
+      "Enjoy 2 free AI chats and quick searches daily. Credits reset every 24 hours. Premium features require a monthly or yearly subscription.",
     cta: "Create Free Account",
   },
   {
@@ -177,28 +178,28 @@ function UpgradePageContent() {
           </h1>
 
           <div className="mt-8 space-y-3">
-            <div className="rounded-2xl border border-border bg-background/80 p-4">
-              <p className="text-sm font-semibold text-foreground">
+            <div className="rounded-2xl border border-border bg-background/80 p-5">
+              <p className="text-base font-semibold leading-snug text-foreground">
                 {isSignedIn
                   ? `Current plan: ${getEntitlementPlanLabel(entitlement)}`
-                  : "Choose the plan that fits how often you use SeekEatz."}
+                  : "Choose your plan and start finding meals instantly."}
               </p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {isSignedIn
-                  ? entitlement.hasPremiumAccess
+              {isSignedIn ? (
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  {entitlement.hasPremiumAccess
                     ? entitlement.billingStatus === "trialing" && entitlement.trialExpiresAt
                       ? `Your waitlist free month is active through ${new Date(entitlement.trialExpiresAt).toLocaleDateString()}.`
                       : "Premium is active on this account."
-                    : "Pick a plan below to unlock unlimited access."
-                  : "Your free daily chats are up. Upgrade to premium to unlock full access."}
-              </p>
+                    : "Pick a plan below to unlock unlimited access."}
+                </p>
+              ) : null}
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="grid auto-rows-fr gap-4 md:grid-cols-3 md:items-stretch">
               {planCards.map((plan) => (
                 <div
                   key={plan.id}
-                  className={`flex h-full flex-col rounded-[1.75rem] border p-5 ${
+                  className={`flex min-h-0 w-full flex-col self-stretch rounded-[1.75rem] border p-5 ${
                     plan.id === "free"
                       ? "border-border bg-background/80"
                       : plan.id === "yearly"
@@ -206,87 +207,104 @@ function UpgradePageContent() {
                         : "border-border bg-background/80"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-base font-semibold text-foreground">{plan.name}</p>
-                        {plan.badge ? (
-                          <span className="rounded-full bg-cyan-500/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-cyan-700">
-                            {plan.badge}
-                          </span>
-                        ) : null}
-                      </div>
-                      {plan.description ? (
-                        <p className="mt-1 text-sm text-muted-foreground">{plan.description}</p>
-                      ) : null}
+                  <div className="shrink-0 space-y-2">
+                    {/* Same layout height on all cards: invisible copy reserves space on Free/Monthly */}
+                    <div className="flex items-center justify-center">
+                      {plan.badge ? (
+                        <span className="inline-flex whitespace-nowrap rounded-full border border-cyan-400/50 bg-gradient-to-r from-cyan-500/20 via-cyan-400/15 to-blue-500/15 px-3 py-1 text-[11px] font-bold uppercase leading-none tracking-[0.14em] text-cyan-900 shadow-sm ring-1 ring-cyan-500/25 dark:text-cyan-100">
+                          {plan.badge}
+                        </span>
+                      ) : (
+                        <span
+                          className="invisible inline-flex whitespace-nowrap rounded-full border border-cyan-400/50 bg-gradient-to-r from-cyan-500/20 via-cyan-400/15 to-blue-500/15 px-3 py-1 text-[11px] font-bold uppercase leading-none tracking-[0.14em] text-cyan-900 shadow-sm ring-1 ring-cyan-500/25 dark:text-cyan-100"
+                          aria-hidden
+                        >
+                          {planCards.find((p) => p.badge)?.badge ?? "Best value"}
+                        </span>
+                      )}
                     </div>
-                    <p className="text-sm font-semibold text-foreground">{plan.price}</p>
+                    <div className="flex min-h-[2.75rem] items-center justify-between gap-3">
+                      <p className="min-w-0 text-base font-semibold leading-tight text-foreground">
+                        {plan.name}
+                      </p>
+                      <p className="shrink-0 tabular-nums text-sm font-semibold leading-none text-foreground">
+                        {plan.price}
+                      </p>
+                    </div>
+                    {plan.description && plan.id !== "monthly" ? (
+                      <p className="text-sm text-muted-foreground">{plan.description}</p>
+                    ) : null}
                   </div>
-                  {plan.id === "monthly" ? (
-                    <div className="mt-5 space-y-3 text-sm text-muted-foreground">
-                      {premiumBenefits.map((benefit) => (
-                        <div key={benefit} className="flex items-center gap-3">
-                          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-cyan-500/15 text-cyan-500">
-                            <Check className="h-4 w-4" />
-                          </span>
-                          <span>{benefit}</span>
+
+                  <div className="mt-4 flex min-h-0 flex-1 flex-col">
+                    {plan.id === "monthly" || plan.id === "yearly" ? (
+                      <>
+                        {plan.id === "monthly" ? (
+                          <p className="px-1 text-sm leading-6 text-muted-foreground">{plan.description}</p>
+                        ) : plan.details ? (
+                          <p className="px-1 text-sm leading-6 text-muted-foreground">{plan.details}</p>
+                        ) : null}
+                        <div className="mt-4 space-y-3 text-sm text-muted-foreground">
+                          {premiumBenefits.map((benefit) => (
+                            <div key={benefit} className="flex items-center gap-3">
+                              <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-500/15 text-cyan-500">
+                                <Check className="h-4 w-4" />
+                              </span>
+                              <span>{benefit}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  ) : plan.id === "yearly" ? (
-                    <div className="mt-7 px-1 text-sm leading-6 text-muted-foreground">
-                      {plan.details}
-                    </div>
-                  ) : (
-                    <div className="mt-7 px-1 text-sm leading-6 text-muted-foreground">
-                      {plan.details}
-                    </div>
-                  )}
-                  <button
-                    type="button"
-                    disabled={
-                      plan.id === "free"
-                        ? false
-                        : isSignedIn
-                          ? !iapReady ||
-                            !isNativeApp() ||
-                            entitlement.hasPremiumAccess ||
-                            pendingPlanId !== null
-                          : false
-                    }
-                    onClick={() => {
-                      if (plan.id === "free") {
-                        router.push(
-                          `/auth/signup?redirectTo=${encodedPostSignupOnboardingPath}&switch=1&tutorial=1&plan=free&method=email${isMasterMode ? "&master=1" : ""}`,
-                        );
-                        return;
-                      }
+                      </>
+                    ) : (
+                      <p className="text-sm leading-relaxed text-muted-foreground">{plan.details}</p>
+                    )}
+                  </div>
 
-                      if (!isSignedIn) {
-                        router.push(`${signUpHref}&plan=${plan.id}`);
-                        return;
+                  <div className="mt-auto shrink-0 pt-6">
+                    <button
+                      type="button"
+                      disabled={
+                        plan.id === "free"
+                          ? false
+                          : isSignedIn
+                            ? !iapReady ||
+                              !isNativeApp() ||
+                              entitlement.hasPremiumAccess ||
+                              pendingPlanId !== null
+                            : false
                       }
+                      onClick={() => {
+                        if (plan.id === "free") {
+                          router.push(
+                            `/auth/signup?redirectTo=${encodedPostSignupOnboardingPath}&switch=1&tutorial=1&plan=free&method=email${isMasterMode ? "&master=1" : ""}`,
+                          );
+                          return;
+                        }
 
-                      if (plan.id === "monthly" || plan.id === "yearly") {
-                        void handlePurchase(plan.id);
-                      }
-                    }}
-                    className={`w-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-4 text-base font-semibold text-white shadow-lg shadow-cyan-500/25 disabled:cursor-not-allowed disabled:opacity-50 ${
-                      plan.id === "monthly" ? "mt-8" : "mt-6"
-                    }`}
-                  >
-                    {plan.id === "free"
-                      ? plan.cta
-                      : entitlement.hasPremiumAccess
-                      ? "Current plan active"
-                      : !isSignedIn
+                        if (!isSignedIn) {
+                          router.push(`${signUpHref}&plan=${plan.id}`);
+                          return;
+                        }
+
+                        if (plan.id === "monthly" || plan.id === "yearly") {
+                          void handlePurchase(plan.id);
+                        }
+                      }}
+                      className="w-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-4 text-base font-semibold text-white shadow-lg shadow-cyan-500/25 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {plan.id === "free"
                         ? plan.cta
-                        : pendingPlanId === plan.id
-                          ? "Processing..."
-                          : iapReady && isNativeApp()
+                        : entitlement.hasPremiumAccess
+                        ? "Current plan active"
+                        : !isSignedIn
                           ? plan.cta
-                          : "Finish purchase in the iOS app"}
-                  </button>
+                          : pendingPlanId === plan.id
+                            ? "Processing..."
+                            : iapReady && isNativeApp()
+                            ? plan.cta
+                            : "Finish purchase in the iOS app"}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -332,7 +350,7 @@ function UpgradePageContent() {
 
             {!iapReady && (
               <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                Apple billing is not fully configured yet. Add the RevenueCat public SDK key and App Store product ids before enabling purchases.
+                Apple billing is not enabled for this build yet. Add a RevenueCat public SDK key (`NEXT_PUBLIC_REVENUECAT_IOS_PUBLIC_SDK_KEY` or `NEXT_PUBLIC_REVENUECAT_API_KEY`) and set `NEXT_PUBLIC_APPLE_IAP_READY=true`.
               </div>
             )}
 

@@ -242,16 +242,6 @@ export default function TestimonialsSection() {
                         <TestimonialCard key={i} t={t} delay={i * 150} />
                     ))}
                 </div>
-
-                {/* CTA nudge */}
-                <div className="flex justify-center mt-14">
-                    <p className="text-[13px] text-gray-400 text-center max-w-sm">
-                        Want to be featured here?{' '}
-                        <a href="/get-started" className="text-amber-600 font-semibold hover:underline">
-                            Join early access →
-                        </a>
-                    </p>
-                </div>
             </div>
         </section>
     );

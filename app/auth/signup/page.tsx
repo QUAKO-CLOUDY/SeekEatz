@@ -49,6 +49,8 @@ function SignupPageContent() {
   const emailOnly = searchParams.get("method") === "email";
   const selectedPlan = searchParams.get("plan");
 
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -66,6 +68,25 @@ function SignupPageContent() {
   const [resendCooldown, setResendCooldown] = useState(0);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const resendTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const resetSavedMealStorageForUser = (userId: string) => {
+    if (typeof window === "undefined") return;
+
+    const keysToRemove = [
+      "seekeatz_favorite_meals",
+      "seekeatz_favorite_meals_data",
+      "seekeatz_favorite_meals:guest",
+      "seekeatz_favorite_meals_data:guest",
+      "seekeatz_logged_meals",
+      `seekeatz_favorite_meals:${userId}`,
+      `seekeatz_favorite_meals_data:${userId}`,
+    ];
+
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
+    localStorage.setItem(`seekeatz_favorite_meals:${userId}`, JSON.stringify([]));
+    localStorage.setItem(`seekeatz_favorite_meals_data:${userId}`, JSON.stringify({}));
+    localStorage.setItem("seekeatz_logged_meals", JSON.stringify([]));
+  };
 
   // 🧠 Guard: if already logged in + onboarding done + last login < 30 min → skip this screen
   useEffect(() => {
@@ -102,6 +123,15 @@ function SignupPageContent() {
     e.preventDefault();
     setError(null);
 
+    const normalizedFirstName = firstName.trim();
+    const normalizedLastName = lastName.trim();
+    const fullName = `${normalizedFirstName} ${normalizedLastName}`.trim();
+
+    if (!normalizedFirstName || !normalizedLastName) {
+      setError("Please enter your first and last name.");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -113,6 +143,13 @@ function SignupPageContent() {
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          data: {
+            full_name: fullName,
+            first_name: normalizedFirstName,
+            last_name: normalizedLastName,
+          },
+        },
       });
 
       if (signUpError) {
@@ -245,6 +282,10 @@ function SignupPageContent() {
       // OTP verified — now run all post-signup logic
       const now = Date.now();
       const userId = verifyData.user.id;
+      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+
+      // New accounts should always start with clean local app state.
+      resetSavedMealStorageForUser(userId);
 
       // Check if signup is from chat gate
       const isFromChatGate = typeof window !== 'undefined' &&
@@ -300,9 +341,15 @@ function SignupPageContent() {
 
       // Save profile to Supabase
       try {
+        const profileForBootstrap: Partial<UserProfile> = {
+          ...(profile ? profile as Partial<UserProfile> : {}),
+          full_name: fullName,
+        };
+
         const profileData: Record<string, unknown> = {
           id: userId,
           email: verifyData.user.email,
+          full_name: fullName,
           has_completed_onboarding: true,
           last_login: new Date(now).toISOString(),
           updated_at: new Date().toISOString(),
@@ -318,10 +365,11 @@ function SignupPageContent() {
           if (profile.target_fats_g) profileData.fat_limit = profile.target_fats_g;
           if (profile.preferredMealTypes) profileData.preferred_meal_types = profile.preferredMealTypes;
           if (profile.search_distance_miles) profileData.search_distance_miles = profile.search_distance_miles;
-          profileData.user_profile = profile;
+          profileData.user_profile = profileForBootstrap;
         }
 
         await supabase.from("profiles").upsert(profileData, { onConflict: "id" });
+        localStorage.setItem("userProfile", JSON.stringify(profileForBootstrap));
       } catch (profileErr) {
         console.warn("Profile save skipped:", profileErr);
       }
@@ -346,13 +394,21 @@ function SignupPageContent() {
       localStorage.setItem("onboarded", "true");
       localStorage.setItem("seekeatz_start_app_tutorial", "true");
       localStorage.removeItem(`seekeatz_app_tutorial_completed_${userId}`);
-      if (profile) {
-        localStorage.setItem("userProfile", JSON.stringify(profile));
-      }
+      localStorage.setItem(
+        "userProfile",
+        JSON.stringify({
+          ...(profile ? profile as Partial<UserProfile> : {}),
+          full_name: fullName,
+        }),
+      );
 
       try {
+        const profileForBootstrap: Partial<UserProfile> = {
+          ...(profile ? profile as Partial<UserProfile> : {}),
+          full_name: fullName,
+        };
         const bootstrapResult = await bootstrapAccount({
-          profile: profile as Partial<UserProfile> | null,
+          profile: profileForBootstrap,
           hasCompletedOnboarding: true,
         });
 
@@ -499,7 +555,7 @@ function SignupPageContent() {
           </h1>
           <p className="text-black">
             {selectedPlan === "free"
-              ? "Enter your email to get 2 free chats a day with SeekEatz."
+              ? "Enter your email to get 2 free searches every 24 hours with SeekEatz."
               : "Sign up to get started with SeekEatz"}
           </p>
         </div>
@@ -518,6 +574,33 @@ function SignupPageContent() {
         ) : null}
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label className="text-black mb-2 block">First Name</Label>
+              <Input
+                type="text"
+                placeholder="First"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+                className="h-14 rounded-2xl bg-gray-50 border-gray-300 text-black placeholder:text-gray-400 focus:border-cyan-500 focus:ring-cyan-500/20"
+                autoComplete="given-name"
+              />
+            </div>
+            <div>
+              <Label className="text-black mb-2 block">Last Name</Label>
+              <Input
+                type="text"
+                placeholder="Last"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+                className="h-14 rounded-2xl bg-gray-50 border-gray-300 text-black placeholder:text-gray-400 focus:border-cyan-500 focus:ring-cyan-500/20"
+                autoComplete="family-name"
+              />
+            </div>
+          </div>
+
           <div>
             <Label className="text-black mb-2 block">Email</Label>
             <div className="relative">

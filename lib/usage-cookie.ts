@@ -1,40 +1,9 @@
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { createHmac } from "crypto";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { FREE_DAILY_QUERY_LIMIT } from "@/lib/entitlements";
 
 const COOKIE_NAME = "usage_token";
-
-type UsageDatabase = {
-  public: {
-    Tables: {
-      ip_usage: {
-        Row: {
-          ip: string;
-          usage_count: number | null;
-          updated_at: string | null;
-        };
-        Insert: {
-          ip: string;
-          usage_count?: number | null;
-          updated_at?: string | null;
-        };
-        Update: {
-          ip?: string;
-          usage_count?: number | null;
-          updated_at?: string | null;
-        };
-        Relationships: [];
-      };
-    };
-    Views: Record<string, never>;
-    Functions: Record<string, never>;
-    Enums: Record<string, never>;
-    CompositeTypes: Record<string, never>;
-  };
-};
-
-let usageSupabase: SupabaseClient<UsageDatabase> | null = null;
+const ROLLING_USAGE_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 function getUsageTokenSecret() {
   const secret = process.env.USAGE_TOKEN_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -46,178 +15,101 @@ function getUsageTokenSecret() {
   throw new Error("Missing env: USAGE_TOKEN_SECRET or SUPABASE_SERVICE_ROLE_KEY");
 }
 
-function getUsageSupabase() {
-  if (usageSupabase) {
-    return usageSupabase;
-  }
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    if (process.env.NODE_ENV === "production") {
-      throw new Error("Missing env: NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
-    }
-
-    return null;
-  }
-
-  usageSupabase = createClient<UsageDatabase>(supabaseUrl, serviceRoleKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  });
-
-  return usageSupabase;
-}
-
 function sign(value: string) {
   const hmac = createHmac("sha256", getUsageTokenSecret());
   hmac.update(value);
   return hmac.digest("hex");
 }
 
-function getTodayKey() {
-  return new Date().toISOString().slice(0, 10);
+function getWindowStartMs(now = Date.now()) {
+  return now - ROLLING_USAGE_WINDOW_MS;
 }
 
-function encodeToken(dateKey: string, count: number) {
-  const payload = `${dateKey}:${count}`;
+function pruneUsageTimestamps(timestamps: number[], now = Date.now()) {
+  const windowStart = getWindowStartMs(now);
+
+  return timestamps
+    .filter((timestamp) => Number.isFinite(timestamp) && timestamp >= windowStart && timestamp <= now)
+    .sort((a, b) => a - b)
+    .slice(-FREE_DAILY_QUERY_LIMIT);
+}
+
+function encodeToken(timestamps: number[]) {
+  const normalized = pruneUsageTimestamps(timestamps);
+  const payload = normalized.join(",");
   return `${payload}.${sign(payload)}`;
 }
 
-function decodeToken(token?: string | null): { dateKey: string; count: number } | null {
+function decodeLegacyToken(payload: string): number[] {
+  const [dateKey, countRaw] = payload.split(":");
+  const count = Number.parseInt(countRaw ?? "0", 10);
+
+  if (!dateKey || !Number.isFinite(count) || count <= 0) {
+    return [];
+  }
+
+  // Best-effort fallback for old signed cookies. They will naturally age out
+  // once the new rolling window token is written after the next guest chat.
+  return Array.from({ length: Math.min(count, FREE_DAILY_QUERY_LIMIT) }, () => Date.now());
+}
+
+function decodeToken(token?: string | null): number[] {
   if (!token) {
-    return null;
+    return [];
   }
 
   const [payload, signature] = token.split(".");
-  if (!payload || !signature || sign(payload) !== signature) {
-    return null;
+  if (payload == null || signature == null || sign(payload) !== signature) {
+    return [];
   }
 
-  const [dateKey, countRaw] = payload.split(":");
-  const count = Number.parseInt(countRaw ?? "0", 10);
-  if (!dateKey || !Number.isFinite(count)) {
-    return null;
+  if (!payload) {
+    return [];
   }
 
-  return { dateKey, count: Math.max(0, count) };
+  if (payload.includes(":")) {
+    return decodeLegacyToken(payload);
+  }
+
+  const parsed = payload
+    .split(",")
+    .filter(Boolean)
+    .map((value) => Number.parseInt(value, 10))
+    .filter((value) => Number.isFinite(value));
+
+  return pruneUsageTimestamps(parsed);
 }
 
-export async function getUsageCount(): Promise<number> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
-  const parsed = decodeToken(token);
-  if (!parsed || parsed.dateKey !== getTodayKey()) {
-    return 0;
-  }
-
-  return parsed.count;
-}
-
-async function getIpAddress(): Promise<string> {
-  const headersList = await headers();
-  const forwardedFor = headersList.get("x-forwarded-for");
-  if (forwardedFor) {
-    return forwardedFor.split(",")[0].trim();
-  }
-
-  return "unknown";
-}
-
-async function getIpUsage(ip: string): Promise<number> {
-  if (ip === "unknown") {
-    return 0;
-  }
-
-  try {
-    const supabase = getUsageSupabase();
-    if (!supabase) {
-      return 0;
-    }
-
-    const { data, error } = await supabase
-      .from("ip_usage")
-      .select("usage_count, updated_at")
-      .eq("ip", ip)
-      .single();
-
-    if (error || !data) {
-      return 0;
-    }
-
-    const lastUpdatedDate = String(data.updated_at ?? "").slice(0, 10);
-    if (lastUpdatedDate !== getTodayKey()) {
-      return 0;
-    }
-
-    return Number(data.usage_count ?? 0) || 0;
-  } catch {
-    return 0;
-  }
-}
-
-async function incrementIpUsage(ip: string): Promise<number> {
-  if (ip === "unknown") {
-    return 0;
-  }
-
-  try {
-    const supabase = getUsageSupabase();
-    if (!supabase) {
-      return 0;
-    }
-
-    const current = await getIpUsage(ip);
-    const next = current + 1;
-
-    const { error } = await supabase
-      .from("ip_usage")
-      .upsert(
-        {
-          ip,
-          usage_count: next,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "ip" },
-      );
-
-    if (error) {
-      console.warn("IP usage tracking failed:", error.message);
-      return 0;
-    }
-
-    return next;
-  } catch (error) {
-    console.warn("IP usage tracking exception:", error);
-    return 0;
-  }
-}
-
-export async function incrementUsageCount(): Promise<number> {
-  const currentCookieCount = await getUsageCount();
-  const ip = await getIpAddress();
-  const nextCookieCount = currentCookieCount + 1;
-  const nextIpCount = await incrementIpUsage(ip);
-  const next = Math.max(nextCookieCount, nextIpCount);
+async function persistUsageToken(timestamps: number[]) {
   const cookieStore = await cookies();
 
-  cookieStore.set(COOKIE_NAME, encodeToken(getTodayKey(), next), {
+  cookieStore.set(COOKIE_NAME, encodeToken(timestamps), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     maxAge: 60 * 60 * 24 * 7,
     path: "/",
     sameSite: "lax",
   });
+}
 
-  return next;
+export async function getUsageCount(): Promise<number> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(COOKIE_NAME)?.value;
+  return decodeToken(token).length;
+}
+
+export async function incrementUsageCount(): Promise<number> {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(COOKIE_NAME)?.value;
+  const timestamps = decodeToken(token);
+  const nextTimestamps = pruneUsageTimestamps([...timestamps, Date.now()]);
+
+  await persistUsageToken(nextTimestamps);
+  return nextTimestamps.length;
 }
 
 export async function hasRemainingUsage(): Promise<boolean> {
-  const currentCount = Math.max(await getUsageCount(), await getIpUsage(await getIpAddress()));
-  return currentCount < FREE_DAILY_QUERY_LIMIT;
+  return (await getUsageCount()) < FREE_DAILY_QUERY_LIMIT;
 }
 
 export function getUsageLimit(): number {

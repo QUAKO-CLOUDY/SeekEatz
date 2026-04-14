@@ -387,7 +387,7 @@ export default function AppPreviewSection() {
     }, [attachObserver]);
 
     return (
-        <section ref={sectionRef} className="relative pt-8 sm:pt-10 pb-24 px-6 bg-[#f0f4f8]">
+        <section ref={sectionRef} className="relative bg-[#f0f4f8] px-4 pt-8 pb-24 sm:px-6 sm:pt-10">
             {/* Seamless top gradient from hero */}
             <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#f0f4f8] to-transparent pointer-events-none" />
 
@@ -404,7 +404,7 @@ export default function AppPreviewSection() {
                     <p className="text-sm font-semibold text-cyan-600 uppercase tracking-wider mb-3">
                         See It In Action
                     </p>
-                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
+                    <h2 className="mb-4 text-2xl font-extrabold tracking-tight text-gray-900 sm:text-4xl lg:text-5xl">
                         Your nutrition assistant,{' '}
                         <span className="bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
                             right in your pocket
@@ -427,9 +427,9 @@ export default function AppPreviewSection() {
                     {/* Subtle glow */}
                     <div className="absolute -inset-6 bg-gradient-to-b from-cyan-200/15 via-blue-200/10 to-transparent rounded-3xl blur-2xl pointer-events-none" />
 
-                    <div className="relative bg-white rounded-2xl shadow-xl shadow-gray-900/10 border border-gray-200/60 overflow-hidden">
+                    <div className="relative overflow-hidden rounded-2xl border border-gray-200/60 bg-white shadow-xl shadow-gray-900/10">
                         {/* Tab bar — styled like a web app nav */}
-                        <div className="flex items-center bg-gray-50 border-b border-gray-200/80 px-2">
+                        <div className="scrollbar-hide flex items-center gap-0.5 overflow-x-auto border-b border-gray-200/80 bg-gray-50 px-1.5 sm:gap-1 sm:px-2">
                             {TABS.map((tab) => {
                                 const Icon = tab.icon;
                                 const isActive = activeTab === tab.id;
@@ -437,14 +437,14 @@ export default function AppPreviewSection() {
                                     <button
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
-                                        className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium transition-colors relative ${
+                                        className={`relative flex shrink-0 items-center gap-1.5 px-3 py-3 text-xs font-medium transition-colors sm:gap-2 sm:px-5 sm:py-3.5 sm:text-sm ${
                                             isActive
                                                 ? 'text-cyan-600'
                                                 : 'text-gray-400 hover:text-gray-600'
                                         }`}
                                     >
                                         <Icon className="w-4 h-4" />
-                                        {tab.label}
+                                        <span className="whitespace-nowrap">{tab.label}</span>
                                         {isActive && (
                                             <div className="absolute bottom-0 inset-x-2 h-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full" />
                                         )}
@@ -454,7 +454,7 @@ export default function AppPreviewSection() {
                         </div>
 
                         {/* Screen content */}
-                        <div className="h-[500px] sm:h-[560px] lg:h-[600px] overflow-hidden">
+                        <div className="h-[460px] overflow-hidden sm:h-[560px] lg:h-[600px]">
                             {activeTab === 'chat' && <MockChat />}
                             {activeTab === 'logs' && <MockDailyLog />}
                             {activeTab === 'favorites' && <MockFavorites />}
@@ -478,8 +478,8 @@ export default function AppPreviewSection() {
                 </div>
 
                 {/* Bottom note */}
-                <p className="text-center text-sm text-gray-400 mt-14">
-                    Explore the preview above sign up to unlock all features
+                <p className="mt-14 text-center text-sm text-gray-400">
+                    Explore the preview above. Sign up to unlock all features.
                 </p>
             </div>
         </section>

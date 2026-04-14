@@ -10,19 +10,39 @@ export type AppleProductCatalog = Record<
   }
 >;
 
+function readFirstNonEmptyEnv(...names: string[]): string | null {
+  for (const name of names) {
+    const value = process.env[name]?.trim();
+    if (value) {
+      return value;
+    }
+  }
+
+  return null;
+}
+
 export const APPLE_PRODUCT_CATALOG: AppleProductCatalog = {
   monthly: {
     tier: "monthly",
-    productId: process.env.NEXT_PUBLIC_APPLE_IAP_MONTHLY_PRODUCT_ID?.trim() || null,
+    productId: readFirstNonEmptyEnv(
+      "NEXT_PUBLIC_APPLE_IAP_MONTHLY_PRODUCT_ID",
+      "NEXT_PUBLIC_REVENUECAT_MONTHLY_PRODUCT_ID",
+    ),
   },
   yearly: {
     tier: "yearly",
-    productId: process.env.NEXT_PUBLIC_APPLE_IAP_YEARLY_PRODUCT_ID?.trim() || null,
+    productId: readFirstNonEmptyEnv(
+      "NEXT_PUBLIC_APPLE_IAP_YEARLY_PRODUCT_ID",
+      "NEXT_PUBLIC_REVENUECAT_YEARLY_PRODUCT_ID",
+    ),
   },
 };
 
 export function getRevenueCatIosPublicSdkKey(): string | null {
-  return process.env.NEXT_PUBLIC_REVENUECAT_IOS_PUBLIC_SDK_KEY?.trim() || null;
+  return readFirstNonEmptyEnv(
+    "NEXT_PUBLIC_REVENUECAT_IOS_PUBLIC_SDK_KEY",
+    "NEXT_PUBLIC_REVENUECAT_API_KEY",
+  );
 }
 
 export function getRevenueCatEntitlementId(): string {
@@ -30,14 +50,14 @@ export function getRevenueCatEntitlementId(): string {
 }
 
 export function isAppleIapConfigured(): boolean {
-  if (process.env.NEXT_PUBLIC_APPLE_IAP_READY !== "true") {
+  const readyFlag = process.env.NEXT_PUBLIC_APPLE_IAP_READY?.trim().toLowerCase();
+  if (readyFlag === "false" || readyFlag === "0") {
     return false;
   }
 
-  return Boolean(
-    APPLE_PRODUCT_CATALOG.monthly.productId &&
-      APPLE_PRODUCT_CATALOG.yearly.productId,
-  );
+  // Default to enabled unless explicitly disabled to keep local/test builds usable.
+  // RevenueCat key presence is enforced by isRevenueCatConfigured().
+  return true;
 }
 
 export function isRevenueCatConfigured(): boolean {

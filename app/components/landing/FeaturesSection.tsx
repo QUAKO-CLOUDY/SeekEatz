@@ -98,6 +98,8 @@ export default function FeaturesSection() {
     const [triggered, setTriggered] = useState(false);
     const [orbitAngle, setOrbitAngle] = useState(0);
     const [radius, setRadius] = useState(RADIUS.xl);
+    const [isCompactLayout, setIsCompactLayout] = useState(false);
+    const [viewportWidth, setViewportWidth] = useState(390);
     const ioRef = useRef<IntersectionObserver | null>(null);
 
     const attachObserver = useCallback(() => {
@@ -111,14 +113,19 @@ export default function FeaturesSection() {
                     ioRef.current?.disconnect();
                 }
             },
-            { threshold: 0.62 },
+            { threshold: 0.2 },
         );
         ioRef.current.observe(el);
     }, []);
 
     /* Measure radius on mount + resize */
     useEffect(() => {
-        const update = () => setRadius(getRadius());
+        const update = () => {
+            const width = window.innerWidth;
+            setViewportWidth(width);
+            setRadius(getRadius());
+            setIsCompactLayout(width < 768);
+        };
         update();
         window.addEventListener('resize', update, { passive: true });
         return () => window.removeEventListener('resize', update);
@@ -148,6 +155,17 @@ export default function FeaturesSection() {
         }, 40);
         return () => window.clearInterval(id);
     }, [triggered]);
+
+    const compactStageWidth = Math.min(Math.max(viewportWidth - 24, 296), 372);
+    const mobileCardSize = Math.round(Math.min(Math.max(compactStageWidth * 0.29, 96), 114));
+    const mobileCardHeight = mobileCardSize < 104 ? 108 : 116;
+    const arenaSize = isCompactLayout
+        ? compactStageWidth
+        : radius * 2 + 260;
+    const orbitRadius = isCompactLayout
+        ? Math.max(104, arenaSize / 2 - mobileCardSize / 2 - 2)
+        : radius + 80;
+    const orbitRingRadius = isCompactLayout ? Math.max(orbitRadius - 6, 72) : radius;
 
     return (
         <section
@@ -186,26 +204,26 @@ export default function FeaturesSection() {
                     </p>
                 </div>
 
-                {/* ── Hexagon arena ── */}
                 <div
                     className="relative mx-auto pointer-events-none"
                     style={{
-                        width: radius * 2 + 260,
-                        height: radius * 2 + 260,
+                        width: arenaSize,
+                        height: arenaSize,
                         maxWidth: '100%',
                         aspectRatio: '1 / 1',
+                        transform: isCompactLayout ? 'translateX(-8px)' : undefined,
                     }}
                 >
                     {/* Dashed orbit ring — fades in with cards */}
                     <svg
                         className="absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-1000"
-                        style={{ opacity: triggered ? 0.10 : 0 }}
-                        viewBox={`0 0 ${radius * 2 + 260} ${radius * 2 + 260}`}
+                        style={{ opacity: triggered ? 0.1 : 0 }}
+                        viewBox={`0 0 ${arenaSize} ${arenaSize}`}
                     >
                         <circle
-                            cx={(radius * 2 + 260) / 2}
-                            cy={(radius * 2 + 260) / 2}
-                            r={radius}
+                            cx={arenaSize / 2}
+                            cy={arenaSize / 2}
+                            r={orbitRingRadius}
                             fill="none"
                             stroke="#94a3b8"
                             strokeWidth="1"
@@ -215,25 +233,31 @@ export default function FeaturesSection() {
 
                     {/* Center card */}
                     <div
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 text-center transition-all duration-1000 pointer-events-none"
+                        className="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 text-center transition-all duration-1000 pointer-events-none"
                         style={{
                             opacity: triggered ? 1 : 0,
                             transform: triggered
                                 ? 'translate(-50%, -50%) scale(1)'
-                                : 'translate(-50%, -50%) scale(0.88)',
+                                : 'translate(-50%, -50%) scale(0.9)',
                             transitionDelay: '0ms',
                         }}
                     >
-                        <div className="bg-white/80 backdrop-blur-xl rounded-3xl px-7 py-6 sm:px-9 sm:py-8 border border-white/90 shadow-xl shadow-gray-200/50">
-                            <h3 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
+                        <div
+                            className={`border border-white/90 bg-white/80 shadow-xl shadow-gray-200/50 backdrop-blur-xl ${
+                                isCompactLayout ? 'rounded-2xl px-2.5 py-1.5' : 'rounded-3xl px-7 py-6 sm:px-9 sm:py-8'
+                            }`}
+                        >
+                            <h3 className={`${isCompactLayout ? 'text-[10px]' : 'text-xl sm:text-2xl'} font-extrabold tracking-tight text-gray-900`}>
                                 What We{' '}
                                 <span className="bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
                                     Deliver
                                 </span>
                             </h3>
-                            <p className="text-xs sm:text-sm text-gray-400 mt-1.5 max-w-[160px] mx-auto">
-                                Six tools, one app.
-                            </p>
+                            {!isCompactLayout ? (
+                                <p className="mx-auto mt-1.5 max-w-[160px] text-xs text-gray-400 sm:text-sm">
+                                    Six tools, one app.
+                                </p>
+                            ) : null}
                         </div>
                     </div>
 
@@ -241,11 +265,9 @@ export default function FeaturesSection() {
                     {FEATURES.map((f, i) => {
                         const angleDeg = HEX_ANGLES_DEG[i] + orbitAngle;
                         const angleRad = (angleDeg * Math.PI) / 180;
-                        const orbitRadius = radius + 80; // push cards further out so they don't overlap center
-                        const cx = (radius * 2 + 260) / 2 + Math.cos(angleRad) * orbitRadius;
-                        const cy = (radius * 2 + 260) / 2 + Math.sin(angleRad) * orbitRadius;
-                        // One-by-one reveal: 800ms gap between each card
-                        const delay = 100 + i * 800;
+                        const cx = arenaSize / 2 + Math.cos(angleRad) * orbitRadius;
+                        const cy = arenaSize / 2 + Math.sin(angleRad) * orbitRadius;
+                        const delay = isCompactLayout ? 80 + i * 130 : 100 + i * 800;
 
                         return (
                             <div
@@ -256,7 +278,7 @@ export default function FeaturesSection() {
                                     top: cy,
                                     transform: triggered
                                         ? 'translate(-50%, -50%) scale(1)'
-                                        : 'translate(-50%, -50%) scale(0.5)',
+                                        : 'translate(-50%, -50%) scale(0.6)',
                                     opacity: triggered ? 1 : 0,
                                     transitionProperty: 'transform, opacity',
                                     transitionDuration: '900ms',
@@ -266,26 +288,55 @@ export default function FeaturesSection() {
                                 }}
                             >
                                 <div
-                                    className="w-[170px] sm:w-[210px] lg:w-[235px] rounded-2xl p-4 sm:p-5 border border-white/80 backdrop-blur-md cursor-default select-none group transition-all duration-300 hover:scale-105 hover:shadow-2xl"
+                                    className={`group cursor-default select-none rounded-2xl border border-white/80 backdrop-blur-md transition-all duration-300 hover:scale-105 hover:shadow-2xl ${
+                                        isCompactLayout ? 'p-2.5' : 'w-[170px] p-4 sm:w-[210px] sm:p-5 lg:w-[235px]'
+                                    }`}
                                     style={{
+                                        width: isCompactLayout ? mobileCardSize : undefined,
+                                        height: isCompactLayout ? mobileCardHeight : undefined,
                                         background: `linear-gradient(145deg, ${f.glowColor}, rgba(255,255,255,0.93))`,
                                         boxShadow: `0 0 32px 5px ${f.shadow}, 0 6px 20px ${f.shadow}`,
                                     }}
                                 >
-                                    {/* Icon */}
                                     <div
-                                        className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110"
+                                        className={`mb-2.5 flex items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110 ${
+                                            isCompactLayout ? 'h-8 w-8' : 'h-11 w-11 sm:h-12 sm:w-12'
+                                        }`}
                                         style={{
                                             background: `linear-gradient(135deg, ${f.gradientFrom}, ${f.gradientTo})`,
                                             boxShadow: `0 4px 12px ${f.shadow}`,
                                         }}
                                     >
-                                        <f.Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white drop-shadow-sm" />
+                                        <f.Icon className={`${isCompactLayout ? 'h-4 w-4' : 'h-5 w-5 sm:h-6 sm:w-6'} text-white drop-shadow-sm`} />
                                     </div>
-                                    <h3 className="text-gray-900 font-bold text-sm sm:text-[15px] leading-snug mb-1.5">
+                                    <h3
+                                        className={`${isCompactLayout ? 'text-[8.75px]' : 'text-sm sm:text-[15px]'} mb-1 leading-snug font-bold text-gray-900`}
+                                        style={
+                                            isCompactLayout
+                                                ? {
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 1,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                }
+                                                : undefined
+                                        }
+                                    >
                                         {f.title}
                                     </h3>
-                                    <p className="text-gray-500 text-[11px] sm:text-xs leading-relaxed">
+                                    <p
+                                        className={`${isCompactLayout ? 'text-[7.75px]' : 'text-[11px] sm:text-xs'} ${isCompactLayout ? 'leading-snug' : 'leading-relaxed'} text-gray-500`}
+                                        style={
+                                            isCompactLayout
+                                                ? {
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 4,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                }
+                                                : undefined
+                                        }
+                                    >
                                         {f.desc}
                                     </p>
                                 </div>

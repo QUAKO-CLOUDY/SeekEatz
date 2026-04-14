@@ -9,8 +9,6 @@ import type { UserProfile, Meal } from "../types";
 import { getRestaurantLogoUrl } from "@/lib/image-utils";
 import { useSessionActivity } from "../hooks/useSessionActivity";
 import { normalizeMacros } from "@/lib/macro-utils";
-import { canUseFeature, incrementUsage } from "@/lib/usage-gate";
-import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { AnimatedNumber } from "./AnimatedNumber";
 import { diversifyMealsByRestaurant } from "@/lib/restaurant-diversity";
@@ -187,7 +185,6 @@ function getInitialMacroValues(userProfile: UserProfile): Record<MacroType, numb
 
 export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite, loggedMeals = [] }: Props) {
   const { updateActivity } = useSessionActivity();
-  const router = useRouter();
   
   // Display name fallback from auth metadata/email when profile name is empty
   const [authDisplayName, setAuthDisplayName] = useState<string | null>(null);
@@ -645,7 +642,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         const message = !Array.isArray(data) && data?.message ? String(data.message) : null;
         if (res.status === 504) throw new Error(message || 'Request timed out. Please try again.');
         if (res.status === 403 && !Array.isArray(data) && data?.usageLimit) {
-          const usageError = new Error(message || "You've reached your free usage limit for today.");
+          const usageError = new Error(message || "You've used your 2 free searches for the last 24 hours.");
           (usageError as Error & { usageLimit?: boolean }).usageLimit = true;
           throw usageError;
         }
@@ -701,20 +698,6 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     setLoadMoreNotice(null);
 
     try {
-      // Check if user can use the feature (gate check BEFORE searching)
-      // Timeout after 8s so we never hang forever on auth/network
-      const canUse = await Promise.race([
-        canUseFeature('search'),
-        new Promise<boolean>((resolve) => setTimeout(() => resolve(true), 8000)),
-      ]);
-      if (!canUse) {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('seekeatz_force_upgrade_modal', 'true');
-        }
-        router.push('/chat');
-        return;
-      }
-
       updateActivity();
       setLastSearchParams(null);
       if (typeof window !== 'undefined') {
@@ -789,12 +772,6 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     }
     
       setRecommendedMeals([]);
-      // Don't block on usage increment (timeout 3s) so search never hangs
-      Promise.race([
-        incrementUsage('search'),
-        new Promise<void>((resolve) => setTimeout(resolve, 3000)),
-      ]).catch(() => {});
-
       const mealsResult = await searchMeals(query, activeDistance, false, undefined, undefined, undefined, filters, macroFilters, calorieMode);
       const meals = mealsResult.meals || [];
 
@@ -842,10 +819,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       console.error('Find meals error:', err);
       setRecommendedMeals([]);
       if (err instanceof Error && (err as Error & { usageLimit?: boolean }).usageLimit) {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('seekeatz_force_upgrade_modal', 'true');
-        }
-        router.push('/chat');
+        setSearchError(err.message || 'You have used your 2 free searches for the last 24 hours. Upgrade to keep going.');
         return;
       }
 

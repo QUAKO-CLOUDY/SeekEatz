@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { Heart, Clock, Flame, Zap } from "lucide-react";
+import { Heart, Clock, Flame, Zap, Lock } from "lucide-react";
 import type { Meal, UserProfile } from "../types";
 import type { LoggedMeal } from "./LogScreen";
 import { useNutrition } from "../contexts/NutritionContext";
@@ -16,6 +16,8 @@ type Props = {
   onMealSelect: (meal: Meal) => void;
   onLogMeal?: (meal: Meal) => void;
   onToggleFavorite?: (mealId: string, meal?: Meal) => void;
+  isReadOnly?: boolean;
+  onLockedAction?: () => void;
 };
 
 type ActiveTab = "saved" | "recent";
@@ -25,9 +27,11 @@ type SavedMealRowProps = {
   isFavorite: boolean;
   fitLabel: string | null;
   fitTone: "positive" | "negative" | "neutral";
+  isReadOnly: boolean;
   onOpen: () => void;
   onLog?: () => void;
   onToggleFavorite?: () => void;
+  onLockedAction?: () => void;
 };
 
 function parseNumber(value: unknown): number | null {
@@ -48,9 +52,11 @@ function SavedMealRow({
   isFavorite,
   fitLabel,
   fitTone,
+  isReadOnly,
   onOpen,
   onLog,
   onToggleFavorite,
+  onLockedAction,
 }: SavedMealRowProps) {
   const restaurantName = meal.restaurant_name || meal.restaurant || "Unknown";
   const logoSrc = getRestaurantLogoUrl(restaurantName, meal.restaurantLogoUrl);
@@ -65,7 +71,13 @@ function SavedMealRow({
 
   return (
     <div
-      onClick={onOpen}
+      onClick={() => {
+        if (isReadOnly) {
+          onLockedAction?.();
+          return;
+        }
+        onOpen();
+      }}
       className="group flex cursor-pointer items-center gap-3 rounded-2xl border border-border bg-card/70 p-3 shadow-sm transition-all hover:border-cyan-500/30 hover:bg-card hover:shadow-lg hover:shadow-cyan-500/10"
     >
       <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border bg-white p-2 shadow-sm">
@@ -94,6 +106,10 @@ function SavedMealRow({
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
+                if (isReadOnly) {
+                  onLockedAction?.();
+                  return;
+                }
                 onToggleFavorite();
               }}
               className="rounded-full border border-border bg-background/80 p-1.5 text-muted-foreground transition-colors hover:bg-muted"
@@ -122,6 +138,10 @@ function SavedMealRow({
           type="button"
           onClick={(e) => {
             e.stopPropagation();
+            if (isReadOnly) {
+              onLockedAction?.();
+              return;
+            }
             onLog();
           }}
           className="h-9 flex-shrink-0 rounded-lg bg-emerald-500 px-3 text-xs font-semibold text-black shadow-md shadow-emerald-500/20 transition-colors hover:bg-emerald-400"
@@ -140,7 +160,9 @@ export function Favorites({
   userProfile,
   onMealSelect, 
   onLogMeal,
-  onToggleFavorite 
+  onToggleFavorite,
+  isReadOnly = false,
+  onLockedAction,
 }: Props) {
   const [activeTab, setActiveTab] = React.useState<ActiveTab>("saved");
   const { targets, todaysTotals, isLoading: isNutritionLoading } = useNutrition();
@@ -199,9 +221,11 @@ export function Favorites({
             isFavorite={true}
             fitLabel={fitContext.label}
             fitTone={fitContext.tone}
+            isReadOnly={isReadOnly}
             onOpen={() => onMealSelect(meal)}
             onLog={onLogMeal ? () => onLogMeal(meal) : undefined}
             onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(meal.id, meal) : undefined}
+            onLockedAction={onLockedAction}
           />
         );
       })}
@@ -228,9 +252,11 @@ export function Favorites({
             isFavorite={favoriteMeals.includes(loggedMeal.meal.id)}
             fitLabel={fitContext.label}
             fitTone={fitContext.tone}
+            isReadOnly={isReadOnly}
             onOpen={() => onMealSelect(loggedMeal.meal)}
             onLog={onLogMeal ? () => onLogMeal(loggedMeal.meal) : undefined}
             onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(loggedMeal.meal.id, loggedMeal.meal) : undefined}
+            onLockedAction={onLockedAction}
           />
         );
       })}
@@ -266,6 +292,14 @@ export function Favorites({
       {/* Content */}
       <div className="relative z-10 -mt-4 flex-1 overflow-y-auto rounded-t-3xl border-t border-white/5 bg-background pb-safe" style={{ paddingBottom: "calc(var(--app-nav-safe-offset) + 1rem)" }}>
         <div className="p-6">
+          {isReadOnly ? (
+            <div className="mb-4 rounded-xl border border-amber-300 bg-amber-200 px-4 py-3 text-sm text-black">
+              <div className="flex items-center gap-2">
+                <Lock className="h-4 w-4 text-black" />
+                <span>Favorites is visible, but saving, opening, and logging meals requires Premium.</span>
+              </div>
+            </div>
+          ) : null}
           <div className="mb-5 grid grid-cols-2 rounded-xl border border-border bg-muted/40 p-1">
             {tabs.map((tab) => {
               const isActive = activeTab === tab.id;

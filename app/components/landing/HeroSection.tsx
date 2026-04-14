@@ -26,13 +26,13 @@ export default function HeroSection() {
     return (
         <section
             id="hero"
-            className="relative z-10 bg-[#f0f4f8] overflow-hidden pt-24 pb-6 sm:pb-8"
+            className="relative z-10 overflow-hidden bg-[#f0f4f8] pt-16 pb-6 sm:pt-20 sm:pb-8"
         >
             {/* Subtle decorative blobs */}
             <div className="absolute top-20 right-1/4 w-[500px] h-[500px] bg-blue-100/20 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute bottom-10 left-10 w-[300px] h-[300px] bg-slate-200/30 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="max-w-7xl mx-auto w-full px-6 sm:px-10 lg:px-16">
+            <div className="mx-auto w-full max-w-7xl px-4 sm:px-10 lg:px-16">
                 <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-8">
                     {/* ── Left: Text content ── */}
                     <div
@@ -43,16 +43,8 @@ export default function HeroSection() {
                             transition: 'opacity 0.9s ease, transform 0.9s ease',
                         }}
                     >
-                        {/* Trust badge */}
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200/60 bg-white/70 shadow-sm mb-8">
-                            <span className="text-lg">🍽️</span>
-                            <span className="text-sm font-medium text-gray-700">
-                                AI-Powered Restaurant Search
-                            </span>
-                        </div>
-
                         {/* Headline */}
-                        <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-[4.25rem] font-extrabold text-gray-900 leading-[1.08] tracking-tight mb-6">
+                        <h1 className="mb-6 text-3xl font-extrabold leading-[1.08] tracking-tight text-gray-900 sm:text-5xl lg:text-6xl xl:text-[4.25rem]">
                             Find meals that
                             <br className="hidden sm:block" />{' '}
                             fit{' '}
@@ -66,7 +58,7 @@ export default function HeroSection() {
                         </h1>
 
                         {/* Sub-headline */}
-                        <p className="text-lg sm:text-xl text-gray-500 leading-relaxed mb-10 max-w-xl mx-auto lg:mx-0">
+                        <p className="mb-10 mx-auto max-w-xl text-base leading-relaxed text-gray-500 sm:text-xl lg:mx-0">
                             Search real restaurant meals by calories, protein, 
                             and macros all powered by verified nutrition data.
                         </p>
@@ -75,20 +67,20 @@ export default function HeroSection() {
                         <Link href="/upgrade">
                             <Button
                                 size="lg"
-                                className="rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white px-10 py-6 text-lg font-bold shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/30 transition-all hover:-translate-y-0.5"
+                                className="w-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 px-8 py-6 text-base font-bold text-white shadow-xl shadow-cyan-500/20 transition-all hover:-translate-y-0.5 hover:from-cyan-400 hover:to-blue-400 hover:shadow-cyan-500/30 sm:w-auto sm:px-10 sm:text-lg"
                             >
                                 Find meals near you
                                 <ArrowRight className="w-5 h-5 ml-2" />
                             </Button>
                         </Link>
                         <p className="mt-4 text-sm text-gray-400">
-                            No signup required · 3 free searches
+                            2 free searches every 24 hours
                         </p>
                     </div>
 
                     {/* ── Right: Phone video ── */}
                     <div
-                        className="flex-1 flex justify-center lg:justify-end relative self-stretch min-h-[500px] sm:min-h-[600px] lg:min-h-[700px]"
+                        className="relative flex min-h-[360px] flex-1 self-stretch justify-center sm:min-h-[520px] lg:min-h-[700px] lg:justify-end"
                         style={{
                             opacity: visible ? 1 : 0,
                             transform: visible ? 'translateY(0)' : 'translateY(20px)',
@@ -140,3 +132,4 @@ export default function HeroSection() {
         </section>
     );
 }
+

@@ -374,7 +374,7 @@ export default function AccountEditPage() {
 
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 {!entitlement.hasPremiumAccess
-                  ? 'Free accounts get 2 AI searches per day. Restore a previous purchase here or upgrade inside the iOS app.'
+                  ? 'Free accounts get 2 searches every 24 hours across Home and AI Chat. Restore a previous purchase here or upgrade inside the iOS app.'
                   : entitlement.billingStatus === 'trialing' && entitlement.trialExpiresAt
                     ? `Your waitlist free month is active through ${new Date(entitlement.trialExpiresAt).toLocaleDateString()}.`
                     : 'Your premium access is active. You can restore purchases or open App Store subscription management below.'}

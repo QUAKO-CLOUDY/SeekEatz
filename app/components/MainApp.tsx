@@ -66,10 +66,13 @@ const APP_TUTORIAL_STEPS: AppTutorialStep[] = [
     screen: 'favorites',
     title: 'Remember your favorites',
     body: 'Save meals you enjoy to come back to in the future.',
-    target: 'favorites-empty-state',
+    target: 'favorites-heart',
     buttonLabel: 'Next',
     placement: 'below',
-    cardOffset: 24,
+    spotlightShape: 'box',
+    spotlightPadding: 6,
+    cardOffset: 18,
+    compactCard: true,
   },
   {
     screen: 'settings',
@@ -135,11 +138,18 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // Track current user ID
   const [currentUserId, setCurrentUserId] = useState<string | undefined>(undefined);
   const [currentUserEmail, setCurrentUserEmail] = useState<string | undefined>(undefined);
+  const [hasHydratedCurrentUser, setHasHydratedCurrentUser] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [devFullAccess, setDevFullAccessState] = useState(false);
   const [isTutorialActive, setIsTutorialActive] = useState(false);
   const [tutorialStepIndex, setTutorialStepIndex] = useState(0);
   const { entitlement, refresh: refreshEntitlement } = useAccountEntitlement(isMounted);
+  const favoriteMealsStorageKey = currentUserId
+    ? `seekeatz_favorite_meals:${currentUserId}`
+    : 'seekeatz_favorite_meals:guest';
+  const favoriteMealsDataStorageKey = currentUserId
+    ? `seekeatz_favorite_meals_data:${currentUserId}`
+    : 'seekeatz_favorite_meals_data:guest';
 
   // Get updateLoggedMeals from NutritionContext to sync state
   // NutritionProvider is now at root layout level, so this should always work
@@ -192,6 +202,8 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       } catch {
         setCurrentUserId(undefined);
         setCurrentUserEmail(undefined);
+      } finally {
+        setHasHydratedCurrentUser(true);
       }
     };
 
@@ -202,6 +214,8 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   const tutorialCompletionKey = currentUserId
     ? `seekeatz_app_tutorial_completed_${currentUserId}`
     : 'seekeatz_app_tutorial_completed_guest';
+  const hasFullAccess = entitlement.hasPremiumAccess || isMasterAccount || devFullAccess;
+  const isRestrictedAccount = !!currentUserId && !hasFullAccess;
 
   useEffect(() => {
     if (!isMounted) return;
@@ -251,6 +265,87 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     }
   }, [currentScreen, isTutorialActive, tutorialStepIndex]);
 
+  useEffect(() => {
+    if (!isMounted || !hasHydratedCurrentUser || typeof window === 'undefined') return;
+
+    const parseFavoriteIds = (raw: string | null): string[] => {
+      if (!raw) return [];
+      try {
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        console.error('Failed to parse favoriteMeals:', e);
+        return [];
+      }
+    };
+
+    const parseFavoriteData = (raw: string | null): Record<string, Meal> => {
+      if (!raw) return {};
+      try {
+        const parsed = JSON.parse(raw);
+        return typeof parsed === 'object' && parsed !== null ? parsed as Record<string, Meal> : {};
+      } catch (e) {
+        console.error('Failed to parse favoriteMealsData:', e);
+        return {};
+      }
+    };
+
+    if (!currentUserId) {
+      startTransition(() => {
+        setFavoriteMeals([]);
+        setFavoriteMealsData({});
+      });
+      return;
+    }
+
+    const scopedFavorites = localStorage.getItem(favoriteMealsStorageKey);
+    const scopedFavoriteData = localStorage.getItem(favoriteMealsDataStorageKey);
+
+    startTransition(() => {
+      setFavoriteMeals(parseFavoriteIds(scopedFavorites));
+      setFavoriteMealsData(parseFavoriteData(scopedFavoriteData));
+    });
+  }, [favoriteMealsDataStorageKey, favoriteMealsStorageKey, hasHydratedCurrentUser, currentUserId, isMounted]);
+
+  useEffect(() => {
+    if (!isMounted || !isTutorialActive || typeof window === 'undefined') return;
+
+    startTransition(() => {
+      setFavoriteMeals([]);
+      setFavoriteMealsData({});
+    });
+
+    localStorage.removeItem(favoriteMealsStorageKey);
+    localStorage.removeItem(favoriteMealsDataStorageKey);
+
+    if (!currentUserId) {
+      localStorage.removeItem('seekeatz_favorite_meals');
+      localStorage.removeItem('seekeatz_favorite_meals_data');
+    }
+  }, [
+    favoriteMealsDataStorageKey,
+    favoriteMealsStorageKey,
+    currentUserId,
+    isMounted,
+    isTutorialActive,
+  ]);
+
+  useEffect(() => {
+    if (!isMounted || typeof window === 'undefined' || !isRestrictedAccount) return;
+
+    startTransition(() => {
+      setFavoriteMeals([]);
+      setFavoriteMealsData({});
+    });
+
+    localStorage.removeItem(favoriteMealsStorageKey);
+    localStorage.removeItem(favoriteMealsDataStorageKey);
+    localStorage.removeItem('seekeatz_favorite_meals');
+    localStorage.removeItem('seekeatz_favorite_meals_data');
+    localStorage.removeItem('seekeatz_favorite_meals:guest');
+    localStorage.removeItem('seekeatz_favorite_meals_data:guest');
+  }, [favoriteMealsDataStorageKey, favoriteMealsStorageKey, isMounted, isRestrictedAccount]);
+
   // Load all localStorage state on mount (only after component is mounted on client)
   // Consolidated into single effect for better performance
   useEffect(() => {
@@ -286,36 +381,6 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       }
     } catch (e) {
       console.error('Failed to parse navigation state:', e);
-    }
-
-    // Load favorite meals
-    try {
-      const saved = localStorage.getItem('seekeatz_favorite_meals');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          startTransition(() => {
-            setFavoriteMeals(parsed);
-          });
-        }
-      }
-    } catch (e) {
-      console.error('Failed to parse favoriteMeals:', e);
-    }
-
-    // Load favorite meals data
-    try {
-      const saved = localStorage.getItem('seekeatz_favorite_meals_data');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (typeof parsed === 'object' && parsed !== null) {
-          startTransition(() => {
-            setFavoriteMealsData(parsed);
-          });
-        }
-      }
-    } catch (e) {
-      console.error('Failed to parse favoriteMealsData:', e);
     }
 
     // Load user profile
@@ -751,8 +816,6 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   }
 
   // If we reach here, appState is 'app' - render the main app UI
-  const hasFullAccess = entitlement.hasPremiumAccess || isMasterAccount || devFullAccess;
-
   const handleNavigate = (screen: Screen) => {
     // Update activity on navigation
     updateActivity();
@@ -828,7 +891,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         : [...prev, mealId];
       // Persist to localStorage
       if (typeof window !== 'undefined') {
-        localStorage.setItem('seekeatz_favorite_meals', JSON.stringify(updated));
+        localStorage.setItem(favoriteMealsStorageKey, JSON.stringify(updated));
 
         // Also store/remove meal data
         if (meal) {
@@ -840,7 +903,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
                 return newData;
               })()
               : { ...prevData, [mealId]: meal };
-            localStorage.setItem('seekeatz_favorite_meals_data', JSON.stringify(updatedData));
+            localStorage.setItem(favoriteMealsDataStorageKey, JSON.stringify(updatedData));
             return updatedData;
           });
         }
@@ -1004,6 +1067,8 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
             onMealSelect={handleMealSelect}
             onLogMeal={handleLogMeal}
             onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
+            isReadOnly={!!currentUserId && !hasFullAccess}
+            onLockedAction={() => setShowUpgradeModal(true)}
           />
         )}
         {currentScreen === 'settings' && (
@@ -1017,6 +1082,10 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       <Navigation
         currentScreen={currentScreen}
         onNavigate={handleNavigate}
+        lockedScreens={{
+          log: isRestrictedAccount,
+          favorites: isRestrictedAccount,
+        }}
       />
 
       <UpgradeModal

@@ -85,7 +85,7 @@ function OnboardingPageContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      <OnboardingFlow onComplete={handleComplete} initialStep={isPostSignupFlow ? 0 : -1} />
+      <OnboardingFlow onComplete={handleComplete} initialStep={-1} />
     </div>
   );
 }

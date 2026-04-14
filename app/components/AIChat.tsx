@@ -1176,7 +1176,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
 
           setShowUpgradeModal(true);
-          setError(serverMessage || "You've used your 2 free AI searches for today. Upgrade to continue.");
+          setError(serverMessage || "You've used your 2 free searches for the last 24 hours. Upgrade to continue.");
           return;
         }
 
@@ -1826,7 +1826,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                     }}
                     className={`px-4 py-2 border rounded-lg text-sm font-medium transition-all text-center ${isDark ? 'bg-gray-800 border-gray-700 hover:bg-gray-700 text-gray-200' : 'bg-white border-gray-300 hover:bg-gray-50 text-gray-700'}`}
                   >
-                    Wait 24hrs for my free chats
+                    Wait 24 hours for my free chats
                   </button>
                 </div>
               )}
@@ -1945,7 +1945,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
       <UpgradeModal
         open={showUpgradeModal}
-        subtitle="Your free daily chats are up. Upgrade to premium to unlock full access."
+        subtitle="Your 2 free searches for the last 24 hours are used up. Upgrade to premium to unlock unlimited home search, AI chat, logging, and saved meals."
         onClose={() => {
           setShowUpgradeModal(false);
           setError(null);

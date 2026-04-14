@@ -20,10 +20,8 @@ type MealSearchResponse = Awaited<ReturnType<typeof searchHandler>> & {
   restaurant?: string;
 };
 
-function getTodayStartIso() {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  return now.toISOString();
+function getUsageWindowStartIso() {
+  return new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 }
 
 async function getMeteredQueryCountForToday(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
@@ -32,7 +30,7 @@ async function getMeteredQueryCountForToday(supabase: Awaited<ReturnType<typeof 
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
     .eq('event_type', 'metered_query')
-    .gte('created_at', getTodayStartIso());
+    .gte('created_at', getUsageWindowStartIso());
 
   return count ?? 0;
 }
@@ -907,9 +905,9 @@ export async function POST(req: Request) {
         if (meteredCount >= FREE_DAILY_QUERY_LIMIT) {
           return NextResponse.json({
             error: true,
-            message: "You've used your 2 free AI searches for today. Upgrade to unlock unlimited access.",
+            message: "You've used your 2 free searches for the last 24 hours. Upgrade to unlock unlimited access.",
             mode: "text",
-            answer: "You've used your 2 free AI searches for today. Upgrade to unlock unlimited access.",
+            answer: "You've used your 2 free searches for the last 24 hours. Upgrade to unlock unlimited access.",
             usageLimit: true
           }, {
             status: 403,
@@ -924,9 +922,9 @@ export async function POST(req: Request) {
       if (!allowed) {
         return NextResponse.json({
           error: true,
-          message: "You've used your 2 free AI searches for today. Create an account to keep going.",
+          message: "You've used your 2 free searches for the last 24 hours. Create an account to keep going.",
           mode: "text",
-          answer: "You've used your 2 free AI searches for today. Create an account to keep going.",
+          answer: "You've used your 2 free searches for the last 24 hours. Create an account to keep going.",
           usageLimit: true
         }, {
           status: 403,

@@ -1218,7 +1218,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
           <div className="mt-5 rounded-2xl border border-sky-500/15 bg-gradient-to-br from-sky-500/[0.08] via-background to-background p-5">
             <p className="text-base font-semibold text-foreground">
               {!entitlement.hasPremiumAccess
-                ? 'Upgrade for unlimited AI chat, meal logging, saved meals, and premium tools.'
+                ? 'Upgrade for unlimited home search, AI chat, meal logging, saved meals, and premium tools.'
                 : entitlement.billingStatus === 'trialing'
                   ? 'Your waitlist free month is active and all premium features are unlocked.'
                   : entitlement.billingTier === 'yearly'
@@ -1227,7 +1227,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
               {!entitlement.hasPremiumAccess
-                ? 'Free accounts get 2 AI searches per day and read-only access outside the home and chat surfaces.'
+                ? 'Free accounts get 2 total searches every rolling 24 hours across Home and AI Chat. Logging and saved meals still require premium.'
                 : entitlement.billingStatus === 'trialing' && entitlement.trialExpiresAt
                   ? `Your free month ends on ${new Date(entitlement.trialExpiresAt).toLocaleDateString()}.`
                   : 'Manage your plan details or review upgrade options on the subscription screen.'}

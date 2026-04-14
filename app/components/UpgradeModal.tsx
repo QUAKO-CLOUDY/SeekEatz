@@ -24,7 +24,7 @@ export function UpgradeModal({
   title = "Keep making smarter choices.",
   subtitle = "Unlock SeekEatz Premium to keep finding meals that fit your goals, every time you eat out.",
   buttonLabel = "Upgrade to Premium",
-  dismissLabel = "Wait 24hrs for my free chats",
+  dismissLabel = "Wait 24 hours for my free chats",
   onClose,
 }: Props) {
   const router = useRouter();

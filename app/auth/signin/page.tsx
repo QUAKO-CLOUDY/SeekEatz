@@ -33,6 +33,25 @@ function SignInPageContent() {
   const encodedRedirectTo = encodeURIComponent(redirectTo);
   const upgradeHref = `/upgrade?redirectTo=${encodedRedirectTo}${shouldStartTutorial ? "&tutorial=1" : ""}${isMasterMode ? "&master=1" : ""}`;
 
+  const resetSavedMealStorageForUser = (userId: string) => {
+    if (typeof window === "undefined") return;
+
+    const keysToRemove = [
+      "seekeatz_favorite_meals",
+      "seekeatz_favorite_meals_data",
+      "seekeatz_favorite_meals:guest",
+      "seekeatz_favorite_meals_data:guest",
+      "seekeatz_logged_meals",
+      `seekeatz_favorite_meals:${userId}`,
+      `seekeatz_favorite_meals_data:${userId}`,
+    ];
+
+    keysToRemove.forEach((key) => localStorage.removeItem(key));
+    localStorage.setItem(`seekeatz_favorite_meals:${userId}`, JSON.stringify([]));
+    localStorage.setItem(`seekeatz_favorite_meals_data:${userId}`, JSON.stringify({}));
+    localStorage.setItem("seekeatz_logged_meals", JSON.stringify([]));
+  };
+
   // Check if user is already authenticated - if so, redirect to chat
   // Also listen for auth state changes to redirect immediately on sign-in
   useEffect(() => {
@@ -138,6 +157,11 @@ function SignInPageContent() {
           }
         } catch (error) {
           console.warn("Could not fetch existing profile:", error);
+        }
+
+        const isFreshAccount = shouldStartTutorial || (!hasCompletedOnboarding && !profile);
+        if (isFreshAccount) {
+          resetSavedMealStorageForUser(userId);
         }
         
         // Claim anonymous data (saved_meals, daily_logs, user_favorites)

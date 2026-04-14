@@ -10,7 +10,7 @@ export type AppTutorialStep = {
   target: string;
   buttonLabel: string;
   placement?: "auto" | "above" | "below" | "center-below";
-  spotlightShape?: "rounded" | "circle";
+  spotlightShape?: "rounded" | "circle" | "box";
   cardOffset?: number;
   initialDelayMs?: number;
   spotlightPadding?: number;
@@ -224,14 +224,23 @@ export function AppTutorialOverlay({ step, stepIndex, totalSteps, onNext }: Prop
       {layout.spotlight ? (
         <div
           className={`absolute border-2 border-cyan-300 shadow-[0_0_0_9999px_rgba(2,6,23,0.14),0_0_28px_rgba(34,211,238,0.28)] transition-opacity duration-150 ${
-            step.spotlightShape === "circle" ? "rounded-full" : "rounded-[1.4rem]"
+            step.spotlightShape === "circle"
+              ? "rounded-full"
+              : step.spotlightShape === "box"
+                ? "rounded-none"
+                : "rounded-[1.4rem]"
           } ${isReadyToShow ? "opacity-100" : "opacity-0"}`}
           style={{
             top: layout.spotlight.top,
             left: layout.spotlight.left,
             width: layout.spotlight.width,
             height: layout.spotlight.height,
-            borderRadius: step.spotlightShape === "circle" ? "9999px" : layout.spotlight.borderRadius,
+            borderRadius:
+              step.spotlightShape === "circle"
+                ? "9999px"
+                : step.spotlightShape === "box"
+                  ? "0px"
+                  : layout.spotlight.borderRadius,
           }}
         />
       ) : null}

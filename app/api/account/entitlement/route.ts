@@ -7,10 +7,8 @@ import {
   PROFILE_ENTITLEMENT_SELECT,
 } from "@/lib/entitlements";
 
-function getTodayStartIso() {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  return now.toISOString();
+function getUsageWindowStartIso() {
+  return new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 }
 
 export async function GET() {
@@ -35,7 +33,7 @@ export async function GET() {
         .select("id", { count: "exact", head: true })
         .eq("user_id", user.id)
         .eq("event_type", "metered_query")
-        .gte("created_at", getTodayStartIso()),
+        .gte("created_at", getUsageWindowStartIso()),
     ]);
 
     const entitlement = buildEntitlement({

@@ -6,10 +6,8 @@ export const dynamic = 'force-dynamic';
 
 const SEARCH_TIMEOUT_MS = 22000; // 22s server timeout (client uses 25s)
 
-function getTodayStartIso() {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  return now.toISOString();
+function getUsageWindowStartIso() {
+  return new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 }
 
 export async function POST(req: Request) {
@@ -50,7 +48,7 @@ export async function POST(req: Request) {
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id)
           .eq('event_type', 'metered_query')
-          .gte('created_at', getTodayStartIso()),
+          .gte('created_at', getUsageWindowStartIso()),
       ]);
 
       const entitlement = buildEntitlement({
@@ -63,7 +61,7 @@ export async function POST(req: Request) {
         if ((usageResult.count ?? 0) >= FREE_DAILY_QUERY_LIMIT) {
           return Response.json({
             error: 'Usage limit reached',
-            message: "You've used your 2 free AI searches for today. Upgrade to unlock unlimited access.",
+            message: "You've used your 2 free searches for the last 24 hours. Upgrade to unlock unlimited access.",
             usageLimit: true
           }, { status: 403 });
         }
@@ -75,7 +73,7 @@ export async function POST(req: Request) {
       if (!allowed) {
         return Response.json({
           error: 'Usage limit reached',
-          message: "You've used your 2 free AI searches for today. Create an account to keep going.",
+          message: "You've used your 2 free searches for the last 24 hours. Create an account to keep going.",
           usageLimit: true
         }, { status: 403 });
       }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Activity, Heart, Settings as SettingsIcon } from "lucide-react";
+import { Home, Activity, Heart, Lock, Settings as SettingsIcon } from "lucide-react";
 import Logo from "./Logo";
 
 export type Screen = "home" | "log" | "chat" | "favorites" | "settings" | "search";
@@ -8,9 +8,10 @@ export type Screen = "home" | "log" | "chat" | "favorites" | "settings" | "searc
 type Props = {
   currentScreen: Screen;
   onNavigate: (screen: Screen) => void;
+  lockedScreens?: Partial<Record<Screen, boolean>>;
 };
 
-export function Navigation({ currentScreen, onNavigate }: Props) {
+export function Navigation({ currentScreen, onNavigate, lockedScreens = {} }: Props) {
   const isAIChatActive = currentScreen === "chat";
 
   return (
@@ -50,6 +51,7 @@ export function Navigation({ currentScreen, onNavigate }: Props) {
       <button
         onClick={() => onNavigate("log")}
         className="flex flex-1 flex-col items-center gap-0.5 px-2 py-1.5 transition-all"
+        aria-label={lockedScreens.log ? "Log (premium)" : "Log"}
       >
         <div
           className={`p-1.5 rounded-lg ${
@@ -62,13 +64,16 @@ export function Navigation({ currentScreen, onNavigate }: Props) {
             }`}
           />
         </div>
-        <span
-          className={`text-[10px] ${
-            currentScreen === "log" ? "text-green-400" : "text-muted-foreground"
-          }`}
-        >
-          Log
-        </span>
+        <div className="flex items-center gap-1">
+          <span
+            className={`text-[10px] ${
+              currentScreen === "log" ? "text-green-400" : "text-muted-foreground"
+            }`}
+          >
+            Log
+          </span>
+          {lockedScreens.log ? <Lock className="h-2.5 w-2.5 text-amber-400" /> : null}
+        </div>
       </button>
 
       {/* Center AI Chat FAB */}
@@ -128,6 +133,7 @@ export function Navigation({ currentScreen, onNavigate }: Props) {
       <button
         onClick={() => onNavigate("favorites")}
         className="flex flex-1 flex-col items-center gap-0.5 px-2 py-1.5 transition-all"
+        aria-label={lockedScreens.favorites ? "Favorites (premium)" : "Favorites"}
       >
         <div
           className={`p-1.5 rounded-lg ${
@@ -142,13 +148,16 @@ export function Navigation({ currentScreen, onNavigate }: Props) {
             }`}
           />
         </div>
-        <span
-          className={`text-[10px] ${
-            currentScreen === "favorites" ? "text-pink-400" : "text-muted-foreground"
-          }`}
-        >
-          Favorites
-        </span>
+        <div className="flex items-center gap-1">
+          <span
+            className={`text-[10px] ${
+              currentScreen === "favorites" ? "text-pink-400" : "text-muted-foreground"
+            }`}
+          >
+            Favorites
+          </span>
+          {lockedScreens.favorites ? <Lock className="h-2.5 w-2.5 text-amber-400" /> : null}
+        </div>
       </button>
 
       {/* Settings */}

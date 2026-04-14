@@ -26,6 +26,8 @@ export function getBillingTierFromAppleProductId(
     return "free";
   }
 
+  const normalizedProductId = productId.toLowerCase();
+
   if (productId === getAppleProductIdForTier("monthly")) {
     return "monthly";
   }
@@ -34,10 +36,21 @@ export function getBillingTierFromAppleProductId(
     return "yearly";
   }
 
-  return "free";
+  if (
+    normalizedProductId.includes("year") ||
+    normalizedProductId.includes("annual")
+  ) {
+    return "yearly";
+  }
+
+  if (normalizedProductId.includes("month")) {
+    return "monthly";
+  }
+
+  // Unknown paid identifier should still be treated as paid to avoid downgrading active subscribers.
+  return "monthly";
 }
 
 export function getDefaultRevenueCatEntitlementId(): string {
   return getRevenueCatEntitlementId();
 }
-

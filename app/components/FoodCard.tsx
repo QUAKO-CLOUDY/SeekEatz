@@ -1,5 +1,6 @@
 import React from 'react';
 import { getLogo } from '@/utils/logos';
+import { LogoImage } from './ui/LogoImage';
 
 type MacroMap = {
   calories: number | null;
@@ -29,21 +30,17 @@ export default function FoodCard({ item, restaurantName }: Props) {
   return (
     <div className="flex items-center gap-4 p-4 border rounded-lg bg-white shadow-sm mb-3 hover:shadow-md transition-shadow cursor-pointer">
       {/* Logo Section */}
-      <img
-        src={getLogo(restaurantName)}
-        alt={restaurantName || 'Restaurant logo'}
-        className="h-12 w-12 object-contain flex-shrink-0"
-        onError={(e) => {
-          // Fallback to default.png if logo fails to load
-          if (e.currentTarget.src !== window.location.origin + '/logos/default.png') {
-            e.currentTarget.onerror = null; // Prevent infinite loop
-            e.currentTarget.src = '/logos/default.png';
-          } else {
-            // If default.png also fails, hide the image
-            e.currentTarget.style.display = 'none';
-          }
-        }}
-      />
+      <div className="relative h-12 w-12 flex-shrink-0">
+        <LogoImage
+          key={getLogo(restaurantName)}
+          src={getLogo(restaurantName)}
+          alt={restaurantName || 'Restaurant logo'}
+          fill
+          sizes="48px"
+          className="object-contain"
+          hideOnFallbackError
+        />
+      </div>
 
       {/* Info Section */}
       <div className="flex-1">

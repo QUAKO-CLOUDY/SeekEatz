@@ -13,6 +13,7 @@ type DailyLogProps = {
   onRemoveMeal?: (mealId: string) => void;
 };
 
-export function DailyLog(_props: DailyLogProps) {
+export function DailyLog(props: DailyLogProps) {
+  void props;
   return <div className="p-10 text-white">Daily Log Screen</div>;
 }

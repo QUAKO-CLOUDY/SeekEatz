@@ -85,7 +85,7 @@ export class ResponseFormatter {
           )
         : undefined;
 
-    return {
+    const meal: Meal = {
       id:               String(item.id),
       name:             item.name ?? '',
       restaurant:       restaurantName,
@@ -98,7 +98,7 @@ export class ResponseFormatter {
         calories: Number(macros.calories ?? 0),
         protein:  Number(macros.protein  ?? 0),
         carbs:    Number(macros.carbs    ?? 0),
-        fat:      Number(macros.fat      ?? 0),
+        fats:     Number(macros.fat      ?? 0),
       },
       // Images
       image:      getRestaurantLogoUrl(restaurantName, restaurantLogoUrl),
@@ -111,14 +111,28 @@ export class ResponseFormatter {
       dietary_tags: item.food_tags ?? [],
       // Match score from ranker
       matchScore:   item.matchScore,
-      ...(item.matchReasons ? { matchReasons: item.matchReasons } as any : {}),
-      ...(item.searchMetadata ? { searchMetadata: item.searchMetadata } as any : {}),
-      // Restaurant logo (from restaurants table)
-      ...(restaurantLogoUrl ? { restaurantLogoUrl } as any : {}),
-      ...(distance !== undefined ? { distance } : {}),
-      ...(latitude !== undefined ? { latitude } : {}),
-      ...(longitude !== undefined ? { longitude } : {}),
     };
+
+    if (item.matchReasons) {
+      meal.matchReasons = item.matchReasons;
+    }
+    if (item.searchMetadata) {
+      meal.searchMetadata = item.searchMetadata;
+    }
+    if (restaurantLogoUrl) {
+      meal.restaurantLogoUrl = restaurantLogoUrl;
+    }
+    if (distance !== undefined) {
+      meal.distance = distance;
+    }
+    if (latitude !== undefined) {
+      meal.latitude = latitude;
+    }
+    if (longitude !== undefined) {
+      meal.longitude = longitude;
+    }
+
+    return meal;
   }
 }
 
@@ -133,7 +147,7 @@ export function formatMealsSync(items: RawResult[]): Meal[] {
     const macros = item.macros ?? {};
     const restaurantName = item.restaurant_name ?? '';
     const restaurantLogoUrl = getRestaurantLogoUrl(restaurantName);
-    return {
+    const meal: Meal = {
       id:              String(item.id),
       name:            item.name ?? '',
       restaurant:      restaurantName,
@@ -146,7 +160,7 @@ export function formatMealsSync(items: RawResult[]): Meal[] {
         calories: Number(macros.calories ?? 0),
         protein:  Number(macros.protein  ?? 0),
         carbs:    Number(macros.carbs    ?? 0),
-        fat:      Number(macros.fat      ?? 0),
+        fats:     Number(macros.fat      ?? 0),
       },
       image:       restaurantLogoUrl,
       price:       item.price != null ? Number(item.price) : undefined,
@@ -154,9 +168,16 @@ export function formatMealsSync(items: RawResult[]): Meal[] {
       tags:        item.food_tags ?? [],
       dietary_tags: item.food_tags ?? [],
       matchScore:  item.matchScore,
-      restaurantLogoUrl,
-      ...(item.matchReasons ? { matchReasons: item.matchReasons } as any : {}),
-      ...(item.searchMetadata ? { searchMetadata: item.searchMetadata } as any : {}),
     };
+
+    meal.restaurantLogoUrl = restaurantLogoUrl;
+    if (item.matchReasons) {
+      meal.matchReasons = item.matchReasons;
+    }
+    if (item.searchMetadata) {
+      meal.searchMetadata = item.searchMetadata;
+    }
+
+    return meal;
   });
 }

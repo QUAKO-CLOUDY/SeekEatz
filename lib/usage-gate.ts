@@ -8,14 +8,16 @@ export type FeatureType = 'chat' | 'search';
 /**
  * Always allow feature usage. Trial credits are no longer enforced.
  */
-export async function canUseFeature(_feature: FeatureType): Promise<boolean> {
+export async function canUseFeature(feature: FeatureType): Promise<boolean> {
+  void feature;
   return true;
 }
 
 /**
  * No-op usage increment. Returns 0 to indicate we don't track trial counts anymore.
  */
-export async function incrementUsage(_feature: FeatureType): Promise<number> {
+export async function incrementUsage(feature: FeatureType): Promise<number> {
+  void feature;
   return 0;
 }
 
@@ -32,7 +34,6 @@ export function getTrialCount(): number {
 export async function hasReachedLimit(): Promise<boolean> {
   return false;
 }
-
 
 
 

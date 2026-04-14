@@ -37,8 +37,6 @@ export function detectExplicitRestaurantConstraint(message: string): {
   }
 
   const trimmed = normalizeSearchText(message).text.trim();
-  const lowerMessage = trimmed.toLowerCase();
-
   // Generic cuisine/restaurant type words that should NOT be treated as specific restaurants
   const genericRestaurantTypes = [
     'steakhouse', 'restaurant', 'diner', 'cafe', 'cafeteria', 'bistro', 'pizzeria',

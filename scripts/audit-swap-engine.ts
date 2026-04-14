@@ -5,8 +5,8 @@
  * Run with: npx tsx scripts/audit-swap-engine.ts
  */
 
-import { getApplicableSwaps, GLOBAL_SWAP_LIBRARY } from '../utils/global-swap-library.js';
-import { getDishStructure, inferExtendedDishType } from '../utils/dish-structure.js';
+import { getApplicableSwaps } from '../utils/global-swap-library.js';
+import { inferExtendedDishType } from '../utils/dish-structure.js';
 import { filterCompatibleSwaps } from '../utils/swap-compatibility-v2.js';
 import { estimateMacroImpact } from '../utils/macro-impact-estimator.js';
 import type { SwapLibraryEntry } from '../utils/global-swap-library.js';
@@ -60,14 +60,6 @@ function banner(text: string) {
     console.log(`\n┌${line}┐`);
     console.log(`│  ${text.padEnd(66)}│`);
     console.log(`└${line}┘`);
-}
-
-function warn(msg: string) {
-    console.log(`  ⚠️  ${msg}`);
-}
-
-function pass(msg: string) {
-    console.log(`  ✅ ${msg}`);
 }
 
 function fail(msg: string) {

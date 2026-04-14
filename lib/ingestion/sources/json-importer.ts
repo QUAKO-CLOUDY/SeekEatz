@@ -102,7 +102,7 @@ export async function importJSONFile(
       import_batch_id: batchId,
     }));
 
-    const { data, error, count } = await supabase
+    const { error } = await supabase
       .from('menu_items')
       .upsert(chunk, {
         onConflict:        'restaurant_name,name',

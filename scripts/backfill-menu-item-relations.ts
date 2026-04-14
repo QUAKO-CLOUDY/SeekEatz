@@ -109,6 +109,121 @@ function inferMenuItemUpdate(item: MenuItemRow): MenuItemUpdate | null {
       modifier_unit_max_qty: 1,
     });
   } else if (
+    restaurant === 'shake shack' &&
+    /^flat-top dogs$/.test(category) &&
+    /^add cheese sauce$/i.test(name)
+  ) {
+    apply({
+      normalized_category: 'modifier',
+      item_type: 'sauce',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'serving',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 2,
+    });
+  } else if (
+    restaurant === 'shake shack' &&
+    /^burgers$/.test(category) &&
+    /^(martin'?s potato roll|gluten free bun|lettuce wrap)$/i.test(name)
+  ) {
+    apply({
+      normalized_category: 'modifier',
+      item_type: 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'swap',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 1,
+    });
+  } else if (
+    restaurant === 'shake shack' &&
+    /^(burgers|chicken|flat-top dogs|breakfast|combo meals)$/.test(category)
+  ) {
+    apply({
+      normalized_category:
+        /^combo meals$/.test(category) && /hot dog/i.test(name) ? 'hot_dog' :
+        /^combo meals$/.test(category) && /chicken/i.test(name) ? 'chicken' :
+        /^combo meals$/.test(category) && /burger/i.test(name) ? 'burger' :
+        /^burgers$/.test(category) ? 'burger' :
+        /^flat-top dogs$/.test(category) ? 'hot_dog' :
+        /^breakfast$/.test(category) ? 'breakfast' :
+        'chicken',
+      item_type: 'meal',
+      is_modifier: false,
+      is_searchable: true,
+      modifier_unit_label: null,
+      modifier_unit_default_qty: null,
+      modifier_unit_max_qty: null,
+    });
+  } else if (
+    restaurant === 'shake shack' &&
+    /^extras$/.test(category)
+  ) {
+    const isBreakfastSide = /hashbrowns/i.test(name);
+    const isEggLike = /egg white|(^|:\s*)egg\b/i.test(name);
+    apply({
+      normalized_category: 'modifier',
+      item_type: isBreakfastSide ? 'side' : 'modifier',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: isBreakfastSide ? 'side' : isEggLike ? 'egg' : 'portion',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: isBreakfastSide ? 1 : isEggLike ? 2 : 2,
+    });
+  } else if (
+    restaurant === 'shake shack' &&
+    /^sauce$/.test(category)
+  ) {
+    apply({
+      normalized_category: 'modifier',
+      item_type: 'sauce',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'serving',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 3,
+    });
+  } else if (
+    restaurant === 'shake shack' &&
+    /^fries & sides$/.test(category)
+  ) {
+    apply({
+      normalized_category: 'side',
+      item_type: 'side',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: 'side',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: 1,
+    });
+  } else if (
+    restaurant === 'shake shack' &&
+    /^(drinks|shakes|floats)$/.test(category)
+  ) {
+    apply({
+      normalized_category: 'drink',
+      item_type: 'drink',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: null,
+      modifier_unit_default_qty: null,
+      modifier_unit_max_qty: null,
+    });
+  } else if (
+    restaurant === 'shake shack' &&
+    /^cups & sundaes$/.test(category)
+  ) {
+    apply({
+      normalized_category: 'snack',
+      item_type: 'snack',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: null,
+      modifier_unit_default_qty: null,
+      modifier_unit_max_qty: null,
+    });
+  } else if (
     restaurant === 'chick-fil-a' &&
     /^(breakfast|entrées|entrees|salads)$/.test(category)
   ) {
@@ -1025,6 +1140,67 @@ const RESTAURANT_RULES: Record<string, RestaurantRuleSet> = {
         relationType: 'side_option',
         groupName: 'Sides',
         maxQuantity: 1,
+      },
+    ],
+  },
+  'Shake Shack': {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [/^burgers$/i, /^chicken$/i, /^flat-top dogs$/i, /^combo meals$/i],
+        childCategoryPatterns: [/^sauce$/i],
+        childExcludeNamePatterns: [/breakfast sauce/i],
+        relationType: 'sauce_option',
+        groupName: 'Sauces',
+        maxQuantity: 3,
+      },
+      {
+        mealCategoryPatterns: [/^burgers$/i, /^combo meals$/i],
+        mealNamePatterns: [/burger/i],
+        childCategoryPatterns: [/^extras$/i],
+        childNamePatterns: [/burger patty|veggie patty/i],
+        relationType: 'protein_option',
+        groupName: 'Protein Add-ons',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^burgers$/i, /^chicken$/i, /^flat-top dogs$/i, /^combo meals$/i],
+        childCategoryPatterns: [/^extras$/i],
+        childExcludeNamePatterns: [/burger patty|veggie patty|egg white|(^|:\s*)egg\b|hashbrowns|sausage patty/i],
+        relationType: 'add_on',
+        groupName: 'Toppings',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^burgers$/i, /^chicken$/i, /^combo meals$/i],
+        mealNamePatterns: [/burger|chicken/i],
+        childCategoryPatterns: [/^burgers$/i],
+        childNamePatterns: [/^martin'?s potato roll$/i, /^gluten free bun$/i, /^lettuce wrap$/i],
+        relationType: 'swap_candidate',
+        groupName: 'Bun Options',
+        maxQuantity: 1,
+      },
+      {
+        mealCategoryPatterns: [/^burgers$/i, /^chicken$/i, /^flat-top dogs$/i, /^combo meals$/i],
+        childCategoryPatterns: [/^fries & sides$/i],
+        relationType: 'side_option',
+        groupName: 'Sides',
+        maxQuantity: 1,
+      },
+      {
+        mealCategoryPatterns: [/^breakfast$/i],
+        childCategoryPatterns: [/^extras$/i],
+        childNamePatterns: [/^extras:\s*(egg|egg white|hashbrowns|sausage patty)/i],
+        relationType: 'add_on',
+        groupName: 'Breakfast Add-ons',
+        maxQuantity: 2,
+      },
+      {
+        mealCategoryPatterns: [/^breakfast$/i],
+        childCategoryPatterns: [/^sauce$/i],
+        childNamePatterns: [/breakfast sauce/i],
+        relationType: 'sauce_option',
+        groupName: 'Breakfast Sauces',
+        maxQuantity: 2,
       },
     ],
   },

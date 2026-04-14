@@ -84,7 +84,10 @@ export interface SearchParams {
 
   } | null;
   location?: string;
-  userContext?: any;
+  userContext?: {
+    userId?: string;
+    [key: string]: unknown;
+  };
   offset?: number;
   limit?: number;
   searchKey?: string;

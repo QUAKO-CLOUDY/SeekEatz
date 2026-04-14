@@ -10,16 +10,33 @@ export interface MenuItemClassification {
   isModifier: boolean;
 }
 
+type MenuItemRow = {
+  category?: string | null;
+  name?: string | null;
+};
+
 /**
  * Classifies a menu item row as a dish or modifier
  * Strict default: if not confidently a dish, treat as modifier (do not show in search results)
  */
-export function classifyMenuItem(row: any): MenuItemClassification {
+export function classifyMenuItem(row: MenuItemRow): MenuItemClassification {
   const category = (row.category || '').toLowerCase().trim();
   const name = (row.name || '').toLowerCase().trim();
 
   if (isSmoothieLikeMenuItem({ category, name })) {
     return { isDish: true, isModifier: false };
+  }
+
+  const isStandaloneBreadSwap =
+    /^(martin'?s potato roll|gluten free bun|lettuce wrap)$/i.test(name) &&
+    /(burger|sandwich|chicken|dog)/i.test(category);
+
+  const isStandaloneSauceAddOn =
+    /^add cheese sauce$/i.test(name) &&
+    /(burger|dog)/i.test(category);
+
+  if (isStandaloneBreadSwap || isStandaloneSauceAddOn) {
+    return { isDish: false, isModifier: true };
   }
 
   // 1. DISH ALLOWLIST by category keywords (case-insensitive)

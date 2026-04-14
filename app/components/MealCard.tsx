@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { Star, Heart, Flame, Beef, Wheat, Droplets } from "lucide-react";
 import type { Meal, UserProfile } from "../types"; // Use shared types
 import type { LoggedMeal } from "./LogScreen";
+import { LogoImage } from "./ui/LogoImage";
 import { useNutrition } from "../contexts/NutritionContext";
 import { getRestaurantLogoUrl } from "@/lib/image-utils";
 
@@ -125,21 +126,16 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
 
           <div className="mt-2.5 grid min-h-0 flex-1 grid-cols-[auto_minmax(0,1fr)] items-center gap-3">
             {/* Left Logo - Restaurant Logo */}
-            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
-              <img
+            <div className="relative flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <LogoImage
+                key={logoSrcWithCacheBust}
                 src={logoSrcWithCacheBust}
                 alt={restaurantName}
-                className="h-full w-full object-contain p-1.5"
-                onError={(e) => {
-                  const fallbackSrc = `/logos/default.png?v=${meal.id}`;
-                  if (e.currentTarget.src.includes('/logos/default.png')) {
-                    e.currentTarget.style.display = 'none';
-                    return;
-                  }
-
-                  e.currentTarget.onerror = null;
-                  e.currentTarget.src = fallbackSrc;
-                }}
+                fallbackSrc={`/logos/default.png?v=${meal.id}`}
+                fill
+                sizes="44px"
+                className="object-contain p-1.5"
+                hideOnFallbackError
               />
             </div>
 
@@ -243,32 +239,24 @@ export function MealCard({ meal, isFavorite, onClick, onToggleFavorite, compact 
           aspectRatio: '16 / 9',
           padding: '16px'
         }}
-      >
+        >
         {/* Restaurant Logo - Fills entire image area */}
-        <div className="flex h-full w-full items-center justify-center rounded-2xl border border-border/70 bg-white p-3 shadow-sm dark:bg-gray-900">
-          <img
+        <div className="relative flex h-full w-full items-center justify-center rounded-2xl border border-border/70 bg-white p-3 shadow-sm dark:bg-gray-900">
+          <LogoImage
+            key={logoSrcWithCacheBust}
             src={logoSrcWithCacheBust}
             alt={restaurantName}
-            className="h-full w-full object-contain object-center"
+            fallbackSrc={`/logos/default.png?v=${meal.id}`}
+            fill
+            sizes="(max-width: 640px) 100vw, 50vw"
+            className="object-contain object-center"
             style={{
-              width: '100%',
-              height: '100%',
               objectFit: 'contain',
               objectPosition: 'center',
-              display: 'block',
               maxWidth: '100%',
               maxHeight: '100%'
             }}
-            onError={(e) => {
-              const fallbackSrc = `/logos/default.png?v=${meal.id}`;
-              if (e.currentTarget.src.includes('/logos/default.png')) {
-                e.currentTarget.style.display = 'none';
-                return;
-              }
-
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = fallbackSrc;
-            }}
+            hideOnFallbackError
           />
         </div>
 

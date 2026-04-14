@@ -1,12 +1,10 @@
 'use client';
 
-import { Send, Copy, AlertCircle, Trash2 } from "lucide-react";
+import { Send, AlertCircle, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { MealCard } from "./MealCard";
 import type { Meal, UserProfile } from "../types";
-import { copyToClipboard } from "@/lib/clipboard-utils";
 import { createClient } from "@/utils/supabase/client";
 import { useTheme } from "../contexts/ThemeContext";
 import { useChat } from "../contexts/ChatContext";
@@ -25,7 +23,7 @@ interface AIChatProps {
   favoriteMeals?: string[];
   onMealSelect?: (meal: Meal) => void;
   onToggleFavorite?: (mealId: string, meal?: Meal) => void;
-  onSignInRequest?: () => void; // Callback to trigger sign-in flow
+  onSignInRequest?: () => void;
 }
 
 type PaginationFilters = Record<string, unknown>;
@@ -77,6 +75,8 @@ type SearchResultItem = {
 };
 
 type SearchApiResponse = {
+  mode?: "meals" | "text";
+  type?: "text";
   meals?: SearchResultItem[];
   hasMore?: boolean;
   nextOffset?: number;
@@ -174,27 +174,32 @@ function buildInputPlaceholder(now: Date = new Date()): string {
 }
 
 function mapSearchItemToMeal(item: SearchResultItem): Meal {
+  const mealName = item.item_name || item.name || "";
+  const restaurantName = item.restaurant_name || item.restaurant || "";
+
   return {
-    id: item.id,
-    name: item.item_name || item.name,
-    restaurant: item.restaurant_name,
-    restaurant_name: item.restaurant_name,
+    id: String(item.id ?? ""),
+    name: mealName,
+    restaurant: restaurantName,
+    restaurant_name: item.restaurant_name || restaurantName,
     calories: item.calories ?? 0,
     protein: item.protein ?? item.protein_g ?? 0,
     carbs: item.carbs ?? item.carbs_g ?? 0,
     fats: item.fats ?? item.fats_g ?? item.fat_g ?? 0,
     image: getRestaurantLogoUrl(
-      item.restaurant_name || item.restaurant || '',
+      restaurantName,
       item.restaurantLogoUrl || item.restaurant_logo_url || item.logo_url
     ),
     restaurantLogoUrl: getRestaurantLogoUrl(
-      item.restaurant_name || item.restaurant || '',
+      restaurantName,
       item.restaurantLogoUrl || item.restaurant_logo_url || item.logo_url
     ),
     description: item.description || '',
-    category: item.category || '',
+    category: item.category === 'restaurant' || item.category === 'grocery'
+      ? item.category
+      : undefined,
     dietary_tags: item.dietary_tags || [],
-    price: item.price || null,
+    price: item.price ?? undefined,
     distance: item.distance,
     latitude: item.latitude,
     longitude: item.longitude,
@@ -239,29 +244,6 @@ function buildMealHistory(
   return { seenMealIds, restaurantExposure };
 }
 
-function findLatestQuickPromptMealMessage(
-  messages: ChatMessage[],
-  promptText: string
-): { message: ChatMessage; index: number } | null {
-  const normalizedPrompt = promptText.trim().toLowerCase();
-
-  for (let index = messages.length - 1; index >= 1; index -= 1) {
-    const assistantMessage = messages[index];
-    const previousMessage = messages[index - 1];
-
-    if (
-      assistantMessage.role === 'assistant' &&
-      assistantMessage.mealSearchContext &&
-      previousMessage?.role === 'user' &&
-      previousMessage.content.trim().toLowerCase() === normalizedPrompt
-    ) {
-      return { message: assistantMessage, index };
-    }
-  }
-
-  return null;
-}
-
 function buildQuickPromptMealHistory(
   messages: ChatMessage[],
   promptText: string,
@@ -299,10 +281,8 @@ function buildQuickPromptMealHistory(
   return { seenMealIds, restaurantExposure };
 }
 
-const CHAT_SCROLL_POSITION_KEY = 'seekeatz_chat_scroll_position';
-
 export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelect, onToggleFavorite, onSignInRequest }: AIChatProps) {
-  const router = useRouter();
+  void onSignInRequest;
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
   const { messages, visibleMealsCount, isLoading, setMessages, setVisibleMealsCount, setIsLoading, clearChat, updateActivity } = useChat();
@@ -311,13 +291,12 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const [currentHour, setCurrentHour] = useState(() => new Date().getHours());
   const welcomeMessage = useMemo(
     () => buildWelcomeMessage(userProfile),
-    [userProfile?.full_name]
+    [userProfile]
   );
   const chatPlaceholder = useMemo(
     () => buildInputPlaceholder(new Date(new Date().setHours(currentHour))),
     [currentHour]
   );
-  const [isLimitReached, setIsLimitReached] = useState(false); // kept for compatibility, but no longer used for gating
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const activeQuickPromptRef = useRef<ActiveQuickPromptState | null>(null);
 
@@ -350,7 +329,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       console.log('[AIChat] Network came online - resetting loading state');
       setIsLoading(false);
       if (abortControllerRef.current) {
-        try { abortControllerRef.current.abort(); } catch (e) { /* ignore */ }
+        try { abortControllerRef.current.abort(); } catch { /* ignore */ }
         abortControllerRef.current = null;
       }
     };
@@ -358,7 +337,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       console.log('[AIChat] Network went offline - resetting loading state');
       setIsLoading(false);
       if (abortControllerRef.current) {
-        try { abortControllerRef.current.abort(); } catch (e) { /* ignore */ }
+        try { abortControllerRef.current.abort(); } catch { /* ignore */ }
         abortControllerRef.current = null;
       }
     };
@@ -384,12 +363,10 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           const { data: { user: fetchedUser }, error } = await withAuthTimeout(supabase.auth.getUser(), 3000);
           if (error && (error.message?.includes('Auth session missing') || error.name === 'AuthSessionMissingError')) {
             setIsSignedIn(false);
-            setIsLimitReached(false);
             break;
           } else if (fetchedUser) {
             user = fetchedUser;
             setIsSignedIn(true);
-            setIsLimitReached(false);
             setMessages(prev => prev.filter(msg => !msg.isGateMessage));
             break;
           }
@@ -417,8 +394,6 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
       if (event === 'SIGNED_IN' && session?.user) {
         // User signed in - immediately clear guest restrictions
-        setIsLimitReached(false);
-
         // Remove gate messages immediately
         setMessages(prev => prev.filter(msg => !msg.isGateMessage));
 
@@ -454,7 +429,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [currentSessionId, setMessages, setIsLoading]);
+  }, [clearChat, currentSessionId, setMessages, setIsLoading]);
   // Local state - chat state is managed by ChatContext
   const [inputText, setInputText] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -619,7 +594,6 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
   // Trial limits have been removed – always allow chat usage and clear any legacy gate messages.
   useEffect(() => {
-    setIsLimitReached(false);
     setMessages(prev => prev.filter(msg => !msg.isGateMessage));
   }, [setMessages]);
 
@@ -700,30 +674,6 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     const lowerQuery = query.toLowerCase();
     return mealKeywords.some(keyword => lowerQuery.includes(keyword));
   }, []);
-
-  // Centralized chat reset (clears messages but NOT trial count)
-  const resetChat = useCallback(() => {
-    // Stop any in-flight requests
-    if (abortControllerRef.current) {
-      try {
-        abortControllerRef.current.abort();
-      } catch (e) {
-        console.warn('Error aborting chat request:', e);
-      } finally {
-        abortControllerRef.current = null;
-      }
-    }
-
-    // Clear state (using context)
-    clearChat();
-    setInputText('');
-    setError(null);
-
-    // Clear guest session (messages, but NOT trial count)
-    clearGuestSession();
-    // Rotate session ID
-    setCurrentSessionId(getGuestSessionId());
-  }, [clearChat]);
 
   // Auto-scroll
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -843,7 +793,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         }
       }
     }
-  }, [isMounted, messages.length, scrollToBottom]);
+  }, [isMounted, messages, scrollToBottom]);
 
   // Mark component as mounted
   useEffect(() => {
@@ -874,7 +824,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       };
       setMessages([initialMessage]);
     }
-  }, [isMounted, messages.length, welcomeMessage]);
+  }, [isMounted, messages.length, setMessages, welcomeMessage]);
 
   useEffect(() => {
     if (!isMounted || messages.length !== 1) return;
@@ -885,7 +835,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     if (firstMessage.content === welcomeMessage) return;
 
     setMessages([{ ...firstMessage, content: welcomeMessage }]);
-  }, [isMounted, messages, welcomeMessage]);
+  }, [isMounted, messages, setMessages, welcomeMessage]);
 
   useEffect(() => {
     if (messages.length === 0) {
@@ -928,16 +878,13 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   // Clear gate when user is authenticated
   useEffect(() => {
     if (isSignedIn) {
-      // User is authenticated - immediately clear all guest restrictions
-      setIsLimitReached(false);
-
       // Remove any gate messages (messages with isGateMessage: true)
       setMessages(prev => {
         const filtered = prev.filter(msg => !msg.isGateMessage);
         return filtered;
       });
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, setMessages]);
 
   // Check if user is at bottom of scroll
   const checkIfAtBottom = () => {
@@ -966,54 +913,6 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       container.removeEventListener('scroll', checkIfAtBottom);
     };
   }, [messages]);
-
-  // Check if content contains <MEAL_CARDS> (even partially)
-  const hasMealCards = (content: string): boolean => {
-    return content.includes('<MEAL_CARDS>');
-  };
-
-  // Parse <MEAL_CARDS> from content and extract meals + pagination info
-  const parseMealCards = (content: string): {
-    cleanContent: string;
-    meals: Meal[];
-    mealSearchContext?: { searchKey: string; nextOffset: number; hasMore: boolean }
-  } => {
-    const mealCardsRegex = /<MEAL_CARDS>([\s\S]*?)<\/MEAL_CARDS>/;
-    const match = content.match(mealCardsRegex);
-
-    if (!match) {
-      return { cleanContent: content, meals: [] };
-    }
-
-    try {
-      const jsonStr = match[1].trim();
-      console.log('[AIChat Debug] Parsing JSON from <MEAL_CARDS>:', jsonStr.substring(0, 500));
-      const parsed = JSON.parse(jsonStr);
-      const meals: Meal[] = parsed.meals || [];
-      const hasMore = parsed.hasMore === true;
-      const nextOffset = typeof parsed.nextOffset === 'number' ? parsed.nextOffset : 0;
-      const searchKey = parsed.searchKey || '';
-
-      console.log('[AIChat Debug] Parsed meals count:', meals.length, 'hasMore:', hasMore);
-
-      // Remove the <MEAL_CARDS> block from content
-      const cleanContent = content.replace(mealCardsRegex, '').trim();
-
-      const mealSearchContext = hasMore && searchKey ? {
-        searchKey,
-        nextOffset,
-        hasMore
-      } : undefined;
-
-      return { cleanContent, meals, mealSearchContext };
-    } catch (err) {
-      console.error('[AIChat Debug] Failed to parse MEAL_CARDS JSON:', err);
-      console.error('[AIChat Debug] JSON string that failed:', match[1].substring(0, 500));
-      // If parsing fails, just remove the block
-      const cleanContent = content.replace(mealCardsRegex, '').trim();
-      return { cleanContent, meals: [] };
-    }
-  };
 
   // Generate a short summary line based on user query and found meals
   const generateSummaryLine = (userQuery: string, mealCount: number): string => {
@@ -1249,7 +1148,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             if (!isUsageLimitError) {
               console.error('[AIChat] Parsed error JSON:', errorJson);
             }
-          } catch (parseError) {
+          } catch {
             // Not JSON, use raw text if available
             if (rawResponseText.trim()) {
               errorMessage = rawResponseText.substring(0, 200);
@@ -1320,7 +1219,11 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             // Log the full error response
             console.error('[AIChat] API returned error in JSON response:', jsonData);
             // Use server's message field if available, otherwise use answer or error field
-            const serverErrorMessage = jsonData.message || jsonData.answer || jsonData.error || 'Chat request failed';
+            const serverErrorMessage =
+              (typeof jsonData.message === 'string' && jsonData.message) ||
+              (typeof jsonData.answer === 'string' && jsonData.answer) ||
+              (typeof jsonData.error === 'string' && jsonData.error) ||
+              'Chat request failed';
             setError(serverErrorMessage);
             setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
             return;
@@ -1356,7 +1259,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             // Store original query and filters for pagination
             const mealSearchContext = hasMore && responseSearchKey ? {
               searchKey: responseSearchKey,
-              nextOffset,
+              nextOffset: nextOffset ?? 0,
               hasMore,
               originalQuery: trimmedText, // Store original query for pagination
               filters: undefined // Can be extended if filters are passed
@@ -1774,19 +1677,6 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       setError(errorMessage);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleCopy = async (text: string) => {
-    // Clipboard interaction only occurs in direct response to user actions
-    // (e.g., onClick handlers that call handleCopy).
-    try {
-      const success = await copyToClipboard(text);
-      if (!success) {
-        console.warn("Clipboard copy failed or is not available in this environment.");
-      }
-    } catch (e) {
-      console.error("Failed to copy:", e);
     }
   };
 

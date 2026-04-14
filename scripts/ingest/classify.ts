@@ -72,6 +72,7 @@ export function detectFoodTags(
   calories: number = 0,
   rawCategory: string = ''
 ): string[] {
+  void calories;
   const text = `${name} ${description} ${rawCategory}`.toLowerCase();
   const tags: string[] = [];
 
@@ -113,8 +114,6 @@ const BREAKFAST_KEYWORDS = [
   'benedict', 'hash brown', 'hashbrown', 'bacon', 'sausage patty', 'bagel sandwich',
   'morning', 'brunch', 'avocado toast', 'granola bowl', 'acai bowl', 'pitaya bowl', 'smoothie bowl',
 ];
-
-const LUNCH_KEYWORDS = ['lunch', 'midday'];
 
 const DINNER_KEYWORDS = [
   'dinner', 'steak', 'prime rib', 'filet', 'lobster',

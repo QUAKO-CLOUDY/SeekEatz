@@ -432,7 +432,7 @@ async function ingestData() {
     let restaurantData;
     try {
       restaurantData = JSON.parse(rawData);
-    } catch (e) {
+    } catch {
       console.error(`❌ Failed to parse JSON: ${file}`);
       totalSkipped++;
       continue;

@@ -1,179 +1,210 @@
 # App Store Submission Prep
 
+This is the final release gate for SeekEatz before App Store submission.
+
+Use this as a strict checklist, not a brainstorming doc.
+
 ## Current repo-side status
 
 These are already in place:
 
-- Production build passes
-- TypeScript passes
-- Search / chat / swap / logo / DB audits pass
-- Capacitor iOS scaffold exists
-- Native-safe external link handling is in place
-- RevenueCat client and App Store sync scaffold are in place
+- `npm run lint` passes with `0 errors` and `0 warnings`
+- Search retrieval audits are passing
+- Exact restaurant-name coverage is passing
+- iOS location usage string exists in [Info.plist](/c:/Users/isaac/my-meals-app/ios/App/App/Info.plist)
+- App privacy manifest exists in [PrivacyInfo.xcprivacy](/c:/Users/isaac/my-meals-app/ios/App/App/PrivacyInfo.xcprivacy)
+- In-app account deletion exists in [app/settings/account/page.tsx](/c:/Users/isaac/my-meals-app/app/settings/account/page.tsx) and [app/api/account/delete/route.ts](/c:/Users/isaac/my-meals-app/app/api/account/delete/route.ts)
+- RevenueCat/App Store scaffolding exists in [lib/billing/revenuecat-client.ts](/c:/Users/isaac/my-meals-app/lib/billing/revenuecat-client.ts), [app/upgrade/page.tsx](/c:/Users/isaac/my-meals-app/app/upgrade/page.tsx), and [app/api/account/app-store/sync/route.ts](/c:/Users/isaac/my-meals-app/app/api/account/app-store/sync/route.ts)
 - Public legal/support pages exist:
   - Privacy Policy: `https://seekeatz.com/legal/privacy`
-  - Terms of Service: `https://seekeatz.com/legal/terms`
+  - Terms: `https://seekeatz.com/legal/terms`
   - Support: `https://seekeatz.com/help/contact`
   - FAQ: `https://seekeatz.com/help/faq`
 
-## Main blocker before submission
+## What is actually release-blocking
 
-### 1. In-app account deletion flow
+Do not submit until all of these are true:
 
-This is the main App Store compliance gap.
+- The native iPhone build launches reliably from a cold start
+- Sign up, sign in, sign out, and account deletion work inside the iOS shell
+- AI chat returns meal cards without `401`, blank states, or spinner hangs
+- Home search returns meal cards and opens meal detail reliably
+- Location allow and deny both behave correctly
+- Upgrade, restore purchases, and subscription management are coherent on-device
+- App Store Connect privacy answers match the app’s actual behavior
+- App Review can access the app without getting stuck
+- No crash, white screen, auth loop, or dead-end CTA exists in the core flow
 
-Current state:
+## Repo-side verification before handoff to Xcode
 
-- Users can create accounts in-app
-- Privacy policy says users may request deletion
-- There is no actual in-app account deletion flow yet
+Run all of these from the repo root:
 
-Why it matters:
+```powershell
+npm run lint
+npm run build
+npm run audit:retrieval-queries
+npm run audit:restaurant-search
+npm run audit:restaurant-readiness
+npm run audit:db-quality
+npm run test:retrieval-parser
+npm run test:retrieval-guardrails
+```
 
-- Apple requires apps that let users create accounts to also let users initiate account deletion in-app
+If any of these fail, fix them before native QA.
 
-Required implementation:
+## Native iPhone QA checklist
 
-- Add an account deletion entry in Settings / Account
-- Require explicit confirmation
-- Delete or deactivate the auth account and user data through a secure server route
-- Handle signed-out redirect and local state cleanup
+Run the full device pass in [ios-manual-qa-checklist.md](/c:/Users/isaac/my-meals-app/docs/ios-manual-qa-checklist.md).
 
-This should be treated as a release blocker.
+Minimum required coverage:
 
-## App Store Connect metadata to prepare
+- one real iPhone on current iOS
+- one simulator
+- one signed-out pass
+- one signed-in free-user pass
+- one signed-in premium/sandbox pass
 
-These should be drafted now so submission is fast once Apple approves the developer account.
+## App Store Connect metadata checklist
 
-### App information
+Prepare all of this before submission:
 
-- App name: `SeekEatz`
+- App name
 - Subtitle
-- Category:
-  - Primary: likely `Food & Drink` or `Health & Fitness`
-  - Recommendation: `Food & Drink`
-- Secondary category: optional
+- Category
 - Age rating questionnaire
-
-### Listing copy
-
-- Promotional text
 - Description
 - Keywords
-- What’s New text for version `1.0.0`
+- Promotional text
+- What’s New text
+- Support URL
+- Privacy Policy URL
+- Review contact name/email/phone
+- App Review notes
+- Demo account credentials if reviewer needs authentication
 
-### URLs
+Review notes should explicitly mention:
 
-- Support URL: `https://seekeatz.com/help/contact`
-- Privacy Policy URL: `https://seekeatz.com/legal/privacy`
-- Marketing URL: optional but recommended
+- the app provides AI-assisted meal search and meal cards
+- location access is optional and used only for nearby results
+- subscriptions are handled through Apple billing / RevenueCat
+- account deletion is available in `Settings -> Account`
 
-### Review information
+## App Privacy checklist
 
-- App Review contact name
-- App Review contact email
-- App Review phone number
-- Demo/test account if needed
-- Notes for reviewer:
-  - explain AI meal recommendation flow
-  - explain premium/paywall behavior
-  - explain that subscriptions are handled through Apple billing
+Before submission, verify the App Privacy form against the actual app.
 
-## Subscription metadata to prepare
-
-These must exist in App Store Connect before real purchase testing.
-
-- Monthly product id
-- Yearly product id
-- Subscription group
-- Display names
-- Descriptions
-- Pricing
-- Localization
-- Review screenshots for the subscription products
-
-Recommended product ids:
-
-- `com.seekeatz.premium.monthly`
-- `com.seekeatz.premium.yearly`
-
-Recommended entitlement name in RevenueCat:
-
-- `premium`
-
-## Privacy label prep
-
-You will need App Privacy answers in App Store Connect. Based on current app behavior, these are the likely categories to review carefully:
+Based on the codebase, review at minimum:
 
 - Contact Info
   - email address
 - Location
-  - if location-based restaurant search is enabled
+  - optional location data for nearby results
 - User Content
-  - meal logs, saved meals, search/chat inputs
-- Usage Data
-  - search activity, feature interactions
-- Diagnostics
-  - if crash/error monitoring is added
+  - search/chat prompts, saved meals, logged meals, favorites
 - Identifiers
   - account/user id
+- Purchases
+  - subscription and entitlement state
+- Usage Data
+  - if you are logging feature/search usage
 
-These answers should be finalized from actual implementation, not guesses.
+Do not guess here. Match App Store Connect answers to the app and third-party services actually used.
 
-## Creative assets to prepare
+## Billing checklist
 
-### Required
+Before submission, verify:
 
-- App icon set for iOS
+- App Store product IDs are finalized
+- RevenueCat iOS public SDK key is set in production env
+- RevenueCat entitlement ID matches the app logic
+- purchase flow works on a sandbox test account
+- restore purchases works on-device
+- manage subscription opens correctly from the account screen
+
+Relevant implementation files:
+
+- [app/upgrade/page.tsx](/c:/Users/isaac/my-meals-app/app/upgrade/page.tsx)
+- [app/settings/account/page.tsx](/c:/Users/isaac/my-meals-app/app/settings/account/page.tsx)
+- [lib/billing/revenuecat-client.ts](/c:/Users/isaac/my-meals-app/lib/billing/revenuecat-client.ts)
+- [lib/billing/apple-products.ts](/c:/Users/isaac/my-meals-app/lib/billing/apple-products.ts)
+
+## Auth and account checklist
+
+Must be verified on-device:
+
+- sign up
+- email verification / OTP if used
+- sign in with valid credentials
+- invalid sign-in error state
+- sign out
+- account deletion
+- post-delete redirect and local cleanup
+- anonymous-to-authenticated data claim if applicable
+
+Relevant files:
+
+- [app/auth/signup/page.tsx](/c:/Users/isaac/my-meals-app/app/auth/signup/page.tsx)
+- [app/auth/signin/page.tsx](/c:/Users/isaac/my-meals-app/app/auth/signin/page.tsx)
+- [app/settings/account/page.tsx](/c:/Users/isaac/my-meals-app/app/settings/account/page.tsx)
+- [app/api/account/delete/route.ts](/c:/Users/isaac/my-meals-app/app/api/account/delete/route.ts)
+- [app/api/claim-anon-data/route.ts](/c:/Users/isaac/my-meals-app/app/api/claim-anon-data/route.ts)
+
+## Location checklist
+
+Must be verified on-device:
+
+- first-time location prompt appears only when expected
+- allow location returns nearby meal results
+- deny location does not break search/chat
+- app still works after permission denial
+- location explanation text is accurate
+
+Relevant files:
+
+- [ios/App/App/Info.plist](/c:/Users/isaac/my-meals-app/ios/App/App/Info.plist)
+- [app/components/OnboardingFlow.tsx](/c:/Users/isaac/my-meals-app/app/components/OnboardingFlow.tsx)
+- [app/components/HomeScreen.tsx](/c:/Users/isaac/my-meals-app/app/components/HomeScreen.tsx)
+- [app/components/AIChat.tsx](/c:/Users/isaac/my-meals-app/app/components/AIChat.tsx)
+
+## Creative assets checklist
+
+Prepare:
+
+- final app icon
 - iPhone screenshots
+- optional iPad screenshots if supported
+- optional app preview video
+- subscription/paywall screenshots if useful for review or marketing
 
-### Recommended
+Recommended screenshot set:
 
-- iPad screenshots if you support iPad
-- App preview video
-- Subscription paywall screenshots
-
-Suggested screenshot set:
-
-- Home search
+- home search
 - AI chat
-- Meal results
-- Meal detail with swaps
-- Favorites / logging
-- Upgrade / premium screen
+- meal cards
+- meal detail with swaps
+- saved/logged meals
+- upgrade screen
+- account screen showing subscription management
 
-## Repo-side checks before handoff to Mac/Xcode
+## Final submission sequence
 
-Run these before final iOS packaging:
+1. Freeze repo changes for the submission build.
+2. Run the repo-side verification commands.
+3. Open the iOS app in Xcode on the Mac.
+4. Run the full native QA checklist.
+5. Fix any iOS-only issues.
+6. Archive the app.
+7. Upload to TestFlight.
+8. Run one final smoke pass from the TestFlight build.
+9. Submit with final metadata, privacy answers, and review notes.
 
-```powershell
-npx tsc -p tsconfig.json --noEmit
-npm run build
-npm run audit:retrieval-queries
-npm run audit:chat-routing
-npm run audit:restaurant-search
-npm run audit:restaurant-logos
-npm run audit:swap-relations
-npm run audit:db-quality
-```
+## Practical recommendation
 
-## Final Mac-side sequence
+The codebase is no longer the obvious blocker. The highest-risk remaining work is operational:
 
-Do this only after repo-side release work is frozen:
+- native iPhone QA
+- billing/restore validation
+- App Store Connect privacy answers
+- accurate App Review notes
 
-1. Open `ios/` in Xcode on Mac
-2. Configure signing/team/bundle id
-3. Add icons / splash assets
-4. Run simulator/device QA
-5. Verify RevenueCat + App Store products
-6. Run the iOS manual QA checklist
-7. Archive
-8. Upload to TestFlight
-9. Fix mobile-only issues
-10. Submit for App Review
-
-## Recommended next repo-side task
-
-Implement the in-app account deletion flow.
-
-That is the cleanest next move because it removes the most obvious App Store compliance blocker while keeping scope focused.
+That is where submission effort should go next.

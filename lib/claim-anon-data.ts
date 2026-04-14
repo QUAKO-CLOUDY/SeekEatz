@@ -28,7 +28,7 @@ export async function claimAnonymousData(): Promise<boolean> {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      await response.json().catch(() => ({ error: 'Unknown error' }));
       console.warn('Anonymous data claim skipped (server endpoint may not be configured).');
       return false;
     }

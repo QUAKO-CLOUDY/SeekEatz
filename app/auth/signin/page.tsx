@@ -12,6 +12,7 @@ import { claimAnonymousData } from "@/lib/claim-anon-data";
 import { AuthProviders } from "@/app/components/AuthProviders";
 import { setDevFullAccess } from "@/lib/onboarding-flow";
 import { bootstrapAccount } from "@/lib/bootstrap-account";
+import { isFullAccessEmail } from "@/lib/full-access";
 
 function SignInPageContent() {
   const router = useRouter();
@@ -89,8 +90,6 @@ function SignInPageContent() {
         // Sign-in successful - update profile and navigate to chat
         const now = Date.now();
         const userId = data.user.id;
-        const normalizedSignedInEmail = data.user.email?.trim().toLowerCase();
-        const normalizedMasterEmail = process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL?.trim().toLowerCase();
         
         // Clear session-based UI state on login
         if (typeof window !== 'undefined') {
@@ -204,7 +203,7 @@ function SignInPageContent() {
           localStorage.setItem("seekeatz_start_app_tutorial", "true");
           localStorage.removeItem(`seekeatz_app_tutorial_completed_${userId}`);
         }
-        if (normalizedSignedInEmail && normalizedSignedInEmail === normalizedMasterEmail) {
+        if (isFullAccessEmail(data.user.email)) {
           setDevFullAccess(true);
         }
         
@@ -242,7 +241,7 @@ function SignInPageContent() {
         // Navigate to chat - the auth state change listener will unlock the chat immediately
         router.push(redirectTo);
       }
-    } catch (err) {
+    } catch {
       setError("An unexpected error occurred. Please try again.");
       setIsLoading(false);
     }

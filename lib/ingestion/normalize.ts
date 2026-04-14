@@ -12,7 +12,6 @@
  */
 
 import {
-  CATEGORY_LABELS,
   DISH_TAXONOMY,
 } from '@/lib/tagging/taxonomy';
 
@@ -250,7 +249,14 @@ export function normalizeMenuItem(
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function normalizeMacros(raw: Record<string, any>): { calories: number; protein: number; carbs: number; fat: number } {
+type MacroRecord = {
+  calories?: number | string;
+  protein?: number | string;
+  carbs?: number | string;
+  fat?: number | string;
+};
+
+function normalizeMacros(raw: MacroRecord): { calories: number; protein: number; carbs: number; fat: number } {
   const cal = clampMacro(raw.calories, 0, 10000);
   const pro = clampMacro(raw.protein,  0, 500);
   const carb = clampMacro(raw.carbs,   0, 500);
@@ -258,7 +264,7 @@ function normalizeMacros(raw: Record<string, any>): { calories: number; protein:
   return { calories: cal, protein: pro, carbs: carb, fat };
 }
 
-function clampMacro(value: any, min: number, max: number): number {
+function clampMacro(value: unknown, min: number, max: number): number {
   const n = Number(value);
   if (isNaN(n) || !isFinite(n)) return 0;
   return Math.max(min, Math.min(max, Math.round(n * 10) / 10));

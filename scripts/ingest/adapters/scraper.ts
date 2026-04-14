@@ -119,11 +119,6 @@ function extractFromJsonLdItem(
     ? node.image
     : (node.image as any)?.url;
 
-  // Parse allergens / diet tags from suitableForDiet
-  const dietTags = node.suitableForDiet
-    ? (Array.isArray(node.suitableForDiet) ? node.suitableForDiet : [node.suitableForDiet])
-    : [];
-
   const price = node.offers
     ? parseNumber((node.offers as any).price)
     : undefined;

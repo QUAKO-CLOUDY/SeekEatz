@@ -11,6 +11,33 @@ import {
   getBillingTierFromAppleProductId,
 } from "@/lib/billing/app-store-sync";
 
+type AppStoreSubscriptionUpsert = {
+  user_id: string;
+  original_transaction_id: string;
+  latest_transaction_id: string;
+  product_id: string;
+  environment: AppStoreSyncPayload["environment"];
+  status: AppStoreSyncPayload["status"];
+  auto_renew_status: boolean | null;
+  expires_at: string | null;
+  last_verified_at: string;
+  raw_payload: unknown;
+  updated_at: string;
+};
+
+type ProfileSubscriptionUpdate = {
+  billing_provider: "app_store";
+  subscription_tier: ReturnType<typeof getBillingTierFromAppleProductId>;
+  subscription_status: AppStoreSyncPayload["status"];
+  trial_source: null;
+  trial_expires_at: string | null;
+  app_store_product_id: string;
+  app_store_original_transaction_id: string;
+  app_store_environment: AppStoreSyncPayload["environment"];
+  app_store_last_verified_at: string;
+  updated_at: string;
+};
+
 function isValidStatus(status: string): status is AppStoreSyncPayload["status"] {
   return ["inactive", "trialing", "active", "canceled", "past_due"].includes(status);
 }
@@ -69,39 +96,58 @@ export async function POST(request: Request) {
     const admin = createAdminClient();
     const nowIso = new Date().toISOString();
     const billingTier = getBillingTierFromAppleProductId(payload.productId);
+    const subscriptionRecord: AppStoreSubscriptionUpsert = {
+      user_id: user.id,
+      original_transaction_id: payload.originalTransactionId,
+      latest_transaction_id: payload.latestTransactionId,
+      product_id: payload.productId,
+      environment: payload.environment,
+      status: payload.status,
+      auto_renew_status: payload.autoRenewStatus,
+      expires_at: payload.expiresAt,
+      last_verified_at: nowIso,
+      raw_payload: payload.rawCustomerInfo ?? null,
+      updated_at: nowIso,
+    };
+    const profileUpdate: ProfileSubscriptionUpdate = {
+      billing_provider: "app_store",
+      subscription_tier: billingTier,
+      subscription_status: payload.status,
+      trial_source: null,
+      trial_expires_at: payload.status === "trialing" ? payload.expiresAt : null,
+      app_store_product_id: payload.productId,
+      app_store_original_transaction_id: payload.originalTransactionId,
+      app_store_environment: payload.environment,
+      app_store_last_verified_at: nowIso,
+      updated_at: nowIso,
+    };
 
-    await admin.from("app_store_subscriptions").upsert(
-      {
-        user_id: user.id,
-        original_transaction_id: payload.originalTransactionId,
-        latest_transaction_id: payload.latestTransactionId,
-        product_id: payload.productId,
-        environment: payload.environment,
-        status: payload.status,
-        auto_renew_status: payload.autoRenewStatus,
-        expires_at: payload.expiresAt,
-        last_verified_at: nowIso,
-        raw_payload: payload.rawCustomerInfo ?? null,
-        updated_at: nowIso,
-      },
-      { onConflict: "original_transaction_id" },
-    );
+    const { error: subscriptionUpsertError } = await (
+      admin.from("app_store_subscriptions" as never) as unknown as {
+        upsert: (
+          values: AppStoreSubscriptionUpsert,
+          options?: { onConflict?: string },
+        ) => Promise<{ error: unknown }>;
+      }
+    ).upsert(subscriptionRecord, { onConflict: "original_transaction_id" });
 
-    await admin
-      .from("profiles")
-      .update({
-        billing_provider: "app_store",
-        subscription_tier: billingTier,
-        subscription_status: payload.status,
-        trial_source: null,
-        trial_expires_at: payload.status === "trialing" ? payload.expiresAt : null,
-        app_store_product_id: payload.productId,
-        app_store_original_transaction_id: payload.originalTransactionId,
-        app_store_environment: payload.environment,
-        app_store_last_verified_at: nowIso,
-        updated_at: nowIso,
-      })
+    if (subscriptionUpsertError) {
+      throw subscriptionUpsertError;
+    }
+
+    const { error: profileUpdateError } = await (
+      admin.from("profiles" as never) as unknown as {
+        update: (values: ProfileSubscriptionUpdate) => {
+          eq: (column: string, value: string) => Promise<{ error: unknown }>;
+        };
+      }
+    )
+      .update(profileUpdate)
       .eq("id", user.id);
+
+    if (profileUpdateError) {
+      throw profileUpdateError;
+    }
 
     const [{ data: profile }, usageResult] = await Promise.all([
       admin

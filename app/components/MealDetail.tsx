@@ -20,6 +20,7 @@ import { motion } from 'framer-motion';
 import { AnimatedNumber } from './AnimatedNumber';
 import type { Meal, UserProfile } from '../types';
 import type { LoggedMeal } from './LogScreen';
+import { LogoImage } from './ui/LogoImage';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { useTheme } from '../contexts/ThemeContext';
 import { useNutrition } from '../contexts/NutritionContext';
@@ -1148,26 +1149,25 @@ export function MealDetail({
                             padding: '10px'
                           }}
                         >
-                          <div className="w-full h-full flex items-center justify-center">
-                            <img
+                          <div className="relative w-full h-full flex items-center justify-center">
+                            <LogoImage
+                              key={getRestaurantLogoUrl(
+                                similar.restaurant_name || similar.restaurant || '',
+                                similar.restaurantLogoUrl
+                              )}
                               src={getRestaurantLogoUrl(
                                 similar.restaurant_name || similar.restaurant || '',
                                 similar.restaurantLogoUrl
                               )}
                               alt={similar.restaurant || similar.restaurant_name || 'Restaurant logo'}
-                              className="w-full h-full object-contain object-center"
+                              fill
+                              sizes="(max-width: 640px) 100vw, 33vw"
+                              className="object-contain object-center"
                               style={{
-                                width: '100%',
-                                height: '100%',
                                 objectFit: 'contain',
                                 objectPosition: 'center',
-                                display: 'block',
                                 maxWidth: '100%',
                                 maxHeight: '100%',
-                              }}
-                              onError={(e) => {
-                                e.currentTarget.src = '/logos/default.png';
-                                e.currentTarget.onerror = null;
                               }}
                             />
                           </div>

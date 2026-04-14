@@ -108,10 +108,6 @@ function getItemName(item: SearchMenuItem): string {
   return (item.name || item.item_name || '').toLowerCase();
 }
 
-function getRestaurantName(item: SearchMenuItem): string {
-  return (item.restaurant_name || item.restaurant || '').trim();
-}
-
 /**
  * Dish taxonomy mapping: dishType → { keywords[] }
  * Maps dish types to name keywords for filtering
@@ -175,11 +171,11 @@ function extractDietaryIntent(query: string): string | null {
  * Applies dietary filter — keeps only items whose name contains dietary keywords
  * Used when user explicitly requests vegetarian/vegan meals
  */
-function applyDietaryFilter(items: SearchMenuItem[], dietaryType: string): SearchMenuItem[] {
+function applyDietaryFilter<T extends SearchMenuItem>(items: T[], dietaryType: string): T[] {
   const keywords = DIETARY_NAME_KEYWORDS[dietaryType];
   if (!keywords || keywords.length === 0) return items;
 
-  return items.filter((item: SearchMenuItem) => {
+  return items.filter((item: T) => {
     const itemName = getItemName(item);
 
     // Check if item name contains any dietary keyword
@@ -240,7 +236,7 @@ function extractProteinKeyword(query: string): string | null {
  * Keeps only items where menu name contains the protein keyword
  * Applied after normalization to filter on meal names
  */
-function applyProteinFilter(items: SearchMenuItem[], proteinKeyword: string): SearchMenuItem[] {
+function applyProteinFilter<T extends SearchMenuItem>(items: T[], proteinKeyword: string): T[] {
   if (!proteinKeyword || !PROTEIN_KEYWORDS[proteinKeyword]) {
     return items; // No protein constraint
   }
@@ -248,7 +244,7 @@ function applyProteinFilter(items: SearchMenuItem[], proteinKeyword: string): Se
   const keywords = PROTEIN_KEYWORDS[proteinKeyword];
   const lowerKeywords = keywords.map(k => k.toLowerCase());
 
-  return items.filter((item: SearchMenuItem) => {
+  return items.filter((item: T) => {
     const itemName = getItemName(item);
 
     // Check if name contains any protein keyword (word boundary to avoid partial matches)
@@ -358,10 +354,10 @@ function extractExcludedKeywords(query: string): string[] {
  * Applies exclusion filter — removes items whose name contains any excluded keyword
  * Used when user says "not chicken", "without beef", etc.
  */
-function applyExclusionFilter(items: SearchMenuItem[], excludedKeywords: string[]): SearchMenuItem[] {
+function applyExclusionFilter<T extends SearchMenuItem>(items: T[], excludedKeywords: string[]): T[] {
   if (!excludedKeywords || excludedKeywords.length === 0) return items;
 
-  return items.filter((item: SearchMenuItem) => {
+  return items.filter((item: T) => {
     const itemName = getItemName(item);
 
     // Check if name contains any excluded keyword
@@ -380,7 +376,7 @@ function applyExclusionFilter(items: SearchMenuItem[], excludedKeywords: string[
  * Keeps only items where name matches keywords (category not used - menu_items doesn't have reliable category)
  * Applied BEFORE macro filtering per requirements
  */
-function applyDishTypeFilter(items: SearchMenuItem[], dishType: string): SearchMenuItem[] {
+function applyDishTypeFilter<T extends SearchMenuItem>(items: T[], dishType: string): T[] {
   if (!dishType || !DISH_TAXONOMY[dishType]) {
     return items; // No dish type constraint
   }
@@ -388,7 +384,7 @@ function applyDishTypeFilter(items: SearchMenuItem[], dishType: string): SearchM
   const { keywords } = DISH_TAXONOMY[dishType];
   const lowerKeywords = keywords.map(k => k.toLowerCase());
 
-  return items.filter((item: SearchMenuItem) => {
+  return items.filter((item: T) => {
     const itemName = getItemName(item);
 
     // Check if name matches any keyword (word boundary to avoid partial matches)
@@ -552,7 +548,6 @@ function isDishItem(menuItem: SearchMenuItem, dishType?: string | null): boolean
     }
 
     // Component blacklist matched and dishType doesn't override - exclude it
-    const originalName = menuItem.name || menuItem.item_name || 'unknown';
     // Log removed to reduce terminal output clutter
     return false;
   }
@@ -1045,77 +1040,8 @@ function normalizeItemName(name: string): string {
     .trim();
 }
 
-/**
- * Creates a stable dedupe key for a meal item
- * Prefers id if present, otherwise uses (restaurant_name + normalized_item_name)
- */
-function getDedupeKey(item: SearchMenuItem): string {
-  // Prefer id if present
-  if (item.id) {
-    return `id:${String(item.id)}`;
-  }
+void normalizeItemName;
 
-  // Fallback to restaurant_name + normalized_item_name
-  const restaurant = (item.restaurant_name || '').trim();
-  const normalizedName = normalizeItemName(item.name || item.item_name || '');
-  return `name:${restaurant}|${normalizedName}`;
-}
-
-
-/**
- * Detects if the user explicitly requested a restaurant
- * Only treats restaurant as explicit if:
- * - A restaurant entity was extracted in params.restaurant, OR
- * - Query contains "from/at/in <restaurant>" pattern
- */
-function isRestaurantExplicitlyRequested(params: SearchParams): boolean {
-  // Check if restaurant was extracted as an entity
-  if (params.restaurant) {
-    return true;
-  }
-
-  // Check query for explicit restaurant patterns
-  const queryLower = (params.query || '').toLowerCase();
-  const explicitPatterns = [
-    /\bfrom\s+([a-z\s]+?)(?:\s|$)/i,
-    /\bat\s+([a-z\s]+?)(?:\s|$)/i,
-    /\bin\s+([a-z\s]+?)(?:\s|$)/i,
-  ];
-
-  return explicitPatterns.some(pattern => pattern.test(queryLower));
-}
-
-/**
- * Detects if the query contains explicit numeric constraints that can be handled via JSON filtering
- * Returns true if query has numeric constraints (calories, protein, carbs, fat) and no restaurant name
- */
-function hasStructuredConstraints(params: SearchParams): boolean {
-  // Check if we have explicit numeric constraints in params
-  const hasParamsConstraints = !!(
-    params.calorieCap ||
-    params.minProtein ||
-    params.maxCarbs ||
-    params.maxFat
-  );
-
-  // Check if there's no restaurant filter (fast-path only works without restaurant)
-  const hasNoRestaurant = !params.restaurant;
-
-  // Also check the query text for common constraint patterns
-  const queryLower = (params.query || '').toLowerCase();
-  const hasConstraintKeywords = !!(
-    // Calories: "under 700 calories", "below 500 cal", "less than 600 calories"
-    queryLower.match(/\b(under|below|less than|at most|max|maximum)\s+(\d+)\s*(calories?|cal)\b/) ||
-    // Protein: "at least 30 grams protein", "over 40g protein", "minimum 25 protein"
-    queryLower.match(/\b(at least|over|above|min|minimum)\s+(\d+)\s*(grams?\s+)?(protein|pro)\b/) ||
-    // Carbs: "under 50 grams carbs", "below 30g carbs", "max 40 carbs"
-    queryLower.match(/\b(under|below|less than|at most|max|maximum)\s+(\d+)\s*(grams?\s+)?(carbs?|carbohydrates?)\b/) ||
-    // Fat: "under 20 grams fat", "below 15g fat", "max 25 fat"
-    queryLower.match(/\b(under|below|less than|at most|max|maximum)\s+(\d+)\s*(grams?\s+)?(fat|fats)\b/)
-  );
-
-  return (hasParamsConstraints || hasConstraintKeywords) && hasNoRestaurant;
-}
 
 /**
  * Normalizes dietary tags to a consistent lowercase format with synonym handling
@@ -1228,15 +1154,6 @@ function isBreakfastItem(item: SearchMenuItem): boolean {
   }
 
   return false;
-}
-
-/**
- * DIET LOGIC REMOVED - All diet/dietary tag filtering is disabled
- * This function is kept for compatibility but returns empty arrays
- */
-function extractDietaryConstraints(params: SearchParams): { requiredTags: string[]; excludedTags: string[] } {
-  // All diet logic removed - return empty arrays
-  return { requiredTags: [], excludedTags: [] };
 }
 
 /**
@@ -2071,7 +1988,6 @@ export async function searchHandler(params: SearchParams) {
   let allItems: SearchMenuItem[] = [];
   let retrievalStrategy: 'RESTAURANT_BROWSE' | 'DB_FILTERED' | 'DB_GENERIC' | 'VECTOR' | 'VECTOR_FALLBACK' = 'DB_GENERIC';
   let retrievalReason = '';
-  const candidatesBeforeFiltering = 0; // Will be set after retrieval
 
   // Check for RESTAURANT_BROWSE strategy first (before DB_FILTERED)
   if (restaurantFilter && isRestaurantOnlyBrowseQuery(effectiveQuery, restaurantFilter)) {
@@ -2807,8 +2723,14 @@ export async function searchHandler(params: SearchParams) {
   // Use normalized canonical object directly - it already has all fields from schema
   const finalMeals: FinalSearchMeal[] = diverseItems.map((item: NormalizedSearchMeal) => {
     const restaurantName = item.restaurant_name;
-    const restaurantAssets = restaurantAssetMap.get(restaurantName?.trim().toLowerCase());
-    const restaurantLogoUrl = getRestaurantLogoUrl(restaurantName, restaurantAssets?.logo_url);
+    const restaurantKey = restaurantName?.trim().toLowerCase();
+    const restaurantAssets = restaurantKey
+      ? restaurantAssetMap.get(restaurantKey)
+      : undefined;
+    const restaurantLogoUrl = getRestaurantLogoUrl(
+      restaurantName ?? undefined,
+      restaurantAssets?.logo_url ?? undefined
+    );
 
     return {
       id: item.id,

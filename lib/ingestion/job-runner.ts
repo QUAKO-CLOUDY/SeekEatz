@@ -16,7 +16,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { importAllJSONFiles, summarizeResults, type ImportResult } from './sources/json-importer';
+import { importAllJSONFiles, summarizeResults } from './sources/json-importer';
 
 // ─── Job Runner ───────────────────────────────────────────────────────────────
 
@@ -127,7 +127,7 @@ export class JobRunner {
     errorLog?:  string[],
     durationMs?: number
   ): Promise<void> {
-    const update: Record<string, any> = { status };
+    const update: Record<string, string | string[] | number> = { status };
     if (status === 'running') update.started_at   = new Date().toISOString();
     if (status === 'done' || status === 'failed') {
       update.completed_at = new Date().toISOString();

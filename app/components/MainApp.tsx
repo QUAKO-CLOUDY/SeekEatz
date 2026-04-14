@@ -23,6 +23,7 @@ import { hasDevFullAccess, setDevFullAccess } from '@/lib/onboarding-flow';
 import { clearCachedEntitlement } from '@/lib/entitlements';
 import { useAccountEntitlement } from '@/app/hooks/useAccountEntitlement';
 import { bootstrapAccount } from '@/lib/bootstrap-account';
+import { isFullAccessEmail } from '@/lib/full-access';
 
 type View = 'main' | 'meal-detail';
 
@@ -109,7 +110,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
   // Use default values in useState initializers (no localStorage reads)
   // Navigation history stack to track screen navigation
-  const [navHistory, setNavHistory] = useState<Screen[]>([initialScreen || 'home']);
+  const [, setNavHistory] = useState<Screen[]>([initialScreen || 'home']);
 
   // Current screen - use default value from prop
   const [currentScreen, setCurrentScreen] = useState<Screen>(initialScreen);
@@ -197,11 +198,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     hydrateCurrentUser();
   }, [isMounted, supabase]);
 
-  const normalizedCurrentUserEmail = currentUserEmail?.trim().toLowerCase();
-  const normalizedMasterEmail = process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL?.trim().toLowerCase();
-  const isMasterAccount =
-    !!normalizedCurrentUserEmail &&
-    normalizedCurrentUserEmail === normalizedMasterEmail;
+  const isMasterAccount = isFullAccessEmail(currentUserEmail);
   const tutorialCompletionKey = currentUserId
     ? `seekeatz_app_tutorial_completed_${currentUserId}`
     : 'seekeatz_app_tutorial_completed_guest';
@@ -562,9 +559,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       if (event === 'SIGNED_IN' && session?.user) {
         setCurrentUserId(session.user.id);
         setCurrentUserEmail(session.user.email);
-        const normalizedEmail = session.user.email?.trim().toLowerCase();
-        const normalizedMaster = process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL?.trim().toLowerCase();
-        const isMasterSession = !!normalizedEmail && normalizedEmail === normalizedMaster;
+        const isMasterSession = isFullAccessEmail(session.user.email);
         if (isMasterSession) {
           setDevFullAccess(true);
           setDevFullAccessState(true);

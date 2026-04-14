@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useMemo, useState, useRef, useEffect } from "react";
+import Image from "next/image";
+import React, { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import { Search, Loader2, MapPin } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { MealCard } from "./MealCard";
@@ -40,7 +41,7 @@ type MacroConfig = {
 };
 
 const MACRO_CONFIG: Record<MacroType, MacroConfig> = {
-  calories: { label: "Calories", min: 500, max: 2500, step: 50 },
+  calories: { label: "Calories", min: 350, max: 2000, step: 50 },
   protein: { label: "Protein", unit: "g", min: 0, max: 100, step: 5 },
   carbs: { label: "Carbs", unit: "g", min: 0, max: 100, step: 10 },
   fats: { label: "Fats", unit: "g", min: 0, max: 100, step: 5 },
@@ -134,12 +135,55 @@ const NO_MORE_MEALS_MESSAGE =
 const HOME_MEALS_PAGE_SIZE = 4;
 const APPENDED_MEALS_DIVIDER_LABEL = "More meals";
 const DEFAULT_HOME_DISTANCE_MILES = 10;
+const HOME_MACRO_VALUES_SESSION_KEY = "seekeatz_home_macro_values";
 const DEFAULT_HOME_MACRO_ENABLED: Record<MacroType, boolean> = {
   calories: true,
   protein: true,
   carbs: true,
   fats: true,
 };
+
+function snapMacroValue(type: MacroType, rawValue: number): number {
+  const { min, max, step } = MACRO_CONFIG[type];
+  const clamped = Math.min(max, Math.max(min, rawValue));
+  const snapped = min + Math.round((clamped - min) / step) * step;
+  return Math.min(max, Math.max(min, snapped));
+}
+
+function buildDefaultMacroValues(userProfile: UserProfile): Record<MacroType, number> {
+  return {
+    calories: 1000,
+    protein: snapMacroValue("protein", userProfile?.target_protein_g ?? 100),
+    carbs: snapMacroValue("carbs", userProfile?.target_carbs_g ?? 100),
+    fats: snapMacroValue("fats", userProfile?.target_fats_g ?? 50),
+  };
+}
+
+function getInitialMacroValues(userProfile: UserProfile): Record<MacroType, number> {
+  const defaults = buildDefaultMacroValues(userProfile);
+
+  if (typeof window === "undefined") {
+    return defaults;
+  }
+
+  const saved = sessionStorage.getItem(HOME_MACRO_VALUES_SESSION_KEY);
+  if (!saved) {
+    return defaults;
+  }
+
+  try {
+    const parsed = JSON.parse(saved) as Partial<Record<MacroType, number>>;
+    return {
+      calories: snapMacroValue("calories", parsed.calories ?? defaults.calories),
+      protein: snapMacroValue("protein", parsed.protein ?? defaults.protein),
+      carbs: snapMacroValue("carbs", parsed.carbs ?? defaults.carbs),
+      fats: snapMacroValue("fats", parsed.fats ?? defaults.fats),
+    };
+  } catch (error) {
+    console.error("Failed to parse saved macro values:", error);
+    return defaults;
+  }
+}
 
 export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite, loggedMeals = [] }: Props) {
   const { updateActivity } = useSessionActivity();
@@ -173,25 +217,10 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   const [selectedCuisine] = useState<string | null>(null);
   const [macro, setMacro] = useState<MacroType>("calories");
   
-  // Initialize with user profile targets, or defaults
-  const [macroValues, setMacroValues] = useState<Record<MacroType, number>>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('seekeatz_macro_values');
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch (e) {
-          console.error('Failed to parse saved macro values:', e);
-        }
-      }
-    }
-    return {
-      calories: userProfile?.target_calories || 2000,
-      protein: userProfile?.target_protein_g || 150,
-      carbs: userProfile?.target_carbs_g || 200,
-      fats: userProfile?.target_fats_g || 70,
-    };
-  });
+  // Keep macro changes for the current app session, but always start new sessions at a centered 1000 calories.
+  const [macroValues, setMacroValues] = useState<Record<MacroType, number>>(() =>
+    getInitialMacroValues(userProfile)
+  );
 
   // Direction (above/below) for all macros: calories, protein, carbs, fats
   const [macroDirections, setMacroDirections] = useState<Record<MacroType, Direction>>(() => {
@@ -415,9 +444,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   const handleValueChange = (newValue: number) => {
     setMacroValues((prev) => {
       const updated = { ...prev, [macro]: newValue };
-      // Persist to localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('seekeatz_macro_values', JSON.stringify(updated));
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(HOME_MACRO_VALUES_SESSION_KEY, JSON.stringify(updated));
       }
       return updated;
     });
@@ -496,6 +524,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   // Diet filtering removed - all diet logic disabled
   // This function is kept for compatibility but returns meals unchanged
   const filterMealsByProfile = (meals: Meal[], _profile: UserProfile): Meal[] => {
+    void _profile;
     // All diet filtering removed - return meals unchanged
     return meals;
   };
@@ -564,6 +593,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     },
     calorieMode?: "UNDER" | "OVER"
   ): Promise<SearchMealsResponse> => {
+    void _append;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout so loading doesn't hang
 
@@ -1070,9 +1100,11 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between mb-2 sm:mb-3">
         <div className="flex items-center">
-          <img 
-            src="/logos/seekeatz.png" 
+          <Image
+            src="/logos/seekeatz.png"
             alt="Seekeatz Logo"
+            width={160}
+            height={96}
             className="h-20 sm:h-24 w-auto object-contain"
           />
         </div>
@@ -1136,7 +1168,6 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         >
           <div className="relative overflow-visible p-3">
             <PlateSelector
-              macro={macro}
               value={currentValue}
               config={config}
               isLoading={isLoadingMeals}
@@ -1157,7 +1188,6 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
               const isActive = macro === type;
               const isPopoverOpen = openPopover === type;
               const isEnabled = macroEnabled[type];
-              const isCalories = type === "calories";
               const currentDirection = macroDirections[type];
               
               return (
@@ -1393,13 +1423,12 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
 }
 
 type PlateSelectorProps = {
-  macro: MacroType;
   value: number;
   config: MacroConfig;
   isLoading?: boolean;
 };
 
-function PlateSelector({ macro, value, config, isLoading = false }: PlateSelectorProps) {
+function PlateSelector({ value, config, isLoading = false }: PlateSelectorProps) {
   return (
     <div className="mt-0 sm:mt-1 relative">
       <div
@@ -1515,17 +1544,16 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     return arr;
   }, [min, max, step]);
 
-  // Update transforms only when needed (debounced, not continuous)
-  const updateTransforms = () => {
+  const updateTransforms = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
-    
+
     const containerCenter = container.clientWidth / 2;
     const scrollLeft = container.scrollLeft;
-    
-    itemRefs.current.forEach((el, idx) => {
+
+    itemRefs.current.forEach((el) => {
       if (!el) return;
-      
+
       const elCenter = el.offsetLeft + el.offsetWidth / 2;
       const distanceFromCenter = (scrollLeft + containerCenter) - elCenter;
       
@@ -1540,38 +1568,35 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
       const translateZ = (1 - absDist) * 60;
       const translateY = -absDist * absDist * 12;
       const opacity = 0.35 + (1 - absDist) * 0.65;
-      
+
       // Apply transforms - use CSS transitions for smooth updates
       el.style.transform = `perspective(1000px) rotateY(${rotationY}deg) scale(${scale}) translateZ(${translateZ}px) translateY(${translateY}px)`;
       el.style.opacity = opacity.toString();
     });
-  };
+  }, []);
 
   // Debounced transform update - only runs when scroll position changes significantly
-  const scheduleTransformUpdate = () => {
+  const scheduleTransformUpdate = useCallback(() => {
     if (transformUpdateTimeoutRef.current) {
       clearTimeout(transformUpdateTimeoutRef.current);
     }
-    
+
     // Update immediately for responsive feel, but throttle rapid updates
     updateTransforms();
     
     transformUpdateTimeoutRef.current = setTimeout(() => {
       updateTransforms();
     }, 16); // ~60fps throttle
-  };
+  }, [updateTransforms]);
 
   // scroll to current value on mount / macro change (only if not user scrolling)
-  useEffect(() => {
+  const centerIndex = useCallback((idx: number, behavior: ScrollBehavior = "auto") => {
     if (isUserScrollingRef.current || isProgrammaticScrollRef.current) return;
-    
-    const idx = values.indexOf(value);
-    if (idx === -1) return;
+
     const container = containerRef.current;
     const el = itemRefs.current[idx];
     if (!container || !el) return;
-    
-      // Use requestAnimationFrame to ensure DOM is ready
+
     requestAnimationFrame(() => {
       if (!container || !el) return;
       isProgrammaticScrollRef.current = true;
@@ -1605,7 +1630,13 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
         isProgrammaticScrollRef.current = false;
       }, 100);
     });
-  }, [value, values]);
+  }, [updateTransforms]);
+
+  useEffect(() => {
+    const idx = values.indexOf(value);
+    if (idx === -1) return;
+    centerIndex(idx);
+  }, [centerIndex, value, values]);
 
   // Initial transform update on mount
   useEffect(() => {
@@ -1616,9 +1647,9 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     requestAnimationFrame(() => {
       updateTransforms();
     });
-  }, [values]);
+  }, [updateTransforms, values]);
 
-  const findClosestValue = () => {
+  const findClosestValue = useCallback(() => {
     const container = containerRef.current;
     if (!container) return null;
     
@@ -1646,10 +1677,10 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     });
 
     return { idx: closestIdx, value: values[closestIdx] };
-  };
+  }, [values]);
 
   // Only called when scroll ends - no manual snapping during scroll
-  const handleScrollEnd = () => {
+  const handleScrollEnd = useCallback(() => {
     if (isProgrammaticScrollRef.current) return;
     
     const container = containerRef.current;
@@ -1695,9 +1726,9 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     if (closest.value !== value) {
       onChange(closest.value);
     }
-  };
+  }, [findClosestValue, onChange, updateTransforms, value]);
 
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
     
@@ -1710,7 +1741,6 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     // Update transforms during scroll (throttled)
     scheduleTransformUpdate();
     
-    // Clear any pending scroll end handlers
     if (scrollEndTimeoutRef.current) {
       clearTimeout(scrollEndTimeoutRef.current);
       scrollEndTimeoutRef.current = null;
@@ -1739,7 +1769,7 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
         }, 5); // Very short second check
       }
     }, 10); // Very short initial delay (10ms)
-  };
+  }, [handleScrollEnd, scheduleTransformUpdate]);
 
   const handleClick = (idx: number) => {
     const container = containerRef.current;
@@ -1778,7 +1808,6 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     }, 100);
   };
 
-  // Handle wheel events - only prevent default when hovering over the component
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -1827,9 +1856,8 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
       container.removeEventListener('mouseleave', handleMouseLeave);
       container.removeEventListener('wheel', handleWheel);
     };
-  }, []);
+  }, [handleScroll]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (scrollEndTimeoutRef.current) {
@@ -1886,7 +1914,6 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
           scrollBehavior: 'auto', // Use auto for native momentum (smooth causes issues)
           WebkitOverflowScrolling: 'touch', // Momentum scrolling on iOS
           overscrollBehavior: 'auto', // Allow scroll chaining when not at bounds
-          // Prevent layout shifts
           contain: 'layout style paint',
         }}
       >
@@ -1894,10 +1921,10 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
           className="relative flex gap-5 sm:gap-6 items-center"
           style={{
             transformStyle: 'preserve-3d',
-            minWidth: 'max-content', // Ensure proper width calculation
-            height: '100%', // Fixed height to prevent shifts
-            paddingRight: '50%', // Add padding to allow last item to scroll to center
-            paddingLeft: '50%', // Add padding to allow first item to scroll to center
+            minWidth: 'max-content',
+            height: '100%',
+            paddingRight: '50%',
+            paddingLeft: '50%',
           }}
         >
           {values.map((val, idx) => {
@@ -1914,38 +1941,33 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
                 style={{ 
                   scrollSnapAlign: 'center', // CSS scroll snap
                   scrollSnapStop: 'normal', // Allow momentum scrolling (changed from 'always')
-                  willChange: 'transform', // Optimize for transforms
-                  // Increased width and spacing to prevent overlap
+                  willChange: 'transform',
                   minWidth: '52px',
-                  width: '52px', // Increased from 48px for better spacing
+                  width: '52px',
                   flexShrink: 0,
-                  height: '100%', // Fixed height
+                  height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  // Smooth transitions for transforms (not during active scroll)
                   transition: isScrolling ? 'none' : 'transform 0.2s ease-out, opacity 0.2s ease-out',
                 }}
               >
-                {/* tick with enhanced glow when active - use transform only, no height changes */}
                 <div
                   className="w-[2px] rounded-full mb-2 sm:mb-3 relative dark:bg-white/30 bg-foreground/30"
                   style={{
-                    height: '12px', // Fixed height to prevent layout shifts
-                    transform: isActive ? 'scaleY(2.5)' : 'scaleY(1)', // Use transform, not height
+                    height: '12px',
+                    transform: isActive ? 'scaleY(2.5)' : 'scaleY(1)',
                     backgroundColor: isActive ? '#4DDDF9' : undefined,
                     boxShadow: isActive ? '0 0 12px rgba(77,221,249,1)' : 'none',
                     willChange: 'transform',
                     transition: isScrolling ? 'none' : 'transform 0.2s ease-out, background-color 0.2s ease-out, box-shadow 0.2s ease-out',
                   }}
                 />
-                {/* number with enhanced styling - fixed size to prevent layout shifts */}
                 <span
                   className={`font-bold ${isActive ? 'text-[#4DDDF9]' : 'text-muted-foreground'}`}
                   style={{
                     fontSize: isActive ? '1.05rem' : '0.75rem',
-                    // Remove glow so numbers stay razor-sharp, especially on dark backgrounds.
                     textShadow: 'none',
                     WebkitFontSmoothing: 'antialiased',
                     MozOsxFontSmoothing: 'grayscale',

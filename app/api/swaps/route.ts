@@ -37,7 +37,7 @@ type SearchableMenuItem = {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { restaurant_name, meal_id, meal_name, meal_macros, user_goals, calorieCap, minProtein, maxCarbs, maxFat } = body;
+    const { restaurant_name, meal_id, meal_name, meal_macros, calorieCap, minProtein, maxCarbs, maxFat } = body;
 
     if (!restaurant_name) {
       return NextResponse.json(

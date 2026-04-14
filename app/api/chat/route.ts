@@ -4,9 +4,9 @@ import { openai } from '@ai-sdk/openai';
 import { generateObject } from 'ai';
 import { z } from 'zod';
 import { ROUTER_SYSTEM_PROMPT } from '@/lib/chat-prompts';
-import { searchHandler, type RetrievalResult } from '@/lib/retrieval/retrieval-engine';
+import { searchHandler } from '@/lib/retrieval/retrieval-engine';
 import { buildSearchParams } from '@/lib/search-utils';
-import { resolveRestaurantFromText, extractRestaurantPhrase, resolveRestaurantUniversal, isRestaurantOnlyQuery } from '@/lib/restaurant-resolver';
+import { resolveRestaurantUniversal, isRestaurantOnlyQuery } from '@/lib/restaurant-resolver';
 import { extractMacroConstraintsFromText, hasConstraints } from '@/lib/extractMacroConstraintsFromText';
 import { isSmoothieLikeText } from '@/lib/smoothie-search';
 import { hasRemainingUsage, incrementUsageCount } from '@/lib/usage-cookie';
@@ -14,6 +14,11 @@ import { buildEntitlement, type EntitlementProfileRow, FREE_DAILY_QUERY_LIMIT, P
 import type { Meal } from '@/app/types';
 
 export const maxDuration = 30;
+
+type MealSearchResponse = Awaited<ReturnType<typeof searchHandler>> & {
+  mode: 'meals';
+  restaurant?: string;
+};
 
 function getTodayStartIso() {
   const now = new Date();
@@ -219,41 +224,6 @@ function isLocationOnly(message: string): boolean {
 }
 
 /**
- * Detects generic meal discovery phrases
- * Returns true if message is a generic meal discovery query (no restaurant intent)
- * Returns false if message contains explicit restaurant markers ("from", "at", "in")
- */
-function isGenericMealDiscovery(message: string): boolean {
-  if (!message || typeof message !== 'string') return false;
-
-  const lowerMessage = message.toLowerCase().trim();
-
-  // Check for explicit restaurant markers first - if present, NOT generic
-  const explicitRestaurantMarkers = [
-    /\b(from|at|in)\s+[a-z0-9]/i,  // "from X", "at X", "in X"
-    /\b[a-z0-9\s&'-]+\s+(menu|restaurant|order|near me)\b/i,  // "X menu", "X restaurant"
-  ];
-
-  const hasExplicitMarker = explicitRestaurantMarkers.some(pattern => pattern.test(message));
-  if (hasExplicitMarker) {
-    return false; // Explicit restaurant marker means NOT generic
-  }
-
-  // Generic meal discovery patterns (conservative matching)
-  const genericPatterns = [
-    /^\s*find\s+me\s+(lunch|dinner|breakfast)\b/i,  // "find me lunch", "find me dinner"
-    /\bwhat\s+should\s+i\s+eat\b/i,  // "what should i eat"
-    /\bmeal\s+ideas\b/i,  // "meal ideas"
-    /\bfood\s+ideas\b/i,  // "food ideas"
-    /^\s*find\s+me\b\s*$/i,  // "find me" (standalone)
-    /^\s*find\s+(me\s+)?(something|anything)\b/i,  // "find me something", "find anything"
-    /^\s*(give\s+me\s+)?(options|option)\s*$/i,  // "options", "give me options"
-  ];
-
-  return genericPatterns.some(pattern => pattern.test(message));
-}
-
-/**
  * Pre-router heuristic: Detects food intent keywords
  * Returns true if message contains food-related search intent
  */
@@ -325,98 +295,79 @@ function hasDirectSmoothieSearchIntent(message: string): boolean {
 }
 
 /**
- * Validates restaurant name against database
- * Returns validated restaurant name if found, undefined otherwise
- */
-async function validateRestaurant(restaurantName: string | undefined): Promise<string | undefined> {
-  if (!restaurantName) return undefined;
-
-  try {
-    const supabase = await createClient();
-
-    // Try fuzzy matching using search_restaurants_trgm RPC (same as searchHandler)
-    const { data: restMatches } = await supabase.rpc('search_restaurants_trgm', {
-      query_text: restaurantName
-    });
-
-    if (restMatches && restMatches.length > 0) {
-      // Return the first match (best match)
-      return restMatches[0].name;
-    }
-
-    // If RPC fails or returns no results, restaurant is invalid
-    return undefined;
-  } catch (error) {
-    console.warn('[api/chat] Restaurant validation error:', error);
-    return undefined;
-  }
-}
-
-/**
  * Normalizes constraints to ensure all numeric fields are actual numbers (not strings)
  * Handles conversion from string to number and validates values
  * Returns a single normalized constraints object with numeric fields as numbers
  */
 function normalizeConstraints(constraints: {
   calorieCap?: number | string;
+  minCalories?: number | string;
+  maxCalories?: number | string;
   minProtein?: number | string;
+  maxProtein?: number | string;
+  minCarbs?: number | string;
   maxCarbs?: number | string;
+  minFats?: number | string;
   maxFat?: number | string;
+  maxFats?: number | string;
   restaurant?: string;
 }): {
   calorieCap?: number;
+  minCalories?: number;
+  maxCalories?: number;
   minProtein?: number;
+  maxProtein?: number;
+  minCarbs?: number;
   maxCarbs?: number;
+  minFats?: number;
   maxFat?: number;
+  maxFats?: number;
   restaurant?: string;
 } {
   const normalized: {
     calorieCap?: number;
+    minCalories?: number;
+    maxCalories?: number;
     minProtein?: number;
+    maxProtein?: number;
+    minCarbs?: number;
     maxCarbs?: number;
+    minFats?: number;
     maxFat?: number;
+    maxFats?: number;
     restaurant?: string;
   } = {};
 
-  // Normalize calorieCap
-  if (constraints.calorieCap !== undefined && constraints.calorieCap !== null) {
-    const value = typeof constraints.calorieCap === 'string'
-      ? parseFloat(constraints.calorieCap)
-      : constraints.calorieCap;
-    if (!isNaN(value) && value > 0) {
-      normalized.calorieCap = value;
+  const normalizePositiveNumber = (value: number | string | undefined): number | undefined => {
+    if (value === undefined || value === null) {
+      return undefined;
     }
-  }
+
+    const numericValue = typeof value === 'string' ? parseFloat(value) : value;
+    if (Number.isFinite(numericValue) && numericValue > 0) {
+      return numericValue;
+    }
+
+    return undefined;
+  };
+
+  // Normalize calorieCap
+  normalized.calorieCap = normalizePositiveNumber(constraints.calorieCap);
+  normalized.minCalories = normalizePositiveNumber(constraints.minCalories);
+  normalized.maxCalories = normalizePositiveNumber(constraints.maxCalories);
 
   // Normalize minProtein
-  if (constraints.minProtein !== undefined && constraints.minProtein !== null) {
-    const value = typeof constraints.minProtein === 'string'
-      ? parseFloat(constraints.minProtein)
-      : constraints.minProtein;
-    if (!isNaN(value) && value > 0) {
-      normalized.minProtein = value;
-    }
-  }
+  normalized.minProtein = normalizePositiveNumber(constraints.minProtein);
+  normalized.maxProtein = normalizePositiveNumber(constraints.maxProtein);
 
   // Normalize maxCarbs
-  if (constraints.maxCarbs !== undefined && constraints.maxCarbs !== null) {
-    const value = typeof constraints.maxCarbs === 'string'
-      ? parseFloat(constraints.maxCarbs)
-      : constraints.maxCarbs;
-    if (!isNaN(value) && value > 0) {
-      normalized.maxCarbs = value;
-    }
-  }
+  normalized.minCarbs = normalizePositiveNumber(constraints.minCarbs);
+  normalized.maxCarbs = normalizePositiveNumber(constraints.maxCarbs);
 
   // Normalize maxFat
-  if (constraints.maxFat !== undefined && constraints.maxFat !== null) {
-    const value = typeof constraints.maxFat === 'string'
-      ? parseFloat(constraints.maxFat)
-      : constraints.maxFat;
-    if (!isNaN(value) && value > 0) {
-      normalized.maxFat = value;
-    }
-  }
+  normalized.minFats = normalizePositiveNumber(constraints.minFats);
+  normalized.maxFat = normalizePositiveNumber(constraints.maxFat);
+  normalized.maxFats = normalizePositiveNumber(constraints.maxFats);
 
   // Restaurant (string, no conversion needed)
   if (constraints.restaurant) {
@@ -438,7 +389,6 @@ function parseMealConstraintsFromText(message: string): {
   restaurant?: string;
   breakfast?: boolean;
 } {
-  const lowerMessage = message.toLowerCase();
   const constraints: {
     calorieCap?: number;
     minProtein?: number;
@@ -893,7 +843,7 @@ export async function POST(req: Request) {
       });
     }
 
-    const { message, userContext, history } = body;
+    const { message, history } = body;
     const includeDebug = process.env.NODE_ENV === 'development' && body?.debug === true;
 
     // Validate required fields
@@ -1456,19 +1406,6 @@ export async function POST(req: Request) {
         return sanitized;
       }
 
-      // For generic discovery queries, normalize to meal time if present, otherwise keep original
-      function normalizeGenericQuery(originalMessage: string): string {
-        const lowerMessage = originalMessage.toLowerCase().trim();
-
-        // Extract meal time if present
-        if (/\blunch\b/i.test(lowerMessage)) return 'lunch';
-        if (/\bdinner\b/i.test(lowerMessage)) return 'dinner';
-        if (/\bbreakfast\b/i.test(lowerMessage)) return 'breakfast';
-
-        // Otherwise return original (or a generic fallback)
-        return originalMessage.trim() || 'find meals';
-      }
-
       /**
        * Normalizes semantic shorthand slugs like "protein-dish" into human-readable
        * vector search phrases like "high protein meal".
@@ -1587,16 +1524,24 @@ export async function POST(req: Request) {
       const mergedConstraints = {
         ...routerResult.constraints,
         // Macro constraints: extracted (authoritative) > router > parsed > semantic
+        minCalories: extractedConstraints.minCalories
+          ?? routerResult.structuredIntent?.minCalories
+          ?? routerResult.structuredIntent?.calorieRange?.min,
+        maxCalories: extractedConstraints.maxCalories
+          ?? routerResult.structuredIntent?.maxCalories
+          ?? routerResult.structuredIntent?.calorieRange?.max
+          ?? routerResult.constraints?.calorieCap
+          ?? parsedConstraints.calorieCap
+          ?? semanticConstraints.calorieCap,
         minProtein: extractedConstraints.minProtein ?? routerResult.constraints?.minProtein ?? parsedConstraints.minProtein ?? semanticConstraints.minProtein,
         calorieCap: extractedConstraints.maxCalories ?? routerResult.constraints?.calorieCap ?? parsedConstraints.calorieCap ?? semanticConstraints.calorieCap,
         maxCarbs: extractedConstraints.maxCarbs ?? routerResult.constraints?.maxCarbs ?? parsedConstraints.maxCarbs ?? semanticConstraints.maxCarbs,
         maxFat: extractedConstraints.maxFats ?? routerResult.constraints?.maxFat ?? parsedConstraints.maxFat ?? semanticConstraints.maxFat,
-        // Also handle minimum calories, carbs, fats from extracted constraints
-        ...(extractedConstraints.minCalories && { minCalories: extractedConstraints.minCalories }),
-        ...(extractedConstraints.minCarbs && { minCarbs: extractedConstraints.minCarbs }),
-        ...(extractedConstraints.minFats && { minFats: extractedConstraints.minFats }),
+        // Also handle minimum carbs/fats from extracted constraints
+        ...(extractedConstraints.minCarbs !== undefined && { minCarbs: extractedConstraints.minCarbs }),
+        ...(extractedConstraints.minFats !== undefined && { minFats: extractedConstraints.minFats }),
         // Handle max protein from extracted constraints
-        ...(extractedConstraints.maxProtein && { maxProtein: extractedConstraints.maxProtein }),
+        ...(extractedConstraints.maxProtein !== undefined && { maxProtein: extractedConstraints.maxProtein }),
         // STRICT: Only set restaurant if we have a canonical match AND no macro constraints
         // Do NOT use routerResult.constraints?.restaurant or parsedConstraints.restaurant
         // when status is NOT_FOUND, AMBIGUOUS, NO_RESTAURANT, or when macro constraints are detected
@@ -1613,6 +1558,18 @@ export async function POST(req: Request) {
         ...normalizedConstraints,
         restaurant: normalizedConstraints.restaurant, // Already canonicalRestaurant or undefined
       };
+
+      const authoritativeMinOnlyCalories =
+        extractedConstraints.minCalories !== undefined &&
+        extractedConstraints.maxCalories === undefined;
+      const effectiveMinCalories =
+        extractedConstraints.minCalories ?? validatedConstraints.minCalories;
+      const effectiveMaxCalories = authoritativeMinOnlyCalories
+        ? undefined
+        : extractedConstraints.maxCalories
+          ?? validatedConstraints.maxCalories
+          ?? validatedConstraints.calorieCap;
+      const effectiveCalorieCap = effectiveMaxCalories;
 
       // Log when restaurant param is omitted (NOT_FOUND, AMBIGUOUS, or NO_RESTAURANT)
       if (restaurantMatch.status !== 'MATCH' && isDev) {
@@ -1634,6 +1591,8 @@ export async function POST(req: Request) {
         mergedConstraints: mergedConstraints,
         normalizedConstraints: normalizedConstraints,
         validatedConstraints: validatedConstraints,
+        effectiveMinCalories,
+        effectiveMaxCalories,
         restaurantFromResolver: restaurantMatch.status === 'MATCH' ? restaurantMatch.canonicalName : undefined,
         explicitRestaurant,
         canonicalRestaurant: canonicalRestaurant || undefined,
@@ -1657,9 +1616,9 @@ export async function POST(req: Request) {
         const searchParams = await buildSearchParams({
           query: queryForSearch, // Use generic query for restaurant-only, else sanitized message
           // Merge extracted constraints (authoritative) with validated constraints
-          calorieCap: extractedConstraints.maxCalories ?? validatedConstraints.calorieCap,
-          minCalories: extractedConstraints.minCalories,
-          maxCalories: extractedConstraints.maxCalories ?? validatedConstraints.calorieCap,
+          calorieCap: effectiveCalorieCap,
+          minCalories: effectiveMinCalories,
+          maxCalories: effectiveMaxCalories,
           minProtein: extractedConstraints.minProtein ?? validatedConstraints.minProtein,
           maxProtein: extractedConstraints.maxProtein,
           minCarbs: extractedConstraints.minCarbs,
@@ -1681,6 +1640,8 @@ export async function POST(req: Request) {
         if (isDev) {
           console.log('[api/chat] Final constraints passed to searchHandler:', {
             calorieCap: searchParams.calorieCap,
+            minCalories: searchParams.minCalories,
+            maxCalories: searchParams.maxCalories,
             minProtein: searchParams.minProtein,
             maxCarbs: searchParams.maxCarbs,
             maxFat: searchParams.maxFat,
@@ -1777,7 +1738,7 @@ export async function POST(req: Request) {
 
         // Standardize response shape: add mode field for meal results
         // Include restaurant metadata if restaurantMatch is MATCH
-        const responseData: RetrievalResult & { mode: 'meals'; restaurant?: string } = {
+        const responseData: MealSearchResponse = {
           mode: 'meals',
           ...result,
           // Prepend location message if present (MVP v1 behavior)

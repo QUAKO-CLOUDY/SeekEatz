@@ -105,14 +105,14 @@ export function NutritionProvider({ children, userId: propUserId, loggedMeals: p
     if (typeof window !== 'undefined') {
       loadData();
     }
-  }, [userId]); // Only reload when userId changes
+  }, [loggedMeals, refreshTargets, refreshTotals, userId]); // Only reload when userId changes
 
   // Update totals when loggedMeals change
   useEffect(() => {
     if (typeof window !== 'undefined') {
       refreshTotals(loggedMeals);
     }
-  }, [loggedMeals]);
+  }, [loggedMeals, refreshTotals]);
 
   // Method to update loggedMeals from parent components (like MainApp)
   const updateLoggedMeals = useCallback((meals: LoggedMeal[]) => {

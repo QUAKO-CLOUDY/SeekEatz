@@ -30,6 +30,9 @@ const BROAD_CALORIE_DISCOVERY_LIMIT = 120;
 const BROAD_CALORIE_DISCOVERY_TARGET = 60;
 const BROAD_DISCOVERY_LIMIT = 180;
 const BROAD_DISCOVERY_TARGET = 120;
+const RESTAURANT_DIVERSITY_EXPANSION_PAGE_SIZE = 180;
+const RESTAURANT_DIVERSITY_EXPANSION_MAX_PAGES = 4;
+const RESTAURANT_DIVERSITY_UNIQUE_BUFFER = 4;
 const MODIFIER_NAME_PATTERNS = [
   /\badd\b/,
   /\bextra\b/,
@@ -390,7 +393,7 @@ export async function retrieveMealsWithClient(
     restaurantVariants,
   });
 
-  const deterministicSearch = await runDeterministicSearch(supabase, parsed, filterResult.params);
+  let deterministicSearch = await runDeterministicSearch(supabase, parsed, filterResult.params);
   const deterministicResults = applyResolvedRestaurantFilter(
     applyNearbyRestaurantFilter(deterministicSearch.results, nearbyFilter),
     {
@@ -436,6 +439,61 @@ export async function retrieveMealsWithClient(
       parsed,
       undefined
     );
+  }
+
+  if (
+    shouldExpandRestaurantDiversityPool(parsed, restaurantVariants, filterResult.restaurantResolved) &&
+    needsRestaurantDiversityExpansion(deterministicFiltered, offset, limit)
+  ) {
+    const diversityExpansion = await expandDeterministicResultsForRestaurantDiversity(
+      supabase,
+      deterministicSearch.trace.source,
+      parsed,
+      filterResult.params,
+      {
+        restaurantId: searchParams.restaurantId,
+        restaurantNames: filterResult.resolvedRestaurantNames,
+      },
+      nearbyFilter,
+      filterResult.dietaryKeywords,
+      {
+        offset,
+        limit,
+        existingItems: deterministicFiltered,
+      }
+    );
+
+    if (diversityExpansion.results.length > 0) {
+      console.log('[RetrievalEngine] expanded deterministic pool for restaurant diversity', {
+        addedResults: diversityExpansion.results.length,
+        fetchedRowCount: diversityExpansion.fetchedRowCount,
+        restaurantsBefore: countUniqueRestaurants(deterministicFiltered),
+        restaurantsAfter: countUniqueRestaurants([
+          ...deterministicFiltered,
+          ...diversityExpansion.results,
+        ]),
+      });
+
+      deterministicFiltered = dedupeRawResultsById([
+        ...deterministicFiltered,
+        ...diversityExpansion.results,
+      ]);
+
+      deterministicSearch = {
+        ...deterministicSearch,
+        trace: {
+          ...deterministicSearch.trace,
+          modernRpcCount:
+            deterministicSearch.trace.source === 'search_meals_v2'
+              ? diversityExpansion.fetchedRowCount
+              : deterministicSearch.trace.modernRpcCount,
+          legacyCount:
+            deterministicSearch.trace.source === 'search_menu_items'
+              ? diversityExpansion.fetchedRowCount
+              : deterministicSearch.trace.legacyCount,
+        },
+      };
+    }
   }
 
   const semanticFallbackTriggered =
@@ -784,6 +842,89 @@ function applyResolvedRestaurantFilter(
     const restaurantName = item.restaurant_name?.trim().toLowerCase();
     return Boolean(restaurantName && allowedRestaurantNames.has(restaurantName));
   });
+}
+
+async function expandDeterministicResultsForRestaurantDiversity(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  source: DeterministicSearchTrace['source'],
+  parsed: ParsedQuery,
+  params: RPCParams,
+  restaurantFilter: {
+    restaurantId?: string;
+    restaurantNames?: string[];
+  },
+  nearbyFilter: NearbyFilterContext,
+  dietaryKeywords: string[] | undefined,
+  options: {
+    offset: number;
+    limit: number;
+    existingItems: RawResult[];
+  }
+): Promise<{ results: RawResult[]; fetchedRowCount: number }> {
+  if (source !== 'search_meals_v2' && source !== 'search_menu_items') {
+    return { results: [], fetchedRowCount: 0 };
+  }
+
+  const requiredUniqueRestaurants = getRequiredUniqueRestaurantCount(
+    options.offset,
+    options.limit
+  );
+  const pageSize = Math.max(params.p_limit, RESTAURANT_DIVERSITY_EXPANSION_PAGE_SIZE);
+  let aggregated = dedupeRawResultsById(options.existingItems);
+  let fetchedRowCount = 0;
+
+  for (let pageIndex = 0; pageIndex < RESTAURANT_DIVERSITY_EXPANSION_MAX_PAGES; pageIndex += 1) {
+    if (countUniqueRestaurants(aggregated) >= requiredUniqueRestaurants) {
+      break;
+    }
+
+    const pageOffset = pageIndex * pageSize;
+    const pageParams: RPCParams = {
+      ...params,
+      p_limit: pageSize,
+      p_offset: pageOffset,
+    };
+
+    const rpcResponse =
+      source === 'search_meals_v2'
+        ? await supabase.rpc('search_meals_v2', pageParams)
+        : await supabase.rpc('search_menu_items', toLegacySearchParams(pageParams));
+
+    if (rpcResponse.error) {
+      console.warn('[RetrievalEngine] restaurant diversity expansion failed:', rpcResponse.error.message);
+      break;
+    }
+
+    const pageResults = (rpcResponse.data ?? []) as RawResult[];
+    if (pageResults.length === 0) {
+      break;
+    }
+
+    fetchedRowCount += pageResults.length;
+
+    const filteredPage = applyPostRetrievalFilters(
+      applyResolvedRestaurantFilter(
+        applyNearbyRestaurantFilter(pageResults, nearbyFilter),
+        restaurantFilter
+      ),
+      parsed,
+      dietaryKeywords
+    );
+
+    aggregated = dedupeRawResultsById([...aggregated, ...filteredPage]);
+
+    if (pageResults.length < pageSize) {
+      break;
+    }
+  }
+
+  const existingIds = new Set(options.existingItems.map((item) => item.id));
+  const additionalResults = aggregated.filter((item) => !existingIds.has(item.id));
+
+  return {
+    results: additionalResults,
+    fetchedRowCount,
+  };
 }
 
 async function runDeterministicSearch(
@@ -1734,6 +1875,62 @@ function getCandidateLimit(
   }
 
   return Math.max(limit * 3, 24);
+}
+
+function shouldExpandRestaurantDiversityPool(
+  parsed: ParsedQuery,
+  restaurantVariants?: string[],
+  restaurantResolved = false
+): boolean {
+  if (parsed.restaurantQuery || restaurantResolved || restaurantVariants?.length) {
+    return false;
+  }
+
+  if (isSmoothieQuery(parsed)) {
+    return false;
+  }
+
+  return true;
+}
+
+function needsRestaurantDiversityExpansion(
+  items: RawResult[],
+  offset: number,
+  limit: number
+): boolean {
+  if (items.length < limit) {
+    return false;
+  }
+
+  return countUniqueRestaurants(items) < getRequiredUniqueRestaurantCount(offset, limit);
+}
+
+function getRequiredUniqueRestaurantCount(offset: number, limit: number): number {
+  return Math.max(limit, offset + limit + RESTAURANT_DIVERSITY_UNIQUE_BUFFER);
+}
+
+function countUniqueRestaurants(items: RawResult[]): number {
+  return new Set(
+    items
+      .map((item) => item.restaurant_name?.trim().toLowerCase())
+      .filter((value): value is string => Boolean(value))
+  ).size;
+}
+
+function dedupeRawResultsById(items: RawResult[]): RawResult[] {
+  const seenIds = new Set<number | string>();
+  const deduped: RawResult[] = [];
+
+  for (const item of items) {
+    if (seenIds.has(item.id)) {
+      continue;
+    }
+
+    seenIds.add(item.id);
+    deduped.push(item);
+  }
+
+  return deduped;
 }
 
 function getTargetResultWindow(

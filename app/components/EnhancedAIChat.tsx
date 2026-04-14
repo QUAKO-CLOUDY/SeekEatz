@@ -73,7 +73,8 @@ const MOCK_MEALS: Meal[] = [
   },
 ];
 
-export function EnhancedAIChat({ userProfile: _userProfile, onMealSelect }: Props) {
+export function EnhancedAIChat({ userProfile, onMealSelect }: Props) {
+  void userProfile;
   // Temporary theme mock until we install the context
   const resolvedTheme: string = "light"; 
 const isDark = resolvedTheme === "dark";

@@ -1,258 +1,272 @@
 # iOS Manual QA Checklist
 
-Use this checklist when running SeekEatz inside the Capacitor iOS shell on a real device or simulator.
+Use this checklist against the native iOS build, not just the web app.
 
-This is the gate before Apple subscription work and before TestFlight submission.
+Run it before TestFlight submission and again on the final build you submit to App Review.
 
 ## Preconditions
 
-- Latest repo changes are pulled
+- Latest release candidate code is on the Mac
+- `npm run lint` passes
 - `npm run build` passes
-- Capacitor iOS project exists under [ios/](c:/Users/isaac/my-meals-app/ios)
-- App is opened from Xcode on a Mac
-- The app loads the intended environment
-  - production shell: `https://seekeatz.com`
-  - local shell only if `CAP_SERVER_URL` is intentionally set
-- Test account credentials are available
-- A device with network access is available
-- Location permissions can be granted and revoked during testing
+- Core search audits pass
+- The iOS project opens in Xcode
+- Signing and bundle ID are configured
+- Required env vars are set for the build you are testing
+- Test accounts are ready:
+  - one new/free account
+  - one existing account
+  - one sandbox billing account
 
-## Test Devices
+## Required devices
 
-Run at minimum:
+Minimum:
 
-- iPhone simulator, latest iOS
-- One physical iPhone
+- one physical iPhone on current iOS
+- one simulator
 
-If possible, also run:
+Recommended:
 
-- Small phone viewport
-- Large phone viewport
+- one smaller phone viewport
+- one larger phone viewport
 
-## Release Blockers
+## Immediate release blockers
 
-Any of these is a blocker:
+Stop the pass and fix before submission if any of these happen:
 
-- app fails to boot or hangs on splash/blank screen
-- auth redirect loops
-- sign in or sign up fails in native shell
-- AI chat fails to return meal cards
-- home search fails to return meal cards
-- meal detail cannot open
-- logging meals fails
-- favorites fail to save or reload
-- keyboard covers critical inputs/buttons
-- safe area clips CTA/header/footer content
-- app crashes or hard reloads during core flows
-- native external links fail silently
-- upgrade flow is broken or misleading
+- app crashes
+- blank screen or stuck splash
+- auth redirect loop
+- chat or search does not return meal cards
+- meal detail fails to open
+- favorites or meal logging fail silently
+- location permission breaks the app
+- purchase, restore, or manage-subscription flow is broken
+- account deletion is missing or fails
+- critical CTA is hidden behind keyboard or safe area
 
-## Smoke Test
+## Smoke test
 
-Pass these first before deeper QA:
+Pass this first:
 
-1. Launch app from cold start.
-2. Confirm landing/waitlist/home entry screen renders without layout breakage.
-3. Navigate to sign up and sign in screens.
-4. Complete one authenticated session.
-5. Open AI chat and run one query.
-6. Open Home search and run one search.
-7. Open one meal detail screen.
-8. Save one favorite.
-9. Log one meal.
-10. Sign out and return to sign in.
+1. Cold launch the app.
+2. Confirm initial screen renders cleanly.
+3. Sign up or sign in.
+4. Run one AI chat query that returns meal cards.
+5. Run one Home search that returns meal cards.
+6. Open meal detail.
+7. Favorite one meal.
+8. Log one meal.
+9. Open settings/account.
+10. Sign out.
 
 ## Authentication
 
-### Sign Up
+### Sign up
 
-- Open `/auth/signup`
-- Confirm no blank screen or Suspense fallback hang
-- Create account with email flow
-- OTP screen renders correctly
-- OTP inputs are usable with iOS keyboard
-- Successful verification routes into the app without full-document failure
-- Post-signup redirect lands on the intended screen
+- Open the sign-up flow
+- Create a new account
+- Complete OTP/email verification if enabled
+- Confirm redirect lands in the intended app flow
+- Confirm no white screen or stuck loading state
 
-### Sign In
+### Sign in
 
-- Open `/auth/signin`
 - Sign in with valid credentials
-- Invalid credentials show clear error
-- Existing session returns correctly to app
-- Auth screen does not flicker/loop
+- Confirm invalid credentials show a clean error
+- Confirm authenticated state persists across relaunch
 
-### Sign Out
+### Anonymous to authenticated state
 
-- Sign out from settings
-- Confirm app returns to sign-in state cleanly
-- Confirm no stale user data remains on protected screens
+- Use the app signed out if supported
+- Sign in afterward
+- Confirm guest/session data claims correctly if applicable
 
-### OAuth
+### Sign out
 
-If Apple/Google auth is enabled:
+- Sign out from settings/account
+- Confirm protected screens are no longer accessible
+- Confirm stale user data is cleared
 
-- Tap provider button
-- Confirm redirect opens correctly in native shell
-- Confirm return into app succeeds
-- Confirm user session persists after relaunch
+## Core search and chat
 
-## Navigation and Shell Behavior
+### Home search
 
-- Back navigation behaves correctly
-- No unexpected full-page white flashes during route changes
-- Safe areas are respected on top and bottom
-- Content is not clipped under notch/home indicator
-- Keyboard does not cover auth or form CTA buttons
-- Scrolling works normally on long pages
-- No trapped scroll regions
-
-## Home Search
-
-Run these queries and confirm meal cards render:
+Run all of these:
 
 - `pizza`
 - `salad`
-- `smoothies`
 - `high protein under 600 calories`
-- `vegan meals`
 - `dominos`
-- `qdoba under 700 calories`
-- `chopt creative salad`
+- `sweetgreen under 600 calories`
+- `qdoba bowl under 700 calories`
 
 Verify:
 
-- restaurant-specific queries only show that restaurant
-- generic queries show varied restaurants before repeating
-- logos render correctly
-- no placeholder meal-card logos
-- no sauces/add-ons/modifiers appear as meal cards
+- meal cards render
+- restaurant-specific queries stay scoped
+- no obvious modifiers/sauces appear as meal cards
+- tapping a card opens meal detail
 
-## AI Chat
+### AI chat
 
-Run these prompts:
+Run all of these:
 
 - `dominos`
-- `dominos under 900 calories`
-- `smoothies`
-- `salads from chopt creative salad co`
 - `high protein lunch under 700 calories`
+- `greek salad at cava`
+- `acai bowl for breakfast`
 - `vegan dinner near me`
 
 Verify:
 
-- meal cards appear in chat
-- restaurant queries stay scoped
-- macro constraints are respected
-- location queries still work after permission grant
-- chat state survives app navigation
-- guest and signed-in behavior both work
+- meal cards appear inside chat
+- constraints are respected
+- location queries behave correctly
+- no blank result bubbles or hanging spinners
 
-## Meal Detail and Swaps
+## Meal detail, swaps, favorites, logging
 
-Open meal detail from both Home search and AI chat.
+### Meal detail
 
-Verify:
+- Open detail from Home search
+- Open detail from AI chat
+- Confirm restaurant logo, macros, and core metadata render correctly
 
-- meal detail screen opens correctly
-- macros render correctly
-- restaurant logo renders correctly
-- swap suggestions load
-- DB-backed swaps appear where expected
-- quantity config behaves correctly
-- no side-based swap suggestions appear for Chick-fil-A and Zaxby’s yet
+### Swaps
 
-Suggested restaurant checks:
+- Open meals that should have swaps
+- Confirm swap suggestions load
+- Confirm selecting a swap updates the detail state correctly
 
-- Sweetgreen
-- CAVA
-- Taziki's Mediterranean Cafe
-- Chopt Creative Salad Co.
-- WaBa Grill
-- QDOBA Mexican Eats
-- The Habit Burger & Grill
-- Chick-fil-A
-- Zaxby's
+### Favorites
 
-## Favorites and Logging
-
-- Save a meal to favorites
-- Kill app and relaunch
+- Save a favorite
+- Relaunch the app
 - Confirm favorite persists
-- Log a meal with and without swaps
-- Confirm logged macros match selected modifications
-- Confirm daily log screen loads correctly after relaunch
 
-## Location and Permissions
+### Meal logging
 
-- Deny location permission and test search/chat
-- Grant location permission and test again
-- Confirm location-based search still works
-- Confirm denied permission does not break the app
+- Log a meal
+- Log a meal with modifications if supported
+- Confirm the daily log screen updates correctly
 
-## Waitlist and External Links
+## Location and permissions
 
-- Open waitlist screen
-- Test native share sheet if available
-- Test copy link
-- Test one external social share link
-- Test support/contact links
+### Denied path
 
-Verify:
+- Deny location when prompted
+- Run chat and search flows
+- Confirm no crash or broken state
 
-- external links open via native browser/sheet
-- returning to the app is clean
+### Allowed path
 
-## Upgrade and Entitlement UI
+- Allow location
+- Run nearby-style queries
+- Confirm nearby results still work
 
-This is UI-only QA for now until Apple billing is implemented.
+### Settings path
 
-- Open upgrade screen signed out
-- Open upgrade screen signed in
-- Confirm current plan messaging is coherent
-- Confirm free vs premium CTA labels are correct
-- Confirm no dead-end button behavior
-- Confirm tutorial and redirect params still behave correctly
+- Revoke location from iOS settings
+- Relaunch app
+- Confirm app still behaves gracefully
 
-## Persistence / Relaunch
+## Billing and subscriptions
 
-Check all of these:
+Run this inside the native iOS app with sandbox billing configured.
 
-- cold launch after sign in
-- cold launch after sign out
+### Upgrade screen
+
+- Open upgrade while signed out
+- Open upgrade while signed in
+- Confirm copy and CTA state are coherent
+
+### Purchase flow
+
+- Start a purchase
+- Complete it with sandbox Apple ID
+- Confirm entitlement/UI updates after success
+
+### Restore purchases
+
+- Use the restore action from:
+  - upgrade screen
+  - account screen
+- Confirm restored access is reflected correctly
+
+### Manage subscription
+
+- Open subscription management from the account screen
+- Confirm the App Store management path opens correctly
+
+## Account management and deletion
+
+### Account screen
+
+- Open `Settings -> Account`
+- Confirm plan, restore, and management actions are visible and coherent
+
+### Delete account
+
+- Trigger delete account
+- Confirm destructive confirmation is shown
+- Confirm account is deleted successfully
+- Confirm the app signs out / redirects cleanly
+- Confirm relogin with deleted account fails as expected
+
+Important:
+
+- App Store subscriptions are managed separately through Apple
+- Verify the deletion messaging states that clearly
+
+## Navigation, layout, and polish
+
+- top safe area is respected
+- bottom safe area is respected
+- keyboard does not cover primary CTAs
+- scrolling is smooth on long screens
+- no trapped nested scroll regions
+- back navigation is predictable
+- no full-screen white flashes on route changes
+
+## External links and support
+
+- privacy policy link opens
+- terms link opens
+- support/contact link opens
+- return to app is clean after opening external browser
+
+## Persistence and relaunch
+
+Test:
+
+- cold launch signed in
+- cold launch signed out
 - relaunch while chat has content
-- relaunch while on Home search
-- relaunch after favoriting meals
+- relaunch after favorite/save/log activity
 
 Verify:
 
-- no corrupted local/session state
-- no unexpected onboarding re-entry
-- no broken auth session restoration
+- session restores correctly
+- chat/search state is not obviously corrupted
+- no unexpected onboarding loop
 
-## Evidence to Capture
+## Evidence to capture for any issue
 
-For any bug, capture:
-
-- screen name
+- device model
+- iOS version
+- signed-out / signed-in / premium state
 - exact steps
 - expected result
 - actual result
 - screenshot or screen recording
-- device + iOS version
-- account state
-  - signed out
-  - signed in free
-  - signed in premium/test
 
-## Exit Criteria
+## Exit criteria
 
-Manual iOS QA is complete when:
+This pass is complete only when:
 
-- all smoke test items pass
+- all smoke-test items pass
 - no release blockers remain
-- auth, search, AI chat, swaps, logging, favorites, and settings pass on device
-- no critical layout or keyboard issues remain
-- external links behave correctly in native shell
-
-After this, the next task is Apple subscription and entitlement implementation.
+- auth, search, chat, logging, favorites, location, billing, and account deletion all work on a physical iPhone
+- there are no critical layout or keyboard issues
+- reviewer access is not blocked by missing credentials or broken flows

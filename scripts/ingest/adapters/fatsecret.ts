@@ -111,16 +111,6 @@ interface FSFood {
   food_url?:        string;
 }
 
-interface FSFoodDetail {
-  food_id:    string;
-  food_name:  string;
-  brand_name?: string;
-  food_type:  string;
-  servings: {
-    serving: FSServing | FSServing[];
-  };
-}
-
 interface FSServing {
   serving_id:         string;
   serving_description: string;
@@ -213,57 +203,6 @@ async function searchFoods(
   }
 
   return allFoods;
-}
-
-// ─── Get detailed nutrition for a single food item ───────────────────────────
-
-async function getFoodDetail(foodId: string): Promise<FSFoodDetail | null> {
-  try {
-    const data = await apiCall({
-      method:  'food.get.v4',
-      food_id: foodId,
-    });
-    return data?.food ?? null;
-  } catch {
-    return null;
-  }
-}
-
-// ─── Map a FatSecret serving to RawIngestionItem ─────────────────────────────
-
-function mapServingToItem(
-  food:           FSFood | FSFoodDetail,
-  serving:        FSServing,
-  restaurantName: string
-): RawIngestionItem | null {
-  const calories = parseFloat(serving.calories);
-  if (!calories || calories < 10) return null;
-
-  const brandName = (food as any).brand_name ?? restaurantName;
-
-  // Choose the "standard" serving — prefer the first one that isn't an add-on
-  const servingDesc = serving.serving_description ?? '';
-  const isAddon = /add|extra|side|sauce|dressing/i.test(servingDesc);
-
-  return {
-    source:           'nutritionix', // treat FatSecret data at same confidence tier
-    restaurantName:   brandName,
-    name:             food.food_name,
-    calories,
-    protein_g:        serving.protein       ? parseFloat(serving.protein)       : undefined,
-    carbs_g:          serving.carbohydrate  ? parseFloat(serving.carbohydrate)  : undefined,
-    fat_g:            serving.fat           ? parseFloat(serving.fat)           : undefined,
-    fiber_g:          serving.fiber         ? parseFloat(serving.fiber)         : undefined,
-    sugar_g:          serving.sugar         ? parseFloat(serving.sugar)         : undefined,
-    sodium_mg:        serving.sodium        ? parseFloat(serving.sodium)        : undefined,
-    cholesterol_mg:   serving.cholesterol   ? parseFloat(serving.cholesterol)   : undefined,
-    saturated_fat_g:  serving.saturated_fat ? parseFloat(serving.saturated_fat) : undefined,
-    trans_fat_g:      serving.trans_fat     ? parseFloat(serving.trans_fat)     : undefined,
-    serving_qty:      serving.number_of_units ? parseFloat(serving.number_of_units) : 1,
-    serving_unit:     serving.measurement_description ?? serving.serving_description,
-    externalId:       `fatsecret::${food.food_id}::${serving.serving_id}`,
-    sourceConfidence: isAddon ? 0.70 : 0.90,
-  };
 }
 
 // ─── Main adapter ─────────────────────────────────────────────────────────────

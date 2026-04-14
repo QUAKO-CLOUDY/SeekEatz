@@ -29,12 +29,12 @@ export interface SearchRequestTelemetryPayload {
     maxCarbs?: number;
     maxFat?: number;
     restaurant?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   applied_filters?: {
     dishType?: string;
     protein?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   results_returned: number;
   has_more: boolean;
@@ -65,7 +65,7 @@ export async function logSearchRequest(
     const query_hash = hashQuery(payload.query_text);
 
     // Prepare telemetry record
-    const telemetryRecord: any = {
+    const telemetryRecord: Record<string, unknown> = {
       user_id: user.id,
       source: payload.source,
       query_text: payload.query_text,

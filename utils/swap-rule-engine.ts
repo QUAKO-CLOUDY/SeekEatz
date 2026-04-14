@@ -5,18 +5,13 @@
  * DB-BACKED: All swaps must reference real modifier items from menu_items table
  */
 
-import { normalizeMacros, type Macros } from '@/lib/macro-utils';
 import type { ModifierCandidate } from './modifier-candidates';
 import {
   inferDishType,
   inferIngredientType,
   isCompatible,
   hasProteinTokenOverlap,
-  type DishType,
 } from './dish-compatibility';
-
-// Import extractDishType - need to check if it's exported or recreate it
-// For now, we'll recreate a simple version
 
 export interface SwapModification {
   id: string;
@@ -52,48 +47,16 @@ export interface MacroGoals {
   maxFat?: number;
 }
 
+type MealMacroInput = Partial<{
+  calories: number;
+  protein: number;
+  carbs: number;
+  fats: number;
+}>;
+
 /**
  * Dish taxonomy mapping: dishType → { keywords[] }
  */
-const DISH_TAXONOMY: Record<string, { keywords: string[] }> = {
-  burgers: {
-    keywords: ['burger', 'burgers', 'whopper', 'big mac', 'cheeseburger', 'hamburger']
-  },
-  sandwiches: {
-    keywords: ['sandwich', 'sandwiches', 'sandwhich', 'sandwiche', 'sub', 'subs', 'hoagie', 'hoagies', 'hero', 'heroes']
-  },
-  bowls: {
-    keywords: ['bowl', 'bowls']
-  },
-  burritos: {
-    keywords: ['burrito', 'burritos']
-  },
-  salads: {
-    keywords: ['salad', 'salads', 'caesar', 'cobb', 'garden salad']
-  },
-  pizza: {
-    keywords: ['pizza', 'pizzas', 'pie', 'pies']
-  },
-};
-
-/**
- * Detects dish type from meal name
- */
-function detectDishType(mealName: string): string | null {
-  const lowerName = mealName.toLowerCase();
-  
-  for (const [dishType, { keywords }] of Object.entries(DISH_TAXONOMY)) {
-    for (const keyword of keywords) {
-      const pattern = new RegExp(`\\b${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-      if (pattern.test(lowerName)) {
-        return dishType;
-      }
-    }
-  }
-  
-  return null;
-}
-
 // Old dish-type-specific functions removed - now using DB-backed swaps only
 
 const SINGLE_INGREDIENT_NAME_PATTERN =
@@ -214,7 +177,7 @@ function mealAlreadyIncludesCandidate(mealName: string, candidateName: string): 
 
 function generateContextualSingleIngredientSwap(
   mealName: string,
-  mealMacros: any,
+  mealMacros: MealMacroInput,
   modifierCandidates: ModifierCandidate[],
   usedModifierIds: Set<string>
 ): SwapModification | null {
@@ -302,7 +265,7 @@ function generateContextualSingleIngredientSwap(
  */
 function generateHigherProteinSwap(
   mealName: string,
-  mealMacros: any,
+  mealMacros: MealMacroInput,
   goals: MacroGoals,
   modifierCandidates: ModifierCandidate[]
 ): SwapModification | null {
@@ -455,7 +418,7 @@ function isStructureCandidate(name: string): boolean {
  */
 function generateLowerCaloriesSwap(
   mealName: string,
-  mealMacros: any,
+  mealMacros: MealMacroInput,
   goals: MacroGoals,
   modifierCandidates: ModifierCandidate[]
 ): SwapModification | null {
@@ -636,7 +599,7 @@ function generateLowerCaloriesSwap(
  */
 export async function generateSwapModifications(
   mealName: string,
-  mealMacros: any,
+  mealMacros: MealMacroInput,
   goals: MacroGoals,
   restaurantName: string,
   modifierCandidates: ModifierCandidate[]

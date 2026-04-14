@@ -72,8 +72,36 @@ async function runTests() {
         assert(params4.minProtein === 30, 'High protein -> minProtein 30');
         assert(params4.query === "high protein bowls", 'Query preserved');
 
-        // Test 5: Home Input (Nearby search from userContext)
-        console.log('\nTest 5: Home Input (Nearby via userContext)');
+        // Test 5: Minimum calories from text should not become a max cap
+        console.log('\nTest 5: Min Calories (Text)');
+        const minCaloriesTextInput = {
+            message: "lunch with at least 700 calories and 40g of protein",
+            isHomepage: false
+        };
+        const params5 = await buildSearchParams(minCaloriesTextInput);
+
+        assert(params5.minCalories === 700, 'Extracted 700 minCalories from text');
+        assert(params5.maxCalories === undefined, 'Did not infer maxCalories for "at least 700 calories"');
+        assert(params5.minProtein === 40, 'Extracted 40g protein as minProtein');
+
+        // Test 6: Explicit min-calorie input must win over text parsing
+        console.log('\nTest 6: Min Calories (Explicit Input)');
+        const minCaloriesExplicitInput = {
+            query: "lunch with at least 700 calories and 40g of protein",
+            minCalories: 700,
+            maxCalories: undefined,
+            calorieCap: undefined,
+            minProtein: 40,
+            isHomepage: false
+        };
+        const params6 = await buildSearchParams(minCaloriesExplicitInput);
+
+        assert(params6.minCalories === 700, 'Preserved explicit 700 minCalories input');
+        assert(params6.maxCalories === undefined, 'Explicit min-calorie input did not reintroduce maxCalories');
+        assert(params6.minProtein === 40, 'Preserved explicit 40g minProtein input');
+
+        // Test 7: Home Input (Nearby search from userContext)
+        console.log('\nTest 7: Home Input (Nearby via userContext)');
         const nearbyInput = {
             query: "find meals",
             isHomepage: true,
@@ -85,12 +113,12 @@ async function runTests() {
                 dietary_options: ['high-protein']
             }
         };
-        const params5 = await buildSearchParams(nearbyInput);
+        const params7 = await buildSearchParams(nearbyInput);
 
-        assert(params5.location === 'near me', 'userContext distance activates nearby location search');
-        assert(params5.userContext?.search_distance_miles === 10, 'Preserved userContext search distance');
-        assert(params5.userContext?.user_location_lat === 33.4484, 'Preserved userContext latitude');
-        assert(params5.userContext?.diet_type === 'balanced', 'Preserved userContext diet_type');
+        assert(params7.location === 'near me', 'userContext distance activates nearby location search');
+        assert(params7.userContext?.search_distance_miles === 10, 'Preserved userContext search distance');
+        assert(params7.userContext?.user_location_lat === 33.4484, 'Preserved userContext latitude');
+        assert(params7.userContext?.diet_type === 'balanced', 'Preserved userContext diet_type');
 
     } catch (err) {
         console.error('Test Exception:', err);

@@ -56,7 +56,7 @@ export async function hasCompletedOnboarding(userId?: string): Promise<boolean> 
     if (profile?.has_completed_onboarding) {
       return true;
     }
-  } catch (error) {
+  } catch {
     // Profiles table might not exist - fall through to localStorage
   }
 
@@ -133,7 +133,10 @@ export async function updateLastLogin(userId?: string): Promise<void> {
 /**
  * Set onboarding completion flag
  */
-export async function setOnboardingComplete(userId: string, profile?: any): Promise<void> {
+export async function setOnboardingComplete(
+  userId: string,
+  profile?: Record<string, unknown> | null
+): Promise<void> {
   const supabase = createClient();
   const now = Date.now();
 

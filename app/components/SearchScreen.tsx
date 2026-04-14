@@ -30,6 +30,13 @@ type SearchResultItem = {
     fat_g?: number;
     fats_g?: number;
   };
+  macros?: {
+    calories?: number;
+    protein?: number;
+    carbs?: number;
+    fat?: number;
+    fats?: number;
+  };
   calories?: number;
   protein_g?: number;
   carbs_g?: number;
@@ -41,7 +48,15 @@ type SearchResultItem = {
 
 type SearchResponse =
   | SearchResultItem[]
-  | { meals?: SearchResultItem[]; results?: SearchResultItem[] };
+  | {
+      meals?: SearchResultItem[];
+      results?: SearchResultItem[];
+      hasMore?: boolean;
+      nextOffset?: number;
+      searchKey?: string;
+    };
+
+const SEARCH_SCREEN_PAGE_SIZE = 12;
 
 // Convert API result to Meal type
 function convertToMeal(item: SearchResultItem): Meal {
@@ -69,7 +84,7 @@ function convertToMeal(item: SearchResultItem): Meal {
                (item.nutrition_info?.fats_g) ?? 0;
 
   return {
-    id: item.id || `meal-${Date.now()}-${Math.random()}`,
+    id: String(item.id ?? `meal-${Date.now()}-${Math.random()}`),
     name: mealName,
     restaurant: restaurantName,
     restaurant_name: restaurantName, // Add for logo logic consistency
@@ -79,7 +94,7 @@ function convertToMeal(item: SearchResultItem): Meal {
     fats: typeof fats === 'number' ? fats : 0,
     image: imageUrl,
     restaurantLogoUrl: imageUrl,
-    price: item.price || null, // Keep null for proper handling
+    price: item.price ?? undefined,
     description: item.description || '',
     category: category,
     dietary_tags: item.dietary_tags || item.tags || [],
@@ -91,7 +106,11 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
   const [results, setResults] = useState<Meal[]>([]);
   const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [searchKey, setSearchKey] = useState<string | undefined>(undefined);
+  const [nextOffset, setNextOffset] = useState<number>(0);
+  const [hasMore, setHasMore] = useState(false);
 
   async function handleSearch(e?: React.FormEvent) {
     e?.preventDefault();
@@ -99,12 +118,18 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
 
     setLoading(true);
     setHasSearched(true);
+    setHasMore(false);
+    setNextOffset(0);
+    setSearchKey(undefined);
     
     try {
       const res = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({
+          query,
+          limit: SEARCH_SCREEN_PAGE_SIZE,
+        }),
       });
       
       const data: SearchResponse = await res.json();
@@ -115,12 +140,21 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
       
       if (Array.isArray(data)) {
         normalizedResults = data;
+        setHasMore(false);
+        setNextOffset(0);
+        setSearchKey(undefined);
       } else if (data && typeof data === 'object' && Array.isArray(data.meals)) {
         // New format: { meals, hasMore, nextOffset, searchKey }
         normalizedResults = data.meals;
+        setHasMore(Boolean(data.hasMore));
+        setNextOffset(data.nextOffset ?? normalizedResults.length);
+        setSearchKey(data.searchKey);
       } else if (data && typeof data === 'object' && Array.isArray(data.results)) {
         // Legacy format support
         normalizedResults = data.results;
+        setHasMore(false);
+        setNextOffset(0);
+        setSearchKey(undefined);
       }
       
       // Store raw results for FoodCard display
@@ -133,8 +167,72 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
       console.error('Search failed:', error);
       setResults([]);
       setSearchResults([]);
+      setHasMore(false);
+      setNextOffset(0);
+      setSearchKey(undefined);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleLoadMore() {
+    if (loading || loadingMore || !hasMore || !searchKey) return;
+
+    setLoadingMore(true);
+
+    try {
+      const res = await fetch('/api/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          searchKey,
+          isPagination: true,
+          offset: nextOffset,
+          limit: SEARCH_SCREEN_PAGE_SIZE,
+        }),
+      });
+
+      const data: SearchResponse = await res.json();
+      console.log("Search API pagination response:", data);
+
+      const nextItems = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.meals)
+          ? data.meals
+          : Array.isArray(data?.results)
+            ? data.results
+            : [];
+
+      if (nextItems.length === 0) {
+        setHasMore(false);
+        return;
+      }
+
+      setSearchResults((prev) => {
+        const seenIds = new Set(prev.map((item) => String(item.id ?? '')));
+        const dedupedNext = nextItems.filter((item) => !seenIds.has(String(item.id ?? '')));
+        return [...prev, ...dedupedNext];
+      });
+
+      setResults((prev) => {
+        const seenIds = new Set(prev.map((meal) => meal.id));
+        const dedupedNextMeals = nextItems
+          .map(convertToMeal)
+          .filter((meal) => !seenIds.has(meal.id));
+        return [...prev, ...dedupedNextMeals];
+      });
+
+      if (!Array.isArray(data) && data && typeof data === 'object') {
+        setHasMore(Boolean(data.hasMore));
+        setNextOffset(data.nextOffset ?? (nextOffset + nextItems.length));
+        setSearchKey(data.searchKey ?? searchKey);
+      } else {
+        setHasMore(false);
+      }
+    } catch (error) {
+      console.error('Load more failed:', error);
+    } finally {
+      setLoadingMore(false);
     }
   }
 
@@ -198,7 +296,24 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
                 className="cursor-pointer"
               >
                 <FoodCard 
-                  item={item} 
+                  item={{
+                    name: meal.name,
+                    category: meal.category ?? 'restaurant',
+                    macros: item.macros
+                      ? {
+                          calories: item.macros.calories ?? null,
+                          protein: item.macros.protein ?? null,
+                          carbs: item.macros.carbs ?? null,
+                          fats: item.macros.fats ?? item.macros.fat ?? null,
+                        }
+                      : {
+                          calories: meal.calories,
+                          protein: meal.protein,
+                          carbs: meal.carbs,
+                          fats: meal.fats,
+                        },
+                    image_url: item.restaurantLogoUrl || item.restaurant_logo_url || item.logo_url || null,
+                  }}
                   restaurantName={item.restaurant_name || 'Unknown Restaurant'} 
                 />
               </div>
@@ -209,6 +324,19 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
             <div className="text-center py-10 text-muted-foreground">
               <p className="mb-2">No meals found matching that description.</p>
               <p className="text-sm text-muted-foreground/70">Try a different search term.</p>
+            </div>
+          )}
+
+          {hasSearched && !loading && results.length > 0 && hasMore && (
+            <div className="flex justify-center pt-2">
+              <button
+                type="button"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loadingMore ? 'Loading...' : 'Load more meals'}
+              </button>
             </div>
           )}
         </div>

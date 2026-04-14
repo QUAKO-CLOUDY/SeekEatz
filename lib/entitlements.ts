@@ -1,4 +1,5 @@
 import type { User } from "@supabase/supabase-js";
+import { isFullAccessEmail, normalizeEmail } from "@/lib/full-access";
 
 export const FREE_DAILY_QUERY_LIMIT = 2;
 export const MONTHLY_PLAN_PRICE = 8.99;
@@ -63,15 +64,6 @@ export const GUEST_ENTITLEMENT: AppEntitlement = {
   remainingQueriesToday: FREE_DAILY_QUERY_LIMIT,
 };
 
-export function normalizeEmail(email?: string | null): string | null {
-  if (!email) {
-    return null;
-  }
-
-  const normalized = email.trim().toLowerCase();
-  return normalized || null;
-}
-
 function isTrialStillActive(trialExpiresAt?: string | null): boolean {
   if (!trialExpiresAt) {
     return false;
@@ -83,13 +75,6 @@ function isTrialStillActive(trialExpiresAt?: string | null): boolean {
   }
 
   return timestamp > Date.now();
-}
-
-function isAdminAccount(email?: string | null): boolean {
-  const normalizedEmail = normalizeEmail(email);
-  const normalizedMasterEmail = normalizeEmail(process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL);
-
-  return !!normalizedEmail && normalizedEmail === normalizedMasterEmail;
 }
 
 export function buildEntitlement(args: {
@@ -111,7 +96,7 @@ export function buildEntitlement(args: {
     };
   }
 
-  if (isAdminAccount(normalizedEmail)) {
+  if (isFullAccessEmail(normalizedEmail)) {
     return {
       isAuthenticated: true,
       userId: user.id,

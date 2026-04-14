@@ -176,7 +176,6 @@ export default function ProblemSolutionSection() {
     useEffect(() => {
         attachObserver();
         return () => ioRef.current?.disconnect();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     /* ── Reset ── */
@@ -210,7 +209,6 @@ export default function ProblemSolutionSection() {
         };
         window.addEventListener('seekResetAnimations', onReset);
         return () => window.removeEventListener('seekResetAnimations', onReset);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     /* ── Solution content enters when revealed ── */

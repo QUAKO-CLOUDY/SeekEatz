@@ -1,8 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { Meal } from '../types';
-import { loadChatState, saveChatState, clearChatState, saveChatStateImmediate } from '@/lib/chatStorage';
+import { loadChatState, saveChatState, clearChatState } from '@/lib/chatStorage';
 
 export interface ChatMessage {
   id: string;
@@ -14,7 +14,7 @@ export interface ChatMessage {
     nextOffset: number;
     hasMore: boolean;
     originalQuery?: string;
-    filters?: { [key: string]: any };
+    filters?: Record<string, unknown>;
   };
   isGateMessage?: boolean;
 }
@@ -67,7 +67,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       }
 
       return {
-        messages: loaded.messages,
+        messages: loaded.messages as ChatMessage[],
         visibleMealsCount: loaded.visibleMealsCount,
         isLoading: false,
         lastActiveAt: loaded.lastActiveAt,

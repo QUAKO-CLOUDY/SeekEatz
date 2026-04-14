@@ -25,7 +25,6 @@
  * - Create a test-specific version of searchHandler that uses direct Supabase client
  */
 
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -40,9 +39,6 @@ if (!supabaseUrl || !supabaseKey) {
   console.error('❌ Missing environment variables. Need NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (or NEXT_PUBLIC_SUPABASE_ANON_KEY)');
   process.exit(1);
 }
-
-// Create Supabase client for testing
-const testSupabase = createSupabaseClient(supabaseUrl, supabaseKey);
 
 // Dish taxonomy for validation (must match handler)
 const DISH_TAXONOMY: Record<string, { keywords: string[] }> = {

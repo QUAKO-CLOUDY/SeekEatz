@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useId } from "react";
+import { useMemo, useState } from "react";
 import {
   Calendar,
   Flame,
@@ -20,7 +20,7 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { CircularProgress } from "./CircularProgress";
 import { ManualMealEntry } from "./ManualMealEntry";
-import { Spinner } from "./ui/spinner-1";
+import { LogoImage } from "./ui/LogoImage";
 import { useTheme } from "../contexts/ThemeContext";
 import { useNutrition } from "../contexts/NutritionContext";
 import type { UserProfile, Meal } from "../types";
@@ -32,11 +32,6 @@ export type LoggedMeal = {
   meal: Meal;
   timestamp: string; // ISO
   date: string; // YYYY-MM-DD
-};
-
-type MiniProgressRingProps = {
-  percentage: number;
-  isSpinning: boolean;
 };
 
 type Props = {
@@ -75,65 +70,6 @@ function calculateStreak(loggedDates: string[]): number {
   return streak;
 }
 
-/** Mini animated ring for "track your progress" – mirrors main calorie ring and can spin on tap */
-function MiniProgressRing({ percentage, isSpinning }: MiniProgressRingProps) {
-  const id = `mini-ring-${useId().replace(/:/g, "")}`;
-  const size = 36;
-  const stroke = 3;
-  const r = (size - stroke) / 2;
-  const cx = size / 2;
-  const circumference = r * 2 * Math.PI;
-
-  // Clamp to 0–100 and mirror the main calorie ring progress
-  // Always show at least a subtle arc so the ring is visible even when there’s no data yet
-  const rawPct = Math.max(0, Math.min(percentage, 100));
-  const pct = rawPct === 0 ? 35 : rawPct;
-  const progressOffset = circumference * (1 - pct / 100);
-
-  return (
-    <div className="relative flex items-center justify-center flex-shrink-0">
-      <svg
-        width={size}
-        height={size}
-        className="transform -rotate-90 flex-shrink-0 animate-mini-ring"
-      >
-        <defs>
-          <linearGradient id={id} x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#f472b6" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#f43f5e" stopOpacity="0.9" />
-          </linearGradient>
-        </defs>
-        {/* subtle track */}
-        <circle
-          cx={cx}
-          cy={cx}
-          r={r}
-          stroke="rgba(248, 250, 252, 0.25)"
-          strokeWidth={stroke}
-          fill="none"
-        />
-        <circle
-          cx={cx}
-          cy={cx}
-          r={r}
-          stroke={`url(#${id})`}
-          strokeWidth={stroke}
-          fill="none"
-          strokeDasharray={circumference}
-          strokeDashoffset={progressOffset}
-          strokeLinecap="round"
-        />
-      </svg>
-
-      {isSpinning && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <Spinner size={size} invert />
-        </div>
-      )}
-    </div>
-  );
-}
-
 type Recommendation = {
   icon: React.ComponentType<{ className?: string }>;
   color: "purple" | "cyan" | "green" | "amber";
@@ -157,8 +93,6 @@ export function LogScreen({
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [editingLogId, setEditingLogId] = useState<string | null>(null);
   const editingMeal = editingLogId ? loggedMeals.find((l) => l.id === editingLogId)?.meal : undefined;
-  const [isMiniRingSpinning, setIsMiniRingSpinning] = useState(false);
-
   const loggedDates = Array.from(
     new Set(loggedMeals.map((log) => log.date))
   ).sort((a, b) => b.localeCompare(a)); // newest first
@@ -174,7 +108,7 @@ export function LogScreen({
   );
 
   // Use shared hook for calorie tracking
-  const { targetCalories, todaysConsumedCalories, todaysRemainingCalories } = useCalorieTracking(
+  const { targetCalories, todaysRemainingCalories } = useCalorieTracking(
     userProfile,
     loggedMeals,
     selectedDate
@@ -197,9 +131,6 @@ export function LogScreen({
     }
     return typeof value === 'number' ? value : Number(value) || defaultValue;
   };
-
-  const caloriesPct =
-    targetCalories > 0 ? (totals.calories / targetCalories) * 100 : 0;
 
   const targetProtein = safeGet(targets?.targetProtein, safeGet(userProfile.target_protein_g, 0));
   const targetCarbs = safeGet(targets?.targetCarbs, safeGet(userProfile.target_carbs_g, 0));
@@ -267,11 +198,6 @@ export function LogScreen({
       <div
         className="bg-gradient-to-br from-card via-muted/40 to-card text-foreground p-6 pb-4 relative"
         style={{ paddingTop: `calc(1.5rem + env(safe-area-inset-top, 0px))` }}
-        onClick={() => {
-          // Trigger a short spin animation on the mini ring when the top section is tapped/clicked
-          setIsMiniRingSpinning(true);
-          setTimeout(() => setIsMiniRingSpinning(false), 1400);
-        }}
       >
         <div className="flex items-center justify-between mb-6">
           <div className="pr-4">
@@ -592,18 +518,22 @@ export function LogScreen({
                   className="bg-gradient-to-br from-card to-muted border border-border rounded-2xl p-4 group hover:border-cyan-500/50 transition-all"
                 >
                   <div className="flex gap-3">
-                      <img
+                    <div className="relative h-20 w-20 overflow-hidden rounded-xl bg-white p-2">
+                      <LogoImage
+                        key={getRestaurantLogoUrl(
+                          log.meal.restaurant_name || log.meal.restaurant || '',
+                          log.meal.restaurantLogoUrl
+                        )}
                         src={getRestaurantLogoUrl(
                           log.meal.restaurant_name || log.meal.restaurant || '',
                           log.meal.restaurantLogoUrl
                         )}
                         alt={log.meal.restaurant || log.meal.restaurant_name || 'Restaurant logo'}
-                        className="w-20 h-20 rounded-xl object-contain bg-white p-2"
-                        onError={(e) => {
-                          e.currentTarget.src = '/logos/default.png';
-                          e.currentTarget.onerror = null;
-                        }}
+                        fill
+                        sizes="80px"
+                        className="object-contain"
                       />
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between mb-1">
                         <div className="flex-1">
@@ -741,18 +671,22 @@ export function LogScreen({
                             key={log.id}
                             className="flex gap-3 p-2 rounded-xl hover:bg-muted/50"
                           >
-                              <img
+                            <div className="relative h-12 w-12 overflow-hidden rounded-lg bg-white p-1.5">
+                              <LogoImage
+                                key={getRestaurantLogoUrl(
+                                  log.meal.restaurant_name || log.meal.restaurant || '',
+                                  log.meal.restaurantLogoUrl
+                                )}
                                 src={getRestaurantLogoUrl(
                                   log.meal.restaurant_name || log.meal.restaurant || '',
                                   log.meal.restaurantLogoUrl
                                 )}
                                 alt={log.meal.restaurant || log.meal.restaurant_name || 'Restaurant logo'}
-                                className="w-12 h-12 rounded-lg object-contain bg-white p-1.5"
-                                onError={(e) => {
-                                  e.currentTarget.src = '/logos/default.png';
-                                  e.currentTarget.onerror = null;
-                                }}
+                                fill
+                                sizes="48px"
+                                className="object-contain"
                               />
+                            </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-card-foreground truncate">
                                 {log.meal.name}

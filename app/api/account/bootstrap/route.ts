@@ -4,10 +4,10 @@ import { createAdminClient } from "@/utils/supabase/admin";
 import {
   buildEntitlement,
   type EntitlementProfileRow,
-  normalizeEmail,
   PROFILE_ENTITLEMENT_SELECT,
   WAITLIST_TRIAL_DAYS,
 } from "@/lib/entitlements";
+import { normalizeEmail } from "@/lib/full-access";
 
 type BootstrapBody = {
   profile?: {

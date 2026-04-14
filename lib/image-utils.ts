@@ -99,6 +99,8 @@ export function generateFoodImageUrlFromCollection(
   width: number = 600,
   height: number = 400
 ): string {
+  void width;
+  void height;
   // Create a hash for consistent image selection
   let hash = 0;
   const mealKey = `${mealName}-${restaurant}`;
@@ -125,6 +127,8 @@ export function getFoodPlaceholderUrl(
   width: number = 600,
   height: number = 400
 ): string {
+  void width;
+  void height;
   // Using Foodish API as a backup (free food images)
   const encodedName = encodeURIComponent(mealName.toLowerCase().split(' ')[0]);
   return `https://foodish-api.herokuapp.com/images/${encodedName}/${encodedName}${Math.floor(Math.random() * 10)}.jpg`;

@@ -1,5 +1,3 @@
-import fs from 'fs';
-
 const restaurants = [
     "KFC",
     "Five Guys",
@@ -25,13 +23,13 @@ async function run() {
             let data;
             try {
                 data = JSON.parse(rawText);
-            } catch (e) {
+            } catch {
                 const lines = rawText.split('\n').filter(Boolean);
                 const dataLines = lines.filter(l => l.startsWith('0:'));
                 if (dataLines.length > 0) {
                     try {
                         data = JSON.parse(dataLines[dataLines.length - 1].slice(2));
-                    } catch (err) { }
+                    } catch { }
                 }
             }
 
@@ -46,8 +44,8 @@ async function run() {
             } else {
                 console.log(`  -> Unrecognized format`);
             }
-        } catch (e) {
-            console.log(`  -> Error: ${e.message}`);
+        } catch (error) {
+            console.log(`  -> Error: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
 }

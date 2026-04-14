@@ -61,7 +61,7 @@ async function testQueries() {
             try {
                 // Try raw JSON format first
                 data = JSON.parse(rawText);
-            } catch (e) {
+            } catch {
                 // Next.js AI SDK streams NDJSON. We look for '0:' parts which contain JSON payloads
                 const lines = rawText.split('\n').filter(Boolean);
                 // Find the most complete JSON payload, usually the last '0:' line
@@ -69,7 +69,7 @@ async function testQueries() {
                 if (dataLines.length > 0) {
                     try {
                         data = JSON.parse(dataLines[dataLines.length - 1].slice(2));
-                    } catch (err) {
+                    } catch {
                         data = { raw: rawText.substring(0, 100) + '...' };
                     }
                 } else {
@@ -99,9 +99,10 @@ async function testQueries() {
                 results.push({ query, rawText: rawText.substring(0, 200) });
             }
 
-        } catch (err) {
-            console.log(`  -> Error: ${err.message}`);
-            results.push({ query, error: err.message });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.log(`  -> Error: ${errorMessage}`);
+            results.push({ query, error: errorMessage });
         }
     }
 

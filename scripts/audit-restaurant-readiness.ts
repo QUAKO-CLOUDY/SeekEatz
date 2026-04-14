@@ -134,10 +134,7 @@ async function auditRestaurantQueries(
 
 async function main() {
   const supabase = createSupabaseClient();
-  const [allRows, searchableMealRows] = await Promise.all([
-    fetchAllMenuRestaurantRows(supabase),
-    fetchAllMenuRestaurantRows(supabase, true),
-  ]);
+  const searchableMealRows = await fetchAllMenuRestaurantRows(supabase, true);
 
   const rawRestaurants = getRawJsonRestaurantNames();
   const searchableRestaurantNames = Array.from(

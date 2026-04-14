@@ -4,6 +4,8 @@
  * Resets on tab close or 30 minutes of inactivity
  */
 
+import type { Meal } from '@/app/types';
+
 const GUEST_SESSION_ID_KEY = 'seekeatz_guest_session_id';
 const GUEST_TRIAL_COUNT_KEY = 'guest_trial_count';
 const GUEST_LAST_ACTIVITY_KEY = 'seekeatz_chat_lastActivityAt';
@@ -14,8 +16,14 @@ export interface GuestChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
-  meals?: any[];
-  mealSearchContext?: any;
+  meals?: Meal[];
+  mealSearchContext?: {
+    searchKey: string;
+    nextOffset: number;
+    hasMore: boolean;
+    originalQuery?: string;
+    filters?: Record<string, unknown>;
+  };
   isGateMessage?: boolean;
 }
 

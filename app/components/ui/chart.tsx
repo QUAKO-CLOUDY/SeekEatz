@@ -22,6 +22,16 @@ type ChartContextProps = {
   config: ChartConfig;
 };
 
+type ChartPayloadItem = {
+  dataKey?: string;
+  name?: string;
+  value?: number | string;
+  color?: string;
+  payload?: Record<string, unknown> & {
+    fill?: string;
+  };
+};
+
 const ChartContext = React.createContext<ChartContextProps | null>(null);
 
 function useChart() {
@@ -125,9 +135,8 @@ function ChartTooltipContent({
     indicator?: "line" | "dot" | "dashed";
     nameKey?: string;
     labelKey?: string;
-    // Explicitly typing these to fix the red lines
-    payload?: any[];
-    label?: any;
+    payload?: ChartPayloadItem[];
+    label?: string | number;
   }) {
   const { config } = useChart();
 
@@ -182,10 +191,10 @@ function ChartTooltipContent({
     >
       {!nestLabel ? tooltipLabel : null}
       <div className="grid gap-1.5">
-        {payload.map((item: any, index: number) => {
+        {payload.map((item: ChartPayloadItem, index: number) => {
           const key = `${nameKey || item.name || item.dataKey || "value"}`;
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
-          const indicatorColor = color || item.payload.fill || item.color;
+          const indicatorColor = color || item.payload?.fill || item.color;
 
           return (
             <div
@@ -196,7 +205,7 @@ function ChartTooltipContent({
               )}
             >
               {formatter && item?.value !== undefined && item.name ? (
-                formatter(item.value, item.name, item, index, item.payload)
+                formatter(item.value, item.name, item, index, payload)
               ) : (
                 <>
                   {itemConfig?.icon ? (
@@ -263,7 +272,7 @@ function ChartLegendContent({
   Pick<RechartsPrimitive.LegendProps, "verticalAlign"> & {
     hideIcon?: boolean;
     nameKey?: string;
-    payload?: any[]; // Explicitly typed
+    payload?: ChartPayloadItem[];
   }) {
   const { config } = useChart();
 

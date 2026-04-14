@@ -1,329 +1,1313 @@
 {
     "restaurant_name": "Shake Shack",
     "items": [
-        {
-            "name": "ShackBurger",
-            "category": "Burgers",
-            "price_estimate": 9.49,
-            "image_url": null,
-            "macros": {
-                "calories": 500,
-                "protein": 29,
-                "carbs": 26,
-                "fat": 30
-            }
-        },
-        {
-            "name": "Double ShackBurger",
-            "category": "Burgers",
-            "price_estimate": 12.39,
-            "image_url": null,
-            "macros": {
-                "calories": 760,
-                "protein": 51,
-                "carbs": 27,
-                "fat": 48
-            }
-        },
-        {
-            "name": "Hamburger",
-            "category": "Burgers",
-            "price_estimate": 8.79,
-            "image_url": null,
-            "macros": {
-                "calories": 370,
-                "protein": 25,
-                "carbs": 24,
-                "fat": 18
-            }
-        },
-        {
-            "name": "Double Hamburger",
-            "category": "Burgers",
-            "price_estimate": 11.79,
-            "image_url": null,
-            "macros": {
-                "calories": 560,
-                "protein": 44,
-                "carbs": 24,
-                "fat": 30
-            }
-        },
-        {
-            "name": "Cheeseburger",
-            "category": "Burgers",
-            "price_estimate": 9.49,
-            "image_url": null,
-            "macros": {
-                "calories": 440,
-                "protein": 29,
-                "carbs": 25,
-                "fat": 24
-            }
-        },
-        {
-            "name": "Double Cheeseburger",
-            "category": "Burgers",
-            "price_estimate": 12.39,
-            "image_url": null,
-            "macros": {
-                "calories": 700,
-                "protein": 51,
-                "carbs": 25,
-                "fat": 42
-            }
-        },
-        {
-            "name": "SmokeShack",
-            "category": "Burgers",
-            "price_estimate": 11.29,
-            "image_url": null,
-            "macros": {
-                "calories": 570,
-                "protein": 36,
-                "carbs": 28,
-                "fat": 35
-            }
-        },
-        {
-            "name": "Double SmokeShack",
-            "category": "Burgers",
-            "price_estimate": 14.89,
-            "image_url": null,
-            "macros": {
-                "calories": 830,
-                "protein": 58,
-                "carbs": 28,
-                "fat": 53
-            }
-        },
-        {
-            "name": "Bacon Cheeseburger",
-            "category": "Burgers",
-            "price_estimate": 11.29,
-            "image_url": null,
-            "macros": {
-                "calories": 500,
-                "protein": 35,
-                "carbs": 25,
-                "fat": 29
-            }
-        },
-        {
-            "name": "Double Bacon Cheeseburger",
-            "category": "Burgers",
-            "price_estimate": 14.49,
-            "image_url": null,
-            "macros": {
-                "calories": 760,
-                "protein": 58,
-                "carbs": 25,
-                "fat": 47
-            }
-        },
-        {
-            "name": "‘Shroom Burger",
-            "category": "Burgers",
-            "price_estimate": 11.99,
-            "image_url": null,
-            "macros": {
-                "calories": 510,
-                "protein": 18,
-                "carbs": 49,
-                "fat": 27
-            }
-        },
-        {
-            "name": "Shack Stack",
-            "category": "Burgers",
-            "price_estimate": 15.79,
-            "image_url": null,
-            "macros": {
-                "calories": 770,
-                "protein": 40,
-                "carbs": 50,
-                "fat": 45
-            }
-        },
-        {
-            "name": "Veggie Shack",
-            "category": "Burgers",
-            "price_estimate": 11.29,
-            "image_url": null,
-            "macros": {
-                "calories": 530,
-                "protein": 16,
-                "carbs": 56,
-                "fat": 27
-            }
-        },
-        {
-            "name": "Grilled Cheese",
-            "category": "Burgers",
-            "price_estimate": 6.29,
-            "image_url": null,
-            "macros": {
-                "calories": 320,
-                "protein": 14,
-                "carbs": 25,
-                "fat": 18
-            }
-        },
-        {
-            "name": "Burger Patty",
-            "category": "Protein",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 190,
-                "protein": 19,
-                "carbs": 0,
-                "fat": 12
-            }
-        },
-        {
-            "name": "Chicken Shack",
-            "category": "Chicken",
-            "price_estimate": 10.09,
-            "image_url": null,
-            "macros": {
-                "calories": 550,
-                "protein": 33,
-                "carbs": 34,
-                "fat": 31
-            }
-        },
-        {
-            "name": "Chicken Bites (6 piece)",
-            "category": "Chicken",
-            "price_estimate": 6.99,
-            "image_url": null,
-            "macros": {
-                "calories": 300,
-                "protein": 17,
-                "carbs": 15,
-                "fat": 19
-            }
-        },
-        {
-            "name": "Chicken Bites (10 piece)",
-            "category": "Entree",
-            "price_estimate": 10.09,
-            "image_url": null,
-            "macros": {
-                "calories": 510,
-                "protein": 29,
-                "carbs": 26,
-                "fat": 32
-            }
-        },
-        {
-            "name": "Honey Mustard",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 180,
-                "protein": 1,
-                "carbs": 4,
-                "fat": 19
-            }
-        },
-        {
-            "name": "Egg and Cheese Sandwich",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 530,
-                "protein": 30,
-                "carbs": 28,
-                "fat": 32
-            }
-        },
-        {
-            "name": "Egg and Cheese Sandwich (Dbl Egg)",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 620,
-                "protein": 36,
-                "carbs": 28,
-                "fat": 39
-            }
-        },
-        {
-            "name": "Bacon Breakfast Sandwich",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 400,
-                "protein": 23,
-                "carbs": 25,
-                "fat": 23
-            }
-        },
-        {
-            "name": "Bacon Breakfast Sandwich (Dbl Egg)",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 490,
-                "protein": 29,
-                "carbs": 26,
-                "fat": 30
-            }
-        },
-        {
-            "name": "Sausage Breakfast Sandwich",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 340,
-                "protein": 17,
-                "carbs": 25,
-                "fat": 19
-            }
-        },
-        {
-            "name": "Sausage Breakfast Sandwich (Dbl Egg)",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 430,
-                "protein": 23,
-                "carbs": 25,
-                "fat": 25
-            }
-        },
-        {
-            "name": "Hot Dog",
-            "category": "Flat-Top Hot Dogs",
-            "price_estimate": 5.69,
-            "image_url": null,
-            "macros": {
-                "calories": 350,
-                "protein": 16,
-                "carbs": 25,
-                "fat": 22
-            }
-        },
-        {
-            "name": "Garden Dog",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 180,
-                "protein": 8,
-                "carbs": 27,
-                "fat": 3
-            }
+      {
+        "name": "Single ShackBurger®",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 500,
+          "protein": 29,
+          "carbs": 26,
+          "fat": 30
         }
+      },
+      {
+        "name": "Double ShackBurger®",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 760,
+          "protein": 51,
+          "carbs": 27,
+          "fat": 48
+        }
+      },
+      {
+        "name": "Triple ShackBurger®",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1020,
+          "protein": 74,
+          "carbs": 27,
+          "fat": 67
+        }
+      },
+      {
+        "name": "Single Hamburger",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 370,
+          "protein": 25,
+          "carbs": 24,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Double Hamburger",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 560,
+          "protein": 44,
+          "carbs": 24,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Triple Hamburger",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 750,
+          "protein": 63,
+          "carbs": 24,
+          "fat": 43
+        }
+      },
+      {
+        "name": "Single Cheeseburger",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 440,
+          "protein": 29,
+          "carbs": 25,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Double Cheeseburger",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 700,
+          "protein": 51,
+          "carbs": 25,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Triple Cheeseburger",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 950,
+          "protein": 73,
+          "carbs": 26,
+          "fat": 60
+        }
+      },
+      {
+        "name": "Single SmokeShack™",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 570,
+          "protein": 36,
+          "carbs": 28,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Double SmokeShack™",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 830,
+          "protein": 58,
+          "carbs": 28,
+          "fat": 53
+        }
+      },
+      {
+        "name": "Triple SmokeShack™",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1090,
+          "protein": 80,
+          "carbs": 29,
+          "fat": 71
+        }
+      },
+      {
+        "name": "Bacon Cheeseburger, single",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 500,
+          "protein": 35,
+          "carbs": 25,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Bacon Cheeseburger, double",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 760,
+          "protein": 58,
+          "carbs": 25,
+          "fat": 47
+        }
+      },
+      {
+        "name": "Bacon Cheeseburger, triple",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1020,
+          "protein": 80,
+          "carbs": 26,
+          "fat": 65
+        }
+      },
+      {
+        "name": "Avocado Bacon Burger, Single",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 610,
+          "protein": 36,
+          "carbs": 28,
+          "fat": 39
+        }
+      },
+      {
+        "name": "Avocado Bacon Burger, Double",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 870,
+          "protein": 58,
+          "carbs": 29,
+          "fat": 57
+        }
+      },
+      {
+        "name": "Avocado Bacon Burger, Triple",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1160,
+          "protein": 81,
+          "carbs": 31,
+          "fat": 78
+        }
+      },
+      {
+        "name": "‘Shroom Burger",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 18,
+          "carbs": 49,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Shack Stack®",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 770,
+          "protein": 40,
+          "carbs": 50,
+          "fat": 45
+        }
+      },
+      {
+        "name": "Veggie Shack Single",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 630,
+          "protein": 20,
+          "carbs": 53,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Veggie Shack Double",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 910,
+          "protein": 31,
+          "carbs": 73,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Grilled Cheese",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 320,
+          "protein": 14,
+          "carbs": 25,
+          "fat": 18
+        }
+      },
+      {
+        "name": "BLT",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 380,
+          "protein": 17,
+          "carbs": 26,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Martin's Potato Roll",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 180,
+          "protein": 7,
+          "carbs": 24,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Gluten Free Bun",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 160,
+          "protein": 3,
+          "carbs": 31,
+          "fat": 3.0
+        }
+      },
+      {
+        "name": "Lettuce Wrap",
+        "category": "Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 5,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Burger Patty",
+        "category": "Extras",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 190,
+          "protein": 19,
+          "carbs": 0,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Veggie Patty",
+        "category": "Extras",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 210,
+          "protein": 8,
+          "carbs": 20,
+          "fat": 4
+        }
+      },
+      {
+        "name": "American Cheese",
+        "category": "Extras",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 70,
+          "protein": 4,
+          "carbs": 1,
+          "fat": 6
+        }
+      },
+      {
+        "name": "ShackSauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 60,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Avocado",
+        "category": "Extras",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 60,
+          "protein": 1,
+          "carbs": 3,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Bacon (2 Slices)",
+        "category": "Extras",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 70,
+          "protein": 6,
+          "carbs": 0,
+          "fat": 4.5
+        }
+      },
+      {
+        "name": "Cherry Peppers",
+        "category": "Extras",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Pickled Jalapenos*",
+        "category": "Extras",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Crispy Onions",
+        "category": "Extras",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 110,
+          "protein": 1,
+          "carbs": 7,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Chicken Shack™",
+        "category": "Chicken",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 550,
+          "protein": 33,
+          "carbs": 34,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Chicken Bites (6 piece)",
+        "category": "Chicken",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 300,
+          "protein": 17,
+          "carbs": 15,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Chicken Bites (10 piece)",
+        "category": "Chicken",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 29,
+          "carbs": 26,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Avocado Bacon Chicken",
+        "category": "Chicken",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 680,
+          "protein": 40,
+          "carbs": 37,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Herb Mayonnaise",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 90,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Ranch",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 140,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 14
+        }
+      },
+      {
+        "name": "BBQ Sauce",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 70,
+          "protein": 1,
+          "carbs": 16,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Honey Mustard",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 180,
+          "protein": 1,
+          "carbs": 4,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Egg and Cheese Sandwich*",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 340,
+          "protein": 17,
+          "carbs": 25,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Egg and Cheese Sandwich (Double Egg*)",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 430,
+          "protein": 23,
+          "carbs": 26,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Bacon Egg and Cheese Sandwich*",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 400,
+          "protein": 23,
+          "carbs": 25,
+          "fat": 23
+        }
+      },
+      {
+        "name": "Bacon Egg and Cheese Sandwich (Dbl Egg)*",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 490,
+          "protein": 29,
+          "carbs": 26,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Sausage Breakfast Sandwich*",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 530,
+          "protein": 30,
+          "carbs": 28,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Sausage Breakfast Sandwich (Double Egg)*",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 620,
+          "protein": 36,
+          "carbs": 28,
+          "fat": 39
+        }
+      },
+      {
+        "name": "Wake up Shack*",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 630,
+          "protein": 24,
+          "carbs": 36,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Wake up Shack (Double Egg)*",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 720,
+          "protein": 30,
+          "carbs": 37,
+          "fat": 51
+        }
+      },
+      {
+        "name": "Egg White Light*",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 320,
+          "protein": 15,
+          "carbs": 26,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Egg White Light (Double Egg)*",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 340,
+          "protein": 19,
+          "carbs": 26,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Hashbrowns with Sauce*",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 740,
+          "protein": 6,
+          "carbs": 58,
+          "fat": 54
+        }
+      },
+      {
+        "name": "Crossiant*",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 420,
+          "protein": 7,
+          "carbs": 39,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Chocolate Crossiant*",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 390,
+          "protein": 6,
+          "carbs": 38,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Blueberry Cheese Danish*",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 340,
+          "protein": 6,
+          "carbs": 37,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Monkey Bread*",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 380,
+          "protein": 6,
+          "carbs": 48,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Extras: Egg*",
+        "category": "Extras",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 90,
+          "protein": 6,
+          "carbs": 0,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Extras: Egg White*",
+        "category": "Extras",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 35,
+          "protein": 7,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Extras: Hashbrowns*",
+        "category": "Extras",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 80,
+          "protein": 0,
+          "carbs": 7,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Extras: Breakfast Sauce*",
+        "category": "Sauce",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 150,
+          "protein": 0,
+          "carbs": 4,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Extras: Sausage Patty*",
+        "category": "Extras",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 190,
+          "protein": 13,
+          "carbs": 3,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Hot Dog",
+        "category": "Flat-Top Dogs",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 350,
+          "protein": 16,
+          "carbs": 25,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Shack-Cago Dog*",
+        "category": "Flat-Top Dogs",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 390,
+          "protein": 17,
+          "carbs": 32,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Garden Dog*",
+        "category": "Flat-Top Dogs",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 180,
+          "protein": 8,
+          "carbs": 27,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Cheese Dog",
+        "category": "Flat-Top Dogs",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 450,
+          "protein": 19,
+          "carbs": 25,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Bacon Cheese Dog",
+        "category": "Flat-Top Dogs",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 540,
+          "protein": 25,
+          "carbs": 26,
+          "fat": 38
+        }
+      },
+      {
+        "name": "Crispy Onion Cheese Dog",
+        "category": "Flat-Top Dogs",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 560,
+          "protein": 20,
+          "carbs": 32,
+          "fat": 39
+        }
+      },
+      {
+        "name": "Add Cheese Sauce",
+        "category": "Flat-Top Dogs",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 80,
+          "protein": 2,
+          "carbs": 1,
+          "fat": 7
+        }
+      },
+      {
+        "name": "Regular Fries",
+        "category": "Fries & Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 470,
+          "protein": 6,
+          "carbs": 63,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Cheese Fries",
+        "category": "Fries & Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 710,
+          "protein": 12,
+          "carbs": 64,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Bacon Cheese Fries",
+        "category": "Fries & Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 840,
+          "protein": 24,
+          "carbs": 65,
+          "fat": 52
+        }
+      },
+      {
+        "name": "Double Down Fries*",
+        "category": "Fries & Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1910,
+          "protein": 41,
+          "carbs": 164,
+          "fat": 117
+        }
+      },
+      {
+        "name": "Vanilla Shake",
+        "category": "Shakes",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 680,
+          "protein": 18,
+          "carbs": 72,
+          "fat": 36
+        }
+      },
+      {
+        "name": "Chocolate Shake",
+        "category": "Shakes",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 750,
+          "protein": 16,
+          "carbs": 76,
+          "fat": 45
+        }
+      },
+      {
+        "name": "Black & White Shake",
+        "category": "Shakes",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 770,
+          "protein": 19,
+          "carbs": 80,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Cookies & Cream Shake",
+        "category": "Shakes",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 850,
+          "protein": 19,
+          "carbs": 98,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Root Beer Float",
+        "category": "Floats",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 430,
+          "protein": 7,
+          "carbs": 70,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Creamsicle® Float",
+        "category": "Floats",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 440,
+          "protein": 7,
+          "carbs": 75,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Single Chocolate Cup",
+        "category": "Cups & Sundaes",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 310,
+          "protein": 6,
+          "carbs": 32,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Double Chocolate Cup",
+        "category": "Cups & Sundaes",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 490,
+          "protein": 9,
+          "carbs": 51,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Single Vanilla Cup",
+        "category": "Cups & Sundaes",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 280,
+          "protein": 7,
+          "carbs": 30,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Double Vanilla Cup",
+        "category": "Cups & Sundaes",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 450,
+          "protein": 11,
+          "carbs": 49,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Lemonade Small",
+        "category": "Drinks",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 160,
+          "protein": 0,
+          "carbs": 43,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Coke Small",
+        "category": "Drinks",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 140,
+          "protein": 0,
+          "carbs": 39,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Diet Coke Small",
+        "category": "Drinks",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 0,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Joe Coffee Cold Brew (7.5oz can)",
+        "category": "Drinks",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 5,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      },
+      {
+        "name": "ShackBurger®, Single Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1240,
+          "protein": 35,
+          "carbs": 153,
+          "fat": 53
+        }
+      },
+      {
+        "name": "ShackBurger®, Double Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1490,
+          "protein": 57,
+          "carbs": 154,
+          "fat": 71
+        }
+      },
+      {
+        "name": "SmokeShack™, Single Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1340,
+          "protein": 42,
+          "carbs": 155,
+          "fat": 60
+        }
+      },
+      {
+        "name": "SmokeShack™, Double Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1600,
+          "protein": 64,
+          "carbs": 156,
+          "fat": 78
+        }
+      },
+      {
+        "name": "Avocado Bacon Burger, Single Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1400,
+          "protein": 42,
+          "carbs": 157,
+          "fat": 67
+        }
+      },
+      {
+        "name": "Avocado Bacon Burger, Double Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1660,
+          "protein": 64,
+          "carbs": 158,
+          "fat": 85
+        }
+      },
+      {
+        "name": "Bacon Cheeseburger, Single Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1270,
+          "protein": 41,
+          "carbs": 153,
+          "fat": 54
+        }
+      },
+      {
+        "name": "Bacon Cheeseburger, Double Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1530,
+          "protein": 63,
+          "carbs": 153,
+          "fat": 72
+        }
+      },
+      {
+        "name": "Cheeseburger, Single Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1180,
+          "protein": 35,
+          "carbs": 152,
+          "fat": 46
+        }
+      },
+      {
+        "name": "Cheeseburger, Double Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1430,
+          "protein": 57,
+          "carbs": 153,
+          "fat": 64
+        }
+      },
+      {
+        "name": "Hot Dog Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1090,
+          "protein": 22,
+          "carbs": 152,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Chicken Shack™ Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1290,
+          "protein": 39,
+          "carbs": 162,
+          "fat": 54
+        }
+      },
+      {
+        "name": "Chicken Bites (6 piece) Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1190,
+          "protein": 24,
+          "carbs": 146,
+          "fat": 56
+        }
+      },
+      {
+        "name": "Chicken Bites (10 piece) Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1390,
+          "protein": 35,
+          "carbs": 157,
+          "fat": 69
+        }
+      },
+      {
+        "name": "Smoky Classic BBQ Burger, Single Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1430,
+          "protein": 43,
+          "carbs": 172,
+          "fat": 62
+        }
+      },
+      {
+        "name": "Smoky Classic BBQ Burger, Double Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1690,
+          "protein": 65,
+          "carbs": 173,
+          "fat": 80
+        }
+      },
+      {
+        "name": "Carolina BBQ Burger, Single Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1510,
+          "protein": 42,
+          "carbs": 171,
+          "fat": 71
+        }
+      },
+      {
+        "name": "Carolina BBQ Burger, Double Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1770,
+          "protein": 64,
+          "carbs": 171,
+          "fat": 89
+        }
+      },
+      {
+        "name": "Smoky Classic Chicken Sandwich Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1520,
+          "protein": 50,
+          "carbs": 181,
+          "fat": 66
+        }
+      },
+      {
+        "name": "Carolina BBQ Chicken Sandwich Combo Meal",
+        "category": "Combo Meals",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1600,
+          "protein": 50,
+          "carbs": 180,
+          "fat": 75
+        }
+      }
     ]
-}
+  }

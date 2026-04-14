@@ -10,7 +10,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
  * Get the appropriate query filter for data ownership
  * Returns a query builder with the correct filter applied
  */
-export async function getDataQueryFilter<T>(
+export async function getDataQueryFilter(
   supabase: SupabaseClient,
   tableName: 'saved_meals' | 'daily_logs' | 'user_favorites'
 ) {
@@ -45,7 +45,7 @@ export async function getDataQueryFilter<T>(
  * Insert data with appropriate user_id/device_id
  * Returns the insert query builder
  */
-export async function insertDataWithOwnership<T>(
+export async function insertDataWithOwnership(
   supabase: SupabaseClient,
   tableName: 'saved_meals' | 'daily_logs' | 'user_favorites',
   data: Record<string, unknown>

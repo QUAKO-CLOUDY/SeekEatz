@@ -118,7 +118,7 @@ export async function buildFilters(
 
   // ── Category / meal type ──────────────────────────────────────────────────
   if (parsed.normalizedCategory) params.p_normalized_category = parsed.normalizedCategory;
-  if (parsed.mealType === 'breakfast') params.p_meal_type = parsed.mealType;
+  if (parsed.mealType) params.p_meal_type = parsed.mealType;
 
   // ── Dish / protein keyword (name-based SQL filter) ────────────────────────
   // e.g. "steak dinner" → p_name_keyword = 'steak' so SQL filters name ILIKE '%steak%'
@@ -185,6 +185,19 @@ export async function buildFilters(
 interface ResolvedRestaurants {
   names: string[];
 }
+
+type RestaurantNameRow = {
+  restaurant_name?: string | null;
+};
+
+type RestaurantRow = {
+  name?: string | null;
+};
+
+type DietaryFilterItem = {
+  name?: string;
+  description?: string;
+};
 
 function normalizeRestaurantLookup(value: string): string {
   return value
@@ -341,8 +354,8 @@ async function resolveRestaurantNames(
       .limit(25);
     if (menuNames && menuNames.length > 0) {
       const names = menuNames
-        .map((row: any) => row.restaurant_name as string)
-        .filter(Boolean);
+        .map((row: RestaurantNameRow) => row.restaurant_name)
+        .filter((name): name is string => Boolean(name));
       return { names: [...new Set(names)] };
     }
 
@@ -358,7 +371,11 @@ async function resolveRestaurantNames(
       .limit(50);
 
     if (restaurants && restaurants.length > 0) {
-      return { names: restaurants.map((r: any) => r.name as string) };
+      return {
+        names: restaurants
+          .map((r: RestaurantRow) => r.name)
+          .filter((name): name is string => Boolean(name)),
+      };
     }
   }
 
@@ -392,9 +409,9 @@ function getExplicitDishKeyword(parsed: ParsedQuery): string | undefined {
  * Used when p_diet_type would be needed but dietary_tags column isn't populated.
  */
 export function applyDietaryFilter(
-  items: any[],
+  items: DietaryFilterItem[],
   dietaryKeywords: string[]
-): any[] {
+): DietaryFilterItem[] {
   if (!dietaryKeywords || dietaryKeywords.length === 0) return items;
   const lower = dietaryKeywords.map(k => k.toLowerCase());
   const vegetarianFilter = lower.includes('vegetarian') || lower.includes('veggie');

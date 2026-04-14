@@ -35,8 +35,6 @@ export function extractExplicitRestaurant(message: string): {
   }
 
   const trimmed = normalizeSearchText(message).text.trim();
-  const lowerMessage = trimmed.toLowerCase();
-
   // Pattern 1: "from X" - greedy match to end, then clean trailing words
   const pattern1 = /\bfrom\s+([a-z0-9&' .\-]+)/i;
   const match1 = trimmed.match(pattern1);

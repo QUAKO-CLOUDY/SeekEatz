@@ -9,6 +9,7 @@ type Props = {
 };
 
 export function WelcomeScreen({ onGetStarted }: Props) {
+  void onGetStarted;
   const router = useRouter();
 
   const handleSignIn = () => {

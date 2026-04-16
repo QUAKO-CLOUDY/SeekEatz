@@ -16,6 +16,10 @@
 # next.js
 /.next/
 /out/
+/ios/
+/android/
+/_backups/
+/nul
 
 # production
 /build

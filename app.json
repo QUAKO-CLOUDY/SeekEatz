@@ -13,7 +13,8 @@
       "bundleIdentifier": "com.seekeatz.app",
       "buildNumber": "2",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "SeekEatz uses your location to show nearby restaurants and meal options when you choose to enable location-based search."
+        "NSLocationWhenInUseUsageDescription": "SeekEatz uses your location to show nearby restaurants and meal options when you choose to enable location-based search.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {

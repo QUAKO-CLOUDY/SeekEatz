@@ -1,6 +1,4 @@
-const fs = require("fs");
-const path = require("path");
-const { withDangerousMod } = require("@expo/config-plugins");
+const { withPodfile } = require("@expo/config-plugins");
 
 function injectUseModularHeaders(podfileContents) {
   if (podfileContents.includes("use_modular_headers!")) {
@@ -27,21 +25,8 @@ function injectUseModularHeaders(podfileContents) {
 }
 
 module.exports = function withCapacitorModularHeaders(config) {
-  return withDangerousMod(config, [
-    "ios",
-    async (modConfig) => {
-      const podfilePath = path.join(modConfig.modRequest.platformProjectRoot, "Podfile");
-      if (!fs.existsSync(podfilePath)) {
-        return modConfig;
-      }
-
-      const original = fs.readFileSync(podfilePath, "utf8");
-      const updated = injectUseModularHeaders(original);
-      if (updated !== original) {
-        fs.writeFileSync(podfilePath, updated);
-      }
-
-      return modConfig;
-    },
-  ]);
+  return withPodfile(config, (modConfig) => {
+    modConfig.modResults.contents = injectUseModularHeaders(modConfig.modResults.contents);
+    return modConfig;
+  });
 };

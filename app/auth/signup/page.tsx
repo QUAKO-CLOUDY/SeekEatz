@@ -12,6 +12,7 @@ import { getGuestChatForMigration, clearGuestSessionFull } from "@/lib/guest-ses
 import { claimAnonymousData } from "@/lib/claim-anon-data";
 import { AuthProviders } from "@/app/components/AuthProviders";
 import { bootstrapAccount } from "@/lib/bootstrap-account";
+import { getFreeTierSignupDescription } from "@/lib/free-tier";
 import type { UserProfile } from "@/app/types";
 
 const THIRTY_MINUTES = 30 * 60 * 1000;
@@ -555,7 +556,7 @@ function SignupPageContent() {
           </h1>
           <p className="text-black">
             {selectedPlan === "free"
-              ? "Enter your email to get 2 free searches every 24 hours with SeekEatz."
+              ? getFreeTierSignupDescription()
               : "Sign up to get started with SeekEatz"}
           </p>
         </div>

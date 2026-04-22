@@ -11,6 +11,7 @@ import { extractMacroConstraintsFromText, hasConstraints } from '@/lib/extractMa
 import { isSmoothieLikeText } from '@/lib/smoothie-search';
 import { hasRemainingUsage, incrementUsageCount } from '@/lib/usage-cookie';
 import { buildEntitlement, type EntitlementProfileRow, FREE_DAILY_QUERY_LIMIT, PROFILE_ENTITLEMENT_SELECT } from '@/lib/entitlements';
+import { getFreeTierCreateAccountLimitMessage, getFreeTierUpgradeLimitMessage } from '@/lib/free-tier';
 import type { Meal } from '@/app/types';
 
 export const maxDuration = 30;
@@ -903,11 +904,12 @@ export async function POST(req: Request) {
 
       if (!entitlement.hasPremiumAccess) {
         if (meteredCount >= FREE_DAILY_QUERY_LIMIT) {
+          const limitMessage = getFreeTierUpgradeLimitMessage();
           return NextResponse.json({
             error: true,
-            message: "You've used your 2 free searches for the last 24 hours. Upgrade to unlock unlimited access.",
+            message: limitMessage,
             mode: "text",
-            answer: "You've used your 2 free searches for the last 24 hours. Upgrade to unlock unlimited access.",
+            answer: limitMessage,
             usageLimit: true
           }, {
             status: 403,
@@ -920,11 +922,12 @@ export async function POST(req: Request) {
     } else {
       const allowed = await hasRemainingUsage();
       if (!allowed) {
+        const limitMessage = getFreeTierCreateAccountLimitMessage();
         return NextResponse.json({
           error: true,
-          message: "You've used your 2 free searches for the last 24 hours. Create an account to keep going.",
+          message: limitMessage,
           mode: "text",
-          answer: "You've used your 2 free searches for the last 24 hours. Create an account to keep going.",
+          answer: limitMessage,
           usageLimit: true
         }, {
           status: 403,

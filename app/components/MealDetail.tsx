@@ -50,6 +50,8 @@ type SwapOption = {
   id: string;
   label: string;
   modifierItemIds: string[];
+  expectedEffect?: string;
+  confidenceLabel?: string;
   isModification?: boolean; // true = modification (edit this meal), false = alternative (different meal)
   quantityConfig?: SwapQuantityConfig;
   deltaMacros: {
@@ -176,11 +178,6 @@ function getSwapDescription(delta: { calories: number; protein: number; carbs: n
   }
 }
 
-function formatSignedDelta(value: number, suffix: string): string {
-  const roundedValue = Number.isInteger(value) ? value : Number(value.toFixed(1));
-  return `${roundedValue > 0 ? '+' : ''}${roundedValue}${suffix}`;
-}
-
 function scaleSwapDelta(
   delta: SwapOption['deltaMacros'],
   quantity: number
@@ -197,30 +194,11 @@ function scaleSwapDelta(
   };
 }
 
-function SwapDeltaSummary({ delta }: { delta: SwapOption['deltaMacros'] }) {
-  const entries = [
-    { key: 'calories', label: 'cal', value: delta.calories, tone: 'text-pink-600 dark:text-pink-300' },
-    { key: 'protein', label: 'pro', value: delta.protein, suffix: 'g', tone: 'text-cyan-600 dark:text-cyan-300' },
-    { key: 'carbs', label: 'carbs', value: delta.carbs, suffix: 'g', tone: 'text-green-600 dark:text-green-300' },
-    { key: 'fats', label: 'fat', value: delta.fats, suffix: 'g', tone: 'text-amber-600 dark:text-amber-300' },
-  ].filter((entry) => entry.value !== 0);
-
-  if (entries.length === 0) {
-    return null;
+function getSwapSummaryText(swap: SwapOption, delta: SwapOption['deltaMacros']): string {
+  if (swap.expectedEffect && swap.expectedEffect.trim().length > 0) {
+    return swap.expectedEffect.trim();
   }
-
-  return (
-    <div className="flex flex-wrap gap-1.5 mt-2">
-      {entries.map((entry) => (
-        <span
-          key={entry.key}
-          className={`rounded-full border border-border bg-background/70 px-2 py-1 text-[10px] font-semibold ${entry.tone}`}
-        >
-          {formatSignedDelta(entry.value, entry.suffix ?? '')} {entry.label}
-        </span>
-      ))}
-    </div>
-  );
+  return getSwapDescription(delta);
 }
 
 function inferEggSwapMaxQuantity(mealName: string): number {
@@ -556,6 +534,7 @@ export function MealDetail({
             return {
               id: alt.id || `alt::${meal.id}::${alt.name || 'Alternative'}`,
               label: `Try ${alt.name || 'alternative'} instead`,
+              expectedEffect: 'Alternative menu item',
               modifierItemIds: [],
               isModification: false, // Mark as alternative
               deltaMacros: {
@@ -1106,15 +1085,14 @@ export function MealDetail({
                           }`}
                       >
                         <p className="text-foreground/80 text-sm font-medium leading-snug">{swap.label}</p>
-                        <p className="text-muted-foreground text-xs mt-1 capitalize">
-                          {getSwapDescription(delta)}
+                        <p className="text-muted-foreground text-xs mt-1">
+                          {getSwapSummaryText(swap, delta)}
                         </p>
                         {swap.quantityConfig && isSelected && quantity > 1 && (
                           <p className="text-indigo-600 dark:text-indigo-300 text-[11px] mt-2 font-medium">
                             Applied to {quantity} {swap.quantityConfig.unitLabel}{quantity === 1 ? '' : 's'}
                           </p>
                         )}
-                        <SwapDeltaSummary delta={delta} />
                       </div>
                     );
                   })
@@ -1376,10 +1354,9 @@ export function MealDetail({
                             </div>
                             <div className="text-left">
                               <p className="text-card-foreground text-sm font-medium">{swap.label}</p>
-                              <p className="text-muted-foreground text-xs capitalize">
-                                {getSwapDescription(delta)}
+                              <p className="text-muted-foreground text-xs">
+                                {getSwapSummaryText(swap, delta)}
                               </p>
-                              <SwapDeltaSummary delta={delta} />
                             </div>
                           </div>
                         </button>

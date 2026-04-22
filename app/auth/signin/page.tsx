@@ -17,7 +17,10 @@ import { isFullAccessEmail } from "@/lib/full-access";
 function SignInPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/chat";
+  const requestedRedirectTo = searchParams.get("redirectTo") || "/chat";
+  const redirectTo = requestedRedirectTo.startsWith("/upgrade")
+    ? "/chat"
+    : requestedRedirectTo;
   const isMasterMode = searchParams.get("master") === "1";
   const isSwitchAccountMode = searchParams.get("switch") === "1";
   const shouldStartTutorial = searchParams.get("tutorial") === "1";

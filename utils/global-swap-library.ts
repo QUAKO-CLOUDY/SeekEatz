@@ -65,17 +65,6 @@ export const GLOBAL_SWAP_LIBRARY: SwapLibraryEntry[] = [
         conflictsWith: ['sauce-none', 'sauce-side'],
         details: 'Dressing or sauce on the side so you control how much you use',
     },
-    // Dish-specific: dip-instead-of-coating for burger/sub (more precise than "light sauce")
-    {
-        id: 'dip-instead-of-coating',
-        label: 'Dip instead of coating',
-        category: 'SAUCE_REDUCTION',
-        applicableDishTypes: ['burger', 'sub', 'wrap'],
-        impactLabels: ['Reduce calories', 'Reduce fat'],
-        heuristicDelta: { calories: [-80, -30], fats: [-7, -3] },
-        conflictsWith: ['sauce-none', 'sauce-light'],
-        details: 'Dip on the side instead of coating the item',
-    },
     // Generic: sauce on the side (taco, wrap, sub, bowl, pasta not covered above)
     {
         id: 'sauce-side',
@@ -95,7 +84,7 @@ export const GLOBAL_SWAP_LIBRARY: SwapLibraryEntry[] = [
         applicableDishTypes: ['burger', 'sub', 'bowl', 'taco', 'wrap', 'pasta', 'salad'],
         impactLabels: ['Reduce calories', 'Reduce fat'],
         heuristicDelta: { calories: [-60, -30], fats: [-5, -2] },
-        conflictsWith: ['dip-instead-of-coating', 'sauce-drizzle', 'sauce-side'],
+        conflictsWith: ['sauce-drizzle', 'sauce-side'],
         details: 'Ask for light sauce to cut calories and fat',
     },
     {

@@ -1,6 +1,7 @@
 import { searchHandler } from '@/lib/retrieval/retrieval-engine';
 import { buildSearchParams } from '@/lib/search-utils';
 import { buildEntitlement, type EntitlementProfileRow, FREE_DAILY_QUERY_LIMIT, PROFILE_ENTITLEMENT_SELECT } from '@/lib/entitlements';
+import { getFreeTierCreateAccountLimitMessage, getFreeTierUpgradeLimitMessage } from '@/lib/free-tier';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,9 +60,10 @@ export async function POST(req: Request) {
 
       if (!entitlement.hasPremiumAccess) {
         if ((usageResult.count ?? 0) >= FREE_DAILY_QUERY_LIMIT) {
+          const limitMessage = getFreeTierUpgradeLimitMessage();
           return Response.json({
             error: 'Usage limit reached',
-            message: "You've used your 2 free searches for the last 24 hours. Upgrade to unlock unlimited access.",
+            message: limitMessage,
             usageLimit: true
           }, { status: 403 });
         }
@@ -71,9 +73,10 @@ export async function POST(req: Request) {
     } else {
       const allowed = await hasRemainingUsage();
       if (!allowed) {
+        const limitMessage = getFreeTierCreateAccountLimitMessage();
         return Response.json({
           error: 'Usage limit reached',
-          message: "You've used your 2 free searches for the last 24 hours. Create an account to keep going.",
+          message: limitMessage,
           usageLimit: true
         }, { status: 403 });
       }

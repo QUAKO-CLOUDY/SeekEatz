@@ -1,8 +1,8 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-let adminClient: SupabaseClient<any> | null = null;
+let adminClient: SupabaseClient | null = null;
 
-export function createAdminClient(): SupabaseClient<any> {
+export function createAdminClient(): SupabaseClient {
   if (adminClient) {
     return adminClient;
   }
@@ -14,7 +14,7 @@ export function createAdminClient(): SupabaseClient<any> {
     throw new Error("Supabase admin client is not configured.");
   }
 
-  adminClient = createClient<any>(supabaseUrl, serviceRoleKey, {
+  adminClient = createClient(supabaseUrl, serviceRoleKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,

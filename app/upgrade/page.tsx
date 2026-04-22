@@ -8,6 +8,7 @@ import { AuthProviders } from "@/app/components/AuthProviders";
 import { MONTHLY_PLAN_PRICE, YEARLY_PLAN_PRICE, getEntitlementPlanLabel } from "@/lib/entitlements";
 import { useAccountEntitlement } from "@/app/hooks/useAccountEntitlement";
 import { bootstrapAccount } from "@/lib/bootstrap-account";
+import { getFreeTierPlanDetails } from "@/lib/free-tier";
 import { isRevenueCatConfigured } from "@/lib/billing/apple-products";
 import {
   purchaseRevenueCatTier,
@@ -29,8 +30,7 @@ const planCards = [
     name: "Free",
     price: "$0",
     description: "",
-    details:
-      "Enjoy 2 free AI chats and quick searches daily. Credits reset every 24 hours. Premium features require a monthly or yearly subscription.",
+    details: getFreeTierPlanDetails(),
     cta: "Create Free Account",
   },
   {
@@ -64,7 +64,7 @@ function UpgradePageContent() {
   const isMasterMode = searchParams.get("master") === "1";
   const shouldStartTutorial = searchParams.get("tutorial") === "1";
   const postSignupOnboardingPath = "/onboarding?afterSignup=1";
-  const postAuthRedirect = shouldStartTutorial ? "/chat" : "/upgrade";
+  const postAuthRedirect = "/chat";
   const encodedPostAuthRedirect = encodeURIComponent(postAuthRedirect);
   const encodedPostSignupOnboardingPath = encodeURIComponent(postSignupOnboardingPath);
   const signInHref = `/auth/signin?redirectTo=${encodedPostAuthRedirect}&switch=1${shouldStartTutorial ? "&tutorial=1" : ""}${isMasterMode ? "&master=1" : ""}`;

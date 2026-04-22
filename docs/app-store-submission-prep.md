@@ -6,9 +6,9 @@ Use this as a strict checklist, not a brainstorming doc.
 
 ## Current repo-side status
 
-These are already in place:
+These are in place or ready to verify:
 
-- `npm run lint` passes with `0 errors` and `0 warnings`
+- `npm run lint` is the release gate. Do not hand off to native QA until it passes with `0 errors` and `0 warnings`.
 - Search retrieval audits are passing
 - Exact restaurant-name coverage is passing
 - iOS location usage string exists in [Info.plist](/c:/Users/isaac/my-meals-app/ios/App/App/Info.plist)

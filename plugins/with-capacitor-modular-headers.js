@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { withPodfile } = require("@expo/config-plugins");
 
 function injectUseModularHeaders(podfileContents) {

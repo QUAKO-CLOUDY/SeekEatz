@@ -23,6 +23,105 @@ type SearchableMenuItem = {
   } | null;
 };
 
+type SwapDelta = {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fats: number;
+};
+
+const ZERO_DELTA: SwapDelta = {
+  calories: 0,
+  protein: 0,
+  carbs: 0,
+  fats: 0,
+};
+
+function withIfAvailable(label: string): string {
+  if (/if available/i.test(label)) return label;
+  return `${label} (if available)`;
+}
+
+function fallbackEffectFromSwapType(swapType: string): string {
+  switch (swapType) {
+    case 'higherProtein':
+    case 'proteinUp':
+      return 'Higher protein';
+    case 'lowerCarbs':
+    case 'carbDown':
+      return 'Lower carbs';
+    case 'lowerCalories':
+    case 'calorieDown':
+      return 'Lower calories';
+    case 'fatDown':
+      return 'Lower fat';
+    default:
+      return 'Recommended adjustment';
+  }
+}
+
+function toNonNumericEffect(effect: string | undefined, fallback: string): string {
+  if (!effect || typeof effect !== 'string') return fallback;
+
+  const cleaned = effect
+    .replace(/[+\-]?\d+(\.\d+)?\s*(g|cal|kcal)?/gi, '')
+    .replace(/[↑↓]/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s+,/g, ',')
+    .replace(/,+/g, ',')
+    .replace(/^,\s*|\s*,\s*$/g, '')
+    .trim();
+
+  return cleaned.length > 0 ? cleaned : fallback;
+}
+
+function buildGenericFallbackSwaps() {
+  return [
+    {
+      id: 'generic-swap-sauce-side',
+      label: withIfAvailable('Sauce on the side'),
+      expectedEffect: 'Lighter sauce usage',
+      estimatedDelta: ZERO_DELTA,
+      confidenceLabel: 'Ask if available' as const,
+      type: 'modify' as const,
+      swapType: 'neutral' as const,
+      details: 'General swap recommendation when restaurant-specific modifiers are unavailable.',
+      modifierItemIds: [] as string[],
+      impactLabels: ['Recommended adjustment'],
+      source: 'global' as const,
+      deltaMacros: ZERO_DELTA,
+    },
+    {
+      id: 'generic-swap-grilled',
+      label: withIfAvailable('Grilled instead of fried'),
+      expectedEffect: 'Lighter preparation',
+      estimatedDelta: ZERO_DELTA,
+      confidenceLabel: 'Ask if available' as const,
+      type: 'modify' as const,
+      swapType: 'neutral' as const,
+      details: 'General swap recommendation when restaurant-specific modifiers are unavailable.',
+      modifierItemIds: [] as string[],
+      impactLabels: ['Recommended adjustment'],
+      source: 'global' as const,
+      deltaMacros: ZERO_DELTA,
+    },
+    {
+      id: 'generic-swap-side',
+      label: withIfAvailable('Side salad instead of fries'),
+      expectedEffect: 'Lighter side option',
+      estimatedDelta: ZERO_DELTA,
+      confidenceLabel: 'Ask if available' as const,
+      type: 'modify' as const,
+      swapType: 'neutral' as const,
+      details: 'General swap recommendation when restaurant-specific modifiers are unavailable.',
+      modifierItemIds: [] as string[],
+      impactLabels: ['Recommended adjustment'],
+      source: 'global' as const,
+      deltaMacros: ZERO_DELTA,
+    },
+  ];
+}
+
 /**
  * Swap endpoint v2: Hybrid Swap Engine
  * Returns modification suggestions (DB-backed + global + LLM fallback) and alternative menu items.
@@ -227,7 +326,10 @@ export async function POST(req: Request) {
     const mappedDBMods = modifications.map((mod, index) => ({
       id: mod.id || `mod-${index}`,
       label: mod.swapTitle,
-      expectedEffect: mod.expectedEffect,
+      expectedEffect: toNonNumericEffect(
+        mod.expectedEffect,
+        fallbackEffectFromSwapType(mod.swapType)
+      ),
       estimatedDelta: mod.estimatedDelta,
       confidenceLabel: mod.confidenceLabel,
       type: mod.type,
@@ -276,9 +378,9 @@ export async function POST(req: Request) {
       
       return {
         id: gs.id,
-        label: gs.label,
-        expectedEffect: primaryLabel, // Show only the most important impact
-        estimatedDelta: gs.estimatedDelta,
+        label: withIfAvailable(gs.label),
+        expectedEffect: toNonNumericEffect(primaryLabel, 'Recommended adjustment'),
+        estimatedDelta: ZERO_DELTA,
         confidenceLabel: gs.impactType === 'deterministic' ? 'Likely available' as const : 'Ask if available' as const,
         type: 'modify' as const,
         swapType: 'neutral' as const,
@@ -286,12 +388,7 @@ export async function POST(req: Request) {
         modifierItemIds: [] as string[], // Global swaps have no DB modifier IDs
         impactLabels: [primaryLabel], // Keep only the primary label
         source: 'global' as const,
-        deltaMacros: {
-          calories: gs.estimatedDelta.calories,
-          protein: gs.estimatedDelta.protein,
-          carbs: gs.estimatedDelta.carbs,
-          fats: gs.estimatedDelta.fats,
-        },
+        deltaMacros: ZERO_DELTA,
       };
     });
 
@@ -306,9 +403,9 @@ export async function POST(req: Request) {
       
       return {
         id: ls.id,
-        label: ls.label,
-        expectedEffect: primaryLabel, // Show only the most important impact
-        estimatedDelta: ls.estimatedDelta || { calories: 0, protein: 0, carbs: 0, fats: 0 },
+        label: withIfAvailable(ls.label),
+        expectedEffect: toNonNumericEffect(primaryLabel, 'Recommended adjustment'),
+        estimatedDelta: ZERO_DELTA,
         confidenceLabel: 'Ask if available' as const,
         type: 'modify' as const,
         swapType: 'neutral' as const,
@@ -316,12 +413,7 @@ export async function POST(req: Request) {
         modifierItemIds: [] as string[],
         impactLabels: [primaryLabel], // Keep only the primary label
         source: 'llm' as const,
-        deltaMacros: ls.estimatedDelta ? {
-          calories: ls.estimatedDelta.calories,
-          protein: ls.estimatedDelta.protein,
-          carbs: ls.estimatedDelta.carbs,
-          fats: ls.estimatedDelta.fats,
-        } : { calories: 0, protein: 0, carbs: 0, fats: 0 },
+        deltaMacros: ZERO_DELTA,
       };
     });
 
@@ -330,7 +422,10 @@ export async function POST(req: Request) {
     
     // Limit to 2-3 swaps total (already limited by hybrid generator, but ensure here too)
     const MAX_FINAL_SWAPS = 3;
-    const finalModifications = allModifications.slice(0, MAX_FINAL_SWAPS);
+    let finalModifications = allModifications.slice(0, MAX_FINAL_SWAPS);
+    if (finalModifications.length === 0) {
+      finalModifications = buildGenericFallbackSwaps();
+    }
 
     if (process.env.NODE_ENV === 'development') {
       console.log('[swaps] Final response:', {

@@ -1,12 +1,14 @@
 /**
- * Deprecated client-side gate shim.
+ * Client-side compatibility shim for legacy call sites.
  *
- * Free-tier enforcement now lives in server routes and premium surface
- * restrictions live in the app shell. Keep this permissive until any old call
- * sites are deleted so we do not double-gate the experience.
+ * Free-tier enforcement lives in server routes and uses a rolling 24-hour
+ * window. Keep this permissive to avoid double-gating client interactions.
  */
 
+import { FREE_DAILY_QUERY_LIMIT } from "@/lib/entitlements";
+
 export type FeatureType = 'chat' | 'search';
+export const FREE_TIER_WINDOW_HOURS = 24;
 
 export async function canUseFeature(feature: FeatureType): Promise<boolean> {
   void feature;
@@ -15,11 +17,11 @@ export async function canUseFeature(feature: FeatureType): Promise<boolean> {
 
 export async function incrementUsage(feature: FeatureType): Promise<number> {
   void feature;
-  return 0;
+  return FREE_DAILY_QUERY_LIMIT;
 }
 
 export function getTrialCount(): number {
-  return 0;
+  return FREE_DAILY_QUERY_LIMIT;
 }
 
 export async function hasReachedLimit(): Promise<boolean> {

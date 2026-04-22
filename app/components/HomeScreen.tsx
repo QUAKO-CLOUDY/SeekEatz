@@ -1564,7 +1564,7 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
   }, [updateTransforms]);
 
   // scroll to current value on mount / macro change (only if not user scrolling)
-  const centerIndex = useCallback((idx: number, behavior: ScrollBehavior = "auto") => {
+  const centerIndex = useCallback((idx: number) => {
     if (isUserScrollingRef.current || isProgrammaticScrollRef.current) return;
 
     const container = containerRef.current;

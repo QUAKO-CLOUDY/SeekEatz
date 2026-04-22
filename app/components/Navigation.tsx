@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Home, Activity, Heart, Lock, Settings as SettingsIcon } from "lucide-react";
 import Logo from "./Logo";
 
@@ -13,10 +14,24 @@ type Props = {
 
 export function Navigation({ currentScreen, onNavigate, lockedScreens = {} }: Props) {
   const isAIChatActive = currentScreen === "chat";
+  const [hideForKeyboard, setHideForKeyboard] = useState(false);
+
+  useEffect(() => {
+    const onKeyboardToggle = (event: Event) => {
+      const customEvent = event as CustomEvent<{ open?: boolean }>;
+      const isCoarsePointer = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
+      setHideForKeyboard(Boolean(customEvent.detail?.open) && isCoarsePointer && isAIChatActive);
+    };
+
+    window.addEventListener("seekeatz:chat-keyboard", onKeyboardToggle as EventListener);
+    return () => {
+      window.removeEventListener("seekeatz:chat-keyboard", onKeyboardToggle as EventListener);
+    };
+  }, [isAIChatActive]);
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-[100] flex items-center justify-around border-t border-border bg-card/95 px-2 pt-0.5 backdrop-blur-xl md:left-1/2 md:w-full md:max-w-2xl md:-translate-x-1/2 md:rounded-t-3xl md:border-x lg:max-w-4xl xl:max-w-5xl"
+      className={`fixed bottom-0 left-0 right-0 z-[100] flex items-center justify-around border-t border-border bg-card/95 px-2 pt-0.5 backdrop-blur-xl transition-transform duration-200 md:left-1/2 md:w-full md:max-w-2xl md:-translate-x-1/2 md:rounded-t-3xl md:border-x lg:max-w-4xl xl:max-w-5xl ${hideForKeyboard ? "translate-y-full pointer-events-none" : "translate-y-0"}`}
       style={{
         minHeight: "var(--app-nav-safe-offset)",
         paddingBottom: "env(safe-area-inset-bottom, 0px)",

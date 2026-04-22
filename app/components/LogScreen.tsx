@@ -162,33 +162,78 @@ export function LogScreen({
       return recs;
     }
 
-    if (remaining.calories < -100) {
-      recs.push({
-        icon: Flame,
-        color: "amber",
-        message:
-          "You’re over your calorie goal for this day. Aim for lighter meals or higher protein next time.",
-      });
-    } else if (remaining.calories > 200) {
+    const overCalories = remaining.calories < -100;
+    const caloriesLeft = remaining.calories > 200;
+    const proteinLow = remaining.protein > 20;
+    const proteinHigh = remaining.protein < -20;
+    const carbsHigh = remaining.carbs < -20;
+    const fatsHigh = remaining.fats < -10;
+
+    if (overCalories) {
+      if (proteinLow) {
+        recs.push({
+          icon: Flame,
+          color: "amber",
+          message:
+            "You are over calories and still short on protein. Next meal: go leaner and protein-forward (grilled, low-fat options).",
+        });
+      } else if (proteinHigh) {
+        recs.push({
+          icon: Flame,
+          color: "amber",
+          message:
+            "You are over calories and already above protein. Next meal should be lighter, with lower fat and carbs.",
+        });
+      } else {
+        recs.push({
+          icon: Flame,
+          color: "amber",
+          message:
+            "You are over your calorie goal for this day. Aim for lighter meals next time.",
+        });
+      }
+    } else if (caloriesLeft) {
       recs.push({
         icon: Flame,
         color: "cyan",
-        message:
-          "You still have calories left. A balanced snack or meal can help you feel satisfied.",
+        message: proteinLow
+          ? "You still have calories and protein left. A lean protein snack can close the gap."
+          : "You still have calories left. A balanced snack or meal can help you feel satisfied.",
       });
     }
 
-    if (remaining.protein > 20) {
+    if (!overCalories && proteinLow) {
       recs.push({
         icon: Zap,
         color: "green",
         message:
-          "Protein is a bit low for this day. Consider a higher-protein meal next time.",
+          "Protein is still low for this day. Consider a higher-protein meal next time.",
+      });
+    } else if (proteinHigh && (carbsHigh || fatsHigh)) {
+      recs.push({
+        icon: Zap,
+        color: "purple",
+        message:
+          "Protein is already above target. Next meal, prioritize lighter carbs/fats and fiber-rich foods.",
       });
     }
 
-    return recs;
-  }, [dayMeals, remaining.calories, remaining.protein]);
+    if (recs.length === 0) {
+      recs.push({
+        icon: Info,
+        color: "green",
+        message: "Great balance today. Keep this same pattern for consistent progress.",
+      });
+    }
+
+    return recs.slice(0, 2);
+  }, [
+    dayMeals.length,
+    remaining.calories,
+    remaining.protein,
+    remaining.carbs,
+    remaining.fats,
+  ]);
 
   return (
     <div className="flex flex-col h-full w-full bg-background text-foreground overflow-hidden">
@@ -439,7 +484,7 @@ export function LogScreen({
         {/* AI Recommendations */}
         {recommendations.length > 0 && (
           <div className="mt-4">
-            <p className="text-foreground mb-3">Recommendations</p>
+            <p className="text-foreground mb-2">Recommendations</p>
             <div className="space-y-2">
               {recommendations.map((rec, index) => {
                 const Icon = rec.icon;
@@ -476,14 +521,14 @@ export function LogScreen({
                 return (
                   <div
                     key={index}
-                    className={`${colorClasses.container} rounded-2xl p-4 flex items-start gap-3`}
+                    className={`${colorClasses.container} rounded-xl p-3 flex items-start gap-2.5`}
                   >
                     <div
-                      className={`w-8 h-8 ${colorClasses.icon} rounded-lg flex items-center justify-center flex-shrink-0`}
+                      className={`w-7 h-7 ${colorClasses.icon} rounded-md flex items-center justify-center flex-shrink-0`}
                     >
-                      <Icon className="w-4 h-4 text-white" />
+                      <Icon className="w-3.5 h-3.5 text-white" />
                     </div>
-                    <p className="text-foreground/80 flex-1">{rec.message}</p>
+                    <p className="text-sm leading-5 text-foreground/80 flex-1">{rec.message}</p>
                   </div>
                 );
               })}
@@ -724,3 +769,4 @@ export function LogScreen({
     </div>
   );
 }
+

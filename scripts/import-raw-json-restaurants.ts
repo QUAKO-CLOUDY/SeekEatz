@@ -45,6 +45,13 @@ function normalizeLookup(value: string): string {
     .trim();
 }
 
+function isLikelyPriceLabel(value: string): boolean {
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+  // Reject numeric-only names like "9.99" or "$12.49" which are almost always bad labels.
+  return /^\$?\d+(?:\.\d{1,2})?$/.test(trimmed);
+}
+
 function getTargetFiles(): Array<{ filePath: string; restaurantName: string; items: RawJsonItem[] }> {
   const jsonDir = path.resolve(process.cwd(), 'data', 'jsons');
   const files = fs.readdirSync(jsonDir).filter((file) => file.endsWith('_raw.json')).sort();
@@ -77,6 +84,9 @@ function getTargetFiles(): Array<{ filePath: string; restaurantName: string; ite
 function mapRawItem(restaurantName: string, item: RawJsonItem): RawIngestionItem | null {
   const name = item.name?.trim();
   if (!name) {
+    return null;
+  }
+  if (isLikelyPriceLabel(name)) {
     return null;
   }
 

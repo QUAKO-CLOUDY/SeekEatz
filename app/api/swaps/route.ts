@@ -8,6 +8,9 @@ import {
 } from '@/utils/modifier-candidates';
 import { normalizeMacros } from '@/lib/macro-utils';
 import { generateHybridSwaps } from '@/utils/hybrid-swap-generator';
+import { inferExtendedDishType } from '@/utils/dish-structure';
+import { getApplicableSwaps, type SwapLibraryEntry } from '@/utils/global-swap-library';
+import { filterCompatibleSwaps } from '@/utils/swap-compatibility-v2';
 
 type SearchableMenuItem = {
   id: string;
@@ -36,6 +39,8 @@ const ZERO_DELTA: SwapDelta = {
   carbs: 0,
   fats: 0,
 };
+
+const FRIED_LIKE_MEAL_PATTERN = /\b(fried|deep.?fried|crispy|battered|breaded|crunchy|tenders?|tenderloin)\b/i;
 
 function withIfAvailable(label: string): string {
   if (/if available/i.test(label)) return label;
@@ -75,51 +80,155 @@ function toNonNumericEffect(effect: string | undefined, fallback: string): strin
   return cleaned.length > 0 ? cleaned : fallback;
 }
 
-function buildGenericFallbackSwaps() {
-  return [
-    {
-      id: 'generic-swap-sauce-side',
-      label: withIfAvailable('Sauce on the side'),
-      expectedEffect: 'Lighter sauce usage',
-      estimatedDelta: ZERO_DELTA,
-      confidenceLabel: 'Ask if available' as const,
-      type: 'modify' as const,
-      swapType: 'neutral' as const,
-      details: 'General swap recommendation when restaurant-specific modifiers are unavailable.',
-      modifierItemIds: [] as string[],
-      impactLabels: ['Recommended adjustment'],
-      source: 'global' as const,
-      deltaMacros: ZERO_DELTA,
-    },
-    {
-      id: 'generic-swap-grilled',
-      label: withIfAvailable('Grilled instead of fried'),
-      expectedEffect: 'Lighter preparation',
-      estimatedDelta: ZERO_DELTA,
-      confidenceLabel: 'Ask if available' as const,
-      type: 'modify' as const,
-      swapType: 'neutral' as const,
-      details: 'General swap recommendation when restaurant-specific modifiers are unavailable.',
-      modifierItemIds: [] as string[],
-      impactLabels: ['Recommended adjustment'],
-      source: 'global' as const,
-      deltaMacros: ZERO_DELTA,
-    },
-    {
-      id: 'generic-swap-side',
-      label: withIfAvailable('Side salad instead of fries'),
-      expectedEffect: 'Lighter side option',
-      estimatedDelta: ZERO_DELTA,
-      confidenceLabel: 'Ask if available' as const,
-      type: 'modify' as const,
-      swapType: 'neutral' as const,
-      details: 'General swap recommendation when restaurant-specific modifiers are unavailable.',
-      modifierItemIds: [] as string[],
-      impactLabels: ['Recommended adjustment'],
-      source: 'global' as const,
-      deltaMacros: ZERO_DELTA,
-    },
+function isFriedLikeMeal(mealName: string): boolean {
+  return FRIED_LIKE_MEAL_PATTERN.test(mealName);
+}
+
+function isGrilledInsteadOfFriedSwap(entry: { id?: string; label?: string }): boolean {
+  return entry.id === 'cook-grilled' || /grilled instead of fried/i.test(entry.label ?? '');
+}
+
+function normalizeGenericEffectText(effect: string): string {
+  if (/lighter preparation/i.test(effect)) {
+    return 'Less calories';
+  }
+  return effect;
+}
+
+function stringHash(input: string): number {
+  let hash = 0;
+  for (let i = 0; i < input.length; i += 1) {
+    hash = (hash * 31 + input.charCodeAt(i)) >>> 0;
+  }
+  return hash;
+}
+
+function rotateByOffset<T>(items: T[], offset: number): T[] {
+  if (items.length === 0) return items;
+  const normalized = ((offset % items.length) + items.length) % items.length;
+  if (normalized === 0) return [...items];
+  return [...items.slice(normalized), ...items.slice(0, normalized)];
+}
+
+function pickPrimaryImpactLabel(impactLabels: string[]): string {
+  return impactLabels.find((label) =>
+    /protein|calorie|carb|fat|lighter/i.test(label)
+  ) ?? impactLabels[0] ?? 'Recommended adjustment';
+}
+
+function buildFallbackPoolForDish(dishType: string, mealName: string) {
+  const includeGrilledSwap = dishType !== 'burger' && isFriedLikeMeal(mealName);
+
+  if (dishType === 'breakfast' || dishType === 'breakfast_plate') {
+    return [
+      { id: 'fallback-breakfast-eggs', label: 'Egg whites instead of whole eggs', effect: 'Lighter protein choice' },
+      { id: 'fallback-breakfast-fruit', label: 'Fruit instead of hash browns', effect: 'Lighter side option' },
+      { id: 'fallback-breakfast-syrup', label: 'No syrup', effect: 'Lower added sugar' },
+    ];
+  }
+
+  if (dishType === 'smoothie') {
+    return [
+      { id: 'fallback-smoothie-base', label: 'Unsweetened base instead of juice', effect: 'Lower added sugar' },
+      { id: 'fallback-smoothie-size', label: 'Smaller size', effect: 'Lighter portion' },
+      { id: 'fallback-smoothie-addin', label: 'Skip sugary add-ins', effect: 'Lighter ingredient mix' },
+    ];
+  }
+
+  if (dishType === 'salad' || dishType === 'pasta' || dishType === 'pizza' || dishType === 'bowl') {
+    const swaps = [
+      { id: 'fallback-dressing-side', label: 'Dressing on the side', effect: 'Lighter sauce usage' },
+      { id: 'fallback-half-portion', label: 'Half portion', effect: 'Lighter portion' },
+      { id: 'fallback-veggie-swap', label: 'Extra veggies instead of dense add-ons', effect: 'Lighter ingredient swap' },
+    ];
+    if (includeGrilledSwap) {
+      swaps.push({ id: 'fallback-grilled', label: 'Grilled instead of fried', effect: 'Less calories' });
+    }
+    return swaps;
+  }
+
+  if (dishType === 'burger') {
+    return [
+      { id: 'fallback-burger-half-bun', label: 'Half bun / open faced', effect: 'Lower carbs' },
+      { id: 'fallback-burger-sauce-side', label: 'Sauce on the side', effect: 'Lighter sauce usage' },
+      { id: 'fallback-burger-no-glaze', label: 'No sauce / no glaze', effect: 'Less calories' },
+      { id: 'fallback-burger-side', label: 'Side salad instead of fries', effect: 'Lighter side option' },
+    ];
+  }
+
+  const swaps = [
+    { id: 'fallback-sauce-side', label: 'Sauce on the side', effect: 'Lighter sauce usage' },
+    { id: 'fallback-side', label: 'Side salad instead of fries', effect: 'Lighter side option' },
   ];
+  if (includeGrilledSwap) {
+    swaps.push({ id: 'fallback-grilled', label: 'Grilled instead of fried', effect: 'Less calories' });
+  }
+  return swaps;
+}
+
+function mapGenericSwap(entry: { id: string; label: string; effect: string; details?: string }) {
+  return {
+    id: `generic-${entry.id}`,
+    label: withIfAvailable(entry.label),
+    expectedEffect: normalizeGenericEffectText(entry.effect),
+    estimatedDelta: ZERO_DELTA,
+    confidenceLabel: 'Ask if available' as const,
+    type: 'modify' as const,
+    swapType: 'neutral' as const,
+    details: entry.details ?? 'General swap recommendation when restaurant-specific modifiers are unavailable.',
+    modifierItemIds: [] as string[],
+    impactLabels: ['Recommended adjustment'],
+    source: 'global' as const,
+    deltaMacros: ZERO_DELTA,
+  };
+}
+
+function buildDishAwareGenericSwaps(mealName: string, restaurantName: string, maxSwaps: number) {
+  const dishType = inferExtendedDishType(mealName);
+  const candidateEntries = filterCompatibleSwaps(
+    getApplicableSwaps(dishType),
+    dishType,
+    mealName
+  ).filter((entry) => {
+    if (dishType === 'burger' && isGrilledInsteadOfFriedSwap(entry)) {
+      return false;
+    }
+    if (isGrilledInsteadOfFriedSwap(entry) && !isFriedLikeMeal(mealName)) {
+      return false;
+    }
+    return true;
+  });
+
+  const rotationWindow = Math.floor(Date.now() / (1000 * 60 * 60 * 3)); // rotate every 3 hours
+  const rotationSeed = `${restaurantName}|${mealName}|${rotationWindow}`;
+  const rotatedCandidates = rotateByOffset(candidateEntries, stringHash(rotationSeed));
+
+  const selected: SwapLibraryEntry[] = [];
+  const usedCategories = new Set<string>();
+  for (const entry of rotatedCandidates) {
+    if (usedCategories.has(entry.category)) continue;
+    usedCategories.add(entry.category);
+    selected.push(entry);
+    if (selected.length >= maxSwaps) break;
+  }
+
+  if (selected.length > 0) {
+    return selected.map((entry) =>
+      mapGenericSwap({
+        id: entry.id,
+        label: entry.label,
+        effect: toNonNumericEffect(pickPrimaryImpactLabel(entry.impactLabels), 'Recommended adjustment'),
+        details: entry.details,
+      })
+    );
+  }
+
+  const rotatedFallback = rotateByOffset(
+    buildFallbackPoolForDish(dishType, mealName),
+    stringHash(rotationSeed)
+  ).slice(0, maxSwaps);
+
+  return rotatedFallback.map((entry) => mapGenericSwap(entry));
 }
 
 /**
@@ -367,81 +476,35 @@ export async function POST(req: Request) {
       return true;
     });
 
-    // 2. Map global swaps to same response shape (modifierItemIds = [], heuristic deltas)
-    // Simplify impactLabels to show only the most important one
-    const mappedGlobalSwaps = hybridResult.globalSwaps.map((gs) => {
-      // Get the most impactful label (prioritize calorie/protein changes)
-      const primaryLabel = gs.impactLabels.find(l => 
-        l.toLowerCase().includes('calorie') || 
-        l.toLowerCase().includes('protein')
-      ) || gs.impactLabels[0] || '';
-      
-      return {
-        id: gs.id,
-        label: withIfAvailable(gs.label),
-        expectedEffect: toNonNumericEffect(primaryLabel, 'Recommended adjustment'),
-        estimatedDelta: ZERO_DELTA,
-        confidenceLabel: gs.impactType === 'deterministic' ? 'Likely available' as const : 'Ask if available' as const,
-        type: 'modify' as const,
-        swapType: 'neutral' as const,
-        details: gs.details,
-        modifierItemIds: [] as string[], // Global swaps have no DB modifier IDs
-        impactLabels: [primaryLabel], // Keep only the primary label
-        source: 'global' as const,
-        deltaMacros: ZERO_DELTA,
-      };
-    });
-
-    // 3. Map LLM swaps to same response shape
-    // Simplify impactLabels to show only the most important one
-    const mappedLLMSwaps = hybridResult.llmSwaps.map((ls) => {
-      // Get the most impactful label (prioritize calorie/protein changes)
-      const primaryLabel = ls.impactLabels.find(l => 
-        l.toLowerCase().includes('calorie') || 
-        l.toLowerCase().includes('protein')
-      ) || ls.impactLabels[0] || '';
-      
-      return {
-        id: ls.id,
-        label: withIfAvailable(ls.label),
-        expectedEffect: toNonNumericEffect(primaryLabel, 'Recommended adjustment'),
-        estimatedDelta: ZERO_DELTA,
-        confidenceLabel: 'Ask if available' as const,
-        type: 'modify' as const,
-        swapType: 'neutral' as const,
-        details: ls.details,
-        modifierItemIds: [] as string[],
-        impactLabels: [primaryLabel], // Keep only the primary label
-        source: 'llm' as const,
-        deltaMacros: ZERO_DELTA,
-      };
-    });
-
-    // Combine all swap types into unified modifications array
-    const allModifications = [...validDBMods, ...mappedGlobalSwaps, ...mappedLLMSwaps];
-    
-    // Limit to 2-3 swaps total (already limited by hybrid generator, but ensure here too)
+    // If DB-backed swaps exist, they are always the only swaps returned.
+    // If none exist, fall back to rotating, dish-aware generic swaps.
     const MAX_FINAL_SWAPS = 3;
-    let finalModifications = allModifications.slice(0, MAX_FINAL_SWAPS);
-    if (finalModifications.length === 0) {
-      finalModifications = buildGenericFallbackSwaps();
-    }
+    const hasDbSwaps = validDBMods.length > 0;
+    const genericFallbackSwaps = hasDbSwaps
+      ? []
+      : buildDishAwareGenericSwaps(meal_name, restaurant_name, MAX_FINAL_SWAPS);
+
+    const finalModifications = hasDbSwaps
+      ? validDBMods.slice(0, MAX_FINAL_SWAPS)
+      : genericFallbackSwaps.slice(0, MAX_FINAL_SWAPS);
+
+    const finalSource: 'db' | 'global' = hasDbSwaps ? 'db' : 'global';
 
     if (process.env.NODE_ENV === 'development') {
       console.log('[swaps] Final response:', {
         dbMods: validDBMods.length,
-        globalSwaps: mappedGlobalSwaps.length,
-        llmSwaps: mappedLLMSwaps.length,
-        total: allModifications.length,
+        hybridGlobalCandidates: hybridResult.globalSwaps.length,
+        hybridLlmCandidates: hybridResult.llmSwaps.length,
+        genericFallbackSwaps: genericFallbackSwaps.length,
         finalTotal: finalModifications.length,
-        source: hybridResult.source,
+        source: finalSource,
       });
     }
 
     return NextResponse.json({
       modifications: finalModifications,
       alternatives: alternatives,
-      source: hybridResult.source,
+      source: finalSource,
     });
   } catch (error) {
     console.error('[swaps] Error:', error);

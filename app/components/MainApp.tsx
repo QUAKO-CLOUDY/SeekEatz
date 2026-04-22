@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback, startTransition } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { CheckCircle2 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { Navigation, type Screen } from './Navigation';
 import { HomeScreen } from './HomeScreen';
@@ -31,6 +32,11 @@ type AppState = 'loading' | 'onboarding' | 'auth' | 'app';
 
 type MainAppProps = {
   initialScreen?: Screen;
+};
+
+type PostLogChoiceState = {
+  mealName: string;
+  returnScreen: 'home' | 'chat';
 };
 
 const APP_TUTORIAL_STEPS: AppTutorialStep[] = [
@@ -140,6 +146,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   const [currentUserEmail, setCurrentUserEmail] = useState<string | undefined>(undefined);
   const [hasHydratedCurrentUser, setHasHydratedCurrentUser] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [postLogChoice, setPostLogChoice] = useState<PostLogChoiceState | null>(null);
   const [devFullAccess, setDevFullAccessState] = useState(false);
   const [isTutorialActive, setIsTutorialActive] = useState(false);
   const [tutorialStepIndex, setTutorialStepIndex] = useState(0);
@@ -819,6 +826,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   const handleNavigate = (screen: Screen) => {
     // Update activity on navigation
     updateActivity();
+    setPostLogChoice(null);
 
     // Only add to history if it's a different screen
     if (screen !== currentScreen) {
@@ -941,9 +949,70 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       date: todayStr,
     };
     applyLoggedMeals([...loggedMeals, loggedMeal]);
-    setCurrentView('main');
-    setSelectedMeal(null);
+
+    const returnScreen: 'home' | 'chat' = currentScreen === 'chat' ? 'chat' : 'home';
+    setPostLogChoice({
+      mealName: meal.name,
+      returnScreen,
+    });
+  };
+
+  const handleGoToLogAfterLog = () => {
+    setPostLogChoice(null);
     handleNavigate('log');
+  };
+
+  const handleReturnAfterLog = () => {
+    const destination = postLogChoice?.returnScreen ?? 'home';
+    setPostLogChoice(null);
+    handleNavigate(destination);
+  };
+
+  const renderPostLogChoiceSheet = () => {
+    if (!postLogChoice) {
+      return null;
+    }
+
+    return (
+      <div
+        className="fixed inset-0 z-[130] flex items-end justify-center bg-slate-950/65 backdrop-blur-sm"
+        onClick={() => setPostLogChoice(null)}
+      >
+        <div
+          className="w-full max-w-md rounded-t-[2rem] border border-border bg-card p-6 pb-8 text-card-foreground shadow-2xl animate-in slide-in-from-bottom duration-300 ease-out"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-500">
+            <CheckCircle2 className="h-7 w-7" />
+          </div>
+          <p className="text-center text-xs font-semibold uppercase tracking-[0.18em] text-emerald-500">
+            Meal Logged
+          </p>
+          <h2 className="mt-2 text-center text-2xl font-semibold leading-tight">
+            Added to your daily tracker.
+          </h2>
+          <p className="mt-2 text-center text-sm text-muted-foreground">
+            {postLogChoice.mealName}
+          </p>
+          <div className="mt-6 grid grid-cols-1 gap-3">
+            <button
+              type="button"
+              onClick={handleGoToLogAfterLog}
+              className="w-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-4 text-base font-semibold text-white shadow-lg shadow-cyan-500/25"
+            >
+              Go to log
+            </button>
+            <button
+              type="button"
+              onClick={handleReturnAfterLog}
+              className="w-full rounded-full border border-border bg-background px-5 py-4 text-base font-semibold text-foreground"
+            >
+              Back to search
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const handleRemoveMeal = (id: string) => {
@@ -984,6 +1053,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           isPremium={hasFullAccess}
           onPremiumFeatureAttempt={() => setShowUpgradeModal(true)}
         />
+        {renderPostLogChoiceSheet()}
       </div>
     );
   }
@@ -1093,6 +1163,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         onClose={() => setShowUpgradeModal(false)}
         subtitle="Premium is where SeekEatz becomes your decision system: unlimited searches, AI swaps, meal logging, and saved meals."
       />
+      {renderPostLogChoiceSheet()}
       {isTutorialActive ? (
         <AppTutorialOverlay
           step={APP_TUTORIAL_STEPS[tutorialStepIndex]}

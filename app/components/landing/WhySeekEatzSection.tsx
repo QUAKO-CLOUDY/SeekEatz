@@ -17,9 +17,9 @@ const COMPARISONS = [
     { feature: 'Decision-first, not logging-first', seekeatz: true, mfp: false, loseit: false },
     { feature: 'Conversational AI concierge', seekeatz: true, mfp: false, loseit: false },
     { feature: 'Smart AI meal swaps', seekeatz: true, mfp: false, loseit: false },
-    { feature: 'Verified nutrition database', seekeatz: true, mfp: 'partial' as const, loseit: 'partial' as const },
+    { feature: 'Verified nutrition database', seekeatz: true, mfp: true, loseit: true },
     { feature: 'Built for eating out', seekeatz: true, mfp: false, loseit: false },
-    { feature: 'No crowdsourced guesses', seekeatz: true, mfp: false, loseit: false },
+    { feature: 'No crowdsourced guesses', seekeatz: true, mfp: true, loseit: 'partial' as const },
 ];
 
 function CheckCell({ value }: { value: boolean | 'partial' }) {
@@ -233,7 +233,7 @@ export default function WhySeekEatzSection() {
                                         </span>
                                     </TableCell>
                                     <TableCell className="py-4 px-4 text-center">
-                                        <span className="text-base font-bold text-gray-400">1 / 6</span>
+                                        <span className="text-base font-bold text-gray-400">2 / 6</span>
                                     </TableCell>
                                     <TableCell className="py-4 px-4 text-center">
                                         <span className="text-base font-bold text-gray-400">1 / 6</span>

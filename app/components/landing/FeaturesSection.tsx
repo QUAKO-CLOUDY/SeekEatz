@@ -211,7 +211,7 @@ export default function FeaturesSection() {
                         height: arenaSize,
                         maxWidth: '100%',
                         aspectRatio: '1 / 1',
-                        transform: isCompactLayout ? 'translateX(-8px)' : undefined,
+                        transform: isCompactLayout ? 'translateX(-2px)' : undefined,
                     }}
                 >
                     {/* Dashed orbit ring — fades in with cards */}

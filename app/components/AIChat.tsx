@@ -434,6 +434,8 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const [inputText, setInputText] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState(false);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -799,6 +801,40 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.visualViewport) return;
+
+    const updateKeyboardState = () => {
+      const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+      const keyboardDelta = window.innerHeight - viewportHeight;
+      setIsKeyboardOpen(keyboardDelta > 140);
+    };
+
+    window.visualViewport.addEventListener('resize', updateKeyboardState);
+    window.visualViewport.addEventListener('scroll', updateKeyboardState);
+    updateKeyboardState();
+
+    return () => {
+      window.visualViewport?.removeEventListener('resize', updateKeyboardState);
+      window.visualViewport?.removeEventListener('scroll', updateKeyboardState);
+    };
+  }, []);
+
+  const isTypingMode = isInputFocused || isKeyboardOpen;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.dispatchEvent(
+      new CustomEvent('seekeatz:chat-keyboard', { detail: { open: isTypingMode } })
+    );
+
+    return () => {
+      window.dispatchEvent(
+        new CustomEvent('seekeatz:chat-keyboard', { detail: { open: false } })
+      );
+    };
+  }, [isTypingMode]);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -1708,7 +1744,12 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
       <div
         ref={messagesContainerRef}
-        className="flex-1 space-y-4 overflow-y-auto p-4 pb-[calc(var(--app-nav-safe-offset)+10rem)]"
+        className="flex-1 space-y-4 overflow-y-auto p-4"
+        style={{
+          paddingBottom: isTypingMode
+            ? 'calc(env(safe-area-inset-bottom, 0px) + 6.25rem)'
+            : 'calc(var(--app-nav-safe-offset) + 10rem)',
+        }}
       >
         {messages.map((m) => {
           return (
@@ -1865,7 +1906,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       </div>
 
       {/* Quick Prompt Chips */}
-      <div className={`fixed bottom-[calc(var(--app-nav-safe-offset)+var(--app-chat-composer-height)+0.2rem)] left-0 right-0 w-full z-20 pb-1.5 md:pb-2 transition-all duration-300 ${isDark ? 'bg-gray-900' : 'bg-white'} ${isAtBottom ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}>
+      <div className={`fixed bottom-[calc(var(--app-nav-safe-offset)+var(--app-chat-composer-height)+0.2rem)] left-0 right-0 w-full z-20 pb-1.5 md:pb-2 transition-all duration-300 ${isDark ? 'bg-gray-900' : 'bg-white'} ${isAtBottom && !isTypingMode ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0 pointer-events-none'}`}>
         <div className="relative w-full max-w-3xl mx-auto px-3 md:px-4">
           <div className={`rounded-[1.1rem] border px-2.5 py-1.5 shadow-lg backdrop-blur-xl ${isDark ? 'border-gray-800 bg-gray-900/92 shadow-black/20' : 'border-gray-200 bg-white/92 shadow-gray-200/80'}`}>
             <p className={`mb-0.5 px-1 text-[9px] font-semibold uppercase tracking-[0.11em] ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
@@ -1892,7 +1933,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       </div>
 
       {/* Input Bar */}
-      <div className={`fixed bottom-[var(--app-nav-safe-offset)] left-0 right-0 z-30 flex w-full items-center justify-center transition-all duration-300 ${isDark ? 'bg-gradient-to-t from-gray-950 via-gray-950/95 to-transparent' : 'bg-gradient-to-t from-white via-white/95 to-transparent'}`}>
+      <div className={`fixed ${isTypingMode ? 'bottom-[env(safe-area-inset-bottom,0px)]' : 'bottom-[var(--app-nav-safe-offset)]'} left-0 right-0 z-30 flex w-full items-center justify-center transition-all duration-300 ${isDark ? 'bg-gradient-to-t from-gray-950 via-gray-950/95 to-transparent' : 'bg-gradient-to-t from-white via-white/95 to-transparent'}`}>
         <div className="w-full max-w-3xl px-3 pb-3 md:px-4 md:pb-4">
           <form
             onSubmit={onSubmit}
@@ -1928,6 +1969,8 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                 } ${showUpgradeModal ? 'opacity-60 cursor-not-allowed' : ''}`}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
+              onFocus={() => setIsInputFocused(true)}
+              onBlur={() => setIsInputFocused(false)}
               placeholder={showUpgradeModal ? "Upgrade to keep searching." : chatPlaceholder}
               disabled={showUpgradeModal}
               autoComplete="off"

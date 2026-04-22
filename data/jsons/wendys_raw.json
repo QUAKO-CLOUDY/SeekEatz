@@ -2,7 +2,7 @@
     "restaurant_name": "Wendy's",
     "items": [
         {
-            "name": "9.99",
+            "name": "Dave's Double",
             "category": "Hamburgers",
             "price_estimate": null,
             "image_url": null,
@@ -351,7 +351,7 @@
         },
         {
             "name": "Pain au Chocolat",
-            "category": "Entree",
+            "category": "Sides",
             "price_estimate": null,
             "image_url": null,
             "macros": {
@@ -443,6 +443,90 @@
                 "protein": 1.1,
                 "carbs": 2.3,
                 "fat": 13
+            }
+        },
+        {
+            "name": "Wendy's Signature Sauce",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 130,
+                "protein": 0,
+                "carbs": 4,
+                "fat": 13
+            }
+        },
+        {
+            "name": "Creamy Ranch",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 130,
+                "protein": 0,
+                "carbs": 1,
+                "fat": 14
+            }
+        },
+        {
+            "name": "Scorchin' Hot",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 150,
+                "protein": 0,
+                "carbs": 2,
+                "fat": 16
+            }
+        },
+        {
+            "name": "Sweet Chili",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 80,
+                "protein": 0,
+                "carbs": 21,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Honey Mustard",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 110,
+                "protein": 0,
+                "carbs": 7,
+                "fat": 9
+            }
+        },
+        {
+            "name": "Honey BBQ",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 70,
+                "protein": 0,
+                "carbs": 16,
+                "fat": 0
+            }
+        },
+        {
+            "name": "Ghost Pepper Ranch",
+            "category": "Sauce",
+            "price_estimate": null,
+            "image_url": null,
+            "macros": {
+                "calories": 100,
+                "protein": 0,
+                "carbs": 2,
+                "fat": 10
             }
         }
     ]

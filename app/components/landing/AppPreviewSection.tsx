@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { MessageSquare, BarChart3, Settings, Heart, Send, ArrowRight, Lock, Flame, Zap, Clock } from 'lucide-react';
 import { Button } from '../ui/button';
 
@@ -256,11 +257,11 @@ function MockSettings() {
 /* ─── Mock Favorites Screen ─── */
 function MockFavorites() {
     const savedMeals = [
-        { name: 'Grilled Chicken Bowl', restaurant: 'Chipotle', cal: 510, protein: 48, carbs: 32, fat: 14, image: '🍗', rating: 4.9, timesOrdered: 12 },
-        { name: 'Açaí Power Bowl', restaurant: 'Jamba Juice', cal: 380, protein: 12, carbs: 58, fat: 8, image: '🫐', rating: 4.8, timesOrdered: 8 },
-        { name: 'Salmon Teriyaki Bowl', restaurant: 'Sweetgreen', cal: 560, protein: 44, carbs: 38, fat: 18, image: '🍣', rating: 5.0, timesOrdered: 15 },
-        { name: 'Turkey Avocado Wrap', restaurant: 'Panera Bread', cal: 440, protein: 36, carbs: 28, fat: 16, image: '🌯', rating: 4.7, timesOrdered: 6 },
-        { name: 'Greek Yogurt Parfait', restaurant: 'Starbucks', cal: 320, protein: 18, carbs: 42, fat: 6, image: '🥣', rating: 4.6, timesOrdered: 9 },
+        { name: 'Grilled Chicken Bowl', restaurant: 'Chipotle', cal: 510, protein: 48, carbs: 32, fat: 14, logo: '/logos/chipotle.png', rating: 4.9, timesOrdered: 12 },
+        { name: 'Acai Power Bowl', restaurant: 'Jamba Juice', cal: 380, protein: 12, carbs: 58, fat: 8, logo: '/logos/jamba.png', rating: 4.8, timesOrdered: 8 },
+        { name: 'Salmon Teriyaki Bowl', restaurant: 'Sweetgreen', cal: 560, protein: 44, carbs: 38, fat: 18, logo: '/logos/sweetgreen.png', rating: 5.0, timesOrdered: 15 },
+        { name: 'Turkey Avocado Wrap', restaurant: 'Panera Bread', cal: 440, protein: 36, carbs: 28, fat: 16, logo: '/logos/panera_bread.png', rating: 4.7, timesOrdered: 6 },
+        { name: 'Greek Yogurt Parfait', restaurant: 'Starbucks', cal: 320, protein: 18, carbs: 42, fat: 6, logo: '/logos/starbucks.png', rating: 4.6, timesOrdered: 9 },
     ];
 
     const recentMeals = [
@@ -294,8 +295,14 @@ function MockFavorites() {
                     <div className="space-y-2.5">
                         {savedMeals.map((meal, i) => (
                             <div key={i} className="flex items-center gap-3 p-3 bg-gray-50/80 rounded-xl border border-gray-100/60 hover:border-pink-200 transition-colors cursor-pointer group">
-                                <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center text-2xl shadow-sm border border-gray-100">
-                                    {meal.image}
+                                <div className="relative h-12 w-12 rounded-lg bg-white shadow-sm border border-gray-100 p-1.5">
+                                    <Image
+                                        src={meal.logo}
+                                        alt={`${meal.restaurant} logo`}
+                                        fill
+                                        sizes="48px"
+                                        className="object-contain"
+                                    />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-start justify-between">
@@ -387,7 +394,7 @@ export default function AppPreviewSection() {
     }, [attachObserver]);
 
     return (
-        <section ref={sectionRef} className="relative bg-[#f0f4f8] px-4 pt-8 pb-24 sm:px-6 sm:pt-10">
+        <section ref={sectionRef} className="relative bg-[#f0f4f8] px-4 pt-8 pb-14 sm:px-6 sm:pt-10 sm:pb-20">
             {/* Seamless top gradient from hero */}
             <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#f0f4f8] to-transparent pointer-events-none" />
 
@@ -478,7 +485,7 @@ export default function AppPreviewSection() {
                 </div>
 
                 {/* Bottom note */}
-                <p className="mt-14 text-center text-sm text-gray-400">
+                <p className="mt-8 text-center text-sm text-gray-400 sm:mt-10">
                     Explore the preview above. Sign up to unlock all features.
                 </p>
             </div>

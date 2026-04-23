@@ -64,18 +64,20 @@ export default function HeroSection() {
                         </p>
 
                         {/* CTA */}
-                        <Link href="/upgrade">
-                            <Button
-                                size="lg"
-                                className="w-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 px-8 py-6 text-base font-bold text-white shadow-xl shadow-cyan-500/20 transition-all hover:-translate-y-0.5 hover:from-cyan-400 hover:to-blue-400 hover:shadow-cyan-500/30 sm:w-auto sm:px-10 sm:text-lg"
-                            >
-                                Find meals near you
-                                <ArrowRight className="w-5 h-5 ml-2" />
-                            </Button>
-                        </Link>
-                        <p className="mt-4 text-sm text-gray-400">
-                            2 free searches every 24 hours
-                        </p>
+                        <div className="inline-flex flex-col items-center sm:translate-x-1">
+                            <Link href="/upgrade">
+                                <Button
+                                    size="lg"
+                                    className="w-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 px-8 py-6 text-base font-bold text-white shadow-xl shadow-cyan-500/20 transition-all hover:-translate-y-0.5 hover:from-cyan-400 hover:to-blue-400 hover:shadow-cyan-500/30 sm:w-auto sm:px-10 sm:text-lg"
+                                >
+                                    Find meals near you
+                                    <ArrowRight className="w-5 h-5 ml-2" />
+                                </Button>
+                            </Link>
+                            <p className="mt-4 text-center text-sm text-gray-400">
+                                2 free searches every 24 hours
+                            </p>
+                        </div>
                     </div>
 
                     {/* ── Right: Phone video ── */}
@@ -132,4 +134,3 @@ export default function HeroSection() {
         </section>
     );
 }
-

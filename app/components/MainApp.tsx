@@ -465,11 +465,24 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       // AIChat.tsx has its own auth listener and handles gating.
       // This prevents the 200–600ms auth-retry delay on every chat refresh.
       if (isChatRoute) {
-        if (!isOnboarded) {
-          setAppState('onboarding');
-        } else {
+        if (isOnboarded) {
           setAppState('app');
+          return;
         }
+
+        try {
+          const { data: { user: chatRouteUser } } = await supabase.auth.getUser();
+          if (chatRouteUser) {
+            setCurrentUserId(chatRouteUser.id);
+            setCurrentUserEmail(chatRouteUser.email);
+            setAppState('app');
+            return;
+          }
+        } catch (chatRouteAuthError) {
+          console.warn('Chat route auth check failed:', chatRouteAuthError);
+        }
+
+        setAppState('onboarding');
         return;
       }
 
@@ -758,7 +771,10 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       localStorage.setItem('onboarded', 'true');
       localStorage.setItem('hasCompletedOnboarding', 'true');
     }
-    router.push('/upgrade?flow=onboarding&tutorial=1');
+    setAppState('app');
+    setCurrentScreen('home');
+    setNavHistory(['home']);
+    router.push('/chat');
   };
 
   // Handle auth success (fallback, but onAuthStateChange should handle it)

@@ -7,6 +7,7 @@ import { Menu, X } from 'lucide-react';
 export default function NavBar() {
     const [scrolled, setScrolled] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
+    const signUpHref = "/auth/signup?redirectTo=%2Fupgrade%3FfromSignup%3D1";
 
     useEffect(() => {
         const onScroll = () => setScrolled(window.scrollY > 40);
@@ -75,7 +76,7 @@ export default function NavBar() {
                             Log In
                         </Link>
                         <Link
-                            href="/auth/signup"
+                            href={signUpHref}
                             className="px-4 py-1.5 text-[13px] font-semibold text-white rounded-full bg-gray-900 hover:bg-gray-700 transition-all shadow-sm"
                         >
                             Sign Up
@@ -115,7 +116,7 @@ export default function NavBar() {
                                         Log In
                                     </span>
                                 </Link>
-                                <Link href="/auth/signup" className="flex-1">
+                                <Link href={signUpHref} className="flex-1">
                                     <span className="block text-center px-4 py-2 text-[13px] font-semibold text-white rounded-full bg-gray-900 hover:bg-gray-700 transition-all">
                                         Sign Up
                                     </span>

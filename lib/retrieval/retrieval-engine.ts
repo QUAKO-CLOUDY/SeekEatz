@@ -385,15 +385,38 @@ export async function retrieveMealsWithClient(
   const restaurantVariants = searchParams.restaurantVariants?.length
     ? searchParams.restaurantVariants
     : undefined;
-  const candidateLimit = getCandidateLimit(parsed, limit, restaurantVariants);
+  const targetResultWindow = getTargetResultWindow(parsed, offset, limit);
+  const baseCandidateLimit = getCandidateLimit(parsed, limit, restaurantVariants);
+  // Keep candidate retrieval depth growing with pagination offset so "load more"
+  // doesn't exhaust early when there are still matching meals deeper in the set.
+  const candidateLimit = Math.max(
+    baseCandidateLimit,
+    targetResultWindow * 3,
+    offset + limit + 40
+  );
+  const macroOnlyHomeFiltering = searchParams.isHomepage === true;
 
   const filterResult = await buildFilters(supabase, parsed, {
     limit: candidateLimit,
     offset: 0,
     restaurantVariants,
   });
+  const effectiveFilterParams: RPCParams = macroOnlyHomeFiltering
+    ? {
+        ...filterResult.params,
+        p_exclude_large: false,
+        p_normalized_category: undefined,
+        p_meal_type: undefined,
+        p_name_keyword: undefined,
+        p_protein_sources: undefined,
+        p_exclude_terms: undefined,
+      }
+    : filterResult.params;
+  const effectiveDietaryKeywords = macroOnlyHomeFiltering
+    ? undefined
+    : filterResult.dietaryKeywords;
 
-  let deterministicSearch = await runDeterministicSearch(supabase, parsed, filterResult.params);
+  let deterministicSearch = await runDeterministicSearch(supabase, parsed, effectiveFilterParams);
   const deterministicResults = applyResolvedRestaurantFilter(
     applyNearbyRestaurantFilter(deterministicSearch.results, nearbyFilter),
     {
@@ -404,7 +427,8 @@ export async function retrieveMealsWithClient(
   let deterministicFiltered = applyPostRetrievalFilters(
     deterministicResults,
     parsed,
-    filterResult.dietaryKeywords
+    effectiveDietaryKeywords,
+    { macroOnly: macroOnlyHomeFiltering }
   );
 
   const deterministicThreshold = parsed.restaurantQuery || restaurantVariants?.length
@@ -414,12 +438,12 @@ export async function retrieveMealsWithClient(
   let vectorResults: RawResult[] = [];
   let usedVector = false;
 
-  if (filterResult.dietaryKeywords?.length && deterministicFiltered.length < deterministicThreshold) {
+  if (effectiveDietaryKeywords?.length && deterministicFiltered.length < deterministicThreshold) {
     const dietaryFallbackResults = await runTableDietaryFallback(
       supabase,
       parsed,
-      filterResult.params,
-      filterResult.dietaryKeywords
+      effectiveFilterParams,
+      effectiveDietaryKeywords
     );
     const dietaryFallbackFiltered = applyPostRetrievalFilters(
       applyResolvedRestaurantFilter(
@@ -430,7 +454,8 @@ export async function retrieveMealsWithClient(
         }
       ),
       parsed,
-      filterResult.dietaryKeywords
+      effectiveDietaryKeywords,
+      { macroOnly: macroOnlyHomeFiltering }
     );
 
     deterministicFiltered = mergeAndDeduplicate(
@@ -449,13 +474,14 @@ export async function retrieveMealsWithClient(
       supabase,
       deterministicSearch.trace.source,
       parsed,
-      filterResult.params,
+      effectiveFilterParams,
       {
         restaurantId: searchParams.restaurantId,
         restaurantNames: filterResult.resolvedRestaurantNames,
       },
       nearbyFilter,
-      filterResult.dietaryKeywords,
+      effectiveDietaryKeywords,
+      { macroOnly: macroOnlyHomeFiltering },
       {
         offset,
         limit,
@@ -509,7 +535,9 @@ export async function retrieveMealsWithClient(
         restaurantNames: filterResult.resolvedRestaurantNames,
       }
     );
-    vectorResults = applyPostRetrievalFilters(vectorResults, parsed, filterResult.dietaryKeywords);
+    vectorResults = applyPostRetrievalFilters(vectorResults, parsed, effectiveDietaryKeywords, {
+      macroOnly: macroOnlyHomeFiltering,
+    });
     usedVector = vectorResults.length > 0;
   }
 
@@ -541,7 +569,7 @@ export async function retrieveMealsWithClient(
     restaurantVariants
   );
 
-  ranked = ranked.slice(0, getTargetResultWindow(parsed, offset, limit));
+  ranked = ranked.slice(0, targetResultWindow);
 
   const totalCount = ranked.length;
   const paged = ranked.slice(offset, offset + limit);
@@ -574,7 +602,7 @@ export async function retrieveMealsWithClient(
           semanticQuery: parsed.semanticQuery,
         },
         sql: {
-          rpcParams: filterResult.params,
+          rpcParams: effectiveFilterParams,
           deterministicTrace: deterministicSearch.trace,
           deterministicThreshold,
           deterministicCount: deterministicResults.length,
@@ -855,6 +883,9 @@ async function expandDeterministicResultsForRestaurantDiversity(
   },
   nearbyFilter: NearbyFilterContext,
   dietaryKeywords: string[] | undefined,
+  filterOptions: {
+    macroOnly?: boolean;
+  },
   options: {
     offset: number;
     limit: number;
@@ -908,7 +939,8 @@ async function expandDeterministicResultsForRestaurantDiversity(
         restaurantFilter
       ),
       parsed,
-      dietaryKeywords
+      dietaryKeywords,
+      filterOptions
     );
 
     aggregated = dedupeRawResultsById([...aggregated, ...filteredPage]);
@@ -1325,22 +1357,43 @@ async function runVectorSearch(
 function applyPostRetrievalFilters(
   items: RawResult[],
   parsed: ParsedQuery,
-  dietaryKeywords?: string[]
+  dietaryKeywords?: string[],
+  options: {
+    macroOnly?: boolean;
+  } = {}
 ): RawResult[] {
-  let filtered = applyPostRetrievalFiltersInternal(items, parsed, dietaryKeywords, false);
+  let filtered = applyPostRetrievalFiltersInternal(
+    items,
+    parsed,
+    dietaryKeywords,
+    false,
+    options.macroOnly === true
+  );
 
   if (
     filtered.length === 0 &&
     shouldRelaxRestaurantMealType(parsed)
   ) {
-    filtered = applyPostRetrievalFiltersInternal(items, parsed, dietaryKeywords, true);
+    filtered = applyPostRetrievalFiltersInternal(
+      items,
+      parsed,
+      dietaryKeywords,
+      true,
+      options.macroOnly === true
+    );
   }
 
   if (
     filtered.length === 0 &&
     shouldRelaxSpecificMealType(parsed)
   ) {
-    filtered = applyPostRetrievalFiltersInternal(items, parsed, dietaryKeywords, true);
+    filtered = applyPostRetrievalFiltersInternal(
+      items,
+      parsed,
+      dietaryKeywords,
+      true,
+      options.macroOnly === true
+    );
   }
 
   const smoothieQuery = isSmoothieQuery(parsed);
@@ -1361,10 +1414,15 @@ function applyPostRetrievalFiltersInternal(
   items: RawResult[],
   parsed: ParsedQuery,
   dietaryKeywords: string[] | undefined,
-  relaxMealType: boolean
+  relaxMealType: boolean,
+  macroOnly: boolean
 ): RawResult[] {
   let filtered = items;
   const smoothieQuery = isSmoothieQuery(parsed);
+
+  if (macroOnly) {
+    return filtered.filter((item) => satisfiesParsedMacroConstraints(item, parsed));
+  }
 
   if (dietaryKeywords?.length) {
     filtered = applyDietaryFilter(filtered, dietaryKeywords) as RawResult[];

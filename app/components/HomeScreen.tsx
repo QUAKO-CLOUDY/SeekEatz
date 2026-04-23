@@ -133,7 +133,7 @@ const NO_MORE_MEALS_MESSAGE =
 const HOME_MEALS_PAGE_SIZE = 4;
 const APPENDED_MEALS_DIVIDER_LABEL = "More meals";
 const DEFAULT_HOME_DISTANCE_MILES = 10;
-const HOME_MACRO_VALUES_SESSION_KEY = "seekeatz_home_macro_values";
+const HOME_MACRO_VALUES_SESSION_KEY = "seekeatz_home_macro_values_v2";
 const DEFAULT_HOME_MACRO_ENABLED: Record<MacroType, boolean> = {
   calories: true,
   protein: true,
@@ -149,11 +149,12 @@ function snapMacroValue(type: MacroType, rawValue: number): number {
 }
 
 function buildDefaultMacroValues(userProfile: UserProfile): Record<MacroType, number> {
+  void userProfile;
   return {
     calories: 1000,
-    protein: snapMacroValue("protein", userProfile?.target_protein_g ?? 100),
-    carbs: snapMacroValue("carbs", userProfile?.target_carbs_g ?? 100),
-    fats: snapMacroValue("fats", userProfile?.target_fats_g ?? 50),
+    protein: 50,
+    carbs: 50,
+    fats: 50,
   };
 }
 

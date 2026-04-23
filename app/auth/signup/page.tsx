@@ -43,7 +43,7 @@ function SignupPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
-  const redirectTo = searchParams.get("redirectTo") || "/chat";
+  const redirectTo = searchParams.get("redirectTo") || "/upgrade?fromSignup=1";
   const isMasterMode = searchParams.get("master") === "1";
   const isSwitchAccountMode = searchParams.get("switch") === "1";
   const shouldStartTutorial = searchParams.get("tutorial") === "1";

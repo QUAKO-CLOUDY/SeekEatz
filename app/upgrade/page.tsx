@@ -26,14 +26,6 @@ const premiumBenefits = [
 
 const planCards = [
   {
-    id: "free",
-    name: "Free",
-    price: "$0",
-    description: "",
-    details: getFreeTierPlanDetails(),
-    cta: "Create Free Account",
-  },
-  {
     id: "monthly",
     name: "Monthly",
     price: `$${MONTHLY_PLAN_PRICE.toFixed(2)}/month`,
@@ -49,11 +41,20 @@ const planCards = [
     cta: "Purchase Yearly",
     badge: "Best value",
   },
+  {
+    id: "free",
+    name: "Free",
+    price: "$0",
+    description: "",
+    details: getFreeTierPlanDetails(),
+    cta: "Create Free Account",
+  },
 ];
 
 function UpgradePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const isFromSignup = searchParams.get("fromSignup") === "1";
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [authUserId, setAuthUserId] = useState<string | null>(null);
   const [authEmail, setAuthEmail] = useState<string | null>(null);
@@ -63,12 +64,20 @@ function UpgradePageContent() {
   const { entitlement, refresh } = useAccountEntitlement(true);
   const isMasterMode = searchParams.get("master") === "1";
   const shouldStartTutorial = searchParams.get("tutorial") === "1";
-  const postSignupOnboardingPath = "/onboarding?afterSignup=1";
+  const postSignupUpgradePath = "/upgrade?fromSignup=1";
   const postAuthRedirect = "/chat";
   const encodedPostAuthRedirect = encodeURIComponent(postAuthRedirect);
-  const encodedPostSignupOnboardingPath = encodeURIComponent(postSignupOnboardingPath);
+  const encodedPostSignupUpgradePath = encodeURIComponent(postSignupUpgradePath);
   const signInHref = `/auth/signin?redirectTo=${encodedPostAuthRedirect}&switch=1${shouldStartTutorial ? "&tutorial=1" : ""}${isMasterMode ? "&master=1" : ""}`;
-  const signUpHref = `/auth/signup?redirectTo=${encodedPostSignupOnboardingPath}&switch=1&tutorial=1${isMasterMode ? "&master=1" : ""}`;
+  const signUpHref = `/auth/signup?redirectTo=${encodedPostSignupUpgradePath}&switch=1${isMasterMode ? "&master=1" : ""}`;
+
+  const routeAfterPlanSelection = useCallback(() => {
+    if (isFromSignup) {
+      router.push("/onboarding?afterSignup=1");
+      return;
+    }
+    router.push("/chat");
+  }, [isFromSignup, router]);
 
   const getOnboardingFlag = useCallback(
     () =>
@@ -129,6 +138,7 @@ function UpgradePageContent() {
           email: authEmail,
         });
         await refresh();
+        routeAfterPlanSelection();
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "Purchase could not be completed.";
@@ -137,7 +147,7 @@ function UpgradePageContent() {
         setPendingPlanId(null);
       }
     },
-    [authEmail, authUserId, refresh],
+    [authEmail, authUserId, refresh, routeAfterPlanSelection],
   );
 
   const handleRestorePurchases = useCallback(async () => {
@@ -163,8 +173,8 @@ function UpgradePageContent() {
   }, [authEmail, authUserId, refresh]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto flex min-h-screen w-full max-w-3xl flex-col justify-center px-6 py-10">
+    <div className="h-full overflow-y-auto overscroll-contain bg-background text-foreground">
+      <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col justify-start px-4 py-6 sm:px-6 sm:py-10">
         <div className="rounded-[2rem] border border-border bg-card p-8 shadow-xl">
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25">
             <Crown className="h-7 w-7" />
@@ -223,11 +233,17 @@ function UpgradePageContent() {
                         </span>
                       )}
                     </div>
-                    <div className="flex min-h-[2.75rem] items-center justify-between gap-3">
+                    <div className="flex min-h-[2.75rem] items-center justify-between gap-2">
                       <p className="min-w-0 text-base font-semibold leading-tight text-foreground">
                         {plan.name}
                       </p>
-                      <p className="shrink-0 tabular-nums text-sm font-semibold leading-none text-foreground">
+                      <p
+                        className={`tabular-nums font-semibold text-foreground ${
+                          plan.id === "yearly"
+                            ? "min-w-0 text-right text-[clamp(10px,0.95vw,13px)] leading-tight tracking-tight whitespace-nowrap"
+                            : "shrink-0 text-sm leading-none"
+                        }`}
+                      >
                         {plan.price}
                       </p>
                     </div>
@@ -275,8 +291,13 @@ function UpgradePageContent() {
                       }
                       onClick={() => {
                         if (plan.id === "free") {
+                          if (isSignedIn) {
+                            routeAfterPlanSelection();
+                            return;
+                          }
+
                           router.push(
-                            `/auth/signup?redirectTo=${encodedPostSignupOnboardingPath}&switch=1&tutorial=1&plan=free&method=email${isMasterMode ? "&master=1" : ""}`,
+                            `/auth/signup?redirectTo=${encodedPostSignupUpgradePath}&switch=1&plan=free&method=email${isMasterMode ? "&master=1" : ""}`,
                           );
                           return;
                         }
@@ -293,7 +314,9 @@ function UpgradePageContent() {
                       className="w-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-4 text-base font-semibold text-white shadow-lg shadow-cyan-500/25 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {plan.id === "free"
-                        ? plan.cta
+                        ? isSignedIn
+                          ? "Continue"
+                          : plan.cta
                         : entitlement.hasPremiumAccess
                         ? "Current plan active"
                         : !isSignedIn
@@ -314,7 +337,7 @@ function UpgradePageContent() {
                 <AuthProviders
                   className="mt-2"
                   emailHref={signUpHref}
-                  oauthRedirectPath={postSignupOnboardingPath}
+                  oauthRedirectPath={postSignupUpgradePath}
                   onBeforeRedirect={() => {
                     if (typeof window !== "undefined") {
                       localStorage.setItem("seekeatz_start_app_tutorial", "true");

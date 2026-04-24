@@ -80,8 +80,10 @@ const BREAKFAST_FOOD_PATTERNS = [
   /\byogurt\b/,
   /\bparfait\b/,
   /\bhash\b/,
-  /\bbacon\b/,
-  /\bsausage\b/,
+  /\bbreakfast\s+bacon\b/,
+  /\bbacon\s+(?:egg|breakfast)\b/,
+  /\bbreakfast\s+sausage\b/,
+  /\bsausage\s+(?:egg|breakfast)\b/,
   /\bfrittata\b/,
   /\bavocado toast\b/,
   /\bbreakfast\s+bowl\b/,
@@ -466,6 +468,37 @@ export async function retrieveMealsWithClient(
     );
   }
 
+  if (macroOnlyHomeFiltering || isSmoothieQuery(parsed)) {
+    const smoothieSupplementResults = await runSmoothieTableFallback(
+      supabase,
+      parsed,
+      effectiveFilterParams,
+      { supplemental: !isSmoothieQuery(parsed) }
+    );
+
+    if (smoothieSupplementResults.length > 0) {
+      const smoothieSupplementFiltered = applyPostRetrievalFilters(
+        applyResolvedRestaurantFilter(
+          applyNearbyRestaurantFilter(smoothieSupplementResults, nearbyFilter),
+          {
+            restaurantId: searchParams.restaurantId,
+            restaurantNames: filterResult.resolvedRestaurantNames,
+          }
+        ),
+        parsed,
+        effectiveDietaryKeywords,
+        { macroOnly: macroOnlyHomeFiltering }
+      );
+
+      deterministicFiltered = mergeAndDeduplicate(
+        deterministicFiltered,
+        smoothieSupplementFiltered,
+        parsed,
+        undefined
+      );
+    }
+  }
+
   if (
     shouldExpandRestaurantDiversityPool(parsed, restaurantVariants, filterResult.restaurantResolved) &&
     needsRestaurantDiversityExpansion(deterministicFiltered, offset, limit)
@@ -569,7 +602,9 @@ export async function retrieveMealsWithClient(
     restaurantVariants
   );
 
-  ranked = ranked.slice(0, targetResultWindow);
+  if (!macroOnlyHomeFiltering) {
+    ranked = ranked.slice(0, targetResultWindow);
+  }
 
   const totalCount = ranked.length;
   const paged = ranked.slice(offset, offset + limit);
@@ -1133,40 +1168,52 @@ async function runTableCategoryFallback(
   }
 
   if (isSmoothieQuery(parsed)) {
-    const smoothieCandidateLimit = Math.max(params.p_limit * 12, 180);
-
-    let query = supabase
-      .from('menu_items')
-      .select(baseSelect)
-      .eq('item_type', 'drink')
-      .not('macros', 'is', null)
-      .or([
-        'normalized_category.ilike.%smoothie%',
-        'category.ilike.%smoothie%',
-        'name.ilike.%smoothie%',
-        'name.ilike.%blend%',
-      ].join(', '))
-      .order('restaurant_name', { ascending: true })
-      .order('id', { ascending: true })
-      .limit(smoothieCandidateLimit);
-
-    if (params.p_restaurant_names?.length) {
-      query = query.in('restaurant_name', params.p_restaurant_names);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('[RetrievalEngine] smoothie table fallback error:', error.message);
-      return [];
-    }
-
-    return normalizeTableFallbackRows((data ?? []) as unknown as BreakfastFallbackRow[])
-      .filter((item) => matchesSmoothieIntent(item))
-      .filter((item) => satisfiesParsedMacroConstraints(item, parsed));
+    return runSmoothieTableFallback(supabase, parsed, params);
   }
 
   return [];
+}
+
+async function runSmoothieTableFallback(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  parsed: ParsedQuery,
+  params: RPCParams,
+  options?: { supplemental?: boolean }
+): Promise<RawResult[]> {
+  const baseSelect = getMenuItemFallbackSelect();
+  const smoothieCandidateLimit = options?.supplemental
+    ? Math.max(params.p_limit * 4, 80)
+    : Math.max(params.p_limit * 12, 180);
+
+  let query = supabase
+    .from('menu_items')
+    .select(baseSelect)
+    .eq('item_type', 'drink')
+    .not('macros', 'is', null)
+    .or([
+      'normalized_category.ilike.%smoothie%',
+      'category.ilike.%smoothie%',
+      'name.ilike.%smoothie%',
+      'name.ilike.%blend%',
+    ].join(', '))
+    .order('restaurant_name', { ascending: true })
+    .order('id', { ascending: true })
+    .limit(smoothieCandidateLimit);
+
+  if (params.p_restaurant_names?.length) {
+    query = query.in('restaurant_name', params.p_restaurant_names);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('[RetrievalEngine] smoothie table fallback error:', error.message);
+    return [];
+  }
+
+  return normalizeTableFallbackRows((data ?? []) as unknown as BreakfastFallbackRow[])
+    .filter((item) => matchesSmoothieIntent(item))
+    .filter((item) => satisfiesParsedMacroConstraints(item, parsed));
 }
 
 async function runTableDietaryFallback(
@@ -1419,6 +1466,7 @@ function applyPostRetrievalFiltersInternal(
 ): RawResult[] {
   let filtered = items;
   const smoothieQuery = isSmoothieQuery(parsed);
+  const strictSmoothieOnly = isStrictSmoothieOnlyQuery(parsed);
 
   if (macroOnly) {
     return filtered.filter((item) => satisfiesParsedMacroConstraints(item, parsed));
@@ -1429,7 +1477,9 @@ function applyPostRetrievalFiltersInternal(
   }
 
   filtered = filtered.filter((item) => {
-    const smoothieItem = smoothieQuery && matchesSmoothieIntent(item);
+    const smoothieItem = strictSmoothieOnly
+      ? hasExplicitSmoothieSignals(item)
+      : matchesSmoothieIntent(item);
 
     if (smoothieQuery && !smoothieItem) {
       return false;
@@ -1494,6 +1544,16 @@ function isSmoothieQuery(parsed: ParsedQuery): boolean {
     parsed.categories.includes('smoothie') ||
     isSmoothieLikeText(parsed.raw)
   );
+}
+
+function isStrictSmoothieOnlyQuery(parsed: ParsedQuery): boolean {
+  const raw = parsed.raw.toLowerCase();
+  const asksForSmoothie = /\bsmoothies?\b/.test(raw);
+  if (!asksForSmoothie) {
+    return false;
+  }
+
+  return !/\b(shakes?|acai|pitaya|juice|juices|drink|drinks)\b/.test(raw);
 }
 
 function matchesSmoothieIntent(item: RawResult): boolean {
@@ -1605,6 +1665,10 @@ function matchesMealType(item: RawResult, parsed: ParsedQuery, relaxMealType = f
 
 function looksLikeBreakfastFood(item: RawResult): boolean {
   const haystack = buildHaystack(item);
+  if (/\b(cheeseburger|burger|smashburger|whopper|big\s+mac)\b/i.test(haystack) && !/\bbreakfast\b/i.test(haystack)) {
+    return false;
+  }
+
   if (BREAKFAST_FOOD_PATTERNS.some((pattern) => pattern.test(haystack))) {
     return true;
   }

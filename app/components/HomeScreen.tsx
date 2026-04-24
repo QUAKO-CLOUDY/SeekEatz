@@ -666,18 +666,11 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         normalizedResults = data.results;
       }
       
-      // Convert to Meal type
+      // Convert to Meal type. Home should respect only active macro constraints.
       const meals = normalizedResults.map(convertToMeal);
       
-      // Filter to only full meals (exclude sides/ingredients)
-      const fullMeals = meals.filter((meal: Meal) => {
-        // Exclude very low calorie items (likely single ingredients)
-        if (meal.calories < 150) return false;
-        return true;
-      });
-      
       return {
-        meals: fullMeals,
+        meals,
         searchKey: responseSearchKey,
         hasMore,
         nextOffset: responseNextOffset,

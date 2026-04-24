@@ -191,7 +191,7 @@ export default function TestimonialsSection() {
     }, []);
 
     return (
-        <section className="relative bg-[#f0f4f8] py-24 sm:py-32 overflow-hidden">
+        <section className="relative bg-[#f0f4f8] py-16 sm:py-20 overflow-hidden">
             {/* Ambient glows */}
             <div className="absolute top-0 left-1/4 w-[480px] h-[480px] bg-amber-200/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute bottom-0 right-1/4 w-[480px] h-[480px] bg-cyan-200/10 rounded-full blur-3xl pointer-events-none" />
@@ -222,7 +222,7 @@ export default function TestimonialsSection() {
                 <div
                     ref={badgeRef}
                     style={{ opacity: 0, transform: 'translateY(16px)', transition: 'opacity 0.7s ease 0.2s, transform 0.7s ease 0.2s' }}
-                    className="flex justify-center mb-14"
+                    className="flex justify-center mb-10"
                 >
                     <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/70 border border-amber-200/60 shadow-sm">
                         {/* Pulse dot */}
@@ -237,7 +237,7 @@ export default function TestimonialsSection() {
                 </div>
 
                 {/* Testimonial cards grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {TESTIMONIALS.map((t, i) => (
                         <TestimonialCard key={i} t={t} delay={i * 150} />
                     ))}

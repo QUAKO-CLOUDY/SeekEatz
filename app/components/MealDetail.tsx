@@ -14,6 +14,7 @@ import {
   X,
   Check,
   BottleWine,
+  CupSoda,
   ArrowRightLeft
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -124,10 +125,24 @@ type SauceItem = {
   macros: { calories: number; protein: number; carbs: number; fat: number };
 };
 
+type DrinkItem = {
+  id: string;
+  name: string;
+  macros: { calories: number; protein: number; carbs: number; fat: number };
+};
+
 type SauceSelectorProps = {
   sauces: SauceItem[];
   selectedSauceIds: string[];
   onToggleSauce: (id: string) => void;
+  isLoading: boolean;
+  disabled?: boolean;
+};
+
+type DrinkSelectorProps = {
+  drinks: DrinkItem[];
+  selectedDrinkIds: string[];
+  onToggleDrink: (id: string) => void;
   isLoading: boolean;
   disabled?: boolean;
 };
@@ -341,6 +356,98 @@ function SauceSelector({
   );
 }
 
+function DrinkSelector({
+  drinks,
+  selectedDrinkIds,
+  onToggleDrink,
+  isLoading,
+  disabled = false,
+}: DrinkSelectorProps) {
+  const selectedDrinks = drinks.filter((drink) => selectedDrinkIds.includes(drink.id));
+  const triggerLabel = selectedDrinks.length === 0
+    ? 'Select drinks'
+    : `${selectedDrinks.length} drink${selectedDrinks.length === 1 ? '' : 's'} selected`;
+
+  if (isLoading) {
+    return <div className="text-center py-3 text-muted-foreground text-sm">Loading drinks...</div>;
+  }
+
+  if (drinks.length === 0) {
+    return null;
+  }
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          disabled={disabled}
+          className="w-full flex items-center justify-between rounded-2xl border border-border bg-muted/40 px-4 py-3 text-left text-sm text-foreground transition-colors hover:bg-muted/60 disabled:cursor-not-allowed"
+        >
+          <div>
+            <p className="font-medium">Drinks</p>
+            <p className="text-xs text-muted-foreground">
+              {triggerLabel}
+            </p>
+          </div>
+          <div className="text-right">
+            {selectedDrinks.length > 0 && (
+              <p className="text-xs font-semibold text-cyan-600 dark:text-cyan-400">
+                +{selectedDrinks.reduce((sum, drink) => sum + (drink.macros.calories || 0), 0)} cal
+              </p>
+            )}
+            <ChevronDown className="w-4 h-4 text-muted-foreground ml-auto" />
+          </div>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-[min(22rem,calc(100vw-2rem))] rounded-2xl border-border bg-card p-3">
+        <div className="space-y-2">
+          <div className="px-1 pb-1">
+            <p className="text-sm font-semibold text-card-foreground">Drinks</p>
+            <p className="text-xs text-muted-foreground">Select drinks to add their macros to this meal.</p>
+          </div>
+          <div className="max-h-64 overflow-y-auto space-y-2 pr-1">
+            {drinks.map((drink) => {
+              const isSelected = selectedDrinkIds.includes(drink.id);
+              return (
+                <button
+                  key={drink.id}
+                  type="button"
+                  onClick={() => onToggleDrink(drink.id)}
+                  className={`w-full rounded-xl border px-3 py-2 text-left transition-all ${
+                    isSelected
+                      ? 'border-cyan-500/60 bg-cyan-500/15'
+                      : 'border-border bg-muted/30 hover:bg-muted/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-card-foreground">{drink.name}</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        {drink.macros.protein || 0}g protein, {drink.macros.carbs || 0}g carbs, {drink.macros.fat || 0}g fat
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-cyan-600 dark:text-cyan-400">
+                        {drink.macros.calories || 0} cal
+                      </span>
+                      <span className={`flex h-5 w-5 items-center justify-center rounded-full border ${
+                        isSelected ? 'border-cyan-500 bg-cyan-500 text-white' : 'border-border text-transparent'
+                      }`}>
+                        <Check className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export function MealDetail({
   meal,
   isFavorite,
@@ -368,6 +475,9 @@ export function MealDetail({
   const [restaurantSauces, setRestaurantSauces] = useState<SauceItem[]>([]);
   const [isLoadingSauces, setIsLoadingSauces] = useState(false);
   const [selectedSauceIds, setSelectedSauceIds] = useState<string[]>([]);
+  const [restaurantDrinks, setRestaurantDrinks] = useState<DrinkItem[]>([]);
+  const [isLoadingDrinks, setIsLoadingDrinks] = useState(false);
+  const [selectedDrinkIds, setSelectedDrinkIds] = useState<string[]>([]);
 
   // Manual Form State
   const [manualName, setManualName] = useState('');
@@ -674,6 +784,25 @@ export function MealDetail({
       .finally(() => setIsLoadingSauces(false));
   }, [meal.id, meal.restaurant_name, meal.restaurant]);
 
+  // Fetch drinks for this meal's restaurant (generic sizes + specialty drinks)
+  useEffect(() => {
+    const restaurant = meal.restaurant_name || meal.restaurant;
+    if (!restaurant?.trim()) {
+      setRestaurantDrinks([]);
+      setSelectedDrinkIds([]);
+      return;
+    }
+    setSelectedDrinkIds([]);
+    setIsLoadingDrinks(true);
+    fetch(`/api/drinks?restaurant=${encodeURIComponent(restaurant)}`)
+      .then((res) => res.json())
+      .then((data: { drinks?: DrinkItem[] }) => {
+        setRestaurantDrinks(Array.isArray(data.drinks) ? data.drinks : []);
+      })
+      .catch(() => setRestaurantDrinks([]))
+      .finally(() => setIsLoadingDrinks(false));
+  }, [meal.id, meal.restaurant_name, meal.restaurant]);
+
   // Sum of selected sauces' macros (for effective totals)
   const sauceMacrosSum = useMemo(() => {
     return selectedSauceIds.reduce(
@@ -690,6 +819,23 @@ export function MealDetail({
       { calories: 0, protein: 0, carbs: 0, fats: 0 }
     );
   }, [selectedSauceIds, restaurantSauces]);
+
+  // Sum of selected drinks' macros (for effective totals)
+  const drinkMacrosSum = useMemo(() => {
+    return selectedDrinkIds.reduce(
+      (acc, id) => {
+        const d = restaurantDrinks.find((x) => x.id === id);
+        if (!d) return acc;
+        return {
+          calories: acc.calories + (d.macros.calories || 0),
+          protein: acc.protein + (d.macros.protein || 0),
+          carbs: acc.carbs + (d.macros.carbs || 0),
+          fats: acc.fats + (d.macros.fat ?? 0),
+        };
+      },
+      { calories: 0, protein: 0, carbs: 0, fats: 0 }
+    );
+  }, [selectedDrinkIds, restaurantDrinks]);
 
   const selectedSwapDeltaSum = useMemo(() => {
     return selectedSwapIds.reduce(
@@ -710,15 +856,15 @@ export function MealDetail({
     );
   }, [selectedSwapIds, selectedMealSwaps, selectedSwapQuantities]);
 
-  // Effective macros = base meal + selected swap deltas + selected sauces
+  // Effective macros = base meal + selected swap deltas + selected sauces + selected drinks
   const effectiveMacros = useMemo(() => {
     return {
-      calories: Math.max(0, meal.calories + selectedSwapDeltaSum.calories + sauceMacrosSum.calories),
-      protein: Math.max(0, meal.protein + selectedSwapDeltaSum.protein + sauceMacrosSum.protein),
-      carbs: Math.max(0, (meal.carbs || 0) + selectedSwapDeltaSum.carbs + sauceMacrosSum.carbs),
-      fats: Math.max(0, (meal.fats || 0) + selectedSwapDeltaSum.fats + sauceMacrosSum.fats),
+      calories: Math.max(0, meal.calories + selectedSwapDeltaSum.calories + sauceMacrosSum.calories + drinkMacrosSum.calories),
+      protein: Math.max(0, meal.protein + selectedSwapDeltaSum.protein + sauceMacrosSum.protein + drinkMacrosSum.protein),
+      carbs: Math.max(0, (meal.carbs || 0) + selectedSwapDeltaSum.carbs + sauceMacrosSum.carbs + drinkMacrosSum.carbs),
+      fats: Math.max(0, (meal.fats || 0) + selectedSwapDeltaSum.fats + sauceMacrosSum.fats + drinkMacrosSum.fats),
     };
-  }, [meal.calories, meal.protein, meal.carbs, meal.fats, selectedSwapDeltaSum, sauceMacrosSum]);
+  }, [meal.calories, meal.protein, meal.carbs, meal.fats, selectedSwapDeltaSum, sauceMacrosSum, drinkMacrosSum]);
 
   const totalMacros = effectiveMacros.protein + effectiveMacros.carbs + effectiveMacros.fats;
   const pPercent = totalMacros > 0 ? Math.round((effectiveMacros.protein / totalMacros) * 100) : 0;
@@ -746,6 +892,14 @@ export function MealDetail({
       prev.includes(sauceId)
         ? prev.filter((id) => id !== sauceId)
         : [...prev, sauceId]
+    ));
+  };
+
+  const toggleDrinkSelection = (drinkId: string) => {
+    setSelectedDrinkIds((prev) => (
+      prev.includes(drinkId)
+        ? prev.filter((id) => id !== drinkId)
+        : [...prev, drinkId]
     ));
   };
 
@@ -810,7 +964,7 @@ export function MealDetail({
       return;
     }
 
-    // Final macros = base meal + selected swaps + selected sauces (use effectiveMacros)
+    // Final macros = base meal + selected swaps + selected sauces + selected drinks (use effectiveMacros)
     const finalMacros = { ...effectiveMacros };
 
     // Get selected swaps with full information
@@ -864,6 +1018,7 @@ export function MealDetail({
     setSelectedSwapIds([]);
     setSelectedSwapQuantities({});
     setSelectedSauceIds([]);
+    setSelectedDrinkIds([]);
   };
 
   const handleManualSubmit = () => {
@@ -934,7 +1089,7 @@ export function MealDetail({
             <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <p className="text-card-foreground text-sm font-semibold">Nutrition</p>
-                {(selectedSwapIds.length > 0 || selectedSauceIds.length > 0) && (
+                {(selectedSwapIds.length > 0 || selectedSauceIds.length > 0 || selectedDrinkIds.length > 0) && (
                   <span className="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
                     Customized
                   </span>
@@ -949,8 +1104,8 @@ export function MealDetail({
                     </div>
                     <div>
                       <p className="text-xs font-semibold uppercase text-muted-foreground">Calories</p>
-                      {selectedSauceIds.length > 0 && (
-                        <p className="text-[11px] text-muted-foreground">Meal + sauces</p>
+                      {(selectedSauceIds.length > 0 || selectedDrinkIds.length > 0) && (
+                        <p className="text-[11px] text-muted-foreground">Meal + add-ons</p>
                       )}
                     </div>
                   </div>
@@ -1028,7 +1183,7 @@ export function MealDetail({
             <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
               <div className="mb-4">
                 <p className="text-card-foreground text-sm font-semibold">Customize this meal</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">Sauces and swaps update the macros before logging.</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">Sauces, drinks, and swaps update the macros before logging.</p>
               </div>
 
               {restaurantSauces.length > 0 && (
@@ -1056,7 +1211,32 @@ export function MealDetail({
                 </div>
               )}
 
-              <div className={restaurantSauces.length > 0 ? 'pt-4' : ''}>
+              {restaurantDrinks.length > 0 && (
+                <div className="border-b border-border pb-4 mt-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/15 text-cyan-600 dark:text-cyan-300">
+                      <CupSoda className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-foreground text-sm font-medium">Drinks</p>
+                      <p className="text-muted-foreground text-xs">Add a restaurant drink to include its macros.</p>
+                    </div>
+                  </div>
+                  <DrinkSelector
+                    drinks={restaurantDrinks}
+                    selectedDrinkIds={selectedDrinkIds}
+                    onToggleDrink={toggleDrinkSelection}
+                    isLoading={isLoadingDrinks}
+                  />
+                  {selectedDrinkIds.length > 0 && (
+                    <p className="text-cyan-600 dark:text-cyan-400 text-xs mt-2">
+                      +{drinkMacrosSum.calories} cal from drinks
+                    </p>
+                  )}
+                </div>
+              )}
+
+              <div className={restaurantSauces.length > 0 || restaurantDrinks.length > 0 ? 'pt-4' : ''}>
                 <div className="mb-2 flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/15 text-blue-600 dark:text-blue-300">
                     <ArrowRightLeft className="w-4 h-4" />
@@ -1272,6 +1452,7 @@ export function MealDetail({
                 setSelectedSwapIds([]);
                 setSelectedSwapQuantities({});
                 setSelectedSauceIds([]);
+                setSelectedDrinkIds([]);
               }} className="text-muted-foreground hover:text-foreground p-2">
                 <X className="w-5 h-5" />
               </button>
@@ -1283,9 +1464,9 @@ export function MealDetail({
                 : 'Alternative options:'}
             </p>
 
-            {/* Sauces in modal - same as on card */}
+            {/* Sauces and drinks in modal - same as on card */}
             <div className="relative mb-4">
-              {!isPremium && restaurantSauces.length > 0 && (
+              {!isPremium && (restaurantSauces.length > 0 || restaurantDrinks.length > 0) && (
                 <button
                   type="button"
                   onClick={() => onPremiumFeatureAttempt?.()}
@@ -1304,6 +1485,18 @@ export function MealDetail({
                     selectedSauceIds={selectedSauceIds}
                     onToggleSauce={toggleSauceSelection}
                     isLoading={isLoadingSauces}
+                    disabled={!isPremium}
+                  />
+                </div>
+              )}
+
+              {restaurantDrinks.length > 0 && (
+                <div className={`${isPremium ? '' : 'pointer-events-none blur-[2px] opacity-60'} ${restaurantSauces.length > 0 ? 'mt-3' : ''}`}>
+                  <DrinkSelector
+                    drinks={restaurantDrinks}
+                    selectedDrinkIds={selectedDrinkIds}
+                    onToggleDrink={toggleDrinkSelection}
+                    isLoading={isLoadingDrinks}
                     disabled={!isPremium}
                   />
                 </div>
@@ -1399,8 +1592,8 @@ export function MealDetail({
               </div>
             </div>
 
-            {/* Live Macro Preview (meal + swaps + sauces) */}
-            {(selectedSwapIds.length > 0 || selectedSauceIds.length > 0) && (
+            {/* Live Macro Preview (meal + swaps + sauces + drinks) */}
+            {(selectedSwapIds.length > 0 || selectedSauceIds.length > 0 || selectedDrinkIds.length > 0) && (
               <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-2xl p-4 mb-6">
                 <p className="text-purple-300 text-xs mb-2 uppercase font-bold">Updated Macros</p>
                 <div className="grid grid-cols-4 gap-2 text-center">
@@ -1430,6 +1623,7 @@ export function MealDetail({
                 setSelectedSwapIds([]);
                 setSelectedSwapQuantities({});
                 setSelectedSauceIds([]);
+                setSelectedDrinkIds([]);
               }} className="flex-1 h-12 rounded-full bg-muted border border-border text-foreground font-medium hover:bg-muted/80">
                 Cancel
               </button>

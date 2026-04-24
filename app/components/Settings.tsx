@@ -1296,16 +1296,9 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
           <div className="mb-4 space-y-1">
             <h2 className="text-base font-semibold text-foreground">Account</h2>
             <p className="text-sm text-muted-foreground">
-              Manage your profile details, account deletion, and sign-out from one place.
+              Sign out of your account on this device.
             </p>
           </div>
-          <button
-            onClick={() => router.push('/settings/account')}
-            className="mb-3 flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-background/90 p-3 transition-colors hover:bg-muted/60 dark:bg-background/40"
-          >
-            <User className="size-4 text-foreground" />
-            <span className="font-medium text-foreground">Manage Account</span>
-          </button>
           <button
             onClick={handleLogout}
             className="flex w-full items-center justify-center gap-3 rounded-xl border border-red-200 bg-background/90 p-3 transition-colors hover:bg-red-50 dark:border-red-800 dark:bg-background/40 dark:hover:bg-red-950/20"

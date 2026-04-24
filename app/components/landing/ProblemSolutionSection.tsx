@@ -253,7 +253,7 @@ export default function ProblemSolutionSection() {
     }, [revealed]);
 
     return (
-        <section className="relative bg-[#f0f4f8] py-20 sm:py-28 overflow-hidden">
+        <section className="relative bg-[#f0f4f8] py-14 sm:py-20 overflow-hidden">
             {/* Ambient glow */}
             <div
                 aria-hidden

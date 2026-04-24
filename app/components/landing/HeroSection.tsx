@@ -26,14 +26,14 @@ export default function HeroSection() {
     return (
         <section
             id="hero"
-            className="relative z-10 overflow-hidden bg-[#f0f4f8] pt-16 pb-6 sm:pt-20 sm:pb-8"
+            className="relative z-10 overflow-hidden bg-[#f0f4f8] pt-14 pb-4 sm:pt-16 sm:pb-6"
         >
             {/* Subtle decorative blobs */}
             <div className="absolute top-20 right-1/4 w-[500px] h-[500px] bg-blue-100/20 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute bottom-10 left-10 w-[300px] h-[300px] bg-slate-200/30 rounded-full blur-3xl pointer-events-none" />
 
             <div className="mx-auto w-full max-w-7xl px-4 sm:px-10 lg:px-16">
-                <div className="flex flex-col lg:flex-row items-start gap-12 lg:gap-8">
+                <div className="flex flex-col lg:flex-row items-start lg:items-center gap-10 lg:gap-8">
                     {/* ── Left: Text content ── */}
                     <div
                         className="flex-1 text-center lg:text-left max-w-2xl lg:max-w-none"
@@ -82,7 +82,7 @@ export default function HeroSection() {
 
                     {/* ── Right: Phone video ── */}
                     <div
-                        className="relative flex min-h-[360px] flex-1 self-stretch justify-center sm:min-h-[520px] lg:min-h-[700px] lg:justify-end"
+                        className="relative flex min-h-[320px] flex-1 self-stretch justify-center sm:min-h-[460px] lg:min-h-[620px] lg:justify-end"
                         style={{
                             opacity: visible ? 1 : 0,
                             transform: visible ? 'translateY(0)' : 'translateY(20px)',
@@ -113,7 +113,7 @@ export default function HeroSection() {
 
                 {/* ── Social proof — bottom center ── */}
                 <div
-                    className="flex justify-center pt-2 pb-0 sm:pt-4"
+                    className="flex justify-center pt-1 pb-0 sm:pt-3"
                     style={{
                         opacity: visible ? 1 : 0,
                         transform: visible ? 'translateY(0)' : 'translateY(16px)',
@@ -126,7 +126,7 @@ export default function HeroSection() {
                             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
                         </span>
                         <p className="text-[14px] text-gray-600 font-medium">
-                            <span className="font-extrabold text-gray-900">10,000+</span> menu items available
+                            Verified restaurant nutrition data
                         </p>
                     </div>
                 </div>

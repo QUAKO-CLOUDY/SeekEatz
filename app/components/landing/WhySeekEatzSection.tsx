@@ -119,7 +119,7 @@ export default function WhySeekEatzSection() {
     }, []);
 
     return (
-        <section id="why-seekeatz" className="relative bg-[#f0f4f8] py-24 sm:py-32 overflow-hidden">
+        <section id="why-seekeatz" className="relative bg-[#f0f4f8] py-16 sm:py-20 overflow-hidden">
             {/* Ambient glows matching FeaturesSection */}
             <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-cyan-200/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-violet-200/10 rounded-full blur-3xl pointer-events-none" />
@@ -129,11 +129,8 @@ export default function WhySeekEatzSection() {
                 <div
                     ref={sectionRef}
                     style={{ opacity: 0, transform: 'translateY(24px)', transition: 'opacity 0.8s ease, transform 0.8s ease' }}
-                    className="text-center mb-16"
+                    className="text-center mb-12"
                 >
-                    <p className="text-sm font-semibold text-cyan-600 uppercase tracking-widest mb-3">
-                        Your positioning advantage
-                    </p>
                     <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">
                         Why SeekEatz Is{' '}
                         <span className="bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">

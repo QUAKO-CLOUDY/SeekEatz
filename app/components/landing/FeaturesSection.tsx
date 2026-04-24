@@ -171,7 +171,7 @@ export default function FeaturesSection() {
         <section
             id="features"
             ref={triggerRef}
-            className="relative bg-[#f0f4f8] py-24 sm:py-32 overflow-hidden"
+            className="relative bg-[#f0f4f8] py-16 sm:py-20 overflow-hidden"
         >
             {/* Float keyframes injected here to avoid global CSS */}
             <style>{`
@@ -189,7 +189,7 @@ export default function FeaturesSection() {
 
             <div className="max-w-6xl mx-auto px-6">
                 {/* Section label — always visible */}
-                <div className="text-center mb-16">
+                <div className="text-center mb-12">
                     <p className="text-sm font-semibold text-cyan-600 uppercase tracking-widest mb-3">
                         Everything You Need
                     </p>

@@ -59,6 +59,64 @@ function createResponseHeaders(
   };
 }
 
+type RouterHistoryMessage = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
+function sanitizeRouterHistory(history: unknown): RouterHistoryMessage[] {
+  if (!Array.isArray(history)) {
+    return [];
+  }
+
+  return history
+    .map((entry) => {
+      if (!entry || typeof entry !== 'object') return null;
+      const role = (entry as { role?: unknown }).role;
+      const content = (entry as { content?: unknown }).content;
+
+      if ((role !== 'user' && role !== 'assistant') || typeof content !== 'string') {
+        return null;
+      }
+
+      const trimmed = content.trim();
+      if (!trimmed) {
+        return null;
+      }
+
+      return { role, content: trimmed } as RouterHistoryMessage;
+    })
+    .filter((entry): entry is RouterHistoryMessage => entry !== null)
+    .slice(-8);
+}
+
+function looksLikeClarificationPrompt(text: string): boolean {
+  const normalized = text.trim().toLowerCase();
+  if (!normalized) {
+    return false;
+  }
+
+  if (!normalized.includes('?')) {
+    return false;
+  }
+
+  return (
+    /\b(clarify|specific|specifically|what kind|what type|which|looking for|narrow|refine)\b/.test(normalized) ||
+    /\b(lunch|dinner|breakfast|meal|meals|food|dish|restaurant)\b/.test(normalized)
+  );
+}
+
+function hasPriorClarificationPrompt(history: RouterHistoryMessage[]): boolean {
+  for (let i = history.length - 1; i >= 0; i -= 1) {
+    const entry = history[i];
+    if (entry.role === 'assistant') {
+      return looksLikeClarificationPrompt(entry.content);
+    }
+  }
+
+  return false;
+}
+
 const routerSchema = z.object({
   mode: z.enum(['MEAL_SEARCH', 'NUTRITION_TEXT', 'CLARIFY']),
   query: z.string().optional(),
@@ -720,7 +778,7 @@ function isTooVague(message: string): boolean {
   const words = trimmed.split(/\s+/).filter(w => w.length > 0);
   // Single word queries that are just generic food terms
   if (words.length <= 1) {
-    const vagueSingleWords = ['food', 'eat', 'hungry', 'meal', 'meals', 'snack', 'dinner', 'lunch', 'breakfast'];
+    const vagueSingleWords = ['food', 'eat', 'hungry', 'meal', 'meals'];
     return vagueSingleWords.includes(trimmed.toLowerCase());
   }
   return false;
@@ -843,6 +901,8 @@ export async function POST(req: Request) {
     }
 
     const { message, history } = body;
+    const normalizedHistory = sanitizeRouterHistory(history);
+    const hasRecentClarificationPrompt = hasPriorClarificationPrompt(normalizedHistory);
     const includeDebug = process.env.NODE_ENV === 'development' && body?.debug === true;
 
     // Validate required fields
@@ -954,7 +1014,12 @@ export async function POST(req: Request) {
     };
 
     // 4. PRE-ROUTER HEURISTIC (Skip LLM when possible)
-    const heuristic = preRouterHeuristic(message);
+    const heuristic = hasRecentClarificationPrompt
+      ? {
+          skipLLM: true,
+          mode: 'MEAL_SEARCH' as const,
+        }
+      : preRouterHeuristic(message);
     const heuristicMode = heuristic.mode || null;
 
     console.log('[api/chat] Pre-router heuristic:', {
@@ -1026,7 +1091,7 @@ export async function POST(req: Request) {
           model: openai('gpt-4o-mini'),
           system: ROUTER_SYSTEM_PROMPT,
           messages: [
-            ...(history || []),
+            ...normalizedHistory,
             { role: 'user', content: message }
           ],
           schema: routerSchema,
@@ -1106,6 +1171,15 @@ export async function POST(req: Request) {
         query: message,
         constraints: {},
         structuredIntent: undefined
+      };
+    }
+
+    if (routerResult.mode === 'CLARIFY' && hasRecentClarificationPrompt) {
+      routerResult = {
+        mode: 'MEAL_SEARCH',
+        query: message,
+        constraints: {},
+        structuredIntent: undefined,
       };
     }
 

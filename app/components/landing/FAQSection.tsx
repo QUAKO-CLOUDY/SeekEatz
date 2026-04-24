@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useRef } from 'react';
 import {
@@ -22,12 +22,8 @@ const FAQS = [
         a: 'We pull nutrition data directly from official restaurant PDFs, verified nutrition menus, and a wide range of vetted databases.',
     },
     {
-        q: 'How many restaurants are available?',
-        a: 'We currently have over a couple hundred restaurants available with over 10,000 menu items to choose from.',
-    },
-    {
         q: 'Is SeekEatz free?',
-        a: 'Free — Access AI chat search with up to 3 chats per day.\n\nMonthly subscription — Unlock all features, including unlimited chat, filters, and tracking.\n\nLifetime — One-time payment for full access to all features and future updates.',
+        a: 'Free \u2014 2 free chats a day that resets every 24 hours.\n\nMonthly subscription \u2014 Unlock all features, including unlimited chat, filters, and tracking.\n\nLifetime \u2014 One-time payment for full access to all features and future updates.',
     },
     {
         q: 'What diet types are supported?',
@@ -71,14 +67,14 @@ export default function FAQSection() {
     }, []);
 
     return (
-        <section id="faq" className="relative bg-[#f0f4f8] py-24 sm:py-32 px-6 overflow-hidden">
+        <section id="faq" className="relative bg-[#f0f4f8] py-16 sm:py-20 px-6 overflow-hidden">
             {/* Ambient glow matching sibling sections */}
             <div className="absolute bottom-0 left-1/4 w-[450px] h-[450px] bg-violet-200/10 rounded-full blur-3xl pointer-events-none" />
             <div className="max-w-3xl mx-auto relative z-10">
                 {/* Heading */}
                 <div
                     ref={addFadeRef}
-                    className="text-center mb-12 opacity-0 translate-y-8 transition-all duration-700"
+                    className="text-center mb-10 opacity-0 translate-y-8 transition-all duration-700"
                 >
                     <p className="text-sm font-semibold text-cyan-600 uppercase tracking-widest mb-3">
                         FAQ
@@ -114,3 +110,5 @@ export default function FAQSection() {
         </section>
     );
 }
+
+

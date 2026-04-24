@@ -99,6 +99,7 @@ interface ActiveQuickPromptState {
 
 const CHAT_MEALS_PAGE_SIZE = 5;
 const APPENDED_MEALS_DIVIDER_LABEL = "More meals";
+const ROUTER_HISTORY_LIMIT = 8;
 
 function getChatGreeting(): string {
   const hour = new Date().getHours();
@@ -1100,6 +1101,15 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       // Call API with new request format: { message, limit?, offset?, searchKey?, filters?, userContext? }
       let response: Response;
       try {
+        const routerHistory = messages
+          .filter((entry) => entry.role === 'user' || entry.role === 'assistant')
+          .map((entry) => ({
+            role: entry.role,
+            content: entry.content?.trim() ?? '',
+          }))
+          .filter((entry) => entry.content.length > 0)
+          .slice(-ROUTER_HISTORY_LIMIT);
+
         response = await fetch('/api/chat', {
           method: 'POST',
           headers: {
@@ -1107,6 +1117,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           },
           body: JSON.stringify({
             message: trimmedText,
+            history: routerHistory,
             limit: 10, // Default limit
             offset: 0, // Default offset
             userContext: {

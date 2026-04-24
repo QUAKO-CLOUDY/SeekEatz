@@ -423,14 +423,14 @@ export default function AppPreviewSection() {
     }, [attachObserver]);
 
     return (
-        <section ref={sectionRef} className="relative bg-[#f0f4f8] px-4 pt-8 pb-14 sm:px-6 sm:pt-10 sm:pb-20">
+        <section ref={sectionRef} className="relative bg-[#f0f4f8] px-4 pt-6 pb-10 sm:px-6 sm:pt-8 sm:pb-14">
             {/* Seamless top gradient from hero */}
             <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#f0f4f8] to-transparent pointer-events-none" />
 
             <div className="max-w-5xl mx-auto">
                 {/* Section heading */}
                 <div
-                    className="text-center mb-12"
+                    className="text-center mb-10"
                     style={{
                         opacity: visible ? 1 : 0,
                         transform: visible ? 'translateY(0)' : 'translateY(24px)',
@@ -514,7 +514,7 @@ export default function AppPreviewSection() {
                 </div>
 
                 {/* Bottom note */}
-                <p className="mt-8 text-center text-sm text-gray-400 sm:mt-10">
+                <p className="mt-6 text-center text-sm text-gray-400 sm:mt-8">
                     Explore the preview above. Sign up to unlock all features.
                 </p>
             </div>

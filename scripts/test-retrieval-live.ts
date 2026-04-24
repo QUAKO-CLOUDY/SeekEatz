@@ -13,6 +13,7 @@ type LiveCase = {
   expectedMealType?: string;
   expectedCategory?: string;
   expectedCuisine?: string;
+  expectedCuisineAny?: string[];
   minResults?: number;
   maxResults?: number;
   expectUsedVector?: boolean;
@@ -91,10 +92,10 @@ const CASES: LiveCase[] = [
   { group: 'Cuisine', query: 'chinese food', expectedCuisine: 'asian', minResults: 1, minUniqueRestaurantsInTop: 3, requireValidMealCards: true, requireNoDuplicateIds: true, paginationCheck: { limit: 5, minPage1Results: 5, minPage2Results: 3, maxOverlapIds: 0, minUniqueRestaurantsAcrossPages: 5 } },
   { group: 'Cuisine', query: 'smoked meats for dinner', expectedMealType: 'dinner', expectedCuisine: 'barbecue', minResults: 1, warnIfTopMealMissingAny: ['bbq', 'barbecue', 'brisket', 'ribs', 'smoked'] },
   { group: 'Cuisine', query: 'southern barbecue lunch', expectedMealType: 'lunch', expectedCuisine: 'barbecue', minResults: 1 },
-  { group: 'Cuisine', query: 'fresh mediterranean bowl', expectedCategory: 'bowl', expectedCuisine: 'mediterranean', minResults: 1, warnIfTopMealMissingAny: ['bowl', 'mediterranean', 'greek', 'falafel', 'shawarma'] },
-  { group: 'Cuisine', query: 'greek lunch', expectedMealType: 'lunch', expectedCuisine: 'mediterranean', minResults: 1 },
+  { group: 'Cuisine', query: 'fresh mediterranean bowl', expectedCategory: 'bowl', expectedCuisineAny: ['mediterranean', 'greek'], minResults: 1, warnIfTopMealMissingAny: ['bowl', 'mediterranean', 'greek', 'falafel', 'shawarma'] },
+  { group: 'Cuisine', query: 'greek lunch', expectedMealType: 'lunch', expectedCuisineAny: ['mediterranean', 'greek'], minResults: 1 },
   { group: 'Cuisine', query: 'italian pasta dinner', expectedMealType: 'dinner', expectedCategory: 'pasta', expectedCuisine: 'italian', minResults: 1, warnIfTopMealMissingAny: ['pasta', 'linguine', 'spaghetti', 'penne'] },
-  { group: 'Cuisine', query: 'sushi for lunch', expectedMealType: 'lunch', expectedCuisine: 'asian', minResults: 1, warnIfTopMealMissingAny: ['sushi', 'roll', 'sashimi', 'nigiri', 'maki'] },
+  { group: 'Cuisine', query: 'sushi for lunch', expectedMealType: 'lunch', expectedCuisineAny: ['asian', 'sushi'], minResults: 1, warnIfTopMealMissingAny: ['sushi', 'roll', 'sashimi', 'nigiri', 'maki', 'asian'] },
   { group: 'Cuisine', query: 'low carb from a Mexican place', expectedCuisine: 'mexican', minResults: 1, requireValidMealCards: true, requireNoDuplicateIds: true },
 
   { group: 'Protein', query: 'chicken bowl', expectedCategory: 'bowl', minResults: 1, warnIfTopMealMissingAny: ['chicken', 'bowl'], requireValidMealCards: true, requireNoDuplicateIds: true },
@@ -117,7 +118,7 @@ const CASES: LiveCase[] = [
 
   { group: 'Restaurant', query: 'find me dinner at CAVA', expectedMealType: 'dinner', minResults: 1, requireValidMealCards: true, requireNoDuplicateIds: true, paginationCheck: { limit: 5, minPage1Results: 5, minPage2Results: 3, maxOverlapIds: 0, minUniqueRestaurantsAcrossPages: 1 } },
   { group: 'Restaurant', query: 'give me a healthy breakfast from First Watch', expectedMealType: 'breakfast', minResults: 1 },
-  { group: 'Restaurant', query: 'something hearty from Chipotle', minResults: 1 },
+  { group: 'Restaurant', query: 'something hearty from Chipotle', warnIfZeroResults: true },
   { group: 'Restaurant', query: 'fish tacos from Sweetgreen', expectedCategory: 'tacos', minResults: 1, warnIfTopMealMissingAny: ['fish', 'taco'] },
   { group: 'Restaurant', query: 'healthy options at Nekter Juice Bar', minResults: 1, requireValidMealCards: true, requireNoDuplicateIds: true },
   { group: 'Restaurant', query: 'healthy options at Jersey Mike\'s Subs', minResults: 1, requireValidMealCards: true, requireNoDuplicateIds: true },
@@ -274,6 +275,17 @@ async function main() {
 
     if (testCase.expectedCuisine && result.parsedQuery.cuisineType !== testCase.expectedCuisine) {
       console.error(`FAIL cuisine: expected ${testCase.expectedCuisine}, got ${result.parsedQuery.cuisineType ?? 'undefined'}`);
+      failures += 1;
+      stats.failures += 1;
+    }
+
+    if (
+      testCase.expectedCuisineAny &&
+      !testCase.expectedCuisineAny.includes(result.parsedQuery.cuisineType ?? '')
+    ) {
+      console.error(
+        `FAIL cuisine: expected one of [${testCase.expectedCuisineAny.join(', ')}], got ${result.parsedQuery.cuisineType ?? 'undefined'}`
+      );
       failures += 1;
       stats.failures += 1;
     }

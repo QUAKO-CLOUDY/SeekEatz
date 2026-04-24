@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Check, Crown } from "lucide-react";
+import { ArrowLeft, Check, Crown } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { AuthProviders } from "@/app/components/AuthProviders";
 import { MONTHLY_PLAN_PRICE, YEARLY_PLAN_PRICE, getEntitlementPlanLabel } from "@/lib/entitlements";
@@ -172,9 +172,27 @@ function UpgradePageContent() {
     }
   }, [authEmail, authUserId, refresh]);
 
+  const handleBack = useCallback(() => {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push(isSignedIn ? "/settings" : "/");
+  }, [isSignedIn, router]);
+
   return (
     <div className="h-full overflow-y-auto overscroll-contain bg-background text-foreground">
       <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col justify-start px-4 py-6 sm:px-6 sm:py-10">
+        <button
+          type="button"
+          onClick={handleBack}
+          className="mb-4 inline-flex w-fit items-center gap-2 rounded-full border border-border bg-background/90 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </button>
+
         <div className="rounded-[2rem] border border-border bg-card p-8 shadow-xl">
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25">
             <Crown className="h-7 w-7" />
@@ -370,12 +388,6 @@ function UpgradePageContent() {
                 {billingError}
               </div>
             ) : null}
-
-            {!iapReady && (
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                Apple billing is not enabled for this build yet. Add a RevenueCat public SDK key (`NEXT_PUBLIC_REVENUECAT_IOS_PUBLIC_SDK_KEY` or `NEXT_PUBLIC_REVENUECAT_API_KEY`) and set `NEXT_PUBLIC_APPLE_IAP_READY=true`.
-              </div>
-            )}
 
             {iapReady && !isNativeApp() && (
               <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">

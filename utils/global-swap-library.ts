@@ -175,7 +175,7 @@ export const GLOBAL_SWAP_LIBRARY: SwapLibraryEntry[] = [
         applicableDishTypes: ['burger', 'sub', 'bowl', 'salad', 'wrap', 'taco', 'generic'],
         impactLabels: ['Reduce calories', 'Reduce fat', 'Lighter preparation'],
         heuristicDelta: { calories: [-150, -80], fats: [-12, -6] },
-        requiresMealKeywords: ['fried', 'crispy', 'battered', 'breaded', 'crunchy'],
+        requiresMealKeywords: ['fried', 'crispy', 'battered', 'breaded', 'crunchy', 'tender', 'fingers', 'wings', 'nuggets'],
         details: 'Swap fried preparation for grilled to reduce fat and calories',
     },
     {
@@ -199,18 +199,6 @@ export const GLOBAL_SWAP_LIBRARY: SwapLibraryEntry[] = [
         requiresMealKeywords: ['breaded', 'crispy', 'battered', 'crunchy', 'fried'],
         details: 'Remove the breading to save calories and carbs',
     },
-    {
-        id: 'cook-dry-rub',
-        label: 'Dry rub instead of sauce',
-        category: 'COOKING_METHOD',
-        applicableDishTypes: ['burger', 'sub', 'bowl', 'taco', 'wrap', 'generic'],
-        impactLabels: ['Reduce calories', 'Reduce fat', 'Reduce sauce calories'],
-        heuristicDelta: { calories: [-80, -30], fats: [-6, -2] },
-        conflictsWith: ['sauce-none'],
-        requiresMealKeywords: ['glazed', 'sauced', 'bbq', 'barbecue', 'honey', 'teriyaki', 'buffalo', 'wing', 'ribs', 'pulled', 'smoked'],
-        details: 'Dry rub gives flavor without the sauce calories',
-    },
-
     // ========== PROTEIN_SCALING ==========
     {
         id: 'protein-extra',

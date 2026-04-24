@@ -41,6 +41,9 @@ const ZERO_DELTA: SwapDelta = {
 };
 
 const FRIED_LIKE_MEAL_PATTERN = /\b(fried|deep.?fried|crispy|battered|breaded|crunchy|tenders?|tenderloin)\b/i;
+const CHICKEN_FINGER_LIKE_PATTERN = /\b(chicken\s*(fingers?|tenders?)|fingers?|tenders?|nuggets?|wings?)\b/i;
+const DISALLOWED_SWAP_PHRASE_PATTERN =
+  /\b(dip\s+instead\s+of\s+coating|dry\s+rub\s+instead\s+of\s+sauce)\b/i;
 
 function withIfAvailable(label: string): string {
   if (/if available/i.test(label)) return label;
@@ -95,6 +98,11 @@ function normalizeGenericEffectText(effect: string): string {
   return effect;
 }
 
+function hasDisallowedSwapPhrase(label: string, details?: string): boolean {
+  const haystack = `${label || ''} ${details || ''}`;
+  return DISALLOWED_SWAP_PHRASE_PATTERN.test(haystack);
+}
+
 function stringHash(input: string): number {
   let hash = 0;
   for (let i = 0; i < input.length; i += 1) {
@@ -114,6 +122,131 @@ function pickPrimaryImpactLabel(impactLabels: string[]): string {
   return impactLabels.find((label) =>
     /protein|calorie|carb|fat|lighter/i.test(label)
   ) ?? impactLabels[0] ?? 'Recommended adjustment';
+}
+
+type NonDbMappedSwap = {
+  id: string;
+  label: string;
+  expectedEffect: string;
+  estimatedDelta: SwapDelta;
+  confidenceLabel: 'Likely available' | 'Ask if available';
+  type: 'modify';
+  swapType: 'neutral';
+  details: string;
+  modifierItemIds: string[];
+  impactLabels: string[];
+  source: 'global' | 'llm';
+  deltaMacros: SwapDelta;
+};
+
+function mapHybridGlobalSwap(
+  entry: {
+    id: string;
+    label: string;
+    impactLabels: string[];
+    details: string;
+    estimatedDelta: SwapDelta;
+    impactType?: 'deterministic' | 'heuristic';
+  },
+  index: number
+): NonDbMappedSwap {
+  const fallbackEffect = pickPrimaryImpactLabel(entry.impactLabels);
+  return {
+    id: `hybrid-global-${entry.id || index}`,
+    label: withIfAvailable(entry.label),
+    expectedEffect: normalizeGenericEffectText(toNonNumericEffect(fallbackEffect, 'Recommended adjustment')),
+    estimatedDelta: entry.estimatedDelta ?? ZERO_DELTA,
+    confidenceLabel: entry.impactType === 'deterministic' ? 'Likely available' : 'Ask if available',
+    type: 'modify',
+    swapType: 'neutral',
+    details: entry.details || 'Global swap recommendation for this dish type.',
+    modifierItemIds: [],
+    impactLabels: entry.impactLabels ?? [],
+    source: 'global',
+    deltaMacros: entry.estimatedDelta ?? ZERO_DELTA,
+  };
+}
+
+function mapHybridLlmSwap(
+  entry: {
+    id: string;
+    label: string;
+    impactLabels: string[];
+    details: string;
+    estimatedDelta: SwapDelta;
+  },
+  index: number
+): NonDbMappedSwap {
+  const fallbackEffect = pickPrimaryImpactLabel(entry.impactLabels);
+  return {
+    id: `hybrid-llm-${entry.id || index}`,
+    label: withIfAvailable(entry.label),
+    expectedEffect: normalizeGenericEffectText(toNonNumericEffect(fallbackEffect, 'Recommended adjustment')),
+    estimatedDelta: entry.estimatedDelta ?? ZERO_DELTA,
+    confidenceLabel: 'Ask if available',
+    type: 'modify',
+    swapType: 'neutral',
+    details: entry.details || 'LLM-generated swap suggestion.',
+    modifierItemIds: [],
+    impactLabels: entry.impactLabels ?? [],
+    source: 'llm',
+    deltaMacros: entry.estimatedDelta ?? ZERO_DELTA,
+  };
+}
+
+function scoreNonDbSwapCandidate(
+  swap: NonDbMappedSwap,
+  mealName: string,
+  goals: MacroGoals
+): number {
+  let score = 0;
+  const lowerLabel = (swap.label || '').toLowerCase();
+  const lowerMealName = (mealName || '').toLowerCase();
+  const friedLikeMeal = isFriedLikeMeal(mealName);
+  const chickenFingerLikeMeal = CHICKEN_FINGER_LIKE_PATTERN.test(lowerMealName);
+
+  if (swap.source === 'global') score += 30;
+  if (swap.source === 'llm') score += 10;
+
+  const grilledStyleSwap =
+    /\b(grilled instead of fried|baked instead of fried|no breading)\b/.test(lowerLabel);
+  if (grilledStyleSwap && friedLikeMeal) {
+    score += 220;
+  }
+  if (grilledStyleSwap && chickenFingerLikeMeal) {
+    score += 180;
+  }
+
+  if (/\b(sauce on the side|no sauce|light sauce|half bun|lettuce wrap|side salad instead of fries)\b/.test(lowerLabel)) {
+    score += 45;
+  }
+
+  if (goals.higherProtein && swap.deltaMacros.protein > 0) score += 60;
+  if (goals.lowerCalories && swap.deltaMacros.calories < 0) score += 60;
+  if (goals.lowerCarbs && swap.deltaMacros.carbs < 0) score += 45;
+  if (goals.lowerFat && swap.deltaMacros.fats < 0) score += 45;
+
+  if (!goals.higherProtein && swap.deltaMacros.calories > 0) {
+    score -= Math.min(45, Math.round(swap.deltaMacros.calories / 10));
+  }
+
+  if (swap.deltaMacros.calories < 0) {
+    score += Math.min(40, Math.round(Math.abs(swap.deltaMacros.calories) / 12));
+  }
+
+  return score;
+}
+
+function dedupeSwapsByLabel<T extends { label: string }>(swaps: T[]): T[] {
+  const seen = new Set<string>();
+  const deduped: T[] = [];
+  for (const swap of swaps) {
+    const key = (swap.label || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(swap);
+  }
+  return deduped;
 }
 
 function buildFallbackPoolForDish(dishType: string, mealName: string) {
@@ -454,7 +587,7 @@ export async function POST(req: Request) {
         carbs: mod.estimatedDelta.carbs,
         fats: mod.estimatedDelta.fats,
       },
-    }));
+    })).filter((mod) => !hasDisallowedSwapPhrase(mod.label, mod.details));
 
     // Final validation for DB mods (production-safe)
     const validDBMods = mappedDBMods.filter(mod => {
@@ -477,24 +610,59 @@ export async function POST(req: Request) {
     });
 
     // If DB-backed swaps exist, they are always the only swaps returned.
-    // If none exist, fall back to rotating, dish-aware generic swaps.
+    // If none exist, use hybrid global/LLM swaps first, then fill with dish-aware generic fallbacks.
     const MAX_FINAL_SWAPS = 3;
     const hasDbSwaps = validDBMods.length > 0;
+    const mappedHybridGlobal = hybridResult.globalSwaps
+      .map((swap, index) => mapHybridGlobalSwap(swap, index))
+      .filter((swap) => !hasDisallowedSwapPhrase(swap.label, swap.details));
+    const mappedHybridLlm = hybridResult.llmSwaps
+      .map((swap, index) => mapHybridLlmSwap(swap, index))
+      .filter((swap) => !hasDisallowedSwapPhrase(swap.label, swap.details));
+
+    const rankedHybridNonDb = dedupeSwapsByLabel(
+      [...mappedHybridGlobal, ...mappedHybridLlm]
+        .map((swap) => ({
+          swap,
+          score: scoreNonDbSwapCandidate(swap, meal_name, macroGoals),
+        }))
+        .sort((a, b) => b.score - a.score)
+        .map(({ swap }) => swap)
+    );
+
     const genericFallbackSwaps = hasDbSwaps
       ? []
-      : buildDishAwareGenericSwaps(meal_name, restaurant_name, MAX_FINAL_SWAPS);
+      : buildDishAwareGenericSwaps(meal_name, restaurant_name, MAX_FINAL_SWAPS)
+        .filter((swap) => !hasDisallowedSwapPhrase(swap.label, swap.details));
+
+    const nonDbFinalPool = hasDbSwaps
+      ? []
+      : dedupeSwapsByLabel([...rankedHybridNonDb, ...genericFallbackSwaps]);
 
     const finalModifications = hasDbSwaps
       ? validDBMods.slice(0, MAX_FINAL_SWAPS)
-      : genericFallbackSwaps.slice(0, MAX_FINAL_SWAPS);
+      : nonDbFinalPool.slice(0, MAX_FINAL_SWAPS);
 
-    const finalSource: 'db' | 'global' = hasDbSwaps ? 'db' : 'global';
+    let finalSource: 'db' | 'global' | 'llm' | 'mixed' = 'global';
+    if (hasDbSwaps) {
+      finalSource = 'db';
+    } else {
+      const nonDbSources = new Set(finalModifications.map((swap) => swap.source));
+      if (nonDbSources.has('global') && nonDbSources.has('llm')) {
+        finalSource = 'mixed';
+      } else if (nonDbSources.has('llm')) {
+        finalSource = 'llm';
+      } else {
+        finalSource = 'global';
+      }
+    }
 
     if (process.env.NODE_ENV === 'development') {
       console.log('[swaps] Final response:', {
         dbMods: validDBMods.length,
         hybridGlobalCandidates: hybridResult.globalSwaps.length,
         hybridLlmCandidates: hybridResult.llmSwaps.length,
+        rankedHybridSwaps: rankedHybridNonDb.length,
         genericFallbackSwaps: genericFallbackSwaps.length,
         finalTotal: finalModifications.length,
         source: finalSource,

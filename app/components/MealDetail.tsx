@@ -209,10 +209,112 @@ function scaleSwapDelta(
   };
 }
 
-function getSwapSummaryText(swap: SwapOption, delta: SwapOption['deltaMacros']): string {
-  if (swap.expectedEffect && swap.expectedEffect.trim().length > 0) {
-    return swap.expectedEffect.trim();
+function formatSwapDeltaSummary(delta: SwapOption['deltaMacros']): string {
+  const parts: string[] = [];
+  const calories = Math.round(delta.calories || 0);
+  const protein = Math.round(delta.protein || 0);
+  const carbs = Math.round(delta.carbs || 0);
+  const fats = Math.round(delta.fats || 0);
+
+  if (calories !== 0) parts.push(`${calories > 0 ? '+' : ''}${calories} cal`);
+  if (protein !== 0) parts.push(`${protein > 0 ? '+' : ''}${protein}g protein`);
+  if (carbs !== 0) parts.push(`${carbs > 0 ? '+' : ''}${carbs}g carbs`);
+  if (fats !== 0) parts.push(`${fats > 0 ? '+' : ''}${fats}g fat`);
+
+  return parts.length > 0 ? parts.join(', ') : 'No macro change';
+}
+
+function hasNumericMacroSummary(text: string): boolean {
+  return /[+\-]?\d+(\.\d+)?\s*(g|cal|kcal)\b/i.test(text);
+}
+
+function stripNumericMacroDetails(text: string): string {
+  const stripped = (text || '')
+    .replace(/[+\-]?\d+(\.\d+)?\s*(cal|kcal|g)\s*(protein|carbs?|fat)?/gi, '')
+    .replace(/\s*[,-]\s*[,-]\s*/g, ' - ')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s+,\s+/g, ', ')
+    .replace(/^[-,\s]+|[-,\s]+$/g, '')
+    .trim();
+
+  return stripped;
+}
+
+type SwapDeltaBadge = {
+  key: 'calories' | 'protein' | 'carbs' | 'fats';
+  label: 'CAL' | 'PRO' | 'CARB' | 'FAT';
+  value: string;
+  className: string;
+};
+
+function formatSignedMetric(value: number, unit: 'cal' | 'g'): string {
+  const rounded = Math.round(value || 0);
+  if (rounded === 0) return '';
+  return `${rounded > 0 ? '+' : ''}${rounded}${unit}`;
+}
+
+function getSwapDeltaBadges(delta: SwapOption['deltaMacros']): SwapDeltaBadge[] {
+  const badges: SwapDeltaBadge[] = [];
+  const calories = Math.round(delta.calories || 0);
+  const protein = Math.round(delta.protein || 0);
+  const carbs = Math.round(delta.carbs || 0);
+  const fats = Math.round(delta.fats || 0);
+
+  if (calories !== 0) {
+    badges.push({
+      key: 'calories',
+      label: 'CAL',
+      value: formatSignedMetric(calories, 'cal'),
+      className: 'border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-300',
+    });
   }
+  if (protein !== 0) {
+    badges.push({
+      key: 'protein',
+      label: 'PRO',
+      value: formatSignedMetric(protein, 'g'),
+      className: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300',
+    });
+  }
+  if (carbs !== 0) {
+    badges.push({
+      key: 'carbs',
+      label: 'CARB',
+      value: formatSignedMetric(carbs, 'g'),
+      className: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+    });
+  }
+  if (fats !== 0) {
+    badges.push({
+      key: 'fats',
+      label: 'FAT',
+      value: formatSignedMetric(fats, 'g'),
+      className: 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300',
+    });
+  }
+
+  return badges;
+}
+
+function getSwapSummaryText(swap: SwapOption, delta: SwapOption['deltaMacros']): string {
+  const deltaSummary = formatSwapDeltaSummary(delta);
+  const isDbBacked = Array.isArray(swap.modifierItemIds) && swap.modifierItemIds.length > 0;
+
+  if (swap.expectedEffect && swap.expectedEffect.trim().length > 0) {
+    const trimmedEffect = swap.expectedEffect.trim();
+    if (isDbBacked && !hasNumericMacroSummary(trimmedEffect)) {
+      return `${trimmedEffect} - ${deltaSummary}`;
+    }
+    if (isDbBacked) {
+      return stripNumericMacroDetails(trimmedEffect) || 'Macro adjustment';
+    }
+    return trimmedEffect;
+  }
+
+  if (isDbBacked) {
+    return 'Macro adjustment';
+  }
+
   return getSwapDescription(delta);
 }
 
@@ -1258,6 +1360,8 @@ export function MealDetail({
                     const isSelected = selectedSwapIds.includes(swap.id);
                     const quantity = selectedSwapQuantities[swap.id] ?? swap.quantityConfig?.defaultQuantity ?? 1;
                     const delta = scaleSwapDelta(swap.deltaMacros, quantity);
+                    const summaryText = getSwapSummaryText(swap, delta);
+                    const deltaBadges = getSwapDeltaBadges(delta);
                     return (
                       <div
                         key={swap.id}
@@ -1265,9 +1369,24 @@ export function MealDetail({
                           }`}
                       >
                         <p className="text-foreground/80 text-sm font-medium leading-snug">{swap.label}</p>
-                        <p className="text-muted-foreground text-xs mt-1">
-                          {getSwapSummaryText(swap, delta)}
-                        </p>
+                        {summaryText && (
+                          <p className="text-muted-foreground text-xs mt-1">
+                            {summaryText}
+                          </p>
+                        )}
+                        {deltaBadges.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1.5 tabular-nums">
+                            {deltaBadges.map((badge) => (
+                              <span
+                                key={`${swap.id}-${badge.key}`}
+                                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold tracking-tight ${badge.className}`}
+                              >
+                                <span className="opacity-75">{badge.label}</span>
+                                <span>{badge.value}</span>
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         {swap.quantityConfig && isSelected && quantity > 1 && (
                           <p className="text-indigo-600 dark:text-indigo-300 text-[11px] mt-2 font-medium">
                             Applied to {quantity} {swap.quantityConfig.unitLabel}{quantity === 1 ? '' : 's'}
@@ -1528,6 +1647,8 @@ export function MealDetail({
                     const isSelected = selectedSwapIds.includes(swap.id);
                     const quantity = selectedSwapQuantities[swap.id] ?? swap.quantityConfig?.defaultQuantity ?? 1;
                     const delta = scaleSwapDelta(swap.deltaMacros, quantity);
+                    const summaryText = getSwapSummaryText(swap, delta);
+                    const deltaBadges = getSwapDeltaBadges(delta);
                     return (
                       <div
                         key={swap.id}
@@ -1547,9 +1668,24 @@ export function MealDetail({
                             </div>
                             <div className="text-left">
                               <p className="text-card-foreground text-sm font-medium">{swap.label}</p>
-                              <p className="text-muted-foreground text-xs">
-                                {getSwapSummaryText(swap, delta)}
-                              </p>
+                              {summaryText && (
+                                <p className="text-muted-foreground text-xs">
+                                  {summaryText}
+                                </p>
+                              )}
+                              {deltaBadges.length > 0 && (
+                                <div className="mt-1.5 flex flex-wrap gap-1.5 tabular-nums">
+                                  {deltaBadges.map((badge) => (
+                                    <span
+                                      key={`${swap.id}-${badge.key}`}
+                                      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold tracking-tight ${badge.className}`}
+                                    >
+                                      <span className="opacity-75">{badge.label}</span>
+                                      <span>{badge.value}</span>
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </button>

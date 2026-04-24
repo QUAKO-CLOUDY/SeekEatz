@@ -98,6 +98,8 @@ interface ActiveQuickPromptState {
 }
 
 const CHAT_MEALS_PAGE_SIZE = 5;
+const CHAT_MEALS_REDUCED_PAGE_SIZE = 2;
+const CHAT_MEALS_REDUCED_PAGE_START_CLICK = 5; // 5th click and onward
 const APPENDED_MEALS_DIVIDER_LABEL = "More meals";
 const ROUTER_HISTORY_LIMIT = 8;
 
@@ -437,6 +439,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const [isMounted, setIsMounted] = useState(false);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
+  const [loadMoreDividerBreakpoints, setLoadMoreDividerBreakpoints] = useState<Record<string, number[]>>({});
+  const [loadMoreClickCounts, setLoadMoreClickCounts] = useState<Record<string, number>>({});
   const abortControllerRef = useRef<AbortController | null>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -804,6 +809,22 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   }, []);
 
   useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+
+    const mediaQuery = window.matchMedia('(pointer: coarse)');
+    const updatePointerMode = (event?: MediaQueryListEvent) => {
+      setIsCoarsePointer(event ? event.matches : mediaQuery.matches);
+    };
+
+    updatePointerMode();
+    mediaQuery.addEventListener('change', updatePointerMode);
+
+    return () => {
+      mediaQuery.removeEventListener('change', updatePointerMode);
+    };
+  }, []);
+
+  useEffect(() => {
     if (typeof window === 'undefined' || !window.visualViewport) return;
 
     const updateKeyboardState = () => {
@@ -822,7 +843,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     };
   }, []);
 
-  const isTypingMode = isInputFocused || isKeyboardOpen;
+  const isTypingMode = isKeyboardOpen || (isInputFocused && isCoarsePointer);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -879,6 +900,24 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       activeQuickPromptRef.current = null;
     }
   }, [messages.length]);
+
+  useEffect(() => {
+    const liveMessageIds = new Set(messages.map((message) => message.id));
+
+    setLoadMoreDividerBreakpoints((prev) => {
+      const next = Object.fromEntries(
+        Object.entries(prev).filter(([messageId]) => liveMessageIds.has(messageId))
+      );
+      return Object.keys(next).length === Object.keys(prev).length ? prev : next;
+    });
+
+    setLoadMoreClickCounts((prev) => {
+      const next = Object.fromEntries(
+        Object.entries(prev).filter(([messageId]) => liveMessageIds.has(messageId))
+      );
+      return Object.keys(next).length === Object.keys(prev).length ? prev : next;
+    });
+  }, [messages]);
 
   // Persist messages to guest session (only for guests, authenticated users use Supabase)
   useEffect(() => {
@@ -1653,70 +1692,126 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     setError(null);
 
     try {
-      // Call /api/search with only pagination parameters
-      const requestBody = {
-        searchKey: context.searchKey,
-        offset: context.nextOffset,
-        limit: 5,
-      };
+      const existingMeals =
+        messages.find((message) => message.id === messageId)?.meals ?? [];
+      const seenMealIds = new Set(existingMeals.map((meal) => meal.id));
+      const appendedMeals: Meal[] = [];
+      const clickNumber = (loadMoreClickCounts[messageId] ?? 0) + 1;
+      const targetBatchSize =
+        clickNumber >= CHAT_MEALS_REDUCED_PAGE_START_CLICK
+          ? CHAT_MEALS_REDUCED_PAGE_SIZE
+          : CHAT_MEALS_PAGE_SIZE;
 
-      const response = await fetch('/api/search', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
+      let workingContext: MealSearchContext = { ...context };
+      const MAX_ATTEMPTS = 6;
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = `Error ${response.status}: ${response.statusText}`;
-        try {
-          const errorJson = JSON.parse(errorText);
-          errorMessage = errorJson.error || errorMessage;
-        } catch {
-          if (errorText.trim()) errorMessage = errorText;
+      for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
+        if (!workingContext.hasMore) {
+          break;
         }
-        setError(errorMessage);
-        return;
+
+        const requestBody = {
+          searchKey: workingContext.searchKey,
+          offset: workingContext.nextOffset,
+          limit: CHAT_MEALS_PAGE_SIZE,
+        };
+
+        const response = await fetch('/api/search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          let errorMessage = `Error ${response.status}: ${response.statusText}`;
+          try {
+            const errorJson = JSON.parse(errorText);
+            errorMessage = errorJson.error || errorMessage;
+          } catch {
+            if (errorText.trim()) errorMessage = errorText;
+          }
+          setError(errorMessage);
+          return;
+        }
+
+        const searchData = await response.json();
+        const fetchedMeals: Meal[] = Array.isArray(searchData.meals)
+          ? searchData.meals.map(mapSearchItemToMeal)
+          : [];
+
+        for (const meal of fetchedMeals) {
+          if (!seenMealIds.has(meal.id)) {
+            appendedMeals.push(meal);
+            seenMealIds.add(meal.id);
+          }
+        }
+
+        workingContext = {
+          searchKey: searchData.searchKey || workingContext.searchKey,
+          nextOffset: searchData.nextOffset ?? workingContext.nextOffset,
+          hasMore: searchData.hasMore ?? false,
+          originalQuery: context.originalQuery,
+          filters: context.filters,
+        };
+
+        if (appendedMeals.length >= CHAT_MEALS_PAGE_SIZE) {
+          break;
+        }
+
+        if (appendedMeals.length >= targetBatchSize) {
+          break;
+        }
       }
 
-      // Treat response as: { meals, hasMore, nextOffset, searchKey }
-      const searchData = await response.json();
+      const batchMeals = appendedMeals.slice(0, targetBatchSize);
 
-      if (!searchData.meals || !Array.isArray(searchData.meals)) {
-        setError('Invalid response format from server');
-        return;
-      }
+      setMessages((prev) =>
+        prev.map((msg) => {
+          if (msg.id !== messageId || !msg.meals) {
+            return msg;
+          }
 
-      // Convert search results to Meal format
-      const newMeals: Meal[] = searchData.meals.map(mapSearchItemToMeal);
+          const updatedMeals = deduplicateMealsById([...msg.meals, ...batchMeals]);
 
-      // Append new meals to existing ones
-      setMessages(prev => prev.map(msg => {
-        if (msg.id === messageId && msg.meals) {
-          const updatedMeals = deduplicateMealsById([...msg.meals, ...newMeals]);
-
-          // Update visible count to show all meals (including newly loaded ones)
-          setVisibleMealsCount(prevCount => ({
+          setVisibleMealsCount((prevCount) => ({
             ...prevCount,
-            [messageId]: updatedMeals.length
+            [messageId]: updatedMeals.length,
           }));
 
-          // Always persist the updated context (even if hasMore is false)
           return {
             ...msg,
             meals: updatedMeals,
             mealSearchContext: {
-              searchKey: searchData.searchKey || context.searchKey,
-              nextOffset: searchData.nextOffset ?? context.nextOffset,
-              hasMore: searchData.hasMore ?? false,
+              searchKey: workingContext.searchKey,
+              nextOffset: workingContext.nextOffset,
+              hasMore: workingContext.hasMore,
               originalQuery: context.originalQuery,
-              filters: context.filters
-            }
+              filters: context.filters,
+            },
           };
-        }
-        return msg;
+        })
+      );
+
+      if (batchMeals.length > 0) {
+        const breakpointIndex = existingMeals.length;
+        setLoadMoreDividerBreakpoints((prev) => {
+          const current = prev[messageId] ?? [];
+          if (current.includes(breakpointIndex)) {
+            return prev;
+          }
+          return {
+            ...prev,
+            [messageId]: [...current, breakpointIndex].sort((a, b) => a - b),
+          };
+        });
+      }
+
+      setLoadMoreClickCounts((prev) => ({
+        ...prev,
+        [messageId]: clickNumber,
       }));
     } catch (err) {
       console.error('Error loading more meals:', err);
@@ -1792,6 +1887,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                 // Determine how many meals to show for this message
                 const visibleCount = visibleMealsCount[m.id] ?? CHAT_MEALS_PAGE_SIZE;
                 const mealsToShow = m.meals.slice(0, visibleCount);
+                const dividerBreakpoints = loadMoreDividerBreakpoints[m.id] ?? [];
 
                 return (
                   <div className="flex justify-start mb-2">
@@ -1800,7 +1896,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                         const isFavorite = favoriteMeals?.includes(meal.id) || false;
                         return (
                           <div key={meal.id}>
-                            {index === CHAT_MEALS_PAGE_SIZE && (
+                            {dividerBreakpoints.includes(index) && (
                               <div className="flex items-center gap-3 py-2">
                                 <div className="h-px flex-1 bg-border" />
                                 <span className="text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">

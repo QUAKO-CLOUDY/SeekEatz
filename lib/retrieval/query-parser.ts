@@ -133,6 +133,7 @@ export function parseQuery(raw: string): ParsedQuery {
   const restaurantResult = detectExplicitRestaurantConstraint(query);
   const macroResult = detectMacroConstraints(query);
   const contentQuery = stripRestaurantConstraintForContent(query, restaurantResult.restaurantQuery);
+  const lowerQuery = query.toLowerCase();
   const lowerContent = contentQuery.toLowerCase();
 
   const categories = prioritizeSpecificCategories(detectCategories(lowerContent));
@@ -141,25 +142,25 @@ export function parseQuery(raw: string): ParsedQuery {
     bowlOnlyCategories.unshift('bowl');
     categories.splice(0, categories.length, ...dedupe(bowlOnlyCategories));
   }
-  const mealTypes = dedupe<string>(MEAL_TYPE_PATTERNS.filter(([pattern]) => pattern.test(lowerContent)).map(([, type]) => type));
-  if (!mealTypes.includes('breakfast') && /\begg\b/i.test(lowerContent) && /\b(wrap|sandw(?:ich|hich)|bagel|biscuit)\b/i.test(lowerContent)) {
+  const mealTypes = dedupe<string>(MEAL_TYPE_PATTERNS.filter(([pattern]) => pattern.test(lowerQuery)).map(([, type]) => type));
+  if (!mealTypes.includes('breakfast') && /\begg\b/i.test(lowerQuery) && /\b(wrap|sandw(?:ich|hich)|bagel|biscuit)\b/i.test(lowerQuery)) {
     mealTypes.unshift('breakfast');
   }
-  if (mealTypes.includes('breakfast') && /\bbreakfast\s+sandw(?:ich|hich)\b/i.test(lowerContent)) {
+  if (mealTypes.includes('breakfast') && /\bbreakfast\s+sandw(?:ich|hich)\b/i.test(lowerQuery)) {
     categories.unshift('breakfast_sandwich');
     const entreeIndex = categories.indexOf('entree');
     if (entreeIndex >= 0) {
       categories.splice(entreeIndex, 1);
     }
   }
-  if (mealTypes.includes('breakfast') && /\bbreakfast\s+burrito\b/i.test(lowerContent)) {
+  if (mealTypes.includes('breakfast') && /\bbreakfast\s+burrito\b/i.test(lowerQuery)) {
     categories.unshift('burrito');
     const entreeIndex = categories.indexOf('entree');
     if (entreeIndex >= 0) {
       categories.splice(entreeIndex, 1);
     }
   }
-  if (mealTypes.includes('breakfast') && /\bbreakfast\s+wrap\b/i.test(lowerContent)) {
+  if (mealTypes.includes('breakfast') && /\bbreakfast\s+wrap\b/i.test(lowerQuery)) {
     categories.unshift('wrap');
     const entreeIndex = categories.indexOf('entree');
     if (entreeIndex >= 0) {

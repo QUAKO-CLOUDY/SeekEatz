@@ -94,6 +94,22 @@ const BREAKFAST_FOOD_PATTERNS = [
   /\bbagel\s+sandwich\b/,
   /\bbiscuit\s+sandwich\b/,
 ];
+const BREAKFAST_STRICT_ANCHOR_PATTERNS = [
+  /\bbreakfast\b/,
+  /\bmcmuffin\b/,
+  /\bmcgriddle\b/,
+  /\bhash\s*brown\b/,
+  /\benglish\s+muffin\b/,
+  /\bbagel\b/,
+  /\bbiscuit\b/,
+  /\bcroissant\b/,
+  /\bpancake\b/,
+  /\bwaffle\b/,
+  /\bfrench\s+toast\b/,
+  /\boatmeal\b/,
+  /\b(?:omelet|omelette|frittata)\b/,
+];
+const BURGER_LIKE_PATTERNS = /\b(cheeseburger|burger|smashburger|whopper|big\s+mac|quarter\s+pounder)\b/i;
 const FAMILY_OR_CATERING_PATTERNS = [
   /\bcatering\b/,
   /\bfamily(?:\s|-)?size\b/,
@@ -1478,7 +1494,7 @@ function applyPostRetrievalFiltersInternal(
 
   filtered = filtered.filter((item) => {
     const smoothieItem = strictSmoothieOnly
-      ? hasExplicitSmoothieSignals(item)
+      ? hasStrictSmoothieSignals(item)
       : matchesSmoothieIntent(item);
 
     if (smoothieQuery && !smoothieItem) {
@@ -1593,6 +1609,29 @@ function hasExplicitSmoothieSignals(item: RawResult): boolean {
   return /\b(smoothie|smoothies|blend|blended)\b/i.test(explicitSignals);
 }
 
+function hasStrictSmoothieSignals(item: RawResult): boolean {
+  if (hasExplicitSmoothieSignals(item)) {
+    return true;
+  }
+
+  const normalizedCategory = (item.normalized_category ?? '').toLowerCase();
+  const itemType = (item.item_type ?? '').toLowerCase();
+  if (normalizedCategory !== 'smoothie') {
+    return false;
+  }
+
+  if (itemType && itemType !== 'drink') {
+    return false;
+  }
+
+  const haystack = `${item.name ?? ''} ${item.description ?? ''}`.toLowerCase();
+  if (/\b(juice|juices|coffee|latte|espresso|americano|cappuccino|macchiato|cold brew|tea|refresher)\b/i.test(haystack)) {
+    return false;
+  }
+
+  return true;
+}
+
 export function applyRetrievalGuardrailsForTesting(
   items: RawResult[],
   parsed: ParsedQuery,
@@ -1602,7 +1641,12 @@ export function applyRetrievalGuardrailsForTesting(
 }
 
 function matchesMealType(item: RawResult, parsed: ParsedQuery, relaxMealType = false): boolean {
+  const strictBreakfastRequest = isStrictBreakfastRequest(parsed);
+
   if (!parsed.mealTypes.length) {
+    if (strictBreakfastRequest) {
+      return looksLikeBreakfastFood(item);
+    }
     return true;
   }
 
@@ -1611,12 +1655,18 @@ function matchesMealType(item: RawResult, parsed: ParsedQuery, relaxMealType = f
     if (parsed.mealTypes.some((value) => value.toLowerCase() === 'drink')) {
       return looksLikeDrinkItem(item);
     }
+    if (strictBreakfastRequest) {
+      return looksLikeBreakfastFood(item);
+    }
     return true;
   }
 
   if (itemMealType === 'all_day') {
     if (parsed.mealTypes.some((value) => value.toLowerCase() === 'drink')) {
       return looksLikeDrinkItem(item);
+    }
+    if (strictBreakfastRequest) {
+      return looksLikeBreakfastFood(item);
     }
     return true;
   }
@@ -1665,7 +1715,17 @@ function matchesMealType(item: RawResult, parsed: ParsedQuery, relaxMealType = f
 
 function looksLikeBreakfastFood(item: RawResult): boolean {
   const haystack = buildHaystack(item);
-  if (/\b(cheeseburger|burger|smashburger|whopper|big\s+mac)\b/i.test(haystack) && !/\bbreakfast\b/i.test(haystack)) {
+  const category = (item.normalized_category ?? '').toLowerCase();
+  const hasStrictBreakfastAnchor = BREAKFAST_STRICT_ANCHOR_PATTERNS.some((pattern) => pattern.test(haystack));
+  const hasBreakfastSandwichAnchor =
+    /\b(egg|sausage|bacon|ham)\b/i.test(haystack) &&
+    /\b(sandw(?:ich|hich)|bagel|biscuit|croissant|muffin)\b/i.test(haystack);
+
+  if (category === 'burger' || BURGER_LIKE_PATTERNS.test(haystack)) {
+    return false;
+  }
+
+  if (/\bsandw(?:ich|hich)\b/i.test(haystack) && !hasStrictBreakfastAnchor && !hasBreakfastSandwichAnchor) {
     return false;
   }
 
@@ -1673,7 +1733,6 @@ function looksLikeBreakfastFood(item: RawResult): boolean {
     return true;
   }
 
-  const category = (item.normalized_category ?? '').toLowerCase();
   return (
     category === 'breakfast_sandwich' ||
     ((/\b(acai|pitaya|smoothie)\b/i.test(haystack) || /\bbowl\b/i.test(haystack)) &&
@@ -1742,10 +1801,17 @@ function hasSpecificDishSignals(parsed: ParsedQuery): boolean {
 }
 
 function requiresStrictBreakfastFoodFiltering(parsed: ParsedQuery): boolean {
-  return (
-    parsed.mealTypes.length > 0 &&
-    parsed.mealTypes.every((mealType) => mealType.toLowerCase() === 'breakfast')
-  );
+  return isStrictBreakfastRequest(parsed);
+}
+
+function isStrictBreakfastRequest(parsed: ParsedQuery): boolean {
+  const mealTypes = parsed.mealTypes.map((mealType) => mealType.toLowerCase());
+  if (mealTypes.length > 0) {
+    const hasBreakfastIntent = mealTypes.includes('breakfast') || mealTypes.includes('brunch');
+    return hasBreakfastIntent && mealTypes.every((mealType) => mealType === 'breakfast' || mealType === 'brunch');
+  }
+
+  return /\bbreakfast\b/i.test(parsed.raw);
 }
 
 function matchesRequestedCategory(item: RawResult, parsed: ParsedQuery): boolean {

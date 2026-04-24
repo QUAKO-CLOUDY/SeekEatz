@@ -345,8 +345,14 @@ const RESTAURANT_LOGO_MAP: Record<string, string> = {
   'cheesecake factory': 'cheesecake factory',
 
   // CoreLife Eatery variations
+  'core life eatery': 'corelife eatery',
   'corelife eatery': 'corelife eatery',
   'corelife': 'corelife eatery',
+
+  // Tous Les Jours variations
+  'tous les jours': 'tous les jours',
+  'touslesjours': 'tous les jours',
+  'tous_les_jours': 'tous les jours',
 
   // Crisp & Green variations
   'crisp & green': 'crisp and green',

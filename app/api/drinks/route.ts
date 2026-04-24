@@ -24,23 +24,36 @@ type DrinkSourceFile = {
   items?: RawDrinkEntry[];
 };
 
-const GENERIC_CHAIN_DRINK_SIZES: DrinkItem[] = [
-  {
-    id: 'generic-drink-12oz',
-    name: 'Generic Drink (12 oz)',
-    macros: { calories: 140, protein: 0, carbs: 39, fat: 0 },
-  },
-  {
-    id: 'generic-drink-16oz',
-    name: 'Generic Drink (16 oz)',
-    macros: { calories: 190, protein: 0, carbs: 52, fat: 0 },
-  },
-  {
-    id: 'generic-drink-20oz',
-    name: 'Generic Drink (20 oz)',
-    macros: { calories: 240, protein: 0, carbs: 65, fat: 0 },
-  },
+const GENERIC_SODA_PRODUCTS = [
+  'Coca-Cola',
+  'Sprite',
+  'Fanta Orange',
+  'Pepsi',
+  'Mountain Dew',
+  'Starry',
+  'Dr Pepper',
+  'Lemonade',
+  'Root Beer',
+] as const;
+
+const GENERIC_SODA_SIZES: Array<{ label: string; calories: number; carbs: number }> = [
+  { label: '12 oz', calories: 140, carbs: 39 },
+  { label: '16 oz', calories: 190, carbs: 52 },
+  { label: '20 oz', calories: 240, carbs: 65 },
 ];
+
+const GENERIC_CHAIN_SODA_FALLBACK: DrinkItem[] = GENERIC_SODA_PRODUCTS.flatMap((product) =>
+  GENERIC_SODA_SIZES.map((size) => ({
+    id: `generic-${product.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${size.label.replace(/\s+/g, '').toLowerCase()}`,
+    name: `${product} (${size.label})`,
+    macros: {
+      calories: size.calories,
+      protein: 0,
+      carbs: size.carbs,
+      fat: 0,
+    },
+  }))
+);
 
 function normalizeRestaurantForMatch(name: string): string {
   return (name || '').toLowerCase().trim();
@@ -72,9 +85,23 @@ function isSpecialtyDrinkName(name: string): boolean {
   return /\b(smoothie|smoothies|shake|shakes|milkshake|acai|pitaya|blend|blended|frappe|freeze|float|slush|boba|coffee|latte|mocha|espresso|matcha|cold brew|tea|chai|juice|lemonade|refresher|specialty)\b/.test(normalized);
 }
 
-function isSmoothieOrShakeName(name: string): boolean {
+function isFoodLikeName(name: string): boolean {
   const normalized = normalizeDrinkNameForMatch(name);
-  return /\b(smoothie|smoothies|shake|shakes|milkshake|acai|pitaya|blend|blended)\b/.test(normalized);
+  if (!normalized) return false;
+  return /\b(cake|toast|pancake|waffle|sandwich|burger|pizza|pasta|salad|bowl|burrito|taco|omelet|omelette|bagel|biscuit|croissant|muffin|entree|appetizer|board)\b/.test(normalized);
+}
+
+function isLikelyDrinkName(name: string): boolean {
+  const normalized = normalizeDrinkNameForMatch(name);
+  if (!normalized) return false;
+
+  // Guardrail: avoid misclassifying food items that include beverage words
+  // (e.g., "banana coffee cake") as drinks.
+  if (isFoodLikeName(normalized)) {
+    return false;
+  }
+
+  return /\b(drink|drinks|beverage|beverages|soda|sodas|coke|coca-cola|pepsi|sprite|fanta|mountain dew|starry|dr pepper|root beer|lemonade|tea|coffee|latte|espresso|smoothie|shake|juice|water)\b/.test(normalized);
 }
 
 function toDrinkItem(entry: RawDrinkEntry, index: number): DrinkItem {
@@ -104,9 +131,9 @@ function dedupeDrinksByName(items: DrinkItem[]): DrinkItem[] {
  * GET /api/drinks?restaurant=Cheba+Hut
  * Returns drink options for the given restaurant from data/jsons/*_raw.json.
  * Behavior:
- * 1. Generic chain drink sizes (12/16/20 oz) for standard drink menus.
- * 2. Restaurant-specific specialty drinks (smoothies, shakes, and specialty beverages).
- * 3. Excludes specific standard fountain-drink names to keep the dropdown concise.
+ * 1. Generic non-diet Coke/Pepsi-family sodas (12/16/20 oz) for standard drink menus.
+ * 2. Restaurant-specific drinks from the database when available.
+ * 3. Generic sodas are always included; database drinks are appended when found.
  */
 export async function GET(req: NextRequest) {
   try {
@@ -120,7 +147,7 @@ export async function GET(req: NextRequest) {
     try {
       dirEntries = fs.readdirSync(dataDir, { withFileTypes: true });
     } catch {
-      return Response.json({ drinks: [] });
+      return Response.json({ drinks: GENERIC_CHAIN_SODA_FALLBACK });
     }
 
     const targetNorm = normalizeRestaurantForMatch(restaurant);
@@ -145,41 +172,55 @@ export async function GET(req: NextRequest) {
       const fileRestaurantNorm = normalizeRestaurantForMatch(data.restaurant_name || '');
       if (fileRestaurantNorm !== targetNorm) continue;
 
-      const topLevelDrinks = Array.isArray(data.drinks) ? data.drinks : [];
+      const topLevelDrinks = Array.isArray(data.drinks)
+        ? data.drinks.filter((item) => {
+            const hasName = Boolean(item.name && item.name.trim());
+            const hasMacros = Boolean(item.macros || item.calories != null);
+            if (!hasName || !hasMacros) return false;
+            if (isFoodLikeName(item.name || '')) return false;
+            return (
+              isDrinkCategory(item.category || '') ||
+              isLikelyDrinkName(item.name || '') ||
+              isSpecialtyDrinkName(item.name || '')
+            );
+          })
+        : [];
       const itemLevelDrinks = Array.isArray(data.items)
         ? data.items.filter((item) => {
             const hasName = Boolean(item.name && item.name.trim());
             const hasMacros = Boolean(item.macros || item.calories != null);
-            return hasName && hasMacros && (isDrinkCategory(item.category || '') || isSpecialtyDrinkName(item.name || ''));
+            if (!hasName || !hasMacros) return false;
+            if (isFoodLikeName(item.name || '')) return false;
+            return (
+              isDrinkCategory(item.category || '') ||
+              isLikelyDrinkName(item.name || '') ||
+              isSpecialtyDrinkName(item.name || '')
+            );
           })
         : [];
 
-      const rawDrinks = topLevelDrinks.length > 0 ? topLevelDrinks : itemLevelDrinks;
+      const rawDrinks = [...topLevelDrinks, ...itemLevelDrinks];
 
       if (rawDrinks.length === 0) {
-        return Response.json({ drinks: [] });
+        return Response.json({ drinks: GENERIC_CHAIN_SODA_FALLBACK });
       }
 
-      const mappedDrinks = rawDrinks.map((item, index) => toDrinkItem(item, index));
-      const specialtyDrinks = dedupeDrinksByName(
-        mappedDrinks.filter((drink) => isSpecialtyDrinkName(drink.name))
+      const restaurantSpecificDrinks = dedupeDrinksByName(
+        rawDrinks.map((item, index) => toDrinkItem(item, index))
       );
-
-      const hasAnyStandardDrinkCandidate = mappedDrinks.some((drink) => !isSpecialtyDrinkName(drink.name));
-      const allSmoothieOrShakeMenu = mappedDrinks.every((drink) => isSmoothieOrShakeName(drink.name));
-      const includeGenericSizes = hasAnyStandardDrinkCandidate && !allSmoothieOrShakeMenu;
+      const genericSodas = dedupeDrinksByName(GENERIC_CHAIN_SODA_FALLBACK);
 
       const drinks = [
-        ...(includeGenericSizes ? GENERIC_CHAIN_DRINK_SIZES : []),
-        ...specialtyDrinks,
+        ...genericSodas,
+        ...restaurantSpecificDrinks,
       ];
 
       return Response.json({ drinks });
     }
 
-    return Response.json({ drinks: [] });
+    return Response.json({ drinks: GENERIC_CHAIN_SODA_FALLBACK });
   } catch (err) {
     console.error('[api/drinks]', err);
-    return Response.json({ drinks: [] });
+    return Response.json({ drinks: GENERIC_CHAIN_SODA_FALLBACK });
   }
 }

@@ -152,6 +152,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
 
   const notificationStorageKey = `seekeatz-notification-prefs:${userEmail || 'guest'}`;
   const subscriptionPlanLabel = getEntitlementPlanLabel(entitlement);
+  const canEditProfile = entitlement.hasPremiumAccess;
 
   const applyNotificationPreferences = (preferences: NotificationPreferences) => {
     setMealSuggestions(preferences.mealSuggestions);
@@ -620,6 +621,11 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
 
   // Handle edit mode toggle
   const handleEditClick = () => {
+    if (!canEditProfile) {
+      setEditError('Profile editing is available on Premium plans only.');
+      return;
+    }
+
     setEditedProfile(userProfile);
     setSaveSuccessMessage(null);
     setInputValues({
@@ -650,6 +656,11 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
 
   // Handle save profile changes
   const handleSaveProfile = async () => {
+    if (!canEditProfile) {
+      setEditError('Profile editing is available on Premium plans only.');
+      return;
+    }
+
     setIsSaving(true);
     setEditError(null);
     setUpdateError(null);
@@ -874,11 +885,12 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                   variant="outline"
                   size="sm"
                   onClick={handleEditClick}
+                  disabled={!canEditProfile}
                   data-tutorial-target="settings-edit-profile"
                   className="h-9 rounded-lg px-4 text-black hover:text-black dark:text-white dark:hover:text-white"
                 >
                   <Edit className="mr-2 size-4" />
-                  Edit Profile
+                  {canEditProfile ? 'Edit Profile' : 'Premium required'}
                 </Button>
               ) : (
                 <div className="flex flex-wrap gap-2">
@@ -932,27 +944,22 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
               </div>
             )}
 
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-              <div className="rounded-2xl border border-border/70 bg-background/60 p-5">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex size-12 items-center justify-center rounded-xl bg-muted text-sm font-semibold text-foreground">
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-border/70 bg-background/60 p-4">
+                <div className="mb-3 flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-sm font-semibold text-foreground">
                     {getInitials(isEditing ? inputValues.full_name : (userProfile.full_name || userFullName))}
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                       Identity
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      This name is used across your home, log, and chat experience.
-                    </p>
                   </div>
                 </div>
 
                 {isEditing ? (
                   <div className="space-y-2">
-                    <Label htmlFor="full_name" className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                      Full Name
-                    </Label>
+                    <Label htmlFor="full_name" className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">Name</Label>
                     <Input
                       id="full_name"
                       type="text"
@@ -962,17 +969,17 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                       className="h-10 text-base font-medium"
                       autoFocus
                     />
-                    <p className="text-sm text-muted-foreground">
-                      Your email stays tied to your account and cannot be edited here.
+                    <p className="text-sm text-muted-foreground truncate">
+                      <span className="font-semibold text-foreground">Email:</span> {userEmail || 'user@example.com'}
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-1">
-                    <h3 className="truncate text-lg font-semibold text-foreground">
-                      {userProfile.full_name || userFullName || 'User'}
-                    </h3>
-                    <p className="truncate text-sm text-muted-foreground">
-                      {userEmail || 'user@example.com'}
+                  <div className="space-y-1 text-sm">
+                    <p className="truncate text-muted-foreground">
+                      <span className="font-semibold text-foreground">Name:</span> {userProfile.full_name || userFullName || 'User'}
+                    </p>
+                    <p className="truncate text-muted-foreground">
+                      <span className="font-semibold text-foreground">Email:</span> {userEmail || 'user@example.com'}
                     </p>
                   </div>
                 )}

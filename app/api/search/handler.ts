@@ -1791,11 +1791,16 @@ export async function searchHandler(params: SearchParams) {
   }
 
   // 1. GENERATE SEARCH KEY (Deterministic from normalized query + constraints + dish type + restaurant)
+  // Optional shuffleNonce allows callers (quick prompts) to force a fresh ordering per run.
   // Must be deterministic so pagination uses same result set
   // Diet logic removed - no dietary tags in cache key
   // If searchKey was provided, use it; otherwise generate new one
   // STRICT: Only include rest in searchKey if restaurantName exists (canonical restaurant)
   if (!currentSearchKey) {
+    const requestedShuffleNonce =
+      typeof params.shuffleNonce === 'string' && params.shuffleNonce.trim().length > 0
+        ? params.shuffleNonce.trim()
+        : undefined;
     const randomizeSmoothies = shouldRandomizeSmoothieResults({
       dishType: isSmoothieSearch ? 'smoothie' : dishType,
       constraints: {
@@ -1823,7 +1828,9 @@ export async function searchHandler(params: SearchParams) {
       dishType: dishType || null
     };
 
-    if (randomizeSmoothies) {
+    if (requestedShuffleNonce) {
+      searchKeyData.shuffleNonce = requestedShuffleNonce;
+    } else if (randomizeSmoothies) {
       searchKeyData.shuffleNonce =
         globalThis.crypto?.randomUUID?.() ??
         `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;

@@ -78,9 +78,9 @@ export default function PrivacyPage() {
   const handleBackToSettings = () => {
     if (typeof window !== "undefined") {
       localStorage.setItem("seekeatz_current_screen", "settings");
-      localStorage.setItem("seekeatz_nav_history", JSON.stringify(["chat", "settings"]));
+      localStorage.setItem("seekeatz_nav_history", JSON.stringify(["settings"]));
     }
-    router.push("/chat");
+    router.push("/settings");
   };
 
   return (

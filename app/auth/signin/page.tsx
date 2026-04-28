@@ -2,7 +2,7 @@
 
 import { Suspense, useState, FormEvent, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
@@ -13,6 +13,11 @@ import { AuthProviders } from "@/app/components/AuthProviders";
 import { setDevFullAccess } from "@/lib/onboarding-flow";
 import { bootstrapAccount } from "@/lib/bootstrap-account";
 import { isFullAccessEmail } from "@/lib/full-access";
+import type { UserProfile } from "@/app/types";
+import {
+  clearLoggedMealsStorageForUser,
+  getLoggedMealsStorageKey,
+} from "@/lib/logged-meals-storage";
 
 function SignInPageContent() {
   const router = useRouter();
@@ -32,19 +37,22 @@ function SignInPageContent() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resetPasswordMessage, setResetPasswordMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
   const encodedRedirectTo = encodeURIComponent(redirectTo);
   const upgradeHref = `/upgrade?redirectTo=${encodedRedirectTo}${shouldStartTutorial ? "&tutorial=1" : ""}${isMasterMode ? "&master=1" : ""}`;
 
   const resetSavedMealStorageForUser = (userId: string) => {
     if (typeof window === "undefined") return;
 
+    clearLoggedMealsStorageForUser(userId);
+
     const keysToRemove = [
       "seekeatz_favorite_meals",
       "seekeatz_favorite_meals_data",
       "seekeatz_favorite_meals:guest",
       "seekeatz_favorite_meals_data:guest",
-      "seekeatz_logged_meals",
       `seekeatz_favorite_meals:${userId}`,
       `seekeatz_favorite_meals_data:${userId}`,
     ];
@@ -52,7 +60,7 @@ function SignInPageContent() {
     keysToRemove.forEach((key) => localStorage.removeItem(key));
     localStorage.setItem(`seekeatz_favorite_meals:${userId}`, JSON.stringify([]));
     localStorage.setItem(`seekeatz_favorite_meals_data:${userId}`, JSON.stringify({}));
-    localStorage.setItem("seekeatz_logged_meals", JSON.stringify([]));
+    localStorage.setItem(getLoggedMealsStorageKey(userId), JSON.stringify([]));
   };
 
   // Check if user is already authenticated - if so, redirect to chat
@@ -93,6 +101,7 @@ function SignInPageContent() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
+    setResetPasswordMessage(null);
     setIsLoading(true);
 
     try {
@@ -133,10 +142,11 @@ function SignInPageContent() {
           ? localStorage.getItem("pendingOnboardingProfile")
           : null;
         
-        let profile = null;
+        let profile: Partial<UserProfile> | null = null;
+        let didLoadExistingProfile = false;
         if (pendingProfile) {
           try {
-            profile = JSON.parse(pendingProfile);
+            profile = JSON.parse(pendingProfile) as Partial<UserProfile>;
             localStorage.removeItem("pendingOnboardingProfile");
           } catch (e) {
             console.warn("Failed to parse pending onboarding profile:", e);
@@ -153,16 +163,18 @@ function SignInPageContent() {
             .single();
           
           if (profileData) {
+            didLoadExistingProfile = true;
             hasCompletedOnboarding = profileData.has_completed_onboarding === true;
             if (!profile && profileData.user_profile) {
-              profile = profileData.user_profile;
+              profile = profileData.user_profile as Partial<UserProfile>;
             }
           }
         } catch (error) {
           console.warn("Could not fetch existing profile:", error);
         }
 
-        const isFreshAccount = shouldStartTutorial || (!hasCompletedOnboarding && !profile);
+        const isFreshAccount =
+          shouldStartTutorial || (didLoadExistingProfile && !hasCompletedOnboarding && !profile);
         if (isFreshAccount) {
           resetSavedMealStorageForUser(userId);
         }
@@ -184,45 +196,6 @@ function SignInPageContent() {
           }
         }
 
-        // Update profile in database - ensure profile row exists with all required fields
-        try {
-          const profileData: Record<string, unknown> = {
-            id: userId,
-            email: data.user.email, // Include email field
-            last_login: new Date(now).toISOString(),
-            updated_at: new Date().toISOString(),
-          };
-
-          // Set has_completed_onboarding if user has completed onboarding
-          if (profile || hasCompletedOnboarding) {
-            profileData.has_completed_onboarding = true;
-          }
-
-          // Include profile data if available
-          if (profile) {
-            profileData.user_profile = profile;
-            // Also map individual fields if needed
-            if (profile.goal) profileData.goal = profile.goal;
-            if (profile.diet_type) profileData.diet_type = profile.diet_type;
-            if (profile.dietary_options) profileData.dietary_options = profile.dietary_options;
-            if (profile.target_calories) profileData.calorie_goal = profile.target_calories;
-            if (profile.target_protein_g) profileData.protein_goal = profile.target_protein_g;
-            if (profile.target_carbs_g) profileData.carb_limit = profile.target_carbs_g;
-            if (profile.target_fats_g) profileData.fat_limit = profile.target_fats_g;
-            if (profile.preferredMealTypes) profileData.preferred_meal_types = profile.preferredMealTypes;
-            if (profile.search_distance_miles) profileData.search_distance_miles = profile.search_distance_miles;
-          }
-
-          await supabase
-            .from("profiles")
-            .upsert(profileData, {
-              onConflict: "id",
-            });
-        } catch (error) {
-          console.error("Could not update profile:", error);
-          // Don't block navigation even if profile update fails
-        }
-
         // Update localStorage
         localStorage.setItem(`seekEatz_lastLogin_${userId}`, now.toString());
         localStorage.setItem("seekEatz_lastLogin", now.toString());
@@ -239,8 +212,14 @@ function SignInPageContent() {
           localStorage.setItem(`seekEatz_hasCompletedOnboarding_${userId}`, "true");
           localStorage.setItem("hasCompletedOnboarding", "true");
           localStorage.setItem("onboarded", "true");
-          if (profile) {
-            localStorage.setItem("userProfile", JSON.stringify(profile));
+          const profileForStorage: Partial<UserProfile> | null = profile
+            ? {
+              ...profile,
+              full_name: profile.full_name ?? (data.user.user_metadata?.full_name as string | undefined),
+            }
+            : null;
+          if (profileForStorage) {
+            localStorage.setItem("userProfile", JSON.stringify(profileForStorage));
           }
           localStorage.removeItem("seekEatz_onboardingQuestionsComplete");
         }
@@ -250,8 +229,17 @@ function SignInPageContent() {
         localStorage.removeItem("seekeatz_nav_history");
 
         try {
+          const profileForBootstrap: Partial<UserProfile> | undefined = profile
+            ? {
+              ...profile,
+              full_name: profile.full_name ?? (data.user.user_metadata?.full_name as string | undefined),
+            }
+            : data.user.user_metadata?.full_name
+              ? { full_name: data.user.user_metadata.full_name as string }
+              : undefined;
+
           const bootstrapResult = await bootstrapAccount({
-            profile,
+            profile: profileForBootstrap,
             hasCompletedOnboarding: !!(profile || hasCompletedOnboarding),
           });
 
@@ -274,24 +262,59 @@ function SignInPageContent() {
     }
   };
 
+  const handleForgotPassword = async () => {
+    setError(null);
+    setResetPasswordMessage(null);
+
+    const normalizedEmail = email.trim();
+    if (!normalizedEmail) {
+      setError("Enter your email first, then tap Forgot password.");
+      return;
+    }
+
+    try {
+      setIsResettingPassword(true);
+      const supabase = createClient();
+      const redirectToReset = `${window.location.origin}/auth/reset-password`;
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+        redirectTo: redirectToReset,
+      });
+
+      if (resetError) {
+        setError(resetError.message);
+        return;
+      }
+
+      setResetPasswordMessage("Password reset link sent. Check your email.");
+    } catch {
+      setError("Could not send reset link. Please try again.");
+    } finally {
+      setIsResettingPassword(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="w-full max-w-md">
+        <button
+          type="button"
+          onClick={() => {
+            if (typeof window !== "undefined" && window.history.length > 1) {
+              router.back();
+              return;
+            }
+            router.push("/");
+          }}
+          className="mb-5 inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-black transition-colors hover:bg-gray-50"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </button>
+
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-black mb-2">Welcome Back</h1>
           <p className="text-black">Sign in to continue to SeekEatz</p>
         </div>
-
-        <AuthProviders
-          mode="signin"
-          oauthRedirectPath={redirectTo}
-          className="mb-6"
-          onBeforeRedirect={() => {
-            if (shouldStartTutorial && typeof window !== "undefined") {
-              localStorage.setItem("seekeatz_start_app_tutorial", "true");
-            }
-          }}
-        />
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -346,7 +369,32 @@ function SignInPageContent() {
           >
             {isLoading ? "Signing in..." : "Sign In"}
           </Button>
+
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            disabled={isResettingPassword}
+            className="w-full text-center text-sm font-medium text-cyan-600 transition-colors hover:text-cyan-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isResettingPassword ? "Sending reset link..." : "Forgot password?"}
+          </button>
         </form>
+
+        <AuthProviders
+          oauthRedirectPath={redirectTo}
+          className="mt-4"
+          onBeforeRedirect={() => {
+            if (shouldStartTutorial && typeof window !== "undefined") {
+              localStorage.setItem("seekeatz_start_app_tutorial", "true");
+            }
+          }}
+        />
+
+        {resetPasswordMessage && (
+          <div className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            {resetPasswordMessage}
+          </div>
+        )}
 
         <p className="text-black text-sm text-center mt-6">
           Don&apos;t have an account?{" "}

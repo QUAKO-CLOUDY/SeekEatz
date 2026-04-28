@@ -25,6 +25,11 @@ import { clearCachedEntitlement } from '@/lib/entitlements';
 import { useAccountEntitlement } from '@/app/hooks/useAccountEntitlement';
 import { bootstrapAccount } from '@/lib/bootstrap-account';
 import { isFullAccessEmail } from '@/lib/full-access';
+import {
+  getLastResetDateStorageKey,
+  getLoggedMealsStorageKey,
+  migrateLegacyLoggedMealsStorage,
+} from '@/lib/logged-meals-storage';
 
 type View = 'main' | 'meal-detail';
 
@@ -88,6 +93,42 @@ const APP_TUTORIAL_STEPS: AppTutorialStep[] = [
     buttonLabel: 'Finish',
   },
 ];
+
+const ACTIVE_APP_USER_KEY = 'seekeatz_active_app_user_id';
+
+function clearHomeScreenCache(): void {
+  if (typeof window === 'undefined') return;
+
+  const localKeys = [
+    'seekeatz_recommended_meals',
+    'seekeatz_has_searched',
+    'seekeatz_last_search_params',
+    'seekeatz_macro_enabled',
+    'seekeatz_macro_directions',
+    'seekeatz_selected_cuisine',
+  ];
+
+  const sessionKeys = [
+    'seekeatz_home_macro_values_v2',
+    'seekeatz_home_distance_override',
+    'seekeatz_home_scroll_position',
+    'seekeatz_last_clicked_meal_id',
+  ];
+
+  localKeys.forEach((key) => localStorage.removeItem(key));
+  sessionKeys.forEach((key) => sessionStorage.removeItem(key));
+}
+
+function syncActiveUserCache(userId: string | undefined): void {
+  if (typeof window === 'undefined' || !userId) return;
+
+  const lastActiveUserId = localStorage.getItem(ACTIVE_APP_USER_KEY);
+  if (lastActiveUserId !== userId) {
+    clearHomeScreenCache();
+  }
+
+  localStorage.setItem(ACTIVE_APP_USER_KEY, userId);
+}
 
 export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // ========== ALL HOOKS MUST BE DECLARED FIRST ==========
@@ -157,6 +198,8 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   const favoriteMealsDataStorageKey = currentUserId
     ? `seekeatz_favorite_meals_data:${currentUserId}`
     : 'seekeatz_favorite_meals_data:guest';
+  const loggedMealsStorageKey = getLoggedMealsStorageKey(currentUserId ?? null);
+  const lastResetDateStorageKey = getLastResetDateStorageKey(currentUserId ?? null);
 
   // Get updateLoggedMeals from NutritionContext to sync state
   // NutritionProvider is now at root layout level, so this should always work
@@ -167,22 +210,17 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem('seekeatz_logged_meals', JSON.stringify(nextMeals));
+        localStorage.setItem(loggedMealsStorageKey, JSON.stringify(nextMeals));
       } catch (e) {
         console.error('Failed to save loggedMeals:', e);
       }
     }
 
     updateLoggedMeals(nextMeals);
-  }, [updateLoggedMeals]);
-
-  // Session timeout handler - redirects to login on timeout
-  const handleSessionTimeout = () => {
-    setAppState('auth');
-  };
+  }, [loggedMealsStorageKey, updateLoggedMeals]);
 
   // Track session activity - updates on navigation and user interactions
-  const { updateActivity } = useSessionActivity(handleSessionTimeout);
+  const { updateActivity } = useSessionActivity();
 
   // Hydration fix: Mark component as mounted on client
   useEffect(() => {
@@ -204,6 +242,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     const hydrateCurrentUser = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
+        syncActiveUserCache(user?.id);
         setCurrentUserId(user?.id);
         setCurrentUserEmail(user?.email);
       } catch {
@@ -353,10 +392,9 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     localStorage.removeItem('seekeatz_favorite_meals_data:guest');
   }, [favoriteMealsDataStorageKey, favoriteMealsStorageKey, isMounted, isRestrictedAccount]);
 
-  // Load all localStorage state on mount (only after component is mounted on client)
-  // Consolidated into single effect for better performance
+  // Load persisted local state after hydration and whenever account scope changes.
   useEffect(() => {
-    if (!isMounted) return;
+    if (!isMounted || !hasHydratedCurrentUser) return;
 
     // Load navigation history and current screen
     try {
@@ -407,9 +445,11 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
     // Load logged meals and reset today's meals if it's a new day
     try {
-      const saved = localStorage.getItem('seekeatz_logged_meals');
+      migrateLegacyLoggedMealsStorage(currentUserId ?? null);
+
+      const saved = localStorage.getItem(loggedMealsStorageKey);
       const todayStr = new Date().toISOString().split('T')[0];
-      const lastResetDate = localStorage.getItem('seekeatz_last_reset_date');
+      const lastResetDate = localStorage.getItem(lastResetDateStorageKey);
 
       if (saved) {
         const parsed = JSON.parse(saved);
@@ -427,7 +467,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
               applyLoggedMeals(filteredMeals);
             });
             // Update last reset date to today
-            localStorage.setItem('seekeatz_last_reset_date', todayStr);
+            localStorage.setItem(lastResetDateStorageKey, todayStr);
           } else {
             // Same day or first time - keep all meals including today's
             startTransition(() => {
@@ -435,18 +475,25 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
             });
             // Set last reset date if not set
             if (!lastResetDate) {
-              localStorage.setItem('seekeatz_last_reset_date', todayStr);
+              localStorage.setItem(lastResetDateStorageKey, todayStr);
             }
           }
         }
       } else {
         // No saved meals - set last reset date to today
-        localStorage.setItem('seekeatz_last_reset_date', todayStr);
+        localStorage.setItem(lastResetDateStorageKey, todayStr);
       }
     } catch (e) {
       console.error('Failed to parse loggedMeals:', e);
     }
-  }, [applyLoggedMeals, isMounted]);
+  }, [
+    applyLoggedMeals,
+    currentUserId,
+    hasHydratedCurrentUser,
+    isMounted,
+    lastResetDateStorageKey,
+    loggedMealsStorageKey,
+  ]);
 
   // Initialize app state: Check localStorage for 'onboarded' and Supabase session
   useEffect(() => {
@@ -642,6 +689,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       console.log('Auth state changed:', event, session?.user?.id);
 
       if (event === 'SIGNED_IN' && session?.user) {
+        syncActiveUserCache(session.user.id);
         setCurrentUserId(session.user.id);
         setCurrentUserEmail(session.user.email);
         const isMasterSession = isFullAccessEmail(session.user.email);

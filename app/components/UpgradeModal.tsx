@@ -29,13 +29,19 @@ export function UpgradeModal({
 }: Props) {
   const router = useRouter();
 
-  if (!open) {
-    return null;
-  }
-
   return (
-    <div className="fixed inset-0 z-[120] flex items-end justify-center bg-slate-950/75 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-t-[2rem] border border-white/40 bg-white p-6 pb-8 shadow-2xl">
+    <div
+      className={`fixed inset-0 z-[120] flex items-end justify-center transition-colors duration-300 ${
+        open
+          ? "bg-slate-950/75 backdrop-blur-sm"
+          : "pointer-events-none bg-slate-950/0 backdrop-blur-0"
+      }`}
+    >
+      <div
+        className={`w-full max-w-md rounded-t-[2rem] border border-white/40 bg-white p-6 pb-8 shadow-2xl transition-transform duration-300 ease-out ${
+          open ? "translate-y-0" : "translate-y-full"
+        }`}
+      >
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-600">

@@ -901,6 +901,16 @@ export async function POST(req: Request) {
     }
 
     const { message, history } = body;
+    const quickPromptNonce =
+      typeof body?.quickPromptNonce === 'string' && body.quickPromptNonce.trim().length > 0
+        ? body.quickPromptNonce.trim()
+        : undefined;
+    const excludedRestaurants = Array.isArray(body?.excludedRestaurants)
+      ? body.excludedRestaurants
+        .filter((value: unknown): value is string => typeof value === 'string')
+        .map((value: string) => value.trim())
+        .filter((value: string) => value.length > 0)
+      : undefined;
     const normalizedHistory = sanitizeRouterHistory(history);
     const hasRecentClarificationPrompt = hasPriorClarificationPrompt(normalizedHistory);
     const includeDebug = process.env.NODE_ENV === 'development' && body?.debug === true;
@@ -1392,13 +1402,13 @@ export async function POST(req: Request) {
           error: false,
           message: "Diet filter request detected.",
           mode: "text",
-          answer: "This specific diet filter is coming soon. For now I can filter by vegetarian/vegan, calories/macros, restaurant name, and dish type like burgers/bowls/sandwiches."
+          answer: "This specific diet filter isn't supported yet. Right now I can filter by vegetarian/vegan, calories/macros, restaurant name, and dish type like burgers, bowls, and sandwiches."
         }, {
           headers: createResponseHeaders(usedLLMRouter, 'MEAL_SEARCH', heuristicMode || 'none')
         });
       }
 
-      // Check for "near me" language - MVP v1: return friendly message but proceed with normal search
+      // Check for explicit nearby intent and optional explicit radius (e.g. "within 5 miles").
       const locationKeywords = [
         'near me', 'nearby', 'close to me', 'within',
         'closest', 'near', 'local', 'in my area', 'around me', 'around here', 'close by'
@@ -1410,10 +1420,9 @@ export async function POST(req: Request) {
         }
         return lowerMessage.includes(keyword);
       });
-
-      // Friendly message for location requests (MVP v1)
-      const locationMessage = hasLocationRequest
-        ? "Location-based filtering is coming soon — here are some great options from restaurants we support."
+      const requestedRadiusMatch = lowerMessage.match(/\bwithin\s+(\d+)\s*(?:mile|miles|mi)\b/i);
+      const requestedRadiusMiles = requestedRadiusMatch
+        ? Number.parseInt(requestedRadiusMatch[1], 10)
         : undefined;
 
       // MVP v1: Sanitize message by removing location phrases and meal-time words (except breakfast) before search
@@ -1685,6 +1694,15 @@ export async function POST(req: Request) {
           finalRestaurantConstraint: canonicalRestaurant || undefined,
         });
 
+        const requestUserContext =
+          body?.userContext && typeof body.userContext === 'object'
+            ? body.userContext
+            : undefined;
+        const normalizedChatUserContext = {
+          ...(requestUserContext ?? {}),
+          ...(requestedRadiusMiles !== undefined ? { search_distance_miles: requestedRadiusMiles } : {}),
+        };
+
         // Build normalized SearchParams using unified function
         // CRITICAL: Merge extracted constraints into search params BEFORE calling buildSearchParams
         // This ensures extracted constraints are always applied (authoritative)
@@ -1704,10 +1722,16 @@ export async function POST(req: Request) {
           restaurantId: restaurantId, // Pass restaurant_id when available
           restaurant: validatedConstraints.restaurant,
           restaurantVariants: restaurantVariants, // Pass variants for filtering
-          userContext: body?.userContext,
+          location: hasLocationRequest ? 'near me' : undefined,
+          radius_miles: requestedRadiusMiles,
+          userContext: Object.keys(normalizedChatUserContext).length > 0
+            ? normalizedChatUserContext
+            : undefined,
           limit: detectSuperlativeIntent(message) ? 50 : 5, // 50 for superlative (sort+slice to 1 later), 5 otherwise
           offset: 0,
           searchKey: undefined, // Let searchHandler generate it
+          shuffleNonce: quickPromptNonce,
+          excludedRestaurants,
           isPagination: false,
         });
 
@@ -1721,6 +1745,7 @@ export async function POST(req: Request) {
             maxCarbs: searchParams.maxCarbs,
             maxFat: searchParams.maxFat,
             restaurant: searchParams.restaurant,
+            location: searchParams.location,
             query: searchParams.query,
             restaurantOnly,
             queryForSearch,
@@ -1816,8 +1841,6 @@ export async function POST(req: Request) {
         const responseData: MealSearchResponse = {
           mode: 'meals',
           ...result,
-          // Prepend location message if present (MVP v1 behavior)
-          ...(locationMessage && { message: locationMessage })
         };
 
         if (!includeDebug) {

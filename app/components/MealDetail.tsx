@@ -148,51 +148,6 @@ type DrinkSelectorProps = {
 };
 
 // --- HELPER LOGIC ---
-/** Converts delta macros into descriptive text (e.g., "more protein", "reduce calories") */
-function getSwapDescription(delta: { calories: number; protein: number; carbs: number; fats: number }): string {
-  const descriptions: string[] = [];
-  
-  // Prioritize the most impactful changes
-  if (delta.protein > 0) {
-    descriptions.push('more protein');
-  }
-  if (delta.calories < 0) {
-    descriptions.push('reduce calories');
-  }
-  if (delta.carbs < 0) {
-    descriptions.push('less carbs');
-  }
-  if (delta.fats < 0) {
-    descriptions.push('less fats');
-  }
-  if (delta.protein < 0) {
-    descriptions.push('less protein');
-  }
-  if (delta.calories > 0) {
-    descriptions.push('more calories');
-  }
-  if (delta.carbs > 0) {
-    descriptions.push('more carbs');
-  }
-  if (delta.fats > 0) {
-    descriptions.push('more fats');
-  }
-  
-  // If no changes, return a neutral message
-  if (descriptions.length === 0) {
-    return 'no macro change';
-  }
-  
-  // Join with commas, with "and" before the last item if multiple
-  if (descriptions.length === 1) {
-    return descriptions[0];
-  } else if (descriptions.length === 2) {
-    return `${descriptions[0]} and ${descriptions[1]}`;
-  } else {
-    return `${descriptions.slice(0, -1).join(', ')}, and ${descriptions[descriptions.length - 1]}`;
-  }
-}
-
 function scaleSwapDelta(
   delta: SwapOption['deltaMacros'],
   quantity: number
@@ -308,14 +263,14 @@ function getSwapSummaryText(swap: SwapOption, delta: SwapOption['deltaMacros']):
     if (isDbBacked) {
       return stripNumericMacroDetails(trimmedEffect) || 'Macro adjustment';
     }
-    return trimmedEffect;
+    return stripNumericMacroDetails(trimmedEffect) || 'Recommended adjustment';
   }
 
   if (isDbBacked) {
     return 'Macro adjustment';
   }
 
-  return getSwapDescription(delta);
+  return 'Recommended adjustment';
 }
 
 function inferEggSwapMaxQuantity(mealName: string): number {
@@ -600,7 +555,10 @@ export function MealDetail({
     : null;
   // Only show prepTime if we have real data, otherwise show nothing or "Nearby"
   const prepTime = meal.prepTime ? `${meal.prepTime} min` : null;
-  const locationLabel = distance ? null : (meal.latitude && meal.longitude ? "Nearby" : null);
+  const locationLabel = null;
+  const restaurantName = meal.restaurant_name || meal.restaurant || 'Unknown';
+  const detailLogoSrc = getRestaurantLogoUrl(restaurantName, meal.restaurantLogoUrl);
+  const detailLogoSrcWithCacheBust = `${detailLogoSrc}?v=detail-${meal.id}`;
   // Get user goals and today's consumed totals from the shared nutrition context.
   const { targets, todaysTotals, isLoading: isLogLoading } = useNutrition();
 
@@ -674,6 +632,14 @@ export function MealDetail({
   // Fetch swaps ONCE when meal is selected - Single source of truth
   useEffect(() => {
     const fetchMealSwaps = async () => {
+      if (!isPremium) {
+        setSelectedMealSwaps([]);
+        setSelectedSwapIds([]);
+        setSelectedSwapQuantities({});
+        setIsLoadingSwaps(false);
+        return;
+      }
+
       if (!meal.restaurant_name && !meal.restaurant) {
         setSelectedMealSwaps([]);
         return;
@@ -771,6 +737,7 @@ export function MealDetail({
 
     fetchMealSwaps();
   }, [
+    isPremium,
     meal.id,
     meal.restaurant_name,
     meal.restaurant,
@@ -1157,10 +1124,26 @@ export function MealDetail({
 
             {/* TITLE & INFO */}
             <div className="rounded-2xl border border-border bg-card px-4 py-3 shadow-sm">
-              <p className="text-xs font-semibold uppercase text-muted-foreground">
-                {meal.restaurant_name || meal.restaurant}
-              </p>
-              <h1 className="mt-1 text-foreground text-2xl font-bold leading-tight">{meal.name}</h1>
+              <div className="flex items-start gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold uppercase text-muted-foreground">
+                    {restaurantName}
+                  </p>
+                  <h1 className="mt-1 text-foreground text-2xl font-bold leading-tight">{meal.name}</h1>
+                </div>
+                <div className="relative mt-1 h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-border/70 bg-white shadow-sm dark:bg-gray-900">
+                  <LogoImage
+                    key={detailLogoSrcWithCacheBust}
+                    src={detailLogoSrcWithCacheBust}
+                    alt={restaurantName}
+                    fallbackSrc={`/logos/default.png?v=detail-${meal.id}`}
+                    fill
+                    sizes="96px"
+                    className="object-contain object-center p-0.5"
+                    hideOnFallbackError
+                  />
+                </div>
+              </div>
               <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 {distance && (
                   <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted/40 px-2.5 py-1">
@@ -1349,7 +1332,20 @@ export function MealDetail({
                   </div>
                 </div>
                 <div className="space-y-2">
-                {isLoadingSwaps ? (
+                {!isPremium ? (
+                  <button
+                    type="button"
+                    onClick={() => onPremiumFeatureAttempt?.()}
+                    className="w-full rounded-xl border border-cyan-300/40 bg-cyan-500/10 px-4 py-4 text-left transition-colors hover:bg-cyan-500/15"
+                  >
+                    <p className="text-sm font-semibold text-cyan-700 dark:text-cyan-300">
+                      AI swaps are Premium only
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Upgrade to unlock swap recommendations for meal optimization.
+                    </p>
+                  </button>
+                ) : isLoadingSwaps ? (
                   <div className="text-center py-4 text-muted-foreground text-sm">Loading swaps...</div>
                 ) : selectedMealSwaps.length === 0 ? (
                   <div className="text-center py-4 text-muted-foreground text-sm">
@@ -1360,8 +1356,9 @@ export function MealDetail({
                     const isSelected = selectedSwapIds.includes(swap.id);
                     const quantity = selectedSwapQuantities[swap.id] ?? swap.quantityConfig?.defaultQuantity ?? 1;
                     const delta = scaleSwapDelta(swap.deltaMacros, quantity);
+                    const isDbBackedSwap = Array.isArray(swap.modifierItemIds) && swap.modifierItemIds.length > 0;
                     const summaryText = getSwapSummaryText(swap, delta);
-                    const deltaBadges = getSwapDeltaBadges(delta);
+                    const deltaBadges = isDbBackedSwap ? getSwapDeltaBadges(delta) : [];
                     return (
                       <div
                         key={swap.id}
@@ -1647,8 +1644,9 @@ export function MealDetail({
                     const isSelected = selectedSwapIds.includes(swap.id);
                     const quantity = selectedSwapQuantities[swap.id] ?? swap.quantityConfig?.defaultQuantity ?? 1;
                     const delta = scaleSwapDelta(swap.deltaMacros, quantity);
+                    const isDbBackedSwap = Array.isArray(swap.modifierItemIds) && swap.modifierItemIds.length > 0;
                     const summaryText = getSwapSummaryText(swap, delta);
-                    const deltaBadges = getSwapDeltaBadges(delta);
+                    const deltaBadges = isDbBackedSwap ? getSwapDeltaBadges(delta) : [];
                     return (
                       <div
                         key={swap.id}

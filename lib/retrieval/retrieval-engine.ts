@@ -33,6 +33,8 @@ const BROAD_DISCOVERY_TARGET = 120;
 const RESTAURANT_DIVERSITY_EXPANSION_PAGE_SIZE = 180;
 const RESTAURANT_DIVERSITY_EXPANSION_MAX_PAGES = 4;
 const RESTAURANT_DIVERSITY_UNIQUE_BUFFER = 4;
+const DEFAULT_NEARBY_RADIUS_MILES = 10;
+const MINIMUM_MEAL_CARD_CALORIES = 600;
 const MODIFIER_NAME_PATTERNS = [
   /\badd\b/,
   /\bextra\b/,
@@ -64,6 +66,30 @@ const GENERIC_ADDON_NAMES = new Set([
   'mushrooms',
   'meat sauce',
 ]);
+const MEAL_LIKE_NAME_PATTERNS = /\b(bowl|salad|sandw(?:ich|hich)|wrap|burrito|taco|pizza|pasta|plate|platter|meal|combo|entree|burger|quesadilla|soup|ramen|noodle|skillet|hash|toast)\b/i;
+const SINGLE_INGREDIENT_KEYWORDS = [
+  'chicken', 'steak', 'beef', 'salmon', 'shrimp', 'tofu', 'pork', 'sausage', 'ham',
+  'rice', 'beans', 'egg', 'eggs', 'avocado', 'guacamole', 'cheese', 'bacon',
+  'broccoli', 'spinach', 'lettuce', 'kale', 'quinoa', 'cauliflower', 'carrots',
+];
+const HEALTHY_INTENT_EXCLUSION_PATTERNS = [
+  /\bwings?\b/i,
+  /\bboneless\s+wings?\b/i,
+  /\bfried\b/i,
+  /\bcrispy\b/i,
+  /\bbreaded\b/i,
+  /\bloaded\s+fries?\b/i,
+  /\bfries?\b/i,
+  /\bnachos?\b/i,
+  /\bmilkshakes?\b/i,
+  /\bshake\b/i,
+  /\bsoda\b/i,
+  /\bcoke\b/i,
+  /\bpepsi\b/i,
+  /\bcookie\b/i,
+  /\bbrownie\b/i,
+  /\bice\s*cream\b/i,
+];
 const BREAKFAST_FOOD_PATTERNS = [
   /\bbreakfast\b/,
   /\begg\b/,
@@ -419,6 +445,20 @@ export async function retrieveMealsWithClient(
     offset: 0,
     restaurantVariants,
   });
+  const excludedRestaurantNames = toNormalizedRestaurantNameSet(
+    searchParams.excludedRestaurants
+  );
+  const applyRestaurantScopeFilters = (items: RawResult[]): RawResult[] =>
+    applyExcludedRestaurantFilter(
+      applyResolvedRestaurantFilter(
+        applyNearbyRestaurantFilter(items, nearbyFilter),
+        {
+          restaurantId: searchParams.restaurantId,
+          restaurantNames: filterResult.resolvedRestaurantNames,
+        }
+      ),
+      excludedRestaurantNames
+    );
   const effectiveFilterParams: RPCParams = macroOnlyHomeFiltering
     ? {
         ...filterResult.params,
@@ -435,13 +475,7 @@ export async function retrieveMealsWithClient(
     : filterResult.dietaryKeywords;
 
   let deterministicSearch = await runDeterministicSearch(supabase, parsed, effectiveFilterParams);
-  const deterministicResults = applyResolvedRestaurantFilter(
-    applyNearbyRestaurantFilter(deterministicSearch.results, nearbyFilter),
-    {
-      restaurantId: searchParams.restaurantId,
-      restaurantNames: filterResult.resolvedRestaurantNames,
-    }
-  );
+  const deterministicResults = applyRestaurantScopeFilters(deterministicSearch.results);
   let deterministicFiltered = applyPostRetrievalFilters(
     deterministicResults,
     parsed,
@@ -464,13 +498,7 @@ export async function retrieveMealsWithClient(
       effectiveDietaryKeywords
     );
     const dietaryFallbackFiltered = applyPostRetrievalFilters(
-      applyResolvedRestaurantFilter(
-        applyNearbyRestaurantFilter(dietaryFallbackResults, nearbyFilter),
-        {
-          restaurantId: searchParams.restaurantId,
-          restaurantNames: filterResult.resolvedRestaurantNames,
-        }
-      ),
+      applyRestaurantScopeFilters(dietaryFallbackResults),
       parsed,
       effectiveDietaryKeywords,
       { macroOnly: macroOnlyHomeFiltering }
@@ -494,13 +522,7 @@ export async function retrieveMealsWithClient(
 
     if (smoothieSupplementResults.length > 0) {
       const smoothieSupplementFiltered = applyPostRetrievalFilters(
-        applyResolvedRestaurantFilter(
-          applyNearbyRestaurantFilter(smoothieSupplementResults, nearbyFilter),
-          {
-            restaurantId: searchParams.restaurantId,
-            restaurantNames: filterResult.resolvedRestaurantNames,
-          }
-        ),
+        applyRestaurantScopeFilters(smoothieSupplementResults),
         parsed,
         effectiveDietaryKeywords,
         { macroOnly: macroOnlyHomeFiltering }
@@ -509,6 +531,29 @@ export async function retrieveMealsWithClient(
       deterministicFiltered = mergeAndDeduplicate(
         deterministicFiltered,
         smoothieSupplementFiltered,
+        parsed,
+        undefined
+      );
+    }
+  }
+
+  if (isStrictBreakfastRequest(parsed)) {
+    const breakfastSupplementResults = await runBreakfastTableSupplement(
+      supabase,
+      effectiveFilterParams
+    );
+
+    if (breakfastSupplementResults.length > 0) {
+      const breakfastSupplementFiltered = applyPostRetrievalFilters(
+        applyRestaurantScopeFilters(breakfastSupplementResults),
+        parsed,
+        effectiveDietaryKeywords,
+        { macroOnly: macroOnlyHomeFiltering }
+      );
+
+      deterministicFiltered = mergeAndDeduplicate(
+        deterministicFiltered,
+        breakfastSupplementFiltered,
         parsed,
         undefined
       );
@@ -538,20 +583,25 @@ export async function retrieveMealsWithClient(
       }
     );
 
-    if (diversityExpansion.results.length > 0) {
+    const expansionResults = applyExcludedRestaurantFilter(
+      diversityExpansion.results,
+      excludedRestaurantNames
+    );
+
+    if (expansionResults.length > 0) {
       console.log('[RetrievalEngine] expanded deterministic pool for restaurant diversity', {
-        addedResults: diversityExpansion.results.length,
+        addedResults: expansionResults.length,
         fetchedRowCount: diversityExpansion.fetchedRowCount,
         restaurantsBefore: countUniqueRestaurants(deterministicFiltered),
         restaurantsAfter: countUniqueRestaurants([
           ...deterministicFiltered,
-          ...diversityExpansion.results,
+          ...expansionResults,
         ]),
       });
 
       deterministicFiltered = dedupeRawResultsById([
         ...deterministicFiltered,
-        ...diversityExpansion.results,
+        ...expansionResults,
       ]);
 
       deterministicSearch = {
@@ -577,13 +627,7 @@ export async function retrieveMealsWithClient(
 
   if (semanticFallbackTriggered) {
     vectorResults = await runVectorSearch(supabase, parsed);
-    vectorResults = applyResolvedRestaurantFilter(
-      applyNearbyRestaurantFilter(vectorResults, nearbyFilter),
-      {
-        restaurantId: searchParams.restaurantId,
-        restaurantNames: filterResult.resolvedRestaurantNames,
-      }
-    );
+    vectorResults = applyRestaurantScopeFilters(vectorResults);
     vectorResults = applyPostRetrievalFilters(vectorResults, parsed, effectiveDietaryKeywords, {
       macroOnly: macroOnlyHomeFiltering,
     });
@@ -616,6 +660,12 @@ export async function retrieveMealsWithClient(
     parsed,
     buildRotationSeed(searchParams.userContext?.userId, prepared.searchKey),
     restaurantVariants
+  );
+
+  ranked = rotateNonceDrivenResults(
+    ranked,
+    searchParams.shuffleNonce,
+    buildRotationSeed(searchParams.userContext?.userId, prepared.searchKey)
   );
 
   if (!macroOnlyHomeFiltering) {
@@ -715,7 +765,8 @@ function getRequestedLocation(
   const userContext = searchParams.userContext ?? {};
   const lat = optionLocation?.lat ?? normalizeNumber(userContext.user_location_lat);
   const lng = optionLocation?.lng ?? normalizeNumber(userContext.user_location_lng);
-  const radiusMiles = normalizeNumber(userContext.search_distance_miles);
+  const radiusMiles =
+    normalizeNumber(userContext.search_distance_miles) ?? DEFAULT_NEARBY_RADIUS_MILES;
 
   if (lat === undefined || lng === undefined || radiusMiles === undefined || radiusMiles <= 0) {
     return undefined;
@@ -923,6 +974,30 @@ function applyResolvedRestaurantFilter(
   });
 }
 
+function toNormalizedRestaurantNameSet(
+  restaurantNames: string[] | undefined
+): Set<string> {
+  return new Set(
+    (restaurantNames ?? [])
+      .map((name) => name.trim().toLowerCase())
+      .filter(Boolean)
+  );
+}
+
+function applyExcludedRestaurantFilter(
+  items: RawResult[],
+  excludedRestaurantNames: Set<string>
+): RawResult[] {
+  if (excludedRestaurantNames.size === 0) {
+    return items;
+  }
+
+  return items.filter((item) => {
+    const restaurantName = item.restaurant_name?.trim().toLowerCase();
+    return !restaurantName || !excludedRestaurantNames.has(restaurantName);
+  });
+}
+
 async function expandDeterministicResultsForRestaurantDiversity(
   supabase: Awaited<ReturnType<typeof createClient>>,
   source: DeterministicSearchTrace['source'],
@@ -1015,6 +1090,12 @@ async function runDeterministicSearch(
   parsed: ParsedQuery,
   params: RPCParams
 ): Promise<DeterministicSearchResult> {
+  const getRpcErrorMessage = (error: unknown): string | undefined => {
+    if (!error || typeof error !== 'object') return undefined;
+    const maybeMessage = (error as { message?: unknown }).message;
+    return typeof maybeMessage === 'string' ? maybeMessage : undefined;
+  };
+
   if (!isSQLSufficient(parsed)) {
     return {
       results: [],
@@ -1030,8 +1111,34 @@ async function runDeterministicSearch(
   }
 
   const modernRpc = await supabase.rpc('search_meals_v2', params);
+  const modernRpcErrorMessage = getRpcErrorMessage(modernRpc.error);
   const modernResults = (modernRpc.data ?? []) as RawResult[];
   if (!modernRpc.error && modernResults.length > 0) {
+    if (isStrictBreakfastRequest(parsed)) {
+      const legacyParams = toLegacySearchParams(params);
+      const legacyRpc = await supabase.rpc('search_menu_items', legacyParams);
+      const legacyResults = !legacyRpc.error
+        ? ((legacyRpc.data ?? []) as RawResult[])
+        : [];
+      const combinedBreakfastResults = legacyResults.length > 0
+        ? dedupeRawResultsById([...modernResults, ...legacyResults])
+        : modernResults;
+
+      return {
+        results: combinedBreakfastResults,
+        trace: {
+          skipped: false,
+          source: 'search_meals_v2',
+          modernRpcCount: modernResults.length,
+          legacyCount: legacyResults.length,
+          tableFallbackCount: 0,
+          broadenedCount: 0,
+          modernRpcError: undefined,
+          legacyError: getRpcErrorMessage(legacyRpc.error),
+        },
+      };
+    }
+
     return {
       results: modernResults,
       trace: {
@@ -1051,8 +1158,8 @@ async function runDeterministicSearch(
 
   if (legacyRpc.error) {
     console.error('[RetrievalEngine] deterministic RPC error:', {
-      search_meals_v2: modernRpc.error?.message,
-      search_menu_items: legacyRpc.error.message,
+      search_meals_v2: modernRpcErrorMessage,
+      search_menu_items: getRpcErrorMessage(legacyRpc.error),
     });
     return {
       results: [],
@@ -1063,8 +1170,8 @@ async function runDeterministicSearch(
         legacyCount: legacyResults.length,
         tableFallbackCount: 0,
         broadenedCount: 0,
-        modernRpcError: modernRpc.error?.message,
-        legacyError: legacyRpc.error.message,
+        modernRpcError: modernRpcErrorMessage,
+        legacyError: getRpcErrorMessage(legacyRpc.error),
       },
     };
   }
@@ -1079,7 +1186,7 @@ async function runDeterministicSearch(
         legacyCount: legacyResults.length,
         tableFallbackCount: 0,
         broadenedCount: 0,
-        modernRpcError: modernRpc.error?.message,
+        modernRpcError: modernRpcErrorMessage,
       },
     };
   }
@@ -1098,7 +1205,7 @@ async function runDeterministicSearch(
         legacyCount: legacyResults.length,
         tableFallbackCount: tableFallbackResults.length,
         broadenedCount: 0,
-        modernRpcError: modernRpc.error?.message,
+        modernRpcError: modernRpcErrorMessage,
       },
     };
   }
@@ -1114,7 +1221,7 @@ async function runDeterministicSearch(
         legacyCount: legacyResults.length,
         tableFallbackCount: tableFallbackResults.length,
         broadenedCount: 0,
-        modernRpcError: modernRpc.error?.message,
+        modernRpcError: modernRpcErrorMessage,
       },
     };
   }
@@ -1131,7 +1238,7 @@ async function runDeterministicSearch(
         legacyCount: legacyResults.length,
         tableFallbackCount: tableFallbackResults.length,
         broadenedCount: broadenedResults.length,
-        modernRpcError: modernRpc.error?.message,
+        modernRpcError: modernRpcErrorMessage,
       },
     };
   }
@@ -1145,8 +1252,8 @@ async function runDeterministicSearch(
       legacyCount: legacyResults.length,
       tableFallbackCount: tableFallbackResults.length,
       broadenedCount: broadenedResults.length,
-      modernRpcError: modernRpc.error?.message,
-      broadenedError: broadenedLegacy.error?.message,
+      modernRpcError: modernRpcErrorMessage,
+      broadenedError: getRpcErrorMessage(broadenedLegacy.error),
     },
   };
 }
@@ -1230,6 +1337,33 @@ async function runSmoothieTableFallback(
   return normalizeTableFallbackRows((data ?? []) as unknown as BreakfastFallbackRow[])
     .filter((item) => matchesSmoothieIntent(item))
     .filter((item) => satisfiesParsedMacroConstraints(item, parsed));
+}
+
+async function runBreakfastTableSupplement(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  params: RPCParams
+): Promise<RawResult[]> {
+  let query = supabase
+    .from('menu_items')
+    .select(getMenuItemFallbackSelect())
+    .eq('item_type', 'meal')
+    .eq('meal_type', 'breakfast')
+    .not('macros', 'is', null)
+    .order('restaurant_name', { ascending: true })
+    .order('id', { ascending: true })
+    .limit(Math.max(params.p_limit * 2, 240));
+
+  if (params.p_restaurant_names?.length) {
+    query = query.in('restaurant_name', params.p_restaurant_names);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error('[RetrievalEngine] breakfast supplement fallback error:', error.message);
+    return [];
+  }
+
+  return normalizeTableFallbackRows((data ?? []) as unknown as BreakfastFallbackRow[]);
 }
 
 async function runTableDietaryFallback(
@@ -1485,7 +1619,29 @@ function applyPostRetrievalFiltersInternal(
   const strictSmoothieOnly = isStrictSmoothieOnlyQuery(parsed);
 
   if (macroOnly) {
-    return filtered.filter((item) => satisfiesParsedMacroConstraints(item, parsed));
+    return filtered.filter((item) => {
+      const smoothieItem = strictSmoothieOnly
+        ? hasStrictSmoothieSignals(item)
+        : matchesSmoothieIntent(item);
+
+      if (item.item_type && item.item_type !== 'meal' && !smoothieItem) {
+        return false;
+      }
+
+      if (!smoothieItem && isLikelyModifierLikeResult(item, parsed)) {
+        return false;
+      }
+
+      if (isCateringOrFamilyStyleResult(item)) {
+        return false;
+      }
+
+      if (!matchesHealthyIntent(item, parsed)) {
+        return false;
+      }
+
+      return satisfiesParsedMacroConstraints(item, parsed);
+    });
   }
 
   if (dietaryKeywords?.length) {
@@ -1522,6 +1678,14 @@ function applyPostRetrievalFiltersInternal(
     }
 
     if (!satisfiesParsedMacroConstraints(item, parsed)) {
+      return false;
+    }
+
+    if (!matchesMealCalorieFloor(item, parsed)) {
+      return false;
+    }
+
+    if (!matchesHealthyIntent(item, parsed)) {
       return false;
     }
 
@@ -1718,15 +1882,23 @@ function looksLikeBreakfastFood(item: RawResult): boolean {
   const category = (item.normalized_category ?? '').toLowerCase();
   const hasStrictBreakfastAnchor = BREAKFAST_STRICT_ANCHOR_PATTERNS.some((pattern) => pattern.test(haystack));
   const hasBreakfastSandwichAnchor =
-    /\b(egg|sausage|bacon|ham)\b/i.test(haystack) &&
+    (/\begg\b/i.test(haystack) || /\bbreakfast\b/i.test(haystack)) &&
     /\b(sandw(?:ich|hich)|bagel|biscuit|croissant|muffin)\b/i.test(haystack);
 
   if (category === 'burger' || BURGER_LIKE_PATTERNS.test(haystack)) {
     return false;
   }
 
-  if (/\bsandw(?:ich|hich)\b/i.test(haystack) && !hasStrictBreakfastAnchor && !hasBreakfastSandwichAnchor) {
+  if (
+    /\bsandw(?:ich|hich)\b/i.test(haystack) &&
+    !hasStrictBreakfastAnchor &&
+    !hasBreakfastSandwichAnchor
+  ) {
     return false;
+  }
+
+  if (category === 'breakfast_item' || category === 'breakfast_sandwich') {
+    return true;
   }
 
   if (BREAKFAST_FOOD_PATTERNS.some((pattern) => pattern.test(haystack))) {
@@ -1734,7 +1906,6 @@ function looksLikeBreakfastFood(item: RawResult): boolean {
   }
 
   return (
-    category === 'breakfast_sandwich' ||
     ((/\b(acai|pitaya|smoothie)\b/i.test(haystack) || /\bbowl\b/i.test(haystack)) &&
       /\bbowl\b/i.test(haystack) &&
       /\b(acai|pitaya|smoothie)\b/i.test(haystack))
@@ -1917,8 +2088,10 @@ function isLikelyModifierLikeResult(item: RawResult, parsed: ParsedQuery): boole
   const description = (item.description ?? '').trim().toLowerCase();
   const haystack = `${name} ${description}`.replace(/_/g, ' ');
   const calories = item.macros?.calories ?? 0;
+  const wordCount = name.split(/\s+/).filter(Boolean).length;
+  const normalizedCategory = (item.normalized_category ?? '').toLowerCase();
   const hasMealSignals = Boolean(
-    item.normalized_category ||
+    normalizedCategory ||
     item.meal_type ||
     parsed.categories.length ||
     parsed.mealTypes.length ||
@@ -1937,12 +2110,96 @@ function isLikelyModifierLikeResult(item: RawResult, parsed: ParsedQuery): boole
     !hasMealSignals &&
     calories > 0 &&
     calories <= 350 &&
-    name.split(/\s+/).length <= 3
+    wordCount <= 3
+  ) {
+    return true;
+  }
+
+  const hasIngredientKeyword = SINGLE_INGREDIENT_KEYWORDS.some((keyword) =>
+    name.includes(keyword)
+  );
+  const genericOrUnknownCategory =
+    !normalizedCategory ||
+    normalizedCategory === 'entree' ||
+    normalizedCategory === 'meal' ||
+    normalizedCategory === 'protein';
+  if (
+    hasIngredientKeyword &&
+    genericOrUnknownCategory &&
+    !MEAL_LIKE_NAME_PATTERNS.test(haystack) &&
+    wordCount <= 4 &&
+    calories > 0 &&
+    calories <= 500
   ) {
     return true;
   }
 
   return false;
+}
+
+function matchesHealthyIntent(item: RawResult, parsed: ParsedQuery): boolean {
+  if (!parsed.includeTags.includes('healthy') && parsed.intentLabel !== 'healthy') {
+    return true;
+  }
+
+  const haystack = buildHaystack(item);
+  if (HEALTHY_INTENT_EXCLUSION_PATTERNS.some((pattern) => pattern.test(haystack))) {
+    return false;
+  }
+
+  const calories = item.macros?.calories ?? 0;
+  const fat = item.macros?.fat ?? 0;
+
+  if (calories > 1100) {
+    return false;
+  }
+
+  if (fat > 45 && calories > 650) {
+    return false;
+  }
+
+  return true;
+}
+
+function matchesMealCalorieFloor(item: RawResult, parsed: ParsedQuery): boolean {
+  if (!shouldEnforceMealCalorieFloor(parsed)) {
+    return true;
+  }
+
+  const calories = item.macros?.calories ?? 0;
+  return calories >= MINIMUM_MEAL_CARD_CALORIES;
+}
+
+function shouldEnforceMealCalorieFloor(parsed: ParsedQuery): boolean {
+  if (isSmoothieQuery(parsed)) {
+    return false;
+  }
+
+  // Respect explicit calorie constraints from the user.
+  if (hasExplicitCalorieConstraint(parsed.raw)) {
+    return false;
+  }
+
+  // Keep explicit restaurant searches permissive to avoid empty states.
+  if (parsed.restaurantQuery) {
+    return false;
+  }
+
+  const raw = parsed.raw.toLowerCase();
+  const lunchDinnerMealIntent =
+    parsed.mealTypes.includes('lunch') ||
+    parsed.mealTypes.includes('dinner') ||
+    /\b(lunch|dinner|meal|meals|entree)\b/.test(raw);
+
+  return lunchDinnerMealIntent;
+}
+
+function hasExplicitCalorieConstraint(rawQuery: string): boolean {
+  const lower = rawQuery.toLowerCase();
+  const directionalPattern = /\b(under|below|less\s+than|max(?:imum)?|at\s+most|at\s+least|min(?:imum)?|over|above|more\s+than)\s+\d+\s*(calories?|cal|kcal)?\b/;
+  const rangePattern = /\bbetween\s+\d+\s*(?:and|to|-)\s*\d+\s*(calories?|cal|kcal)?\b/;
+
+  return directionalPattern.test(lower) || rangePattern.test(lower);
 }
 
 function isCateringOrFamilyStyleResult(item: RawResult): boolean {
@@ -2153,6 +2410,93 @@ function stableHash(input: string): number {
   return hash;
 }
 
+function deterministicShuffleBySeed<T>(items: T[], seed: number): T[] {
+  if (items.length <= 1) {
+    return items;
+  }
+
+  const shuffled = [...items];
+  let state = seed || 1;
+
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    state = (state * 1664525 + 1013904223) >>> 0;
+    const swapIndex = state % (index + 1);
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+
+  return shuffled;
+}
+
+function getRestaurantShuffleKey(item: RawResult): string {
+  const byId = (item.restaurant_id ?? '').toString().trim().toLowerCase();
+  if (byId) {
+    return `id:${byId}`;
+  }
+  const byName = (item.restaurant_name ?? '').trim().toLowerCase();
+  if (byName) {
+    return `name:${byName}`;
+  }
+  return 'unknown';
+}
+
+function shuffleRestaurantWindowRoundRobin(
+  items: RawResult[],
+  seed: string
+): RawResult[] {
+  if (items.length <= 1) {
+    return items;
+  }
+
+  const grouped = new Map<string, RawResult[]>();
+  for (const item of items) {
+    const key = getRestaurantShuffleKey(item);
+    const group = grouped.get(key);
+    if (group) {
+      group.push(item);
+    } else {
+      grouped.set(key, [item]);
+    }
+  }
+
+  const restaurantKeys = Array.from(grouped.keys());
+  const shuffledRestaurantKeys = deterministicShuffleBySeed(
+    restaurantKeys,
+    stableHash(`${seed}|restaurants`)
+  );
+
+  const shuffledGroups = new Map<string, RawResult[]>();
+  for (const key of shuffledRestaurantKeys) {
+    const group = grouped.get(key) ?? [];
+    shuffledGroups.set(
+      key,
+      deterministicShuffleBySeed(group, stableHash(`${seed}|group|${key}`))
+    );
+  }
+
+  const positions = new Map<string, number>();
+  const roundRobin: RawResult[] = [];
+
+  while (roundRobin.length < items.length) {
+    let progressed = false;
+    for (const key of shuffledRestaurantKeys) {
+      const group = shuffledGroups.get(key) ?? [];
+      const position = positions.get(key) ?? 0;
+      if (position >= group.length) {
+        continue;
+      }
+      roundRobin.push(group[position]);
+      positions.set(key, position + 1);
+      progressed = true;
+    }
+
+    if (!progressed) {
+      break;
+    }
+  }
+
+  return roundRobin.length === items.length ? roundRobin : items;
+}
+
 function buildRotationSeed(userId: string | undefined, searchKey: string): string {
   return `${userId || 'guest'}|${searchKey}`;
 }
@@ -2194,6 +2538,25 @@ function rotateBroadDiscoveryResults(
   }
 
   return [...items.slice(shift), ...items.slice(0, shift)];
+}
+
+function rotateNonceDrivenResults(
+  items: RawResult[],
+  shuffleNonce: string | undefined,
+  seed: string
+): RawResult[] {
+  if (!shuffleNonce || items.length <= 1) {
+    return items;
+  }
+
+  const shuffleWindow = Math.min(items.length, 120);
+  const windowItems = items.slice(0, shuffleWindow);
+  const shuffledWindow = shuffleRestaurantWindowRoundRobin(
+    windowItems,
+    `${seed}|nonce|${shuffleNonce}`
+  );
+
+  return [...shuffledWindow, ...items.slice(shuffleWindow)];
 }
 
 function hasParsedMacroConstraints(parsed: ParsedQuery): boolean {

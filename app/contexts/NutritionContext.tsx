@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode, useCa
 import { getUserTargets, type UserTargets } from '@/utils/user-targets';
 import { getTodaysTotals, type DailyTotals } from '@/utils/daily-totals';
 import type { LoggedMeal } from '@/app/components/LogScreen';
+import { getLoggedMealsStorageKey, migrateLegacyLoggedMealsStorage } from '@/lib/logged-meals-storage';
 
 interface NutritionContextType {
   targets: UserTargets | null;
@@ -57,20 +58,23 @@ export function NutritionProvider({ children, userId: propUserId, loggedMeals: p
   useEffect(() => {
     if (typeof window !== 'undefined' && !propLoggedMeals) {
       try {
-        const saved = localStorage.getItem('seekeatz_logged_meals');
+        migrateLegacyLoggedMealsStorage(userId);
+        const saved = localStorage.getItem(getLoggedMealsStorageKey(userId));
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed)) {
             setLoggedMeals(parsed);
+            return;
           }
         }
+        setLoggedMeals([]);
       } catch (e) {
         console.error('Failed to parse loggedMeals from localStorage:', e);
       }
     } else if (propLoggedMeals) {
       setLoggedMeals(propLoggedMeals);
     }
-  }, [propLoggedMeals]);
+  }, [propLoggedMeals, userId]);
 
   // Load userId from localStorage if not provided as prop
   useEffect(() => {
@@ -120,19 +124,21 @@ export function NutritionProvider({ children, userId: propUserId, loggedMeals: p
     // Also save to localStorage
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem('seekeatz_logged_meals', JSON.stringify(meals));
+        localStorage.setItem(getLoggedMealsStorageKey(userId), JSON.stringify(meals));
       } catch (e) {
         console.error('Failed to save loggedMeals to localStorage:', e);
       }
     }
-  }, []);
+  }, [userId]);
 
   // Listen for localStorage changes (in case loggedMeals are updated elsewhere)
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
+    const scopedKey = getLoggedMealsStorageKey(userId);
+
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'seekeatz_logged_meals' && e.newValue) {
+      if (e.key === scopedKey && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue);
           if (Array.isArray(parsed)) {
@@ -146,7 +152,7 @@ export function NutritionProvider({ children, userId: propUserId, loggedMeals: p
 
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  }, [userId]);
 
   return (
     <NutritionContext.Provider

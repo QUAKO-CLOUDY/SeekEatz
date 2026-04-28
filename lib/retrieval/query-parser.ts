@@ -143,10 +143,10 @@ export function parseQuery(raw: string): ParsedQuery {
     categories.splice(0, categories.length, ...dedupe(bowlOnlyCategories));
   }
   const mealTypes = dedupe<string>(MEAL_TYPE_PATTERNS.filter(([pattern]) => pattern.test(lowerQuery)).map(([, type]) => type));
-  if (!mealTypes.includes('breakfast') && /\begg\b/i.test(lowerQuery) && /\b(wrap|sandw(?:ich|hich)|bagel|biscuit)\b/i.test(lowerQuery)) {
+  if (!mealTypes.includes('breakfast') && /\begg\b/i.test(lowerQuery) && /\b(wrap|sandw(?:ich(?:es)?|hich)|bagel|biscuit)\b/i.test(lowerQuery)) {
     mealTypes.unshift('breakfast');
   }
-  if (mealTypes.includes('breakfast') && /\bbreakfast\s+sandw(?:ich|hich)\b/i.test(lowerQuery)) {
+  if (mealTypes.includes('breakfast') && /\bbreakfast\s+sandw(?:ich(?:es)?|hich)\b/i.test(lowerQuery)) {
     categories.unshift('breakfast_sandwich');
     const entreeIndex = categories.indexOf('entree');
     if (entreeIndex >= 0) {

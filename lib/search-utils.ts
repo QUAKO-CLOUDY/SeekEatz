@@ -307,6 +307,8 @@ export interface SearchInput {
     limit?: number;
     offset?: number;
     searchKey?: string;
+    shuffleNonce?: string;
+    excludedRestaurants?: string[];
     isPagination?: boolean;
 
     // Location fields (legacy format)
@@ -405,12 +407,13 @@ export async function buildSearchParams(input: SearchInput): Promise<SearchParam
         } : {}),
     };
 
-    // Normalize location: activate nearby search for either legacy radius_miles or normalized userContext distance.
+    // Normalize location: only activate nearby search when explicitly requested.
+    const hasExplicitNearMeInQuery = /\b(near\s+me|nearby|close\s+to\s+me|around\s+here|around\s+me|in\s+my\s+area|closest|within\s+\d+\s*(mile|miles|mi))\b/i.test(queryText);
     let location: string | undefined = undefined;
     if (
         input.location === 'near me' ||
         input.radius_miles !== undefined ||
-        normalizedUserContext.search_distance_miles !== undefined
+        hasExplicitNearMeInQuery
     ) {
         location = 'near me';
     }
@@ -501,6 +504,8 @@ export async function buildSearchParams(input: SearchInput): Promise<SearchParam
         limit: input.limit ?? 5, // Default to 5
         offset: input.offset ?? 0, // Default to 0
         searchKey: input.searchKey,
+        shuffleNonce: input.shuffleNonce,
+        excludedRestaurants: input.excludedRestaurants,
         isPagination: input.isPagination ?? !!input.searchKey, // Auto-detect pagination
         userContext: Object.keys(normalizedUserContext).length > 0 ? normalizedUserContext : undefined,
         isHomepage: input.isHomepage ?? false,

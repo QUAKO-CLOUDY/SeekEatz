@@ -441,7 +441,12 @@ const RESTAURANT_LOGO_MAP: Record<string, string> = {
 
   // Original Chop Shop variations
   'original chop shop': 'original chop shop',
+  'original chopshop': 'original chop shop',
+  'original chop shoppe': 'original chop shop',
   'the original chop shop': 'original chop shop',
+  'the original chopshop': 'original chop shop',
+  'original_chop_shop': 'original chop shop',
+  'original_chopshop': 'original chop shop',
 
   // PF Chang\'s variations
   'p.f. chang\'s': 'pf changs',

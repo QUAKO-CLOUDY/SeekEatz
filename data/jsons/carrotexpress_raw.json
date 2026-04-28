@@ -1,605 +1,1481 @@
 {
     "restaurant_name": "Carrot Express",
     "items": [
-        {
-            "name": "Avo Tuna Melt",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 735,
-                "protein": 61,
-                "carbs": 47,
-                "fat": 28
-            }
-        },
-        {
-            "name": "Huevos Rancheros Burrito",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 765,
-                "protein": 32,
-                "carbs": 68,
-                "fat": 44
-            }
-        },
-        {
-            "name": "Turkey Bacon Power Wrap",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 429,
-                "protein": 33,
-                "carbs": 9,
-                "fat": 27
-            }
-        },
-        {
-            "name": "Fresh Fruit Salad",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 525,
-                "protein": 14,
-                "carbs": 61,
-                "fat": 27
-            }
-        },
-        {
-            "name": "Josh's Overnight Oats",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 746,
-                "protein": 18,
-                "carbs": 87,
-                "fat": 44
-            }
-        },
-        {
-            "name": "Almond Butter Acai Bowl",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 903,
-                "protein": 17,
-                "carbs": 105,
-                "fat": 55
-            }
-        },
-        {
-            "name": "Paradise Acai Bowl",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 662,
-                "protein": 10,
-                "carbs": 105,
-                "fat": 28
-            }
-        },
-        {
-            "name": "Crunchy Avocado Toast",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 443,
-                "protein": 11,
-                "carbs": 40,
-                "fat": 27
-            }
-        },
-        {
-            "name": "Sweet Potato w/ Chicken Salad",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 558,
-                "protein": 24,
-                "carbs": 51,
-                "fat": 28
-            }
-        },
-        {
-            "name": "Sweet Potato w/ Grilled Chicken",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 438,
-                "protein": 42,
-                "carbs": 48,
-                "fat": 5
-            }
-        },
-        {
-            "name": "Sweet Potato w/ Tuna Salad",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 508,
-                "protein": 22,
-                "carbs": 52,
-                "fat": 24
-            }
-        },
-        {
-            "name": "Jack Cheese",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 220,
-                "protein": 14,
-                "carbs": 1,
-                "fat": 18
-            }
-        },
-        {
-            "name": "Lentil & Kale Soup",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 228,
-                "protein": 13,
-                "carbs": 36,
-                "fat": 5
-            }
-        },
-        {
-            "name": "Chicken Caesar Wrap",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 640,
-                "protein": 40,
-                "carbs": 42,
-                "fat": 34
-            }
-        },
-        {
-            "name": "Legal Wrap",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 860,
-                "protein": 56,
-                "carbs": 59,
-                "fat": 37
-            }
-        },
-        {
-            "name": "LIV Wrap",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 891,
-                "protein": 60,
-                "carbs": 51,
-                "fat": 44
-            }
-        },
-        {
-            "name": "Mahi-Mahi Wrap",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 590,
-                "protein": 36,
-                "carbs": 46,
-                "fat": 28
-            }
-        },
-        {
-            "name": "Poke Wrap Bowl With Salmon",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 906,
-                "protein": 42,
-                "carbs": 95,
-                "fat": 42
-            }
-        },
-        {
-            "name": "Green Goddes Salad",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 296,
-                "protein": 11,
-                "carbs": 12,
-                "fat": 25
-            }
-        },
-        {
-            "name": "Kale Caesar Salad",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 278,
-                "protein": 19,
-                "carbs": 28,
-                "fat": 13
-            }
-        },
-        {
-            "name": "La Mexicana Salad",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 471,
-                "protein": 20,
-                "carbs": 30,
-                "fat": 31
-            }
-        },
-        {
-            "name": "Oriental Crunch Salad",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 454,
-                "protein": 13,
-                "carbs": 36,
-                "fat": 32
-            }
-        },
-        {
-            "name": "Turkey Burger",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 276,
-                "protein": 31,
-                "carbs": 46,
-                "fat": 11
-            }
-        },
-        {
-            "name": "Chicken Breast",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 173,
-                "protein": 29,
-                "carbs": 2,
-                "fat": 5
-            }
-        },
-        {
-            "name": "Chicken Salad",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 321,
-                "protein": 14,
-                "carbs": 7,
-                "fat": 21
-            }
-        },
-        {
-            "name": "Miso Tofu",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 279,
-                "protein": 14,
-                "carbs": 7,
-                "fat": 21
-            }
-        },
-        {
-            "name": "Scottish Salmon",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 312,
-                "protein": 33,
-                "carbs": 0,
-                "fat": 19
-            }
-        },
-        {
-            "name": "Tuna Salad",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 351,
-                "protein": 27,
-                "carbs": 1,
-                "fat": 27
-            }
-        },
-        {
-            "name": "Chicken Goddess Ciabatta",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 685,
-                "protein": 53,
-                "carbs": 47,
-                "fat": 31
-            }
-        },
-        {
-            "name": "Tuna- Cado Ciabatta",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 610,
-                "protein": 31,
-                "carbs": 48,
-                "fat": 29
-            }
-        },
-        {
-            "name": "Chicken Cado Ciabatta",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 672,
-                "protein": 38,
-                "carbs": 48,
-                "fat": 31
-            }
-        },
-        {
-            "name": "Healthy Burger Bowl w/ Salmon Burger",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 602,
-                "protein": 32,
-                "carbs": 62,
-                "fat": 27
-            }
-        },
-        {
-            "name": "Healthy Burger Bowl w/ Tofu",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 573,
-                "protein": 18,
-                "carbs": 62,
-                "fat": 30
-            }
-        },
-        {
-            "name": "Healthy Burger Bowl w/ Turkey Burger",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 636,
-                "protein": 32,
-                "carbs": 61,
-                "fat": 29
-            }
-        },
-        {
-            "name": "Healthy Burger Bowl w/ Veggie Burger",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 568,
-                "protein": 13,
-                "carbs": 81,
-                "fat": 22
-            }
-        },
-        {
-            "name": "Mario's Favorite Chicken Bowl",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 647,
-                "protein": 40,
-                "carbs": 58,
-                "fat": 27
-            }
-        },
-        {
-            "name": "Pesto Chicken Bowl",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 1193,
-                "protein": 45,
-                "carbs": 74,
-                "fat": 79
-            }
-        },
-        {
-            "name": "Poke Bowl With Salmon",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 906,
-                "protein": 42,
-                "carbs": 95,
-                "fat": 42
-            }
-        },
-        {
-            "name": "Salmon Buddha Bowl",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 821,
-                "protein": 42,
-                "carbs": 67,
-                "fat": 48
-            }
-        },
-        {
-            "name": "Vegan Picadillo Bowl",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 679,
-                "protein": 19,
-                "carbs": 105,
-                "fat": 21
-            }
-        },
-        {
-            "name": "Miso Salmon Bowl",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 702,
-                "protein": 40,
-                "carbs": 67,
-                "fat": 32
-            }
-        },
-        {
-            "name": "Veggie Burger",
-            "category": "Entree",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 568,
-                "protein": 13,
-                "carbs": 81,
-                "fat": 22
-            }
-        },
-        {
-            "name": "Caesar",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 640,
-                "protein": 40,
-                "carbs": 42,
-                "fat": 34
-            }
-        },
-        {
-            "name": "Cilantro- Lime",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 320,
-                "protein": 0,
-                "carbs": 4,
-                "fat": 32
-            }
-        },
-        {
-            "name": "Eel Sauce",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 228,
-                "protein": 0,
-                "carbs": 12,
-                "fat": 10
-            }
-        },
-        {
-            "name": "Honey- Lime Peanut Vinaigrette",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 180,
-                "protein": 1,
-                "carbs": 12,
-                "fat": 14
-            }
-        },
-        {
-            "name": "Lemon- Apple Cider Vinaigrette",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 400,
-                "protein": 0,
-                "carbs": 2,
-                "fat": 44
-            }
-        },
-        {
-            "name": "Miso- Sesame Ginger Vinaigrette",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 156,
-                "protein": 1,
-                "carbs": 1,
-                "fat": 10
-            }
-        },
-        {
-            "name": "Soy- Ginger",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 135,
-                "protein": 1,
-                "carbs": 2,
-                "fat": 11
-            }
-        },
-        {
-            "name": "Spicy Mayo ( 1 TBSP)",
-            "category": "Sauce",
-            "price_estimate": null,
-            "image_url": null,
-            "macros": {
-                "calories": 120,
-                "protein": 0,
-                "carbs": 0,
-                "fat": 13
-            }
+      {
+        "name": "Crunchy Avocado Toast",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 443,
+          "protein": 11,
+          "carbs": 40,
+          "fat": 27
         }
+      },
+      {
+        "name": "Avo Tuna Melt",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 735,
+          "protein": 61,
+          "carbs": 47,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Josh's Overnight Oats",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 746,
+          "protein": 18,
+          "carbs": 87,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Fresh Fruit Salad",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 525,
+          "protein": 14,
+          "carbs": 61,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Huevos Rancheros Burrito",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 765,
+          "protein": 32,
+          "carbs": 68,
+          "fat": 44
+        }
+      },
+      {
+        "name": "The Scrambled",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 722,
+          "protein": 21,
+          "carbs": 39,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Turkey Bacon Power Wrap",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 429,
+          "protein": 33,
+          "carbs": 9,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Paradise Acai Bowl",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 662,
+          "protein": 10,
+          "carbs": 105,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Almond Butter Acai Bowl",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 903,
+          "protein": 17,
+          "carbs": 105,
+          "fat": 55
+        }
+      },
+      {
+        "name": "Jessie's Breakfast Bowl",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 588,
+          "protein": 27,
+          "carbs": 58,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Ultimate Croissant Eggwich",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 688,
+          "protein": 28,
+          "carbs": 38,
+          "fat": 48
+        }
+      },
+      {
+        "name": "2 Eggs Any Style",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 672,
+          "protein": 33,
+          "carbs": 42,
+          "fat": 48
+        }
+      },
+      {
+        "name": "Gluten Free Carrot Waffle",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 660,
+          "protein": 15,
+          "carbs": 84,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Sunrise Croissant",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 680,
+          "protein": 28,
+          "carbs": 48,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Power Bagel",
+        "category": "All Day Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 715,
+          "protein": 36,
+          "carbs": 66,
+          "fat": 50
+        }
+      },
+      {
+        "name": "Sweet Potatoes",
+        "category": "Loaded Sweet Potatoes",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 208,
+          "protein": 4,
+          "carbs": 48,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Sweet Potato w/ Tuna Salad",
+        "category": "Loaded Sweet Potatoes",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 508,
+          "protein": 22,
+          "carbs": 52,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Sweet Potato w/ Chicken Salad",
+        "category": "Loaded Sweet Potatoes",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 558,
+          "protein": 24,
+          "carbs": 51,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Sweet Potato w/ Grilled Chicken",
+        "category": "Loaded Sweet Potatoes",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 438,
+          "protein": 42,
+          "carbs": 48,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Jack Cheese",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 220,
+          "protein": 14,
+          "carbs": 1,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Garden Gazpacho",
+        "category": "Soups",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 237,
+          "protein": 2,
+          "carbs": 11,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Carrot - Sweet Potato",
+        "category": "Soups",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 79,
+          "protein": 1,
+          "carbs": 11,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Lentil & Kale",
+        "category": "Soups",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 228,
+          "protein": 13,
+          "carbs": 36,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Vegetable",
+        "category": "Soups",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 88,
+          "protein": 2,
+          "carbs": 11,
+          "fat": 3
+        }
+      },
+      {
+        "name": "Plain Tostones",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 280,
+          "protein": 2,
+          "carbs": 43,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Sweet Potato Fries",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 171,
+          "protein": 3,
+          "carbs": 40,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Chicken Caesar Wrap",
+        "category": "Wraps",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 640,
+          "protein": 40,
+          "carbs": 42,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Legal Wrap",
+        "category": "Wraps",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 860,
+          "protein": 56,
+          "carbs": 59,
+          "fat": 37
+        }
+      },
+      {
+        "name": "LIV Wrap",
+        "category": "Wraps",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 891,
+          "protein": 60,
+          "carbs": 51,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Mahi-Mahi Wrap",
+        "category": "Wraps",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 590,
+          "protein": 36,
+          "carbs": 46,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Poke Wrap",
+        "category": "Wraps",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 866,
+          "protein": 39,
+          "carbs": 78,
+          "fat": 43
+        }
+      },
+      {
+        "name": "Green Goddess Salad",
+        "category": "Salads",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 296,
+          "protein": 11,
+          "carbs": 12,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Caesar Salad",
+        "category": "Salads",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 278,
+          "protein": 19,
+          "carbs": 28,
+          "fat": 13
+        }
+      },
+      {
+        "name": "La Mexicana Salad",
+        "category": "Salads",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 471,
+          "protein": 20,
+          "carbs": 30,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Oriental Crunch Salad",
+        "category": "Salads",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 454,
+          "protein": 13,
+          "carbs": 36,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Greek Salad",
+        "category": "Salads",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 204,
+          "protein": 24,
+          "carbs": 27,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Mediterranean Herb Salad",
+        "category": "Salads",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 629,
+          "protein": 21,
+          "carbs": 31,
+          "fat": 59
+        }
+      },
+      {
+        "name": "Caesar Dressing",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 280,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Cilantro- Lime Dressing",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 320,
+          "protein": 0,
+          "carbs": 4,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Eel Sauce",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 228,
+          "protein": 0,
+          "carbs": 57,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Honey - Lime Vinaigrette",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 180,
+          "protein": 0,
+          "carbs": 12,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Honey - Lime Peanut Vinaigrette",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 180,
+          "protein": 1,
+          "carbs": 12,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Lemon - Apple Cider Vinaigrette",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 400,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Miso - Sesame Ginger Vinaigrette",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 156,
+          "protein": 1,
+          "carbs": 1,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Soy - Ginger Dressing",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 135,
+          "protein": 1,
+          "carbs": 2,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Spicy Mayo",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 120,
+          "protein": 0,
+          "carbs": 0,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Greek Vinaigrette",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 400,
+          "protein": 0,
+          "carbs": 2,
+          "fat": 44
+        }
+      },
+      {
+        "name": "Balsamic Vinaigrette",
+        "category": "Dressing",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 216,
+          "protein": 0,
+          "carbs": 12,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Turkey Burger (Add-On)",
+        "category": "Protein",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 276,
+          "protein": 31,
+          "carbs": 46,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Chicken Breast (Add-On)",
+        "category": "Protein",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 173,
+          "protein": 29,
+          "carbs": 2,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Chicken Salad (Add-On)",
+        "category": "Protein",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 321,
+          "protein": 20,
+          "carbs": 3,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Miso Tofu (Add-On)",
+        "category": "Protein",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 279,
+          "protein": 14,
+          "carbs": 7,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Mahi- Mahi (Add-On)",
+        "category": "Protein",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 85,
+          "protein": 19,
+          "carbs": 0,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Scottish Salmon (Add-On)",
+        "category": "Protein",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 312,
+          "protein": 33,
+          "carbs": 0,
+          "fat": 19
+        }
+      },
+      {
+        "name": "Tuna Salad (Add-On)",
+        "category": "Protein",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 351,
+          "protein": 19,
+          "carbs": 0,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Crispy Chicken (Add-On)",
+        "category": "Protein",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 29,
+          "carbs": 19,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Chicken Goddess Ciabatta",
+        "category": "Ciabattas",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 685,
+          "protein": 53,
+          "carbs": 47,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Tuna Cado Ciabatta",
+        "category": "Ciabattas",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 610,
+          "protein": 31,
+          "carbs": 48,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Chicken Cado Ciabatta",
+        "category": "Ciabattas",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 672,
+          "protein": 38,
+          "carbs": 48,
+          "fat": 31
+        }
+      },
+      {
+        "name": "Healthy Burger Power Bowl",
+        "category": "Power Bowls",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 714,
+          "protein": 34,
+          "carbs": 54,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Healthy Burger w/ Tofu Power Bowl",
+        "category": "Power Bowls",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 573,
+          "protein": 18,
+          "carbs": 62,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Healthy Burger w/ Turkey Burger Power Bowl",
+        "category": "Power Bowls",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 636,
+          "protein": 32,
+          "carbs": 61,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Healthy Burger w/ Veggie Burger Power Bowl",
+        "category": "Power Bowls",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 568,
+          "protein": 13,
+          "carbs": 81,
+          "fat": 22
+        }
+      },
+      {
+        "name": "Healthy Burger w/ Salmon Power Bowl",
+        "category": "Power Bowls",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 602,
+          "protein": 32,
+          "carbs": 62,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Mario's Favorite Chicken Power Bowl",
+        "category": "Power Bowls",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 647,
+          "protein": 40,
+          "carbs": 58,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Pesto Chicken Power Bowl",
+        "category": "Power Bowls",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 1193,
+          "protein": 45,
+          "carbs": 74,
+          "fat": 79
+        }
+      },
+      {
+        "name": "Poke Power Bowl",
+        "category": "Power Bowls",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 906,
+          "protein": 42,
+          "carbs": 95,
+          "fat": 42
+        }
+      },
+      {
+        "name": "Salmon Buddha Power Bowl",
+        "category": "Power Bowls",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 821,
+          "protein": 42,
+          "carbs": 67,
+          "fat": 48
+        }
+      },
+      {
+        "name": "Miami Vegan Power Bowl",
+        "category": "Power Bowls",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 771,
+          "protein": 34,
+          "carbs": 93,
+          "fat": 39
+        }
+      },
+      {
+        "name": "Miso Salmon Power Bowl",
+        "category": "Power Bowls",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 702,
+          "protein": 40,
+          "carbs": 67,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Build Your Chicken Power Bowl",
+        "category": "Power Bowls",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 420,
+          "protein": 38,
+          "carbs": 44,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Turkey Burger",
+        "category": "Healthy Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 535,
+          "protein": 32,
+          "carbs": 34,
+          "fat": 28
+        }
+      },
+      {
+        "name": "Salmon Burger",
+        "category": "Healthy Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 490,
+          "protein": 33,
+          "carbs": 30,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Veggie Burger",
+        "category": "Healthy Burgers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 445,
+          "protein": 16,
+          "carbs": 38,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Tuna Salad Pita Melt",
+        "category": "Pita Melts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 570,
+          "protein": 36,
+          "carbs": 44,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Chicken Salad Pita Melt",
+        "category": "Pita Melts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 605,
+          "protein": 45,
+          "carbs": 43,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Shroom Pita Pelt",
+        "category": "Pita Melts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 678,
+          "protein": 19,
+          "carbs": 52,
+          "fat": 46
+        }
+      },
+      {
+        "name": "Grilled Chicken Breast Platter",
+        "category": "Platters",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 375,
+          "protein": 53,
+          "carbs": 3,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Pesto Chicken Breast Platter",
+        "category": "Platters",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 455,
+          "protein": 54,
+          "carbs": 4,
+          "fat": 24
+        }
+      },
+      {
+        "name": "Scottish Salmon Simply Baked Platter",
+        "category": "Platters",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 430,
+          "protein": 45,
+          "carbs": 5,
+          "fat": 25
+        }
+      },
+      {
+        "name": "Pesto Scottish Salmon Platter",
+        "category": "Platters",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 490,
+          "protein": 45,
+          "carbs": 4,
+          "fat": 30
+        }
+      },
+      {
+        "name": "BBQ Chicken Breast Platter",
+        "category": "Platters",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 420,
+          "protein": 53,
+          "carbs": 9,
+          "fat": 17
+        }
+      },
+      {
+        "name": "Crispy Chicken Breast Platter",
+        "category": "Platters",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 510,
+          "protein": 53,
+          "carbs": 19,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Avocado Side",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 120,
+          "protein": 1,
+          "carbs": 6,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Cilantro Brown Rice Side",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 220,
+          "protein": 5,
+          "carbs": 46,
+          "fat": 2
+        }
+      },
+      {
+        "name": "Quinoa Almondine Side",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 240,
+          "protein": 7,
+          "carbs": 35,
+          "fat": 6
+        }
+      },
+      {
+        "name": "Broccoli Side",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 35,
+          "protein": 3,
+          "carbs": 7,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Tostones Side",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 210,
+          "protein": 2,
+          "carbs": 23,
+          "fat": 14
+        }
+      },
+      {
+        "name": "Sweet Potato Fries Side",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 280,
+          "protein": 2,
+          "carbs": 43,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Baked Sweet Potatoes Side",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 130,
+          "protein": 3,
+          "carbs": 30,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Roasted Butternut Squash Side",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 79,
+          "protein": 1,
+          "carbs": 15,
+          "fat": 3
+        }
+      },
+      {
+        "name": "House Salad Side",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 150,
+          "protein": 2,
+          "carbs": 9,
+          "fat": 12
+        }
+      },
+      {
+        "name": "Matcha Cloud Cake",
+        "category": "Desserts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 573,
+          "protein": 8,
+          "carbs": 81,
+          "fat": 26
+        }
+      },
+      {
+        "name": "Chocolate Chip Cookie",
+        "category": "Desserts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 638,
+          "protein": 9,
+          "carbs": 78,
+          "fat": 35
+        }
+      },
+      {
+        "name": "Pumpkin Chai Donut",
+        "category": "Desserts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 213,
+          "protein": 2,
+          "carbs": 33,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Brownie",
+        "category": "Desserts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 612,
+          "protein": 7,
+          "carbs": 78,
+          "fat": 33
+        }
+      },
+      {
+        "name": "Vegan Banana Bread",
+        "category": "Desserts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 498,
+          "protein": 5,
+          "carbs": 30,
+          "fat": 30
+        }
+      },
+      {
+        "name": "Carrot Cake",
+        "category": "Desserts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 871,
+          "protein": 8,
+          "carbs": 91,
+          "fat": 55
+        }
+      },
+      {
+        "name": "Oatmeal Cookie",
+        "category": "Desserts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 686,
+          "protein": 12,
+          "carbs": 86,
+          "fat": 34
+        }
+      },
+      {
+        "name": "Chocolate Chunk Walnut Cookie",
+        "category": "Desserts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 712,
+          "protein": 9,
+          "carbs": 84,
+          "fat": 41
+        }
+      },
+      {
+        "name": "Coconut Guava Cookie",
+        "category": "Desserts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 467,
+          "protein": 7,
+          "carbs": 60,
+          "fat": 27
+        }
+      },
+      {
+        "name": "Honey Almond Cake",
+        "category": "Desserts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 823,
+          "protein": 14,
+          "carbs": 68,
+          "fat": 58
+        }
+      },
+      {
+        "name": "Almond Butter Power Bites",
+        "category": "Desserts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 351,
+          "protein": 10,
+          "carbs": 18,
+          "fat": 29
+        }
+      },
+      {
+        "name": "Key Lime Date Power Bites",
+        "category": "Desserts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 157,
+          "protein": 2,
+          "carbs": 22,
+          "fat": 8
+        }
+      },
+      {
+        "name": "Cocoa Date Power Bites",
+        "category": "Desserts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 199,
+          "protein": 3,
+          "carbs": 22,
+          "fat": 13
+        }
+      },
+      {
+        "name": "Carrot Cake Truffles",
+        "category": "Desserts",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 140,
+          "protein": 2,
+          "carbs": 16,
+          "fat": 9
+        }
+      },
+      {
+        "name": "Choco Dream Smoothie",
+        "category": "Power Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 346,
+          "protein": 20,
+          "carbs": 31,
+          "fat": 18
+        }
+      },
+      {
+        "name": "Skinny Green Smoothie",
+        "category": "Power Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 239,
+          "protein": 25,
+          "carbs": 43,
+          "fat": 4
+        }
+      },
+      {
+        "name": "Peanut Butter Cup Smoothie",
+        "category": "Power Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 680,
+          "protein": 40,
+          "carbs": 70,
+          "fat": 32
+        }
+      },
+      {
+        "name": "Blue Magic Smoothie",
+        "category": "Power Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 535,
+          "protein": 35,
+          "carbs": 54,
+          "fat": 21
+        }
+      },
+      {
+        "name": "Berry Wild Smoothie",
+        "category": "Power Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 736,
+          "protein": 9,
+          "carbs": 80,
+          "fat": 46
+        }
+      },
+      {
+        "name": "Sunrise Smoothie",
+        "category": "Power Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 355,
+          "protein": 16,
+          "carbs": 67,
+          "fat": 5
+        }
+      },
+      {
+        "name": "Strawberry Passion Smoothie",
+        "category": "Power Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 321,
+          "protein": 3,
+          "carbs": 82,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Julie's Smoothie",
+        "category": "Power Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 331,
+          "protein": 5,
+          "carbs": 82,
+          "fat": 1
+        }
+      },
+      {
+        "name": "California Carrot Juice",
+        "category": "Drinks",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 188,
+          "protein": 4,
+          "carbs": 44,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Carrot & Orange Juice",
+        "category": "Drinks",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 204,
+          "protein": 14,
+          "carbs": 48,
+          "fat": 1
+        }
+      },
+      {
+        "name": "Berry Fusion Refresher",
+        "category": "Drinks",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 154,
+          "protein": 1,
+          "carbs": 41,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Wellness Peach Refresher",
+        "category": "Drinks",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 163,
+          "protein": 1,
+          "carbs": 44,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Matcha Lemonade Refresher",
+        "category": "Drinks",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 142,
+          "protein": 1,
+          "carbs": 38,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Immunity Shot",
+        "category": "Drinks",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 111,
+          "protein": 1,
+          "carbs": 30,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Valentina Shot",
+        "category": "Drinks",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 58,
+          "protein": 1,
+          "carbs": 14,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Power Shot",
+        "category": "Drinks",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 20,
+          "protein": 0,
+          "carbs": 4,
+          "fat": 0
+        }
+      },
+      {
+        "name": "Ginger Shot",
+        "category": "Drinks",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 10,
+          "protein": 0,
+          "carbs": 1,
+          "fat": 0
+        }
+      }
     ]
-}
+  }

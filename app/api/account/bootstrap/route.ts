@@ -11,6 +11,7 @@ import { normalizeEmail } from "@/lib/full-access";
 
 type BootstrapBody = {
   profile?: {
+    full_name?: string;
     goal?: string;
     diet_type?: string;
     dietary_options?: string[];
@@ -45,6 +46,9 @@ function mapProfilePayload(body: BootstrapBody) {
     user_profile: profile,
   };
 
+  if (profile.full_name) {
+    update.full_name = profile.full_name;
+  }
   if (body.hasCompletedOnboarding) {
     update.has_completed_onboarding = true;
   }

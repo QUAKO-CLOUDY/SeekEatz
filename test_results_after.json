@@ -4,28 +4,26 @@
     "mode": "meals",
     "mealCount": 5,
     "topItems": [
-      "Buffalo Ranch McChicken (McDonald's)",
-      "Southern Style Buttermilk Crispy Chicken Sandwich (McDonald's)",
-      "Premium Asian Salad with Buttermilk Crispy Chicken (McDonald's)"
+      "Double Quarter Pounder with Cheese (McDonald's)",
+      "Bacon Clubhouse Grilled Chicken Sandwich (McDonald's)",
+      "Premium McWrap Chicken & Bacon (Grilled) (McDonald's)"
     ],
     "answer": null
   },
   {
     "query": "Low calorie meal at a steakhouse.",
     "mode": "meals",
-    "mealCount": 5,
-    "topItems": [
-      "Chick-fil-A Chicken Biscuit (Chick-fil-A)",
-      "Chicken Legs (2) (El Pollo Loco)",
-      "Turkey Sausage Wake-Up Wrap (1 Wrap) (Dunkin')"
-    ],
+    "mealCount": 0,
+    "topItems": [],
     "answer": null
   },
   {
     "query": "What’s the leanest thing at an Italian restaurant?",
     "mode": "meals",
-    "mealCount": 0,
-    "topItems": [],
+    "mealCount": 1,
+    "topItems": [
+      "Italian Sausage Soup, Bowl (Bertucci's)"
+    ],
     "answer": null
   },
   {
@@ -40,9 +38,9 @@
     "mode": "meals",
     "mealCount": 5,
     "topItems": [
-      "Cranberry Bacon Bleu Salad with Grilled Chicken (Culver's)",
-      "Harvest Chopped (The Habit Burger & Grill)",
-      "Southwestern Steak (Chopt Creative Salad Co.)"
+      "#6 Roast Beef & Provolone (Reduced Carb Wrap) (Jersey Mike's Subs)",
+      "Top Sirloin 8 oz (Duffy's Sports Grill)",
+      "BBQ Wrap (Muscle Maker Grill)"
     ],
     "answer": null
   },
@@ -51,30 +49,28 @@
     "mode": "meals",
     "mealCount": 5,
     "topItems": [
-      "Salmon Buddha Bowl (Carrot Express)",
-      "Crispy Chicken Bites (10pc) (The Habit Burger & Grill)",
-      "Market Salad (Chick-fil-A)"
+      "Italian Salad With Chicken (Carrabba's Italian Grill)",
+      "Big Blue Burger (The Stand)",
+      "WaBa (White Meat Chicken & Steak ) Plate (WaBa Grill)"
     ],
     "answer": null
   },
   {
     "query": "Show me meals between 540–600 calories with at least 45g protein.",
     "mode": "meals",
-    "mealCount": 1,
+    "mealCount": 5,
     "topItems": [
-      "Classic Cobb (Chopt Creative Salad Co.)"
+      "Ahi Tuna (Eddie V's Prime Seafood)",
+      "Skewers (Postino)",
+      "Sausage (White Regular) (Jersey Mike's Subs)"
     ],
     "answer": null
   },
   {
     "query": "Under 475 calories, minimum 40g protein, no seafood.",
     "mode": "meals",
-    "mealCount": 5,
-    "topItems": [
-      "Cranberry Bacon Bleu Salad with Grilled Chicken (Culver's)",
-      "Firehouse Chopped Salad with Grilled Chicken (Firehouse Subs)",
-      "Citrus Avocado Fresca Salad (El Pollo Loco)"
-    ],
+    "mealCount": 0,
+    "topItems": [],
     "answer": null
   },
   {
@@ -82,20 +78,18 @@
     "mode": "meals",
     "mealCount": 5,
     "topItems": [
-      "#6 Roast Beef & Provolone (Wheat Wrap) (Jersey Mike's Subs)",
-      "Chicken Boneless 14 Pc (Domino's Pizza)",
-      "Avo Tuna Melt (Carrot Express)"
+      "Thai Monster Bowl (ProteinHouse)",
+      "The Big Eddie (Eddie V's Prime Seafood)",
+      "Greek Chicken & Quinoa Bowl Large (Core Life Eatery)"
     ],
     "answer": null
   },
   {
     "query": "Highest protein meal under 600 calories.",
     "mode": "meals",
-    "mealCount": 5,
+    "mealCount": 1,
     "topItems": [
-      "Double Chicken Avocado Salad (El Pollo Loco)",
-      "Garden Fresco Salad with Grilled Chicken (Culver's)",
-      "Smokehouse Brisket (Arby's)"
+      "Chicken Tortilla & Chipotle Broth (Core Life Eatery)"
     ],
     "answer": null
   },
@@ -111,53 +105,39 @@
     "mode": "meals",
     "mealCount": 5,
     "topItems": [
-      "Sweet Chili Crispy Tofu Sandwich (Dig Inn)",
-      "Turkey Sausage Sandwich On English Muffin (Dunkin')",
-      "Street Corn Double Chicken Burrito Bowl (El Pollo Loco)"
+      "Thai Monster Bowl (ProteinHouse)",
+      "Grilled Chicken Parmigiana (Olive Garden)",
+      "Kale Caesar Chicken Bowl Large (Core Life Eatery)"
     ],
     "answer": null
   },
   {
     "query": "Lowest calorie meals",
     "mode": "meals",
-    "mealCount": 5,
-    "topItems": [
-      "Chicken Sandwich On Ciabatta (The Habit Burger & Grill)",
-      "Blackened Salmon (Clean Eatz)",
-      "Wings 8 Pc (Domino's Pizza)"
-    ],
+    "mealCount": 0,
+    "topItems": [],
     "answer": null
   },
   {
     "query": "Cuisine meals over/under calories or macros",
     "mode": "meals",
-    "mealCount": 5,
-    "topItems": [
-      "Crispy Chicken Sandwich On Ciabatta (The Habit Burger & Grill)",
-      "Sausage Biscuit (Arby's)",
-      "Fan Faves Plate (Dig Inn)"
-    ],
+    "mealCount": 0,
+    "topItems": [],
     "answer": null
   },
   {
     "query": "Multi stack test: cuisine, macros, and calories",
     "mode": "meals",
-    "mealCount": 5,
-    "topItems": [
-      "Italian Oven Baked Sandwich (Domino's Pizza)",
-      "Double Cheeseburger (Burger King)",
-      "Garden Ranch Salad (The Habit Burger & Grill)"
-    ],
+    "mealCount": 0,
+    "topItems": [],
     "answer": null
   },
   {
     "query": "Show me the highest protein meal in the entire database.",
     "mode": "meals",
-    "mealCount": 5,
+    "mealCount": 1,
     "topItems": [
-      "Greek Chicken (CAVA)",
-      "Ultimate Hummus Harissa Bowl (Warm Grains) (Chopt Creative Salad Co.)",
-      "Southwest Bison (Clean Eatz)"
+      "24 Wings (Miller's Ale House)"
     ],
     "answer": null
   },
@@ -173,35 +153,43 @@
     "mode": "meals",
     "mealCount": 5,
     "topItems": [
-      "Egg-Normous Burrito (Burger King)",
-      "Bacon King (Burger King)",
-      "Crispy Onion Whopper (Burger King)"
+      "Triple Whopper with Cheese (Burger King)",
+      "Triple Whopper (Burger King)",
+      "Bacon King (Burger King)"
     ],
     "answer": null
   },
   {
     "query": "show me lunch at olive garden",
-    "mode": "text",
-    "mealCount": 0,
-    "topItems": [],
-    "answer": "Sorry — we don't have olive in our database yet. Want me to show similar options from restaurants we do have?"
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Fried Mozzarella (Olive Garden)",
+      "Meatballs Parmigiana (Olive Garden)",
+      "Italian Sausage (2) (Olive Garden)"
+    ],
+    "answer": null
   },
   {
     "query": "i wanna eat a vegetrian high protein meal",
     "mode": "meals",
     "mealCount": 5,
     "topItems": [
-      "Vegan Dig Classic (Dig Inn)",
-      "#14 The Veggie (Wheat Giant) (Jersey Mike's Subs)",
-      "Kosher Dunkin' Double Veggie Sausage Sandwich (Dunkin')"
+      "Double Cut Lamb Chops (The Capital Grille)",
+      "18 oz. Prime Bone-In NY Strip (Eddie V's Prime Seafood)",
+      "Cowboy Pork Chops (LongHorn Steakhouse)"
     ],
     "answer": null
   },
   {
     "query": "vegan high protein bowls",
     "mode": "meals",
-    "mealCount": 0,
-    "topItems": [],
+    "mealCount": 5,
+    "topItems": [
+      "Kung Pao Tofu Bowl (Lazy Dog Restaurant & Bar)",
+      "Sriracha Ginger Tofu & Grains Bowl Large (Core Life Eatery)",
+      "GF Mongolian Tofu Bowl (P.F. Chang's)"
+    ],
     "answer": null
   },
   {
@@ -209,26 +197,30 @@
     "mode": "meals",
     "mealCount": 5,
     "topItems": [
-      "Chick-fil-A Deluxe Sandwich (Chick-fil-A)",
-      "Turkey Burger (Carrot Express)",
-      "Flatbreads (Clean Eatz)"
+      "Cranberry Bacon Bleu Salad with Grilled Chicken (Culver's)",
+      "Crispy Chicken Tenders 2 Piece (Urban Plates)",
+      "Spicy Thai Chicken & Rice Noodles Bowl Large (Core Life Eatery)"
     ],
     "answer": null
   },
   {
     "query": "High protein vegetarian meals under 500 calories",
     "mode": "meals",
-    "mealCount": 1,
+    "mealCount": 4,
     "topItems": [
-      "#14 The Veggie (In a Tub) (Jersey Mike's Subs)"
+      "Sriracha Ginger Tofu & Grains Bowl Large (Core Life Eatery)",
+      "#14 The Veggie (In a Tub) (Jersey Mike's Subs)",
+      "Sriracha Ginger Tofu & Grains Bowl Large (Core Life Eatery)"
     ],
     "answer": null
   },
   {
     "query": "Leanest thing at chipotle",
     "mode": "meals",
-    "mealCount": 0,
-    "topItems": [],
+    "mealCount": 1,
+    "topItems": [
+      "Sofritas (Chipotle Mexican Grill)"
+    ],
     "answer": null
   },
   {
@@ -240,10 +232,14 @@
   },
   {
     "query": "Food",
-    "mode": "text",
-    "mealCount": 0,
-    "topItems": [],
-    "answer": "What kind of food are you looking for? Any preferences like meal type, calories, protein, or a specific restaurant?"
+    "mode": "meals",
+    "mealCount": 5,
+    "topItems": [
+      "Tender Plate (Low Range) (True Food Kitchen)",
+      "Grass-Fed Burger (True Food Kitchen)",
+      "Grass-Fed Cheeseburger (True Food Kitchen)"
+    ],
+    "answer": null
   },
   {
     "query": "How many calories in a big mac",
@@ -262,12 +258,8 @@
   {
     "query": "Not chicken, high protein",
     "mode": "meals",
-    "mealCount": 5,
-    "topItems": [
-      "Mango Miso Crunch (The Habit Burger & Grill)",
-      "Deep Fried Turkey Club (Arby's)",
-      "Spicy Avotuna (Chopt Creative Salad Co.)"
-    ],
+    "mealCount": 0,
+    "topItems": [],
     "answer": null
   }
 ]

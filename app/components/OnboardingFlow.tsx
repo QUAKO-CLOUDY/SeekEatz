@@ -6,6 +6,8 @@ import { ChevronRight, MapPin, Sparkles, Map, ShieldCheck } from "lucide-react";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/client";
 import { storeLocation } from "@/lib/location";
+import { bootstrapAccount } from "@/lib/bootstrap-account";
+import type { UserProfile } from "@/app/types";
 
 type Props = {
   onComplete: () => void;
@@ -90,9 +92,11 @@ export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
   if (step === 0) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/20 to-background" />
-        
-        <div className="w-full max-w-md text-center relative z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-50 via-background to-blue-50 dark:from-slate-950 dark:via-background dark:to-slate-900" />
+        <div className="absolute -top-24 right-[-4rem] h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
+        <div className="absolute -bottom-24 left-[-4rem] h-56 w-56 rounded-full bg-blue-500/20 blur-3xl" />
+
+        <div className="relative z-10 w-full max-w-md rounded-[2rem] border border-white/40 bg-white/90 p-8 text-center shadow-2xl backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
           <div className="mb-8 flex justify-center">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-blue-500 rounded-full blur-2xl opacity-20 animate-pulse" />
@@ -125,9 +129,11 @@ export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
   if (step === 1) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/20 to-background" />
-        
-        <div className="w-full max-w-md text-center relative z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-50 via-background to-blue-50 dark:from-slate-950 dark:via-background dark:to-slate-900" />
+        <div className="absolute -top-24 right-[-4rem] h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
+        <div className="absolute -bottom-24 left-[-4rem] h-56 w-56 rounded-full bg-blue-500/20 blur-3xl" />
+
+        <div className="relative z-10 w-full max-w-md rounded-[2rem] border border-white/40 bg-white/90 p-8 text-center shadow-2xl backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
           <div className="mb-8 flex justify-center">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full blur-2xl opacity-20 animate-pulse" />
@@ -167,9 +173,11 @@ export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
   if (step === 2) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/20 to-background" />
-        
-        <div className="w-full max-w-md text-center relative z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-50 via-background to-blue-50 dark:from-slate-950 dark:via-background dark:to-slate-900" />
+        <div className="absolute -top-24 right-[-4rem] h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
+        <div className="absolute -bottom-24 left-[-4rem] h-56 w-56 rounded-full bg-blue-500/20 blur-3xl" />
+
+        <div className="relative z-10 w-full max-w-md rounded-[2rem] border border-white/40 bg-white/90 p-8 text-center shadow-2xl backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
           <div className="mb-8 flex justify-center">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full blur-2xl opacity-20 animate-pulse" />
@@ -293,49 +301,20 @@ export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
         // Mark onboarding as complete in database
         try {
           // Load user profile from localStorage if it exists
-          let userProfile = null;
+          let userProfile: Partial<UserProfile> | null = null;
           try {
             const savedProfile = localStorage.getItem("userProfile");
             if (savedProfile) {
-              userProfile = JSON.parse(savedProfile);
+              userProfile = JSON.parse(savedProfile) as Partial<UserProfile>;
             }
           } catch (e) {
             console.warn("Failed to parse userProfile from localStorage:", e);
           }
 
-          const profileData: Record<string, unknown> = {
-            id: user.id,
-            has_completed_onboarding: true, // Mark onboarding as complete
-            last_login: new Date(now).toISOString(),
-            updated_at: new Date().toISOString(),
-          };
-
-          // Include user profile data if available
-          if (userProfile) {
-            if (userProfile.goal) profileData.goal = userProfile.goal;
-            if (userProfile.diet_type) profileData.diet_type = userProfile.diet_type;
-            if (userProfile.dietary_options) profileData.dietary_options = userProfile.dietary_options;
-            if (userProfile.target_calories) profileData.calorie_goal = userProfile.target_calories;
-            if (userProfile.target_protein_g) profileData.protein_goal = userProfile.target_protein_g;
-            if (userProfile.target_carbs_g) profileData.carb_limit = userProfile.target_carbs_g;
-            if (userProfile.target_fats_g) profileData.fat_limit = userProfile.target_fats_g;
-            if (userProfile.preferredMealTypes) profileData.preferred_meal_types = userProfile.preferredMealTypes;
-            if (userProfile.search_distance_miles) profileData.search_distance_miles = userProfile.search_distance_miles;
-            // Store full profile as JSON for easy retrieval
-            profileData.user_profile = userProfile;
-          }
-          
-          const { error: profileError } = await supabase
-            .from("profiles")
-            .upsert(profileData, {
-              onConflict: "id",
-            });
-          
-          if (profileError) {
-            console.error("Could not update profile:", profileError);
-          } else {
-            console.log("Profile updated successfully after onboarding with has_completed_onboarding=true");
-          }
+          await bootstrapAccount({
+            profile: userProfile,
+            hasCompletedOnboarding: true,
+          });
         } catch (error) {
           console.error("Error updating profile:", error);
         }
@@ -364,9 +343,11 @@ export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
   if (step === 3) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-background via-muted/20 to-background" />
-        
-        <div className="w-full max-w-md text-center relative z-10">
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-50 via-background to-blue-50 dark:from-slate-950 dark:via-background dark:to-slate-900" />
+        <div className="absolute -top-24 right-[-4rem] h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
+        <div className="absolute -bottom-24 left-[-4rem] h-56 w-56 rounded-full bg-blue-500/20 blur-3xl" />
+
+        <div className="relative z-10 w-full max-w-md rounded-[2rem] border border-white/40 bg-white/90 p-8 text-center shadow-2xl backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
           <div className="mb-8 flex justify-center">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full blur-2xl opacity-20 animate-pulse" />

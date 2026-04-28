@@ -14,6 +14,10 @@ import { AuthProviders } from "@/app/components/AuthProviders";
 import { bootstrapAccount } from "@/lib/bootstrap-account";
 import { getFreeTierSignupDescription } from "@/lib/free-tier";
 import type { UserProfile } from "@/app/types";
+import {
+  clearLoggedMealsStorageForUser,
+  getLoggedMealsStorageKey,
+} from "@/lib/logged-meals-storage";
 
 const THIRTY_MINUTES = 30 * 60 * 1000;
 const EMAIL_OTP_LENGTH = 6;
@@ -73,12 +77,13 @@ function SignupPageContent() {
   const resetSavedMealStorageForUser = (userId: string) => {
     if (typeof window === "undefined") return;
 
+    clearLoggedMealsStorageForUser(userId);
+
     const keysToRemove = [
       "seekeatz_favorite_meals",
       "seekeatz_favorite_meals_data",
       "seekeatz_favorite_meals:guest",
       "seekeatz_favorite_meals_data:guest",
-      "seekeatz_logged_meals",
       `seekeatz_favorite_meals:${userId}`,
       `seekeatz_favorite_meals_data:${userId}`,
     ];
@@ -86,7 +91,7 @@ function SignupPageContent() {
     keysToRemove.forEach((key) => localStorage.removeItem(key));
     localStorage.setItem(`seekeatz_favorite_meals:${userId}`, JSON.stringify([]));
     localStorage.setItem(`seekeatz_favorite_meals_data:${userId}`, JSON.stringify({}));
-    localStorage.setItem("seekeatz_logged_meals", JSON.stringify([]));
+    localStorage.setItem(getLoggedMealsStorageKey(userId), JSON.stringify([]));
   };
 
   // 🧠 Guard: if already logged in + onboarding done + last login < 30 min → skip this screen
@@ -337,43 +342,15 @@ function SignupPageContent() {
         console.warn('Guest chat migration skipped:', migrationError);
       }
 
-      // Wait for profile trigger
+      // Wait for auth/profile propagation before bootstrap.
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Save profile to Supabase
-      try {
-        const profileForBootstrap: Partial<UserProfile> = {
-          ...(profile ? profile as Partial<UserProfile> : {}),
-          full_name: fullName,
-        };
+      const profileForBootstrap: Partial<UserProfile> = {
+        ...(profile ? profile as Partial<UserProfile> : {}),
+        full_name: fullName,
+      };
 
-        const profileData: Record<string, unknown> = {
-          id: userId,
-          email: verifyData.user.email,
-          full_name: fullName,
-          has_completed_onboarding: true,
-          last_login: new Date(now).toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-
-        if (profile) {
-          if (profile.goal) profileData.goal = profile.goal;
-          if (profile.diet_type) profileData.diet_type = profile.diet_type;
-          if (profile.dietary_options) profileData.dietary_options = profile.dietary_options;
-          if (profile.target_calories) profileData.calorie_goal = profile.target_calories;
-          if (profile.target_protein_g) profileData.protein_goal = profile.target_protein_g;
-          if (profile.target_carbs_g) profileData.carb_limit = profile.target_carbs_g;
-          if (profile.target_fats_g) profileData.fat_limit = profile.target_fats_g;
-          if (profile.preferredMealTypes) profileData.preferred_meal_types = profile.preferredMealTypes;
-          if (profile.search_distance_miles) profileData.search_distance_miles = profile.search_distance_miles;
-          profileData.user_profile = profileForBootstrap;
-        }
-
-        await supabase.from("profiles").upsert(profileData, { onConflict: "id" });
-        localStorage.setItem("userProfile", JSON.stringify(profileForBootstrap));
-      } catch (profileErr) {
-        console.warn("Profile save skipped:", profileErr);
-      }
+      localStorage.setItem("userProfile", JSON.stringify(profileForBootstrap));
 
       // Claim anonymous data
       try {
@@ -404,10 +381,6 @@ function SignupPageContent() {
       );
 
       try {
-        const profileForBootstrap: Partial<UserProfile> = {
-          ...(profile ? profile as Partial<UserProfile> : {}),
-          full_name: fullName,
-        };
         const bootstrapResult = await bootstrapAccount({
           profile: profileForBootstrap,
           hasCompletedOnboarding: true,
@@ -563,7 +536,6 @@ function SignupPageContent() {
 
         {!emailOnly ? (
           <AuthProviders
-            mode="signup"
             oauthRedirectPath={redirectTo}
             className="mb-6"
             onBeforeRedirect={() => {

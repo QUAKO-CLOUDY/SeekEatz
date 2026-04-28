@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
 type Props = {
   onSuccess?: () => void;
@@ -9,14 +9,14 @@ type Props = {
 };
 
 export function DevMasterLoginButton({ onSuccess, className = "" }: Props) {
+  const router = useRouter();
   const enabled = process.env.NEXT_PUBLIC_ENABLE_MASTER_LOGIN === "true";
-  const email = process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL;
-  const password = process.env.NEXT_PUBLIC_MASTER_LOGIN_PASSWORD;
+  const email = process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL ?? "";
 
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  if (!enabled || !email || !password) {
+  if (!enabled || !email) {
     return null;
   }
 
@@ -25,17 +25,7 @@ export function DevMasterLoginButton({ onSuccess, className = "" }: Props) {
     setError(null);
 
     try {
-      const supabase = createClient();
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInError) {
-        setError(signInError.message);
-        return;
-      }
-
+      router.push("/auth/signin?master=1");
       onSuccess?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Master login failed");

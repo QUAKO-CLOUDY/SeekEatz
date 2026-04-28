@@ -92,6 +92,7 @@ export interface SearchParams {
   limit?: number;
   searchKey?: string;
   shuffleNonce?: string;
+  excludedRestaurants?: string[];
   isPagination?: boolean;
   isHomepage?: boolean;
   calorieMode?: "UNDER" | "OVER";

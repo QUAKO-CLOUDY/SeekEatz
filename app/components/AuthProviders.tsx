@@ -1,13 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Mail } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 type Props = {
-  mode?: "signin" | "signup";
-  emailHref?: string;
   oauthRedirectPath?: string;
   className?: string;
   onBeforeRedirect?: () => void;
@@ -33,20 +29,21 @@ function GoogleIcon() {
 }
 
 export function AuthProviders({
-  mode = "signup",
-  emailHref,
   oauthRedirectPath = "/chat",
   className = "",
   onBeforeRedirect,
 }: Props) {
-  const router = useRouter();
   const [isLoadingProvider, setIsLoadingProvider] = useState<string | null>(null);
   const showApple = process.env.NEXT_PUBLIC_ENABLE_APPLE_AUTH !== "false";
   const showGoogle = process.env.NEXT_PUBLIC_ENABLE_GOOGLE_AUTH === "true";
+  const hasProviders = showApple || showGoogle;
 
   const buttonBase =
     "w-full rounded-2xl border px-4 py-3 text-sm font-medium transition-colors";
-  const emailLabel = mode === "signin" ? "Sign in with email" : "Create account with email";
+
+  if (!hasProviders) {
+    return null;
+  }
 
   const signInWithProvider = async (provider: "google" | "apple") => {
     setIsLoadingProvider(provider);
@@ -90,14 +87,6 @@ export function AuthProviders({
           {isLoadingProvider === "google" ? "Connecting to Google..." : "Continue with Google"}
         </button>
       )}
-      <button
-        type="button"
-        onClick={() => router.push(emailHref || (mode === "signin" ? "/auth/signin" : "/auth/signup"))}
-        className={`${buttonBase} border-cyan-200 bg-cyan-50 text-cyan-700 hover:bg-cyan-100 flex items-center justify-center gap-2`}
-      >
-        <Mail className="h-4 w-4" />
-        {emailLabel}
-      </button>
     </div>
   );
 }

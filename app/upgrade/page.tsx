@@ -302,7 +302,6 @@ function UpgradePageContent() {
                           ? false
                           : isSignedIn
                             ? !iapReady ||
-                              !isNativeApp() ||
                               entitlement.hasPremiumAccess ||
                               pendingPlanId !== null
                             : false
@@ -326,6 +325,10 @@ function UpgradePageContent() {
                         }
 
                         if (plan.id === "monthly" || plan.id === "yearly") {
+                          if (!isNativeApp()) {
+                            setBillingError("Purchases are completed in the iOS app. Open SeekEatz on iPhone to finish upgrading.");
+                            return;
+                          }
                           void handlePurchase(plan.id);
                         }
                       }}
@@ -354,7 +357,6 @@ function UpgradePageContent() {
               <>
                 <AuthProviders
                   className="mt-2"
-                  emailHref={signUpHref}
                   oauthRedirectPath={postSignupUpgradePath}
                   onBeforeRedirect={() => {
                     if (typeof window !== "undefined") {

@@ -8,6 +8,7 @@ import {
   WAITLIST_TRIAL_DAYS,
 } from "@/lib/entitlements";
 import { normalizeEmail } from "@/lib/full-access";
+import { sendWaitlistFreeMonthGrantedEmail } from "@/lib/email/resend";
 
 type BootstrapBody = {
   profile?: {
@@ -34,6 +35,10 @@ function addDaysIso(days: number) {
   const now = new Date();
   now.setDate(now.getDate() + days);
   return now.toISOString();
+}
+
+function shouldSendWaitlistGrantEmails() {
+  return process.env.SEND_WAITLIST_GRANT_EMAILS === "true";
 }
 
 function mapProfilePayload(body: BootstrapBody) {
@@ -164,6 +169,17 @@ export async function POST(request: Request) {
       user,
       profile: refreshedProfile as EntitlementProfileRow | null,
     });
+
+    if (waitlistGrantApplied && normalizedEmail && shouldSendWaitlistGrantEmails()) {
+      const origin = new URL(request.url).origin;
+      sendWaitlistFreeMonthGrantedEmail({
+        to: normalizedEmail,
+        trialEndsAtIso: String(profileUpdate.trial_expires_at ?? ""),
+        appUrl: origin,
+      }).catch((emailError) => {
+        console.error("Failed to send waitlist free-month email:", emailError);
+      });
+    }
 
     return NextResponse.json(
       {

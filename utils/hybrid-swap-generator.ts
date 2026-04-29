@@ -163,9 +163,21 @@ export async function generateHybridSwaps(
     const dishType = inferExtendedDishType(mealName) as DishType;
     const allGlobalSwaps = getApplicableSwaps(dishType);
     const compatibleGlobalSwaps = filterCompatibleSwaps(allGlobalSwaps, dishType, mealName);
+    const shouldAllowGlobalProteinUpsell =
+        macroGoals.higherProtein === true ||
+        (typeof macroGoals.minProtein === 'number' && mealMacros.protein < macroGoals.minProtein) ||
+        mealMacros.protein < 30;
+    const goalFilteredGlobalSwaps = compatibleGlobalSwaps.filter((swap) => {
+        const isProteinScalingCategory = swap.category === 'PROTEIN_SCALING';
+        const isProteinUpsellLabel = /\b(add|extra).{0,20}\bprotein\b/i.test(swap.label);
+        if (!shouldAllowGlobalProteinUpsell && (isProteinScalingCategory || isProteinUpsellLabel)) {
+            return false;
+        }
+        return true;
+    });
 
     // Step 3: Estimate impact and score each global swap
-    const scoredGlobalSwaps = compatibleGlobalSwaps
+    const scoredGlobalSwaps = goalFilteredGlobalSwaps
         .filter((swap) => !isAlreadyCoveredByDBSwap(swap, dbModifications))
         .map((swap) => {
             const impact = estimateMacroImpact(swap, mealMacros, modifierCandidates);

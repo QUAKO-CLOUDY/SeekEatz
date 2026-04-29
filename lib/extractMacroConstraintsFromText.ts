@@ -15,6 +15,18 @@ export interface MacroConstraints {
   maxFats?: number;
 }
 
+function parseFirstPositiveInt(match: RegExpMatchArray): number | undefined {
+  for (let i = 1; i < match.length; i += 1) {
+    const group = match[i];
+    if (!group) continue;
+    const parsed = Number.parseInt(group, 10);
+    if (!Number.isNaN(parsed)) {
+      return parsed;
+    }
+  }
+  return undefined;
+}
+
 /**
  * Extract macro constraints from query text
  * Supports comprehensive patterns for minimum/maximum constraints
@@ -91,8 +103,8 @@ export function extractMacroConstraintsFromText(query: string): MacroConstraints
         break;
       }
       // Extract number from various capture groups
-      const value = parseInt(match[1] || match[2] || match[3], 10);
-      if (!isNaN(value) && value > 0 && value < 1000) {
+      const value = parseFirstPositiveInt(match);
+      if (value !== undefined && value > 0 && value < 1000) {
         result.minProtein = value;
         break;
       }
@@ -109,8 +121,8 @@ export function extractMacroConstraintsFromText(query: string): MacroConstraints
   for (const pattern of proteinMaxPatterns) {
     const match = trimmed.match(pattern);
     if (match) {
-      const value = parseInt(match[1] || match[2] || match[3], 10);
-      if (!isNaN(value) && value > 0 && value < 1000) {
+      const value = parseFirstPositiveInt(match);
+      if (value !== undefined && value > 0 && value < 1000) {
         result.maxProtein = value;
         break;
       }
@@ -159,8 +171,8 @@ export function extractMacroConstraintsFromText(query: string): MacroConstraints
           result.maxCalories = 500;
           break;
         }
-        const value = parseInt(match[2] || match[1], 10);
-        if (!isNaN(value) && value >= 50 && value <= 5000) {
+        const value = parseFirstPositiveInt(match);
+        if (value !== undefined && value >= 50 && value <= 5000) {
           result.maxCalories = value;
           break;
         }
@@ -180,8 +192,8 @@ export function extractMacroConstraintsFromText(query: string): MacroConstraints
     for (const pattern of caloriesMinPatterns) {
       const match = trimmed.match(pattern);
       if (match) {
-        const value = parseInt(match[2] || match[1], 10);
-        if (!isNaN(value) && value >= 50 && value <= 5000) {
+        const value = parseFirstPositiveInt(match);
+        if (value !== undefined && value >= 50 && value <= 5000) {
           result.minCalories = value;
           break;
         }
@@ -237,8 +249,8 @@ export function extractMacroConstraintsFromText(query: string): MacroConstraints
   for (const pattern of carbsMinPatterns) {
     const match = trimmed.match(pattern);
     if (match) {
-      const value = parseInt(match[2] || match[1] || match[3], 10);
-      if (!isNaN(value) && value > 0 && value < 500) {
+      const value = parseFirstPositiveInt(match);
+      if (value !== undefined && value > 0 && value < 500) {
         result.minCarbs = value;
         break;
       }
@@ -260,8 +272,8 @@ export function extractMacroConstraintsFromText(query: string): MacroConstraints
         result.maxCarbs = 30;
         break;
       }
-      const value = parseInt(match[2] || match[1] || match[3], 10);
-      if (!isNaN(value) && value > 0 && value < 500) {
+      const value = parseFirstPositiveInt(match);
+      if (value !== undefined && value > 0 && value < 500) {
         result.maxCarbs = value;
         break;
       }
@@ -278,8 +290,8 @@ export function extractMacroConstraintsFromText(query: string): MacroConstraints
   for (const pattern of fatsMinPatterns) {
     const match = trimmed.match(pattern);
     if (match) {
-      const value = parseInt(match[2] || match[1] || match[3], 10);
-      if (!isNaN(value) && value > 0 && value < 200) {
+      const value = parseFirstPositiveInt(match);
+      if (value !== undefined && value > 0 && value < 200) {
         result.minFats = value;
         break;
       }
@@ -301,8 +313,8 @@ export function extractMacroConstraintsFromText(query: string): MacroConstraints
         result.maxFats = 20;
         break;
       }
-      const value = parseInt(match[2] || match[1] || match[3], 10);
-      if (!isNaN(value) && value > 0 && value < 200) {
+      const value = parseFirstPositiveInt(match);
+      if (value !== undefined && value > 0 && value < 200) {
         result.maxFats = value;
         break;
       }

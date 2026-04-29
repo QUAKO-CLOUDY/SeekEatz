@@ -45,6 +45,8 @@ const FRIED_LIKE_MEAL_PATTERN = /\b(fried|deep.?fried|crispy|battered|breaded|cr
 const CHICKEN_FINGER_LIKE_PATTERN = /\b(chicken\s*(fingers?|tenders?)|fingers?|tenders?|nuggets?|wings?)\b/i;
 const DISALLOWED_SWAP_PHRASE_PATTERN =
   /\b(dip\s+instead\s+of\s+coating|dry\s+rub\s+instead\s+of\s+sauce)\b/i;
+const SAUCE_LIKE_PATTERN = /\b(sauce|dressing|vinaigrette|aioli|dip|spread|condiment|mayo|crema)\b/i;
+const REDUCTION_INTENT_PATTERN = /\b(on the side|light|no|skip|without|remove|less)\b/i;
 
 function withIfAvailable(label: string): string {
   if (/if available/i.test(label)) return label;
@@ -102,6 +104,19 @@ function normalizeGenericEffectText(effect: string): string {
 function hasDisallowedSwapPhrase(label: string, details?: string): boolean {
   const haystack = `${label || ''} ${details || ''}`;
   return DISALLOWED_SWAP_PHRASE_PATTERN.test(haystack);
+}
+
+function hasExplicitMacroGoals(goals: MacroGoals): boolean {
+  return Boolean(
+    goals.lowerCalories ||
+      goals.higherProtein ||
+      goals.lowerCarbs ||
+      goals.lowerFat ||
+      goals.calorieCap ||
+      goals.minProtein ||
+      goals.maxCarbs ||
+      goals.maxFat
+  );
 }
 
 function stringHash(input: string): number {
@@ -242,6 +257,16 @@ function findBestModifierCandidateForSwapLabel(
   for (const candidate of modifierCandidates) {
     const normalizedCandidate = normalizeSwapMatchText(candidate.name || '');
     if (!normalizedCandidate) continue;
+    const candidateName = (candidate.name || '').toLowerCase();
+    const relationType = (candidate.relationType || '').toLowerCase();
+    const candidateIsSauceLike =
+      SAUCE_LIKE_PATTERN.test(candidateName) ||
+      relationType === 'sauce_option' ||
+      relationType === 'dressing_option';
+    const labelHintsSauceLike = SAUCE_LIKE_PATTERN.test(normalizedLabel);
+    if (candidateIsSauceLike && !labelHintsSauceLike) {
+      continue;
+    }
 
     let score = 0;
     if (normalizedLabel === normalizedCandidate) {
@@ -255,7 +280,6 @@ function findBestModifierCandidateForSwapLabel(
     }
     score += tokenOverlapScore(labelTokens, toTokenSet(normalizedCandidate));
 
-    const relationType = (candidate.relationType || '').toLowerCase();
     if (relationType === 'protein_option') score += 0.35;
     if (relationType === 'add_on') score += 0.25;
 
@@ -284,18 +308,42 @@ function promoteNonDbSwapToDb(
     return null;
   }
 
+  const candidateName = matchedCandidate.name || '';
+  const lowerLabel = (swap.label || '').toLowerCase();
+  const relationType = (matchedCandidate.relationType || '').toLowerCase();
+  const candidateIsSauceLike =
+    SAUCE_LIKE_PATTERN.test(candidateName.toLowerCase()) ||
+    relationType === 'sauce_option' ||
+    relationType === 'dressing_option';
+  const hasReductionIntent = REDUCTION_INTENT_PATTERN.test(lowerLabel);
+  const shouldTreatAsReduction = candidateIsSauceLike && hasReductionIntent;
+
+  const signed = (value: number) => {
+    if (!shouldTreatAsReduction) return value;
+    return value === 0 ? 0 : -Math.max(1, Math.round(Math.abs(value) * 0.75));
+  };
+
   const delta: SwapDelta = {
-    calories: matchedCandidate.macros.calories,
-    protein: matchedCandidate.macros.protein,
-    carbs: matchedCandidate.macros.carbs,
-    fats: matchedCandidate.macros.fats,
+    calories: signed(matchedCandidate.macros.calories),
+    protein: signed(matchedCandidate.macros.protein),
+    carbs: signed(matchedCandidate.macros.carbs),
+    fats: signed(matchedCandidate.macros.fats),
   };
 
   const inferredSwapType = inferDbSwapTypeFromDelta(delta);
+  const promotedLabel = shouldTreatAsReduction
+    ? /on the side/.test(lowerLabel)
+      ? `Get ${candidateName} on the side`
+      : /light/.test(lowerLabel)
+        ? `Go light on ${candidateName}`
+        : `Skip ${candidateName}`
+    : /^add\b/i.test(swap.label)
+      ? swap.label
+      : buildAddLabel(candidateName);
 
   return {
     id: `db-promoted-${matchedCandidate.id}-${swap.id}`,
-    label: /^add\b/i.test(swap.label) ? swap.label : buildAddLabel(matchedCandidate.name),
+    label: promotedLabel,
     expectedEffect: buildDbExpectedEffect(
       swap.expectedEffect,
       fallbackEffectFromSwapType(inferredSwapType),
@@ -303,7 +351,7 @@ function promoteNonDbSwapToDb(
     ),
     estimatedDelta: delta,
     confidenceLabel: 'Likely available',
-    type: 'add',
+    type: shouldTreatAsReduction ? 'remove' : 'add',
     swapType: inferredSwapType,
     details: `${swap.details} Matched to restaurant modifier data.`,
     modifierItemIds: [matchedCandidate.id],
@@ -507,13 +555,15 @@ function mapHybridLlmSwap(
 function scoreNonDbSwapCandidate(
   swap: NonDbMappedSwap,
   mealName: string,
-  goals: MacroGoals
+  goals: MacroGoals,
+  mealMacros: SwapDelta
 ): number {
   let score = 0;
   const lowerLabel = (swap.label || '').toLowerCase();
   const lowerMealName = (mealName || '').toLowerCase();
   const friedLikeMeal = isFriedLikeMeal(mealName);
   const chickenFingerLikeMeal = CHICKEN_FINGER_LIKE_PATTERN.test(lowerMealName);
+  const hasExplicitGoals = hasExplicitMacroGoals(goals);
 
   if (swap.source === 'global') score += 30;
   if (swap.source === 'llm') score += 10;
@@ -544,6 +594,21 @@ function scoreNonDbSwapCandidate(
     score += Math.min(40, Math.round(Math.abs(swap.deltaMacros.calories) / 12));
   }
 
+  if (!hasExplicitGoals) {
+    if (mealMacros.protein >= 55 && swap.deltaMacros.protein > 0) {
+      score -= 90;
+    }
+    if (mealMacros.calories >= 850 && swap.deltaMacros.calories > 0) {
+      score -= 75;
+    }
+    if (mealMacros.carbs >= 90 && swap.deltaMacros.carbs > 0) {
+      score -= 35;
+    }
+    if (mealMacros.fats >= 45 && swap.deltaMacros.fats > 0) {
+      score -= 35;
+    }
+  }
+
   return score;
 }
 
@@ -562,19 +627,11 @@ function dedupeSwapsByLabel<T extends { label: string }>(swaps: T[]): T[] {
 function scoreDbFinalSwap(
   swap: DbMappedSwap,
   modifierById: Map<string, ModifierCandidate>,
-  goals: MacroGoals
+  goals: MacroGoals,
+  mealMacros: SwapDelta
 ): number {
   let score = 0;
-  const hasExplicitGoals = Boolean(
-    goals.lowerCalories ||
-    goals.higherProtein ||
-    goals.lowerCarbs ||
-    goals.lowerFat ||
-    goals.calorieCap ||
-    goals.minProtein ||
-    goals.maxCarbs ||
-    goals.maxFat
-  );
+  const hasExplicitGoals = hasExplicitMacroGoals(goals);
 
   if (swap.type === 'add') score += 24;
   if (swap.swapType === 'higherProtein' || swap.swapType === 'proteinUp') score += 18;
@@ -583,8 +640,12 @@ function scoreDbFinalSwap(
   if (swap.swapType === 'fatDown') score += 10;
 
   if (!hasExplicitGoals) {
-    if (swap.type === 'add') score += 34;
-    if (swap.type === 'remove') score -= 16;
+    if (swap.type === 'remove') score += 18;
+    if (swap.deltaMacros.calories < 0) score += 14;
+    if (mealMacros.calories >= 850 && swap.deltaMacros.calories > 0) score -= 45;
+    if (mealMacros.protein >= 55 && swap.deltaMacros.protein > 0) score -= 50;
+    if (mealMacros.carbs >= 90 && swap.deltaMacros.carbs > 0) score -= 18;
+    if (mealMacros.fats >= 45 && swap.deltaMacros.fats > 0) score -= 18;
   }
 
   if (goals.higherProtein || goals.minProtein) {
@@ -603,10 +664,13 @@ function scoreDbFinalSwap(
 
   const primaryModifierId = swap.modifierItemIds[0];
   if (primaryModifierId && modifierById.has(primaryModifierId)) {
-    const relationType = (modifierById.get(primaryModifierId)?.relationType || '').toLowerCase();
+    const primaryModifier = modifierById.get(primaryModifierId);
+    const relationType = (primaryModifier?.relationType || '').toLowerCase();
+    const modifierName = (primaryModifier?.name || '').toLowerCase();
     if (relationType === 'protein_option') score += 14;
     if (relationType === 'add_on') score += 10;
     if (relationType === 'side_option') score += 6;
+    if (swap.type === 'add' && SAUCE_LIKE_PATTERN.test(modifierName)) score -= 60;
   }
 
   return score;
@@ -1005,12 +1069,14 @@ export async function POST(req: Request) {
       ...validDBMods,
       ...promotedHybridDbSwaps,
     ]);
-    const supplementalDbSwaps = buildSupplementalDbSwaps(
-      modifierCandidates,
-      dbSeedMods,
-      macroGoals,
-      Math.max(0, MAX_FINAL_SWAPS - dbSeedMods.length)
-    ).filter((swap) => !hasDisallowedSwapPhrase(swap.label, swap.details));
+    const supplementalDbSwaps = hasExplicitMacroGoals(macroGoals)
+      ? buildSupplementalDbSwaps(
+          modifierCandidates,
+          dbSeedMods,
+          macroGoals,
+          Math.max(0, MAX_FINAL_SWAPS - dbSeedMods.length)
+        ).filter((swap) => !hasDisallowedSwapPhrase(swap.label, swap.details))
+      : [];
 
     const dbFinalPool = dedupeSwapsByLabel<DbMappedSwap>([
       ...dbSeedMods,
@@ -1018,7 +1084,7 @@ export async function POST(req: Request) {
     ])
       .map((swap) => ({
         swap,
-        score: scoreDbFinalSwap(swap, modifierById, macroGoals),
+        score: scoreDbFinalSwap(swap, modifierById, macroGoals, normalizedMealMacros),
       }))
       .sort((a, b) => b.score - a.score)
       .map(({ swap }) => swap)
@@ -1030,8 +1096,9 @@ export async function POST(req: Request) {
       remainingHybridNonDb
         .map((swap) => ({
           swap,
-          score: scoreNonDbSwapCandidate(swap, meal_name, macroGoals),
+          score: scoreNonDbSwapCandidate(swap, meal_name, macroGoals, normalizedMealMacros),
         }))
+        .filter(({ score }) => score > -20)
         .sort((a, b) => b.score - a.score)
         .map(({ swap }) => swap)
     );

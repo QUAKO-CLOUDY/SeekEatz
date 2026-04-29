@@ -1495,8 +1495,11 @@ type RulerSliderProps = {
 
 function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const itemRefs = useRef<HTMLDivElement[]>([]);
+  const arrowRef = useRef<HTMLDivElement | null>(null);
+  const itemRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const tickRefs = useRef<Array<HTMLDivElement | null>>([]);
   const scrollEndTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const snapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const transformUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isUserScrollingRef = useRef(false);
   const isProgrammaticScrollRef = useRef(false);
@@ -1512,17 +1515,43 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     return arr;
   }, [min, max, step]);
 
+  const getArrowCenterInContainer = useCallback((container: HTMLDivElement): number => {
+    const arrowEl = arrowRef.current;
+    if (!arrowEl) return container.clientWidth / 2;
+
+    const containerRect = container.getBoundingClientRect();
+    const arrowRect = arrowEl.getBoundingClientRect();
+    return (arrowRect.left + arrowRect.width / 2) - containerRect.left;
+  }, []);
+
+  const getTickAnchorCenter = useCallback((idx: number): number | null => {
+    const itemEl = itemRefs.current[idx];
+    if (!itemEl) return null;
+
+    const tickEl = tickRefs.current[idx];
+    if (!tickEl) return itemEl.offsetLeft + itemEl.offsetWidth / 2;
+
+    return itemEl.offsetLeft + tickEl.offsetLeft + tickEl.offsetWidth / 2;
+  }, []);
+
+  const getTickVisualCenterX = useCallback((idx: number): number | null => {
+    const tickEl = tickRefs.current[idx];
+    if (!tickEl) return null;
+    const tickRect = tickEl.getBoundingClientRect();
+    return tickRect.left + tickRect.width / 2;
+  }, []);
+
   const updateTransforms = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    const containerCenter = container.clientWidth / 2;
+    const containerCenter = getArrowCenterInContainer(container);
     const scrollLeft = container.scrollLeft;
 
-    itemRefs.current.forEach((el) => {
+    itemRefs.current.forEach((el, idx) => {
       if (!el) return;
 
-      const elCenter = el.offsetLeft + el.offsetWidth / 2;
+      const elCenter = getTickAnchorCenter(idx) ?? (el.offsetLeft + el.offsetWidth / 2);
       const distanceFromCenter = (scrollLeft + containerCenter) - elCenter;
       
       // Normalize distance based on container width for curved effect
@@ -1541,7 +1570,7 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
       el.style.transform = `perspective(1000px) rotateY(${rotationY}deg) scale(${scale}) translateZ(${translateZ}px) translateY(${translateY}px)`;
       el.style.opacity = opacity.toString();
     });
-  }, []);
+  }, [getArrowCenterInContainer, getTickAnchorCenter]);
 
   // Debounced transform update - only runs when scroll position changes significantly
   const scheduleTransformUpdate = useCallback(() => {
@@ -1557,48 +1586,54 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     }, 16); // ~60fps throttle
   }, [updateTransforms]);
 
-  // scroll to current value on mount / macro change (only if not user scrolling)
-  const centerIndex = useCallback((idx: number) => {
-    if (isUserScrollingRef.current || isProgrammaticScrollRef.current) return;
-
+  const alignIndexToArrow = useCallback((idx: number, emitValue = false) => {
     const container = containerRef.current;
     const el = itemRefs.current[idx];
     if (!container || !el) return;
 
+    isProgrammaticScrollRef.current = true;
+
+    // First pass: logical center alignment.
+    const arrowCenterInContainer = getArrowCenterInContainer(container);
+    const elCenter = getTickAnchorCenter(idx) ?? (el.offsetLeft + el.offsetWidth / 2);
+    container.scrollLeft = elCenter - arrowCenterInContainer;
+    updateTransforms();
+
+    // Second pass: visual correction using rendered tick center (accounts for perspective).
     requestAnimationFrame(() => {
-      if (!container || !el) return;
-      isProgrammaticScrollRef.current = true;
-      
-      // Use getBoundingClientRect for precise positioning (same as handleScrollEnd)
-      const containerRect = container.getBoundingClientRect();
-      const elRect = el.getBoundingClientRect();
-      
-      // Calculate the center of the visible scroll container (where the arrow is)
-      const containerCenterX = containerRect.left + containerRect.width / 2;
-      
-      // Calculate the element's center in screen coordinates
-      const elCenterX = elRect.left + elRect.width / 2;
-      
-      // Calculate the offset needed to align centers
-      const offsetX = elCenterX - containerCenterX;
-      
-      // Convert screen offset to scroll offset and apply
-      const targetScroll = container.scrollLeft + offsetX;
-      
-      // Use scrollLeft directly for instant positioning
-      container.scrollLeft = targetScroll;
-      
-      // Update transforms after scroll
-      requestAnimationFrame(() => {
-        updateTransforms();
-      });
-      
-      // Reset flag after scroll completes
-      setTimeout(() => {
+      const arrowEl = arrowRef.current;
+      const activeContainer = containerRef.current;
+      if (!arrowEl || !activeContainer) {
         isProgrammaticScrollRef.current = false;
-      }, 100);
+        return;
+      }
+
+      const tickVisualCenterX = getTickVisualCenterX(idx);
+      if (tickVisualCenterX !== null) {
+        const arrowRect = arrowEl.getBoundingClientRect();
+        const arrowVisualCenterX = arrowRect.left + arrowRect.width / 2;
+        const correction = tickVisualCenterX - arrowVisualCenterX;
+        if (Math.abs(correction) > 0.2) {
+          activeContainer.scrollLeft += correction;
+          updateTransforms();
+        }
+      }
+
+      if (emitValue && values[idx] !== value) {
+        onChange(values[idx]);
+      }
+
+      requestAnimationFrame(() => {
+        isProgrammaticScrollRef.current = false;
+      });
     });
-  }, [updateTransforms]);
+  }, [getArrowCenterInContainer, getTickAnchorCenter, getTickVisualCenterX, onChange, updateTransforms, value, values]);
+
+  // scroll to current value on mount / macro change (only if not user scrolling)
+  const centerIndex = useCallback((idx: number) => {
+    if (isUserScrollingRef.current || isProgrammaticScrollRef.current) return;
+    alignIndexToArrow(idx, false);
+  }, [alignIndexToArrow]);
 
   useEffect(() => {
     const idx = values.indexOf(value);
@@ -1621,22 +1656,23 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     const container = containerRef.current;
     if (!container) return null;
     
-    // Get the container's bounding rect to find the true visual center (where the arrow is)
-    const containerRect = container.getBoundingClientRect();
-    const containerCenter = containerRect.left + containerRect.width / 2;
+    const arrowCenterInContainer = getArrowCenterInContainer(container);
+    const contentCenter = container.scrollLeft + arrowCenterInContainer;
 
     let closestIdx = 0;
     let closestDist = Infinity;
 
-    // Find the number closest to the arrow center
-    // This works even when stopped exactly between two numbers
+    const arrowEl = arrowRef.current;
+    const arrowRect = arrowEl?.getBoundingClientRect();
+    const arrowVisualCenterX = arrowRect ? arrowRect.left + arrowRect.width / 2 : null;
+
+    // Find closest by visual tick center when available.
     itemRefs.current.forEach((el, idx) => {
       if (!el) return;
-      // Get the element's absolute center position
-      const elRect = el.getBoundingClientRect();
-      const elCenter = elRect.left + elRect.width / 2;
-      // Calculate distance from arrow center to number center
-      const dist = Math.abs(elCenter - containerCenter);
+      const tickVisualCenterX = getTickVisualCenterX(idx);
+      const dist = arrowVisualCenterX !== null && tickVisualCenterX !== null
+        ? Math.abs(tickVisualCenterX - arrowVisualCenterX)
+        : Math.abs((getTickAnchorCenter(idx) ?? (el.offsetLeft + el.offsetWidth / 2)) - contentCenter);
       // Always find the closest one (handles ties by keeping the first closest found)
       if (dist < closestDist) {
         closestDist = dist;
@@ -1645,7 +1681,7 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     });
 
     return { idx: closestIdx, value: values[closestIdx] };
-  }, [values]);
+  }, [getArrowCenterInContainer, getTickAnchorCenter, getTickVisualCenterX, values]);
 
   // Only called when scroll ends - no manual snapping during scroll
   const handleScrollEnd = useCallback(() => {
@@ -1659,46 +1695,29 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     const closest = findClosestValue();
     if (!closest) return;
     
-    const el = itemRefs.current[closest.idx];
-    if (!el) return;
-    
-    // Use getBoundingClientRect for precise positioning
-    // This accounts for all transforms, padding, and positioning
-    const containerRect = container.getBoundingClientRect();
-    const elRect = el.getBoundingClientRect();
-    
-    // Calculate the center of the visible scroll container (where the arrow is)
-    const containerCenterX = containerRect.left + containerRect.width / 2;
-    
-    // Calculate the element's center in screen coordinates
-    const elCenterX = elRect.left + elRect.width / 2;
-    
-    // Calculate the offset needed to align centers
-    // This is the difference in screen coordinates
-    const offsetX = elCenterX - containerCenterX;
-    
-    // Convert screen offset to scroll offset and apply
-    // We need to scroll by the offset amount to align the centers
-    const targetScroll = container.scrollLeft + offsetX;
-    
-    // Snap instantly to exact position using scrollLeft for immediate positioning
-    // This always snaps to the closest number, even if stopped between two numbers
-    isProgrammaticScrollRef.current = true;
-    container.scrollLeft = targetScroll;
-    isProgrammaticScrollRef.current = false;
-    
-    // Update transforms immediately for visual feedback (synchronously, no RAF delay)
-    updateTransforms();
-    
-    // Always update value to match the closest number (even if already correct, ensures sync)
-    if (closest.value !== value) {
-      onChange(closest.value);
+    alignIndexToArrow(closest.idx, true);
+  }, [alignIndexToArrow, findClosestValue]);
+
+  const scheduleSnapToClosest = useCallback((delayMs = 80) => {
+    if (snapTimeoutRef.current) {
+      clearTimeout(snapTimeoutRef.current);
+      snapTimeoutRef.current = null;
     }
-  }, [findClosestValue, onChange, updateTransforms, value]);
+
+    snapTimeoutRef.current = setTimeout(() => {
+      handleScrollEnd();
+    }, delayMs);
+  }, [handleScrollEnd]);
 
   const handleScroll = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
+
+    // Ignore programmatic alignment scroll events to avoid snap-feedback loops.
+    if (isProgrammaticScrollRef.current) {
+      scheduleTransformUpdate();
+      return;
+    }
     
     // Mark that user is actively scrolling
     if (!isUserScrollingRef.current) {
@@ -1718,7 +1737,7 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     const currentPos = container.scrollLeft;
     lastScrollPositionRef.current = currentPos;
     
-    // Use a very short timeout for immediate snap detection
+    // Short timeout to detect end of momentum scrolling.
     scrollEndTimeoutRef.current = setTimeout(() => {
       // Double-check that scroll position hasn't changed (handles momentum scrolling)
       const newPos = container.scrollLeft;
@@ -1726,54 +1745,21 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
         // Scroll has truly stopped - snap immediately
         isUserScrollingRef.current = false;
         setIsScrolling(false);
-        handleScrollEnd();
+        scheduleSnapToClosest(0);
       } else {
         // Still scrolling, check again
         lastScrollPositionRef.current = newPos;
         scrollEndTimeoutRef.current = setTimeout(() => {
           isUserScrollingRef.current = false;
           setIsScrolling(false);
-          handleScrollEnd();
-        }, 5); // Very short second check
+          scheduleSnapToClosest(0);
+        }, 12);
       }
-    }, 10); // Very short initial delay (10ms)
-  }, [handleScrollEnd, scheduleTransformUpdate]);
+    }, 24);
+  }, [scheduleSnapToClosest, scheduleTransformUpdate]);
 
   const handleClick = (idx: number) => {
-    const container = containerRef.current;
-    const el = itemRefs.current[idx];
-    if (!container || !el) return;
-    
-    isProgrammaticScrollRef.current = true;
-    
-    // Use getBoundingClientRect for precise positioning (same as handleScrollEnd)
-    const containerRect = container.getBoundingClientRect();
-    const elRect = el.getBoundingClientRect();
-    
-    // Calculate the center of the visible scroll container (where the arrow is)
-    const containerCenterX = containerRect.left + containerRect.width / 2;
-    
-    // Calculate the element's center in screen coordinates
-    const elCenterX = elRect.left + elRect.width / 2;
-    
-    // Calculate the offset needed to align centers
-    const offsetX = elCenterX - containerCenterX;
-    
-    // Convert screen offset to scroll offset and apply
-    const targetScroll = container.scrollLeft + offsetX;
-    
-    // Use scrollLeft directly for instant positioning
-    container.scrollLeft = targetScroll;
-    onChange(values[idx]);
-    
-    // Update transforms after scroll
-    requestAnimationFrame(() => {
-      updateTransforms();
-    });
-    
-    setTimeout(() => {
-      isProgrammaticScrollRef.current = false;
-    }, 100);
+    alignIndexToArrow(idx, true);
   };
 
   useEffect(() => {
@@ -1786,6 +1772,9 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
 
     const handleMouseLeave = () => {
       isHoveredRef.current = false;
+    };
+    const handlePointerRelease = () => {
+      scheduleSnapToClosest(40);
     };
 
     const handleWheel = (e: WheelEvent) => {
@@ -1818,18 +1807,25 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
     container.addEventListener('mouseenter', handleMouseEnter);
     container.addEventListener('mouseleave', handleMouseLeave);
     container.addEventListener('wheel', handleWheel, { passive: false });
+    container.addEventListener('pointerup', handlePointerRelease);
+    container.addEventListener('touchend', handlePointerRelease, { passive: true });
 
     return () => {
       container.removeEventListener('mouseenter', handleMouseEnter);
       container.removeEventListener('mouseleave', handleMouseLeave);
       container.removeEventListener('wheel', handleWheel);
+      container.removeEventListener('pointerup', handlePointerRelease);
+      container.removeEventListener('touchend', handlePointerRelease);
     };
-  }, [handleScroll]);
+  }, [handleScroll, scheduleSnapToClosest]);
 
   useEffect(() => {
     return () => {
       if (scrollEndTimeoutRef.current) {
         clearTimeout(scrollEndTimeoutRef.current);
+      }
+      if (snapTimeoutRef.current) {
+        clearTimeout(snapTimeoutRef.current);
       }
       if (transformUpdateTimeoutRef.current) {
         clearTimeout(transformUpdateTimeoutRef.current);
@@ -1858,9 +1854,12 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
       />
 
       {/* Fixed center arrow indicator - points up to show selected number */}
-      <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center">
+      <div
+        ref={arrowRef}
+        className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 z-30 flex w-[14px] flex-col items-center"
+      >
         {/* Arrow point - clean design without shading */}
-        <div 
+        <div
           style={{
             width: 0,
             height: 0,
@@ -1902,7 +1901,7 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
               <div
                 key={val}
                 ref={(el) => {
-                  if (el) itemRefs.current[idx] = el;
+                  itemRefs.current[idx] = el;
                 }}
                 className="flex flex-col items-center cursor-pointer select-none"
                 onClick={() => handleClick(idx)}
@@ -1922,6 +1921,9 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
                 }}
               >
                 <div
+                  ref={(el) => {
+                    tickRefs.current[idx] = el;
+                  }}
                   className="w-[2px] rounded-full mb-2 sm:mb-3 relative dark:bg-white/30 bg-foreground/30"
                   style={{
                     height: '12px',
@@ -1939,10 +1941,13 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
                     textShadow: 'none',
                     WebkitFontSmoothing: 'antialiased',
                     MozOsxFontSmoothing: 'grayscale',
+                    fontVariantNumeric: 'tabular-nums',
                     willChange: 'font-size, color',
                     lineHeight: '1.2',
                     minHeight: '1.05rem',
                     display: 'inline-block',
+                    width: '100%',
+                    textAlign: 'center',
                     transition: isScrolling
                       ? 'none'
                       : 'font-size 0.2s ease-out, color 0.2s ease-out',

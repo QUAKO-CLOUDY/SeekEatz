@@ -20,8 +20,6 @@
     "android": {
       "package": "com.seekeatz.app"
     },
-    "plugins": [
-      "./plugins/with-capacitor-modular-headers"
-    ]
+    "plugins": []
   }
 }

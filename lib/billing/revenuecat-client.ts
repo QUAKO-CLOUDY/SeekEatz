@@ -1,16 +1,6 @@
 "use client";
 
 import {
-  LOG_LEVEL,
-  Purchases,
-  STOREKIT_VERSION,
-  type CustomerInfo,
-  type PurchasesOffering,
-  type PurchasesPackage,
-  type PurchasesEntitlementInfo,
-  type PurchasesSubscriptionInfo,
-} from "@revenuecat/purchases-capacitor";
-import {
   type AppleProductTier,
   getAppleProductIdForTier,
   getRevenueCatEntitlementId,
@@ -23,7 +13,94 @@ import {
 } from "@/lib/billing/app-store-sync";
 import { isNativeApp } from "@/lib/native-runtime";
 
+type PurchasesEntitlementInfo = {
+  identifier: string;
+  isActive: boolean;
+  periodType: string;
+  productIdentifier: string;
+  expirationDate: string | null;
+  isSandbox: boolean;
+  willRenew: boolean;
+  billingIssuesDetectedAt: string | null;
+  unsubscribeDetectedAt: string | null;
+};
+
+type PurchasesSubscriptionInfo = {
+  productIdentifier: string;
+  storeTransactionId: string | null;
+  isSandbox: boolean;
+  periodType: string;
+  expiresDate: string | null;
+  willRenew: boolean;
+  billingIssuesDetectedAt: string | null;
+  unsubscribeDetectedAt: string | null;
+};
+
+type CustomerInfo = {
+  entitlements: {
+    active: Record<string, PurchasesEntitlementInfo>;
+    all: Record<string, PurchasesEntitlementInfo>;
+  };
+  subscriptionsByProductIdentifier: Record<string, PurchasesSubscriptionInfo>;
+  managementURL: string | null;
+};
+
+type PurchasesPackage = {
+  product: {
+    identifier: string;
+  };
+};
+
+type PurchasesOffering = {
+  monthly: PurchasesPackage | null;
+  annual: PurchasesPackage | null;
+  availablePackages: PurchasesPackage[];
+};
+
+type RevenueCatModule = {
+  default: {
+    isConfigured: () => Promise<boolean>;
+    setLogLevel: (level: unknown) => Promise<void>;
+    configure: (config: {
+      apiKey: string;
+      appUserID: string;
+      storeKitVersion?: unknown;
+      shouldShowInAppMessagesAutomatically?: boolean;
+    }) => void;
+    getAppUserID: () => Promise<string>;
+    logIn: (appUserID: string) => Promise<unknown>;
+    setEmail: (email: string | null) => Promise<void>;
+    getOfferings: () => Promise<{ current: PurchasesOffering | null }>;
+    purchasePackage: (aPackage: PurchasesPackage) => Promise<{
+      customerInfo: CustomerInfo;
+      productIdentifier: string;
+    }>;
+    restorePurchases: () => Promise<{ customerInfo: CustomerInfo }>;
+    getCustomerInfo: () => Promise<CustomerInfo>;
+  };
+  LOG_LEVEL: {
+    INFO: unknown;
+  };
+  STOREKIT_VERSION?: {
+    DEFAULT: unknown;
+  };
+};
+
+let purchasesModulePromise: Promise<RevenueCatModule> | null = null;
 let configurePromise: Promise<void> | null = null;
+
+async function getRevenueCatModule(): Promise<RevenueCatModule> {
+  if (!purchasesModulePromise) {
+    purchasesModulePromise = (new Function(
+      "moduleName",
+      "return import(moduleName);",
+    ) as (moduleName: string) => Promise<RevenueCatModule>)(
+      "react-native-purchases",
+    );
+  }
+
+  return purchasesModulePromise;
+}
 
 function assertNativeRevenueCatReady() {
   if (!isNativeApp()) {
@@ -40,17 +117,19 @@ async function configureRevenueCat(
   email?: string | null,
 ): Promise<void> {
   assertNativeRevenueCatReady();
+  const rcModule = await getRevenueCatModule();
+  const Purchases = rcModule.default;
 
   if (!configurePromise) {
     configurePromise = (async () => {
-      const { isConfigured } = await Purchases.isConfigured();
+      const isConfigured = await Purchases.isConfigured();
 
       if (!isConfigured) {
-        await Purchases.setLogLevel({ level: LOG_LEVEL.INFO });
-        await Purchases.configure({
+        await Purchases.setLogLevel(rcModule.LOG_LEVEL.INFO);
+        Purchases.configure({
           apiKey: getRevenueCatIosPublicSdkKey()!,
           appUserID,
-          storeKitVersion: STOREKIT_VERSION.DEFAULT,
+          storeKitVersion: rcModule.STOREKIT_VERSION?.DEFAULT,
           shouldShowInAppMessagesAutomatically: true,
         });
       }
@@ -62,13 +141,13 @@ async function configureRevenueCat(
 
   await configurePromise;
 
-  const { appUserID: currentAppUserID } = await Purchases.getAppUserID();
+  const currentAppUserID = await Purchases.getAppUserID();
   if (currentAppUserID !== appUserID) {
-    await Purchases.logIn({ appUserID });
+    await Purchases.logIn(appUserID);
   }
 
   if (email) {
-    await Purchases.setEmail({ email });
+    await Purchases.setEmail(email);
   }
 }
 
@@ -193,6 +272,7 @@ export async function getRevenueCatOffering(params: {
   email?: string | null;
 }): Promise<PurchasesOffering | null> {
   await configureRevenueCat(params.appUserID, params.email);
+  const { default: Purchases } = await getRevenueCatModule();
   const offerings = await Purchases.getOfferings();
   return offerings.current;
 }
@@ -203,6 +283,7 @@ export async function purchaseRevenueCatTier(params: {
   email?: string | null;
 }) {
   await configureRevenueCat(params.appUserID, params.email);
+  const { default: Purchases } = await getRevenueCatModule();
 
   const offering = await getRevenueCatOffering(params);
   const aPackage = findPackageForTier(offering, params.tier);
@@ -210,7 +291,7 @@ export async function purchaseRevenueCatTier(params: {
     throw new Error(`No ${params.tier} package is available in RevenueCat.`);
   }
 
-  const result = await Purchases.purchasePackage({ aPackage });
+  const result = await Purchases.purchasePackage(aPackage);
   const synced = await syncCustomerInfoToBackend(result.customerInfo);
 
   return {
@@ -225,6 +306,7 @@ export async function restoreRevenueCatPurchases(params: {
   email?: string | null;
 }) {
   await configureRevenueCat(params.appUserID, params.email);
+  const { default: Purchases } = await getRevenueCatModule();
 
   const result = await Purchases.restorePurchases();
   const synced = await syncCustomerInfoToBackend(result.customerInfo);
@@ -240,8 +322,8 @@ export async function getRevenueCatCustomerInfo(params: {
   email?: string | null;
 }) {
   await configureRevenueCat(params.appUserID, params.email);
-  const { customerInfo } = await Purchases.getCustomerInfo();
-  return customerInfo;
+  const { default: Purchases } = await getRevenueCatModule();
+  return Purchases.getCustomerInfo();
 }
 
 export async function getRevenueCatManagementUrl(params: {

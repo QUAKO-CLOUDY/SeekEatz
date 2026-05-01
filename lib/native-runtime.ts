@@ -1,19 +1,26 @@
-import { Capacitor } from "@capacitor/core";
-import { Browser } from "@capacitor/browser";
-
 export function isNativeApp(): boolean {
-  return Capacitor.isNativePlatform();
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const nativeBridge = (
+    window as Window & {
+      ReactNativeWebView?: unknown;
+      webkit?: { messageHandlers?: Record<string, unknown> };
+    }
+  );
+
+  return Boolean(
+    nativeBridge.ReactNativeWebView ||
+      nativeBridge.webkit?.messageHandlers?.ReactNativeWebView,
+  );
 }
 
 export async function openExternalUrl(url: string): Promise<void> {
-  if (typeof window === "undefined") {
-    return;
+  if (typeof window !== "undefined") {
+    const popup = window.open(url, "_blank", "noopener,noreferrer");
+    if (!popup) {
+      window.location.href = url;
+    }
   }
-
-  if (isNativeApp()) {
-    await Browser.open({ url });
-    return;
-  }
-
-  window.open(url, "_blank", "noopener,noreferrer");
 }

@@ -204,7 +204,7 @@ export function extractMacroConstraintsFromText(query: string): MacroConstraints
   // Fallback: If no explicit max or min calorie constraint was extracted,
   // check for approximate calorie mentions like "around 800 cal", "about 600 calories"
   // These create a ±15% range (e.g., "around 800" → 680-920)
-  // Also handles bare "850 calories" as maxCalories
+  // Also handles bare "850 calories" as minCalories (default ABOVE when direction is unspecified)
   // IMPORTANT: This runs AFTER both max and min calorie patterns, so explicit directions always win
   if (result.maxCalories === undefined && result.minCalories === undefined) {
     // "around/about/roughly/approximately X calories" → range ±15%
@@ -219,7 +219,7 @@ export function extractMacroConstraintsFromText(query: string): MacroConstraints
       }
     }
 
-    // Bare calorie mention: "with 850 calories", "850 calories" → treat as maxCalories
+    // Bare calorie mention: "with 850 calories", "850 calories" → treat as minCalories
     if (result.maxCalories === undefined && result.minCalories === undefined) {
       const caloriesFallbackPatterns = [
         /\b(?:with)\s+(\d+)\s*(calories?|cal|kcal)\b/i,
@@ -231,7 +231,7 @@ export function extractMacroConstraintsFromText(query: string): MacroConstraints
         if (match) {
           const value = parseInt(match[1], 10);
           if (!isNaN(value) && value >= 50 && value <= 5000) {
-            result.maxCalories = value;
+            result.minCalories = value;
             break;
           }
         }
@@ -280,6 +280,18 @@ export function extractMacroConstraintsFromText(query: string): MacroConstraints
     }
   }
 
+  // Bare carbs mention without direction defaults to minimum (ABOVE).
+  if (result.minCarbs === undefined && result.maxCarbs === undefined) {
+    const bareCarbsPattern = /\b(\d+)\s*(g|grams?)\s+(of\s+)?(carbs?|carbohydrates?)\b/i;
+    const match = trimmed.match(bareCarbsPattern);
+    if (match) {
+      const value = parseFirstPositiveInt(match);
+      if (value !== undefined && value > 0 && value < 500) {
+        result.minCarbs = value;
+      }
+    }
+  }
+
   // ===== MINIMUM FATS PATTERNS =====
   const fatsMinPatterns = [
     /\b(at\s+least|minimum|min|>=|over|above)\s+(\d+)\s*(g|grams?)\s+(of\s+)?(fat|fats)\b/i,
@@ -317,6 +329,18 @@ export function extractMacroConstraintsFromText(query: string): MacroConstraints
       if (value !== undefined && value > 0 && value < 200) {
         result.maxFats = value;
         break;
+      }
+    }
+  }
+
+  // Bare fat mention without direction defaults to minimum (ABOVE).
+  if (result.minFats === undefined && result.maxFats === undefined) {
+    const bareFatsPattern = /\b(\d+)\s*(g|grams?)\s+(of\s+)?(fat|fats)\b/i;
+    const match = trimmed.match(bareFatsPattern);
+    if (match) {
+      const value = parseFirstPositiveInt(match);
+      if (value !== undefined && value > 0 && value < 200) {
+        result.minFats = value;
       }
     }
   }

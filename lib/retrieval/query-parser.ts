@@ -233,7 +233,7 @@ export function parseQuery(raw: string): ParsedQuery {
     macroResult.hasMacroConstraints
   );
 
-  if (macroResult.proteinMin !== undefined || includeTags.includes('post_workout')) {
+  if (includeTags.includes('post_workout')) {
     sortPriority.add('protein_density');
   }
   if (categories.length > 0) {

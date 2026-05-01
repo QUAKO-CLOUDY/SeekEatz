@@ -84,7 +84,7 @@ export function rankResults(
       if (Math.abs(scoreDelta) > 2) {
         return scoreDelta;
       }
-      return tieBreak(a, b, signature);
+      return tieBreak(a, b, parsed, signature);
     });
 }
 
@@ -368,14 +368,48 @@ function buildSearchSignature(parsed: ParsedQuery): string {
   ].join('|');
 }
 
-function tieBreak(a: RawResult, b: RawResult, signature: string): number {
+function tieBreak(a: RawResult, b: RawResult, parsed: ParsedQuery, signature: string): number {
   const aHash = stableHash(`${signature}|${a.id}|${a.restaurant_name}`);
   const bHash = stableHash(`${signature}|${b.id}|${b.restaurant_name}`);
 
+  const aCalories = Number(a.macros?.calories ?? 0);
+  const bCalories = Number(b.macros?.calories ?? 0);
   const aProtein = Number(a.macros?.protein ?? 0);
   const bProtein = Number(b.macros?.protein ?? 0);
+  const aCarbs = Number(a.macros?.carbs ?? 0);
+  const bCarbs = Number(b.macros?.carbs ?? 0);
+  const aFat = Number(a.macros?.fat ?? 0);
+  const bFat = Number(b.macros?.fat ?? 0);
+
+  const closenessChecks: Array<{
+    target?: number;
+    aValue: number;
+    bValue: number;
+  }> = [
+    { target: parsed.minCalories, aValue: aCalories, bValue: bCalories },
+    { target: parsed.minProtein, aValue: aProtein, bValue: bProtein },
+    { target: parsed.minCarbs, aValue: aCarbs, bValue: bCarbs },
+    { target: parsed.minFat, aValue: aFat, bValue: bFat },
+    { target: parsed.maxCalories, aValue: aCalories, bValue: bCalories },
+    { target: parsed.maxProtein, aValue: aProtein, bValue: bProtein },
+    { target: parsed.maxCarbs, aValue: aCarbs, bValue: bCarbs },
+    { target: parsed.maxFat, aValue: aFat, bValue: bFat },
+  ];
+
+  for (const { target, aValue, bValue } of closenessChecks) {
+    if (target === undefined) continue;
+    const aDelta = Math.abs(aValue - target);
+    const bDelta = Math.abs(bValue - target);
+    if (aDelta !== bDelta) {
+      return aDelta - bDelta;
+    }
+  }
+
+  if (aCalories !== bCalories) {
+    return aCalories - bCalories;
+  }
   if (aProtein !== bProtein) {
-    return bProtein - aProtein;
+    return aProtein - bProtein;
   }
 
   return aHash - bHash;

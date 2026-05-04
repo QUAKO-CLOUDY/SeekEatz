@@ -319,7 +319,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     const checkAuth = async () => {
       try {
         const supabase = createClient();
-        // Retry logic for auth check — capped at 2 retries, 100ms delay, with per-call timeout
+        // Retry logic for auth check - capped at 2 retries, 100ms delay, with per-call timeout
         const withAuthTimeout = (promise: Promise<AuthUserResponse>, ms: number): Promise<AuthTimeoutResponse> =>
           Promise.race([
             promise,
@@ -485,7 +485,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         });
 
       if (sessionError) {
-        // RLS policy likely missing — disable Supabase chat persistence to avoid repeated errors
+        // RLS policy likely missing - disable Supabase chat persistence to avoid repeated errors
         console.warn('Chat session persistence unavailable (RLS policy may be missing). Chat will work without server persistence.');
         supabaseChatAvailable.current = false;
         return;
@@ -569,7 +569,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     }
   }, [isSignedIn, userId, currentSessionId, ensureChatSessionOwned, setMessages]);
 
-  // Trial limits have been removed – always allow chat usage and clear any legacy gate messages.
+  // Trial limits have been removed - always allow chat usage and clear any legacy gate messages.
   useEffect(() => {
     setMessages(prev => prev.filter(msg => !msg.isGateMessage));
   }, [setMessages]);
@@ -1061,7 +1061,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     // Touch activity when user sends a message
     touchGuestActivity();
 
-    // Log chat submit event (fire-and-forget — NEVER block the send flow)
+    // Log chat submit event (fire-and-forget - NEVER block the send flow)
     if (isSignedIn) {
       logUsageEvent('chat_submit', {
         source: 'chat_composer',
@@ -1098,7 +1098,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       content: userVisibleText
     };
 
-    // Log user message to Supabase (fire-and-forget — never block the send flow)
+    // Log user message to Supabase (fire-and-forget - never block the send flow)
     if (isSignedIn) {
       logChatMessage('user', trimmedText).catch(() => { });
     }
@@ -1334,8 +1334,8 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             // Generate summary: use server message if meals array is empty, otherwise use server summary or generate from actual meals.length
             // NEVER hardcode meal count - always use parsedMeals.length
             let summaryLine: string;
-            if (parsedMeals.length === 0 && message) {
-              // If no meals but we have a message (e.g., "No verified matches found..."), use that
+            if (message) {
+              // Always honor backend explanatory message when present.
               summaryLine = message;
             } else {
               // Use server summary if provided, otherwise generate from actual meals.length
@@ -1382,7 +1382,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             setMessages(prev => [...prev, assistantMessage]);
             handleSuccessfulQuery();
 
-            // Log to Supabase — fire-and-forget, never block the UI while isLoading=true
+            // Log to Supabase - fire-and-forget, never block the UI while isLoading=true
             if (isSignedIn) {
               logChatMessage('assistant', summaryLine, diversifiedMeals, mealSearchContext).catch(() => { });
               logUsageEvent('chat_response', { messageCount: parsedMeals.length, hasMeals: true }).catch(() => { });
@@ -1408,7 +1408,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             setMessages(prev => [...prev, assistantMessage]);
             handleSuccessfulQuery();
 
-            // Log to Supabase — fire-and-forget, never block the UI while isLoading=true
+            // Log to Supabase - fire-and-forget, never block the UI while isLoading=true
             if (isSignedIn) {
               logChatMessage('assistant', textContent).catch(() => { });
               logUsageEvent('chat_response', { hasMeals: false }).catch(() => { });
@@ -1672,16 +1672,16 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   // Quick prompt chips with display text and actual prompt text
   const quickPromptSeed = [
     {
-      display: "🔥 Meal under 1000 calories",
+      display: "Meal under 1000 calories",
       prompt: "Find me a meal under 1000 calories and over 650 calories",
       userVisibleText: "Finding meals under 1000 calories."
     },
-    { display: "🌅 Breakfast", prompt: "Find me breakfast options",
+    { display: "Breakfast", prompt: "Find me breakfast options",
       userVisibleText: "Finding breakfast near you." },
-    { display: "🥗 Low carb meal", prompt: "Find me a low carb meal" },
-    { display: "🫒 Low fat meal", prompt: "Find me a low fat meal" },
-    { display: "🍽️ Find me lunch", prompt: "Find me lunch" },
-    { display: "🍴 Find me dinner", prompt: "Find me dinner" }
+    { display: "Low carb meal", prompt: "Find me a low carb meal" },
+    { display: "Low fat meal", prompt: "Find me a low fat meal" },
+    { display: "Find me lunch", prompt: "Find me lunch" },
+    { display: "Find me dinner", prompt: "Find me dinner" }
   ];
   const quickPrompts = quickPromptSeed.map((item) => ({
     ...item,
@@ -1953,3 +1953,4 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     </div>
   );
 }
+

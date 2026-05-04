@@ -112,7 +112,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     };
 
     // Throttle activity updates to avoid excessive state updates
-    let throttleTimer: NodeJS.Timeout | null = null;
+    let throttleTimer: ReturnType<typeof setTimeout> | null = null;
     const throttledHandleActivity = () => {
       if (throttleTimer) return;
       throttleTimer = setTimeout(() => {

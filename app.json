@@ -1,25 +1,31 @@
 {
-  "expo": {
-    "name": "SeekEatz",
-    "version": "0.1.0",
-    "extra": {
-      "eas": {
-        "projectId": "bb1eee24-f509-4d2f-9a34-e13148f99473"
-      }
-    },
-    "owner": "seekeatzs-organization",
-    "slug": "seekeatz",
-    "ios": {
-      "bundleIdentifier": "com.seekeatz.app",
-      "buildNumber": "2",
-      "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "SeekEatz uses your location to show nearby restaurants and meal options when you choose to enable location-based search.",
-        "ITSAppUsesNonExemptEncryption": false
-      }
-    },
-    "android": {
-      "package": "com.seekeatz.app"
-    },
-    "plugins": []
-  }
+    "expo":  {
+                 "name":  "SeekEatz",
+                 "version":  "1.1",
+                 "extra":  {
+                               "eas":  {
+                                           "projectId":  "bb1eee24-f509-4d2f-9a34-e13148f99473"
+                                       }
+                           },
+                 "owner":  "seekeatzs-organization",
+                 "slug":  "seekeatz",
+                 "ios":  {
+                             "bundleIdentifier":  "com.seekeatz.app",
+                             "buildNumber":  "4",
+                             "infoPlist":  {
+                                               "NSLocationWhenInUseUsageDescription":  "SeekEatz uses your location to show nearby restaurants and meal options when you choose to enable location-based search.",
+                                               "ITSAppUsesNonExemptEncryption":  false
+                                           },
+                             "icon":  "./assets/icon.png"
+                         },
+                 "android":  {
+                                 "package":  "com.seekeatz.app"
+                             },
+                 "plugins":  [
+
+                             ],
+                 "icon":  "./assets/icon.png"
+             }
 }
+
+

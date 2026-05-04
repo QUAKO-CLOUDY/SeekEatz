@@ -120,6 +120,10 @@ const BREAKFAST_FOOD_PATTERNS = [
   /\bbagel\s+sandwich\b/,
   /\bbiscuit\s+sandwich\b/,
 ];
+const BREAKFAST_FALSE_POSITIVE_PATTERNS = [
+  /\begg\s*rolls?\b/,
+];
+
 const BREAKFAST_STRICT_ANCHOR_PATTERNS = [
   /\bbreakfast\b/,
   /\bmcmuffin\b/,
@@ -244,6 +248,17 @@ interface DeterministicSearchTrace {
 interface DeterministicSearchResult {
   results: RawResult[];
   trace: DeterministicSearchTrace;
+}
+
+interface ClosestMatchFallbackResult {
+  items: RawResult[];
+  message?: string;
+}
+
+interface ConstraintMatchStat {
+  label: string;
+  passCount: number;
+  totalCount: number;
 }
 
 interface PreparedSearchContext {
@@ -640,6 +655,23 @@ export async function retrieveMealsWithClient(
     parsed,
     undefined
   );
+  let fallbackMessage: string | undefined;
+
+  if (ranked.length === 0) {
+    const fallback = buildClosestConstraintFallback({
+      parsed,
+      deterministicCandidates: deterministicResults,
+      vectorCandidates: vectorResults,
+      dietaryKeywords: effectiveDietaryKeywords,
+      macroOnly: macroOnlyHomeFiltering,
+      fallbackLimit: targetResultWindow,
+    });
+
+    if (fallback.items.length > 0) {
+      ranked = fallback.items;
+      fallbackMessage = fallback.message;
+    }
+  }
 
   const isSingleRestaurantQuery =
     filterResult.restaurantResolved &&
@@ -745,7 +777,9 @@ export async function retrieveMealsWithClient(
     searchKey: prepared.searchKey,
     usedVector,
     parsedQuery: parsed,
-    message: meals.length === 0 ? 'No verified matches found for that request yet.' : undefined,
+    message:
+      fallbackMessage ??
+      (meals.length === 0 ? buildNoMatchesMessage(parsed) : undefined),
     debugInfo,
   };
 }
@@ -1879,6 +1913,10 @@ function matchesMealType(item: RawResult, parsed: ParsedQuery, relaxMealType = f
 
 function looksLikeBreakfastFood(item: RawResult): boolean {
   const haystack = buildHaystack(item);
+
+  if (BREAKFAST_FALSE_POSITIVE_PATTERNS.some((pattern) => pattern.test(haystack))) {
+    return false;
+  }
   const category = (item.normalized_category ?? '').toLowerCase();
   const hasStrictBreakfastAnchor = BREAKFAST_STRICT_ANCHOR_PATTERNS.some((pattern) => pattern.test(haystack));
   const hasBreakfastSandwichAnchor =
@@ -2198,8 +2236,282 @@ function hasExplicitCalorieConstraint(rawQuery: string): boolean {
   const lower = rawQuery.toLowerCase();
   const directionalPattern = /\b(under|below|less\s+than|max(?:imum)?|at\s+most|at\s+least|min(?:imum)?|over|above|more\s+than)\s+\d+\s*(calories?|cal|kcal)?\b/;
   const rangePattern = /\bbetween\s+\d+\s*(?:and|to|-)\s*\d+\s*(calories?|cal|kcal)?\b/;
+  const approximatePattern = /\b(around|about|roughly|approximately|close\s+to|near)\s+\d+\s*(calories?|cal|kcal)\b/;
 
-  return directionalPattern.test(lower) || rangePattern.test(lower);
+  return directionalPattern.test(lower) || rangePattern.test(lower) || approximatePattern.test(lower);
+}
+
+function hasApproximateCalorieConstraint(rawQuery: string): boolean {
+  return /\b(around|about|roughly|approximately|close\s+to|near)\s+\d+\s*(calories?|cal|kcal)\b/i.test(rawQuery);
+}
+
+function extractApproximateCalorieTarget(rawQuery: string): number | undefined {
+  const match = rawQuery.match(/\b(?:around|about|roughly|approximately|close\s+to|near)\s+(\d+)\s*(?:calories?|cal|kcal)\b/i);
+  if (!match) {
+    return undefined;
+  }
+
+  const value = parseInt(match[1], 10);
+  if (Number.isNaN(value) || value <= 0) {
+    return undefined;
+  }
+
+  return value;
+}
+
+function getConstraintDescription(parsed: ParsedQuery): string {
+  const approxTarget = extractApproximateCalorieTarget(parsed.raw);
+  const parts: string[] = [];
+
+  if (parsed.minProtein !== undefined) {
+    parts.push(`at least ${Math.round(parsed.minProtein)} grams of protein`);
+  } else if (parsed.maxProtein !== undefined) {
+    parts.push(`less than ${Math.round(parsed.maxProtein)} grams of protein`);
+  }
+
+  if (parsed.minCarbs !== undefined) {
+    parts.push(`at least ${Math.round(parsed.minCarbs)} grams of carbs`);
+  } else if (parsed.maxCarbs !== undefined) {
+    parts.push(`less than ${Math.round(parsed.maxCarbs)} grams of carbs`);
+  }
+
+  if (parsed.minFat !== undefined) {
+    parts.push(`at least ${Math.round(parsed.minFat)} grams of fat`);
+  } else if (parsed.maxFat !== undefined) {
+    parts.push(`less than ${Math.round(parsed.maxFat)} grams of fat`);
+  }
+
+  if (approxTarget !== undefined) {
+    parts.push(`around ${Math.round(approxTarget)} calories`);
+  } else if (parsed.minCalories !== undefined && parsed.maxCalories !== undefined) {
+    parts.push(`between ${Math.round(parsed.minCalories)} and ${Math.round(parsed.maxCalories)} calories`);
+  } else if (parsed.maxCalories !== undefined) {
+    parts.push(`less than ${Math.round(parsed.maxCalories)} calories`);
+  } else if (parsed.minCalories !== undefined) {
+    parts.push(`at least ${Math.round(parsed.minCalories)} calories`);
+  }
+
+  if (parts.length === 0) {
+    return 'those constraints';
+  }
+
+  if (parts.length === 1) {
+    return parts[0];
+  }
+
+  return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
+}
+
+function buildNoMatchesMessage(parsed: ParsedQuery): string {
+  const description = getConstraintDescription(parsed);
+  if (description === 'those constraints') {
+    return 'No verified matches found for that request yet.';
+  }
+  return `No meals found with ${description} in verified menu data yet.`;
+}
+
+function buildClosestConstraintFallback(args: {
+  parsed: ParsedQuery;
+  deterministicCandidates: RawResult[];
+  vectorCandidates: RawResult[];
+  dietaryKeywords?: string[];
+  macroOnly: boolean;
+  fallbackLimit: number;
+}): ClosestMatchFallbackResult {
+  const { parsed, deterministicCandidates, vectorCandidates, dietaryKeywords, macroOnly, fallbackLimit } = args;
+
+  if (!hasApproximateCalorieConstraint(parsed.raw)) {
+    return { items: [] };
+  }
+
+  const baseCandidates = dedupeRawResultsById([
+    ...deterministicCandidates,
+    ...vectorCandidates,
+  ]);
+
+  if (baseCandidates.length === 0) {
+    return { items: [] };
+  }
+
+  const currentMinCalories = parsed.minCalories;
+  const currentMaxCalories = parsed.maxCalories;
+  const approxTarget =
+    extractApproximateCalorieTarget(parsed.raw) ??
+    (
+      currentMinCalories !== undefined && currentMaxCalories !== undefined
+        ? Math.round((currentMinCalories + currentMaxCalories) / 2)
+        : undefined
+    );
+
+  if (approxTarget === undefined) {
+    return { items: [] };
+  }
+
+  const tightestConstraint = getTightestFailedConstraintLabel(parsed, baseCandidates);
+
+  const baselineHalfWindow =
+    currentMinCalories !== undefined && currentMaxCalories !== undefined
+      ? Math.max(30, Math.round((currentMaxCalories - currentMinCalories) / 2))
+      : Math.max(60, Math.round(approxTarget * 0.15));
+
+  const proteinRelaxSteps = parsed.minProtein !== undefined
+    ? [0, 10, 20]
+    : [0];
+  const windowExpandFactors = [1, 1.35, 1.65];
+
+  for (const proteinRelax of proteinRelaxSteps) {
+    for (const expandFactor of windowExpandFactors) {
+      const expandedHalfWindow = Math.round(baselineHalfWindow * expandFactor);
+      const relaxedParsed: ParsedQuery = {
+        ...parsed,
+        minCalories: Math.max(0, approxTarget - expandedHalfWindow),
+        maxCalories: approxTarget + expandedHalfWindow,
+        minProtein:
+          parsed.minProtein !== undefined
+            ? Math.max(0, parsed.minProtein - proteinRelax)
+            : undefined,
+      };
+
+      const relaxed = applyPostRetrievalFilters(
+        baseCandidates,
+        relaxedParsed,
+        dietaryKeywords,
+        { macroOnly }
+      );
+
+      if (relaxed.length === 0) {
+        continue;
+      }
+
+      const maximumFallbackItems = Math.max(5, fallbackLimit);
+      const fallbackItems = relaxed.slice(0, maximumFallbackItems);
+      const description = getConstraintDescription(parsed);
+      const tightestConstraintNote = tightestConstraint
+        ? ` The tightest constraint was ${tightestConstraint}.`
+        : '';
+      return {
+        items: fallbackItems,
+        message: `No meals found with ${description}.${tightestConstraintNote} Showing closest verified matches.`,
+      };
+    }
+  }
+
+  return { items: [] };
+}
+
+function getTightestFailedConstraintLabel(
+  parsed: ParsedQuery,
+  candidates: RawResult[]
+): string | undefined {
+  const stats = getConstraintMatchStats(parsed, candidates);
+  if (stats.length === 0) {
+    return undefined;
+  }
+
+  const failed = stats.filter((stat) => stat.passCount < stat.totalCount);
+  if (failed.length === 0) {
+    return undefined;
+  }
+
+  failed.sort((a, b) => {
+    const ratioA = a.passCount / a.totalCount;
+    const ratioB = b.passCount / b.totalCount;
+    if (ratioA !== ratioB) {
+      return ratioA - ratioB;
+    }
+    return a.passCount - b.passCount;
+  });
+
+  return failed[0]?.label;
+}
+
+function getConstraintMatchStats(parsed: ParsedQuery, candidates: RawResult[]): ConstraintMatchStat[] {
+  if (candidates.length === 0) {
+    return [];
+  }
+
+  const stats: ConstraintMatchStat[] = [];
+  const approxTarget = extractApproximateCalorieTarget(parsed.raw);
+
+  const pushStat = (label: string, checker: (item: RawResult) => boolean): void => {
+    let passCount = 0;
+    for (const item of candidates) {
+      if (checker(item)) {
+        passCount += 1;
+      }
+    }
+
+    stats.push({
+      label,
+      passCount,
+      totalCount: candidates.length,
+    });
+  };
+
+  if (approxTarget !== undefined && parsed.minCalories !== undefined && parsed.maxCalories !== undefined) {
+    pushStat(`around ${Math.round(approxTarget)} calories`, (item) => {
+      const calories = item.macros?.calories ?? 0;
+      return calories >= parsed.minCalories! && calories <= parsed.maxCalories!;
+    });
+  } else {
+    if (parsed.minCalories !== undefined) {
+      pushStat(`at least ${Math.round(parsed.minCalories)} calories`, (item) => {
+        const calories = item.macros?.calories ?? 0;
+        return calories >= parsed.minCalories!;
+      });
+    }
+
+    if (parsed.maxCalories !== undefined) {
+      pushStat(`less than ${Math.round(parsed.maxCalories)} calories`, (item) => {
+        const calories = item.macros?.calories ?? 0;
+        return calories <= parsed.maxCalories!;
+      });
+    }
+  }
+
+  if (parsed.minProtein !== undefined) {
+    pushStat(`at least ${Math.round(parsed.minProtein)} grams of protein`, (item) => {
+      const protein = item.macros?.protein ?? 0;
+      return protein >= parsed.minProtein!;
+    });
+  }
+
+  if (parsed.maxProtein !== undefined) {
+    pushStat(`less than ${Math.round(parsed.maxProtein)} grams of protein`, (item) => {
+      const protein = item.macros?.protein ?? 0;
+      return protein <= parsed.maxProtein!;
+    });
+  }
+
+  if (parsed.minCarbs !== undefined) {
+    pushStat(`at least ${Math.round(parsed.minCarbs)} grams of carbs`, (item) => {
+      const carbs = item.macros?.carbs ?? 0;
+      return carbs >= parsed.minCarbs!;
+    });
+  }
+
+  if (parsed.maxCarbs !== undefined) {
+    pushStat(`less than ${Math.round(parsed.maxCarbs)} grams of carbs`, (item) => {
+      const carbs = item.macros?.carbs ?? 0;
+      return carbs <= parsed.maxCarbs!;
+    });
+  }
+
+  if (parsed.minFat !== undefined) {
+    pushStat(`at least ${Math.round(parsed.minFat)} grams of fat`, (item) => {
+      const fat = item.macros?.fat ?? 0;
+      return fat >= parsed.minFat!;
+    });
+  }
+
+  if (parsed.maxFat !== undefined) {
+    pushStat(`less than ${Math.round(parsed.maxFat)} grams of fat`, (item) => {
+      const fat = item.macros?.fat ?? 0;
+      return fat <= parsed.maxFat!;
+    });
+  }
+
+  return stats;
 }
 
 function isCateringOrFamilyStyleResult(item: RawResult): boolean {

@@ -72,7 +72,7 @@ function SignupPageContent() {
   const [otpError, setOtpError] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const resendTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const resendTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const resetSavedMealStorageForUser = (userId: string) => {
     if (typeof window === "undefined") return;

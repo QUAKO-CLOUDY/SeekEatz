@@ -132,7 +132,7 @@ const NO_MORE_MEALS_MESSAGE =
   "There are no more meals that fit these constraints in our database. Please change the restrictions to get access to more mealcards.";
 const HOME_MEALS_PAGE_SIZE = 4;
 const APPENDED_MEALS_DIVIDER_LABEL = "More meals";
-const DEFAULT_HOME_DISTANCE_MILES = 10;
+const DEFAULT_HOME_DISTANCE_MILES = 15;
 const HOME_MACRO_VALUES_SESSION_KEY = "seekeatz_home_macro_values_v2";
 const DEFAULT_HOME_MACRO_ENABLED: Record<MacroType, boolean> = {
   calories: true,
@@ -332,7 +332,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     const container = containerRef.current;
     if (!container) return;
     
-    let scrollTimeout: NodeJS.Timeout;
+    let scrollTimeout: ReturnType<typeof setTimeout>;
     const handleScroll = () => {
       if (typeof window !== 'undefined') {
         // Debounce scroll position saving
@@ -404,6 +404,26 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
 
   // Keep home aligned with the rest of the app when the profile distance is missing.
   const activeDistance = homeDistanceOverride ?? userProfile.search_distance_miles ?? DEFAULT_HOME_DISTANCE_MILES;
+
+  const applyDistanceWindow = useCallback((meals: Meal[], radiusMiles: number): Meal[] => {
+    const hasLocationContext = Boolean(getStoredLocation());
+    if (!hasLocationContext) {
+      return meals;
+    }
+
+    return meals.filter((meal) => {
+      if (meal.distance === undefined || meal.distance === null || Number.isNaN(meal.distance)) {
+        return false;
+      }
+
+      return meal.distance <= radiusMiles;
+    });
+  }, []);
+
+  useEffect(() => {
+    setRecommendedMeals((prev) => applyDistanceWindow(prev, activeDistance));
+    setAllSearchMeals((prev) => applyDistanceWindow(prev, activeDistance));
+  }, [activeDistance, applyDistanceWindow]);
 
   const config = MACRO_CONFIG[macro];
   const currentValue = macroValues[macro];
@@ -667,7 +687,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       }
       
       // Convert to Meal type. Home should respect only active macro constraints.
-      const meals = normalizedResults.map(convertToMeal);
+      const meals = applyDistanceWindow(normalizedResults.map(convertToMeal), distance ?? activeDistance);
       
       return {
         meals,
@@ -1498,9 +1518,9 @@ function RulerSlider({ min, max, step, value, onChange }: RulerSliderProps) {
   const arrowRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<Array<HTMLDivElement | null>>([]);
   const tickRefs = useRef<Array<HTMLDivElement | null>>([]);
-  const scrollEndTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const snapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const transformUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const scrollEndTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const snapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const transformUpdateTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isUserScrollingRef = useRef(false);
   const isProgrammaticScrollRef = useRef(false);
   const [isScrolling, setIsScrolling] = useState(false);

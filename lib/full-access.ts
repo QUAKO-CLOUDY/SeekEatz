@@ -19,10 +19,16 @@ function parseEmailList(value?: string | null): string[] {
 }
 
 export function getFullAccessEmails(): string[] {
-  return [
+  const configured = [
     ...parseEmailList(process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL),
     ...parseEmailList(process.env.NEXT_PUBLIC_APP_REVIEW_LOGIN_EMAIL),
+    ...parseEmailList(process.env.MASTER_LOGIN_EMAIL),
+    ...parseEmailList(process.env.APP_REVIEW_LOGIN_EMAIL),
   ];
+
+  // Keep reviewer access stable even if env wiring is temporarily missing.
+  const defaults = ["reviewer@seekeatz.com"];
+  return Array.from(new Set([...configured, ...defaults]));
 }
 
 export function isFullAccessEmail(email?: string | null): boolean {

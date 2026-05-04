@@ -48,6 +48,15 @@ const DISALLOWED_SWAP_PHRASE_PATTERN =
 const SAUCE_LIKE_PATTERN = /\b(sauce|dressing|vinaigrette|aioli|dip|spread|condiment|mayo|crema)\b/i;
 const REDUCTION_INTENT_PATTERN = /\b(on the side|light|no|skip|without|remove|less)\b/i;
 
+function isSauceLikeCandidate(name: string, relationType?: string): boolean {
+  const normalizedRelationType = (relationType || '').toLowerCase();
+  return (
+    SAUCE_LIKE_PATTERN.test(name) ||
+    normalizedRelationType === 'sauce_option' ||
+    normalizedRelationType === 'dressing_option'
+  );
+}
+
 function withIfAvailable(label: string): string {
   if (/if available/i.test(label)) return label;
   return `${label} (if available)`;
@@ -187,6 +196,13 @@ type DbMappedSwap = {
   deltaMacros: SwapDelta;
 };
 
+const DEFAULT_DB_QUANTITY_CONFIG: NonNullable<DbMappedSwap['quantityConfig']> = {
+  unitLabel: 'portion',
+  min: 1,
+  defaultQuantity: 1,
+  max: 1,
+};
+
 function formatDeltaMacroSummary(delta: SwapDelta): string {
   const parts: string[] = [];
   const calories = Math.round(delta.calories);
@@ -259,10 +275,7 @@ function findBestModifierCandidateForSwapLabel(
     if (!normalizedCandidate) continue;
     const candidateName = (candidate.name || '').toLowerCase();
     const relationType = (candidate.relationType || '').toLowerCase();
-    const candidateIsSauceLike =
-      SAUCE_LIKE_PATTERN.test(candidateName) ||
-      relationType === 'sauce_option' ||
-      relationType === 'dressing_option';
+    const candidateIsSauceLike = isSauceLikeCandidate(candidateName, relationType);
     const labelHintsSauceLike = SAUCE_LIKE_PATTERN.test(normalizedLabel);
     if (candidateIsSauceLike && !labelHintsSauceLike) {
       continue;
@@ -383,6 +396,41 @@ function getCandidateQuantityConfig(candidate: ModifierCandidate): DbMappedSwap[
   };
 }
 
+function normalizeModifierId(value: string | number): string {
+  return String(value).trim();
+}
+
+function ensureDbQuantityConfig(
+  explicitConfig: DbMappedSwap['quantityConfig'],
+  modifierItemIds: string[],
+  modifierById: Map<string, ModifierCandidate>
+): NonNullable<DbMappedSwap['quantityConfig']> {
+  if (explicitConfig) {
+    const min = Math.max(1, Number(explicitConfig.min ?? DEFAULT_DB_QUANTITY_CONFIG.min));
+    const defaultQuantity = Math.max(
+      min,
+      Number(explicitConfig.defaultQuantity ?? explicitConfig.min ?? DEFAULT_DB_QUANTITY_CONFIG.defaultQuantity)
+    );
+    const max = Math.max(defaultQuantity, Number(explicitConfig.max ?? defaultQuantity));
+
+    return {
+      unitLabel: explicitConfig.unitLabel || DEFAULT_DB_QUANTITY_CONFIG.unitLabel,
+      min,
+      defaultQuantity,
+      max,
+    };
+  }
+
+  const firstModifierId = modifierItemIds[0];
+  const candidate = firstModifierId ? modifierById.get(normalizeModifierId(firstModifierId)) : undefined;
+  const candidateConfig = candidate ? getCandidateQuantityConfig(candidate) : undefined;
+  if (candidateConfig) {
+    return candidateConfig;
+  }
+
+  return DEFAULT_DB_QUANTITY_CONFIG;
+}
+
 function scoreSupplementalDbCandidate(
   candidate: ModifierCandidate,
   goals: MacroGoals
@@ -422,27 +470,23 @@ function buildSupplementalDbSwaps(
   goals: MacroGoals,
   maxCount: number
 ): DbMappedSwap[] {
-  const usedModifierIds = new Set(
-    existingDbMods.flatMap((mod) => mod.modifierItemIds)
-  );
+  const usedModifierIds = new Set(existingDbMods.flatMap((mod) => mod.modifierItemIds));
 
   const candidates = modifierCandidates
     .filter((candidate) => !usedModifierIds.has(candidate.id))
-    .filter((candidate) => candidate.macros.calories > 0)
+    .filter((candidate) => candidate.macros.calories >= 0)
     .filter((candidate) => {
       const relationType = (candidate.relationType || '').toLowerCase();
       const groupName = (candidate.groupName || '').toLowerCase();
       const category = (candidate.category || '').toLowerCase();
-      const name = (candidate.name || '').toLowerCase();
 
       const modifierLike =
-        /\b(protein|add|side)\b/.test(relationType) ||
-        /\b(protein|add|side)\b/.test(groupName) ||
-        /\b(add|addon|add-on|protein|side|modifier|ingredient|extra)\b/.test(category);
+        /\b(protein|add|side|sauce|dressing)\b/.test(relationType) ||
+        /\b(protein|add|side|sauce|dressing)\b/.test(groupName) ||
+        /\b(add|addon|add-on|protein|side|modifier|ingredient|extra|sauce|dressing|condiment)\b/.test(category);
 
       if (!modifierLike) return false;
-      if (candidate.macros.calories > 450 && !/\b(protein|add|side)\b/.test(relationType)) return false;
-      if (/\b(sauce|dressing|vinaigrette|aioli|dip|spread|condiment)\b/.test(name)) return false;
+      if (candidate.macros.calories > 450 && !/\b(protein|add|side|sauce|dressing)\b/.test(relationType)) return false;
       return true;
     })
     .map((candidate) => ({
@@ -459,33 +503,43 @@ function buildSupplementalDbSwaps(
       break;
     }
 
-    const label = buildAddLabel(candidate.name);
+    const candidateIsSauceLike = isSauceLikeCandidate(candidate.name.toLowerCase(), candidate.relationType);
+    const signed = (value: number) =>
+      candidateIsSauceLike ? (value === 0 ? 0 : -Math.max(1, Math.round(Math.abs(value) * 0.75))) : value;
+
+    const delta: SwapDelta = {
+      calories: signed(candidate.macros.calories),
+      protein: signed(candidate.macros.protein),
+      carbs: signed(candidate.macros.carbs),
+      fats: signed(candidate.macros.fats),
+    };
+    const inferredSwapType = inferDbSwapTypeFromDelta(delta);
+    const label = candidateIsSauceLike ? `Go light on ${candidate.name}` : buildAddLabel(candidate.name);
     const labelKey = label.toLowerCase().replace(/\s+/g, ' ').trim();
     if (!labelKey || seenLabels.has(labelKey)) {
       continue;
     }
     seenLabels.add(labelKey);
 
-    const delta: SwapDelta = {
-      calories: candidate.macros.calories,
-      protein: candidate.macros.protein,
-      carbs: candidate.macros.carbs,
-      fats: candidate.macros.fats,
-    };
-
     selected.push({
       id: `db-addon-${candidate.id}`,
       label,
       expectedEffect: buildDbExpectedEffect(
         undefined,
-        candidate.macros.protein > 0 ? 'Higher protein add-on' : 'Modifier add-on',
+        candidateIsSauceLike
+          ? 'Lower calories by reducing sauce'
+          : candidate.macros.protein > 0
+            ? 'Higher protein add-on'
+            : 'Modifier add-on',
         delta
       ),
       estimatedDelta: delta,
       confidenceLabel: 'Likely available',
-      type: 'add',
-      swapType: candidate.macros.protein >= 8 ? 'higherProtein' : 'neutral',
-      details: `Add ${candidate.name} using restaurant modifier data`,
+      type: candidateIsSauceLike ? 'remove' : 'add',
+      swapType: inferredSwapType,
+      details: candidateIsSauceLike
+        ? `Reduce ${candidate.name} using restaurant modifier data`
+        : `Add ${candidate.name} using restaurant modifier data`,
       modifierItemIds: [candidate.id],
       quantityConfig: getCandidateQuantityConfig(candidate),
       impactLabels: ['db_modifier'],
@@ -997,31 +1051,39 @@ export async function POST(req: Request) {
 
     // ========== Map all swap types to unified response format ==========
 
+    const modifierById = new Map(
+      modifierCandidates.map((candidate) => [normalizeModifierId(candidate.id), candidate])
+    );
+
     // 1. Map DB-backed modifications (existing shape)
-    const mappedDBMods: DbMappedSwap[] = modifications.map((mod, index) => ({
-      id: mod.id || `mod-${index}`,
-      label: mod.swapTitle,
-      expectedEffect: buildDbExpectedEffect(
-        mod.expectedEffect,
-        fallbackEffectFromSwapType(mod.swapType),
-        mod.estimatedDelta
-      ),
-      estimatedDelta: mod.estimatedDelta,
-      confidenceLabel: mod.confidenceLabel,
-      type: mod.type,
-      swapType: mod.swapType,
-      details: mod.details,
-      modifierItemIds: mod.modifierItemIds,
-      quantityConfig: mod.quantityConfig,
-      impactLabels: [] as string[],
-      source: 'db' as const,
-      deltaMacros: {
-        calories: mod.estimatedDelta.calories,
-        protein: mod.estimatedDelta.protein,
-        carbs: mod.estimatedDelta.carbs,
-        fats: mod.estimatedDelta.fats,
-      },
-    })).filter((mod) => !hasDisallowedSwapPhrase(mod.label, mod.details));
+    const mappedDBMods: DbMappedSwap[] = modifications.map((mod, index) => {
+      const normalizedModifierItemIds = (mod.modifierItemIds || []).map((id) => normalizeModifierId(id));
+
+      return {
+        id: mod.id || `mod-${index}`,
+        label: mod.swapTitle,
+        expectedEffect: buildDbExpectedEffect(
+          mod.expectedEffect,
+          fallbackEffectFromSwapType(mod.swapType),
+          mod.estimatedDelta
+        ),
+        estimatedDelta: mod.estimatedDelta,
+        confidenceLabel: mod.confidenceLabel,
+        type: mod.type,
+        swapType: mod.swapType,
+        details: mod.details,
+        modifierItemIds: normalizedModifierItemIds,
+        quantityConfig: ensureDbQuantityConfig(mod.quantityConfig, normalizedModifierItemIds, modifierById),
+        impactLabels: [] as string[],
+        source: 'db' as const,
+        deltaMacros: {
+          calories: mod.estimatedDelta.calories,
+          protein: mod.estimatedDelta.protein,
+          carbs: mod.estimatedDelta.carbs,
+          fats: mod.estimatedDelta.fats,
+        },
+      };
+    }).filter((mod) => !hasDisallowedSwapPhrase(mod.label, mod.details));
 
     // Final validation for DB mods (production-safe)
     const validDBMods = mappedDBMods.filter(mod => {
@@ -1031,9 +1093,7 @@ export async function POST(req: Request) {
         }
         return false;
       }
-      const allIdsValid = mod.modifierItemIds.every(id =>
-        modifierCandidates.some(candidate => candidate.id === id)
-      );
+      const allIdsValid = mod.modifierItemIds.every((id) => modifierById.has(normalizeModifierId(id)));
       if (!allIdsValid) {
         if (process.env.NODE_ENV === 'development') {
           console.warn('[swaps] Filtered out DB modification with invalid modifierItemIds:', mod.id, mod.modifierItemIds);
@@ -1046,7 +1106,6 @@ export async function POST(req: Request) {
     // If DB-backed swaps exist, they are always the only swaps returned.
     // If none exist, use hybrid global/LLM swaps first, then fill with dish-aware generic fallbacks.
     const MAX_FINAL_SWAPS = 3;
-    const modifierById = new Map(modifierCandidates.map((candidate) => [candidate.id, candidate]));
     const mappedHybridGlobal = hybridResult.globalSwaps
       .map((swap, index) => mapHybridGlobalSwap(swap, index))
       .filter((swap) => !hasDisallowedSwapPhrase(swap.label, swap.details));

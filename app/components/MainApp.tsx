@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback, startTransition } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import { Navigation, type Screen } from './Navigation';
@@ -135,22 +135,12 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
   // Router and Supabase client
   const router = useRouter();
-  const pathname = usePathname();
 
-  // Client ready check (stable boolean) - must be defined before isChatRoute
+  // Client ready check (stable boolean)
   const isClient = typeof window !== 'undefined';
 
   // Create stable Supabase client instance
   const supabase = useMemo(() => createClient(), []);
-
-  // Check if we're on the /chat route (robust pathname check)
-  // Normalize pathname: remove trailing slashes and query strings for comparison
-  // Handle /chat, /chat/, /chat?foo=bar, etc.
-  // Only compute on client-side to avoid hydration mismatches
-  const normalizedPathname = isClient && pathname
-    ? pathname.replace(/\/$/, '').split('?')[0]
-    : '';
-  const isChatRoute = normalizedPathname === '/chat' || initialScreen === 'chat';
 
   // Hydration fix: Track if component is mounted on client
   const [isMounted, setIsMounted] = useState(false);
@@ -179,7 +169,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     target_protein_g: 150,
     target_carbs_g: 200,
     target_fats_g: 70,
-    search_distance_miles: 10,
+    search_distance_miles: 15,
   });
 
   // Track current user ID
@@ -508,31 +498,6 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         localStorage.getItem('hasCompletedOnboarding') === 'true'
         : false;
 
-      // Fast path for /chat route: skip auth checks entirely.
-      // AIChat.tsx has its own auth listener and handles gating.
-      // This prevents the 200–600ms auth-retry delay on every chat refresh.
-      if (isChatRoute) {
-        if (isOnboarded) {
-          setAppState('app');
-          return;
-        }
-
-        try {
-          const { data: { user: chatRouteUser } } = await supabase.auth.getUser();
-          if (chatRouteUser) {
-            setCurrentUserId(chatRouteUser.id);
-            setCurrentUserEmail(chatRouteUser.email);
-            setAppState('app');
-            return;
-          }
-        } catch (chatRouteAuthError) {
-          console.warn('Chat route auth check failed:', chatRouteAuthError);
-        }
-
-        setAppState('onboarding');
-        return;
-      }
-
       // Check Supabase session - retry if not found initially (session might still be propagating)
       // Treat AuthSessionMissingError as "no user" (signed-out preview mode)
       let user = null;
@@ -628,23 +593,18 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
               // Wait a bit and retry getting user
               setTimeout(async () => {
                 try {
-                  const { data: { user: retryUser }, error: retryError } = await supabase.auth.getUser();
+                  const { data: { user: retryUser } } = await supabase.auth.getUser();
                   if (retryUser) {
                     setAppState('app');
                   } else {
-                    // If error is AuthSessionMissingError, treat as no user (expected for signed-out)
-                    if (retryError && !retryError.message?.includes('Auth session missing')) {
-                      setAppState('auth');
-                    } else {
-                      setAppState('app');
-                    }
+                    setAppState('auth');
                   }
                 } catch {
                   setAppState('auth');
                 }
               }, 1000);
-              // Show app while waiting for session retry (don't stay on loading)
-              return 'app';
+              // Keep users in auth while session propagation retries.
+              return 'auth';
             }
           }
           // Onboarded but not authenticated - show auth
@@ -656,12 +616,12 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       });
       } catch (err) {
         console.warn('initializeApp error, showing app:', err);
-        setAppState(isChatRoute ? 'app' : isOnboarded ? 'auth' : 'onboarding');
+        setAppState(isOnboarded ? 'auth' : 'onboarding');
       }
     };
 
     initializeApp();
-  }, [supabase, isMounted, isChatRoute]);
+  }, [supabase, isMounted]);
 
   // Safety: if still loading after 5s (e.g. getUser/profile hung), force a visible state
   useEffect(() => {
@@ -673,11 +633,11 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           ? localStorage.getItem('onboarded') === 'true' ||
             localStorage.getItem('hasCompletedOnboarding') === 'true'
           : false;
-        return isChatRoute ? 'app' : isOnboarded ? 'auth' : 'onboarding';
+        return isOnboarded ? 'auth' : 'onboarding';
       });
     }, 5000);
     return () => clearTimeout(t);
-  }, [isMounted, appState, isChatRoute]);
+  }, [isMounted, appState]);
 
   // Set up auth state change listener - this is the primary way we react to sign-in
   useEffect(() => {
@@ -735,14 +695,14 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
           target_protein_g: 150,
           target_carbs_g: 200,
           target_fats_g: 70,
-          search_distance_miles: 10,
+          search_distance_miles: 15,
         });
         // Check if onboarded as guest
         const isOnboarded = typeof window !== 'undefined'
           ? localStorage.getItem('onboarded') === 'true' ||
           localStorage.getItem('hasCompletedOnboarding') === 'true'
           : false;
-        setAppState(isOnboarded ? 'app' : 'auth');
+        setAppState(isOnboarded ? 'auth' : 'onboarding');
       }
     });
 
@@ -814,15 +774,39 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // ========== ALL HOOKS END HERE - NOW HANDLERS AND CONDITIONAL RENDERS ==========
 
   // Handle onboarding completion
-  const handleOnboardingComplete = () => {
+  const handleOnboardingComplete = async () => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('onboarded', 'true');
       localStorage.setItem('hasCompletedOnboarding', 'true');
     }
-    setAppState('app');
+
+    let shouldBypassUpgrade = hasFullAccess || isMasterAccount;
+    if (!shouldBypassUpgrade) {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        shouldBypassUpgrade = isFullAccessEmail(user?.email);
+      } catch {
+        shouldBypassUpgrade = false;
+      }
+    }
+
+    if (shouldBypassUpgrade && typeof window !== 'undefined') {
+      localStorage.setItem('seekeatz_start_app_tutorial', 'true');
+      localStorage.removeItem(tutorialCompletionKey);
+    }
+
+    setAppState(shouldBypassUpgrade ? 'app' : 'auth');
     setCurrentScreen('home');
     setNavHistory(['home']);
-    router.push('/chat');
+
+    if (shouldBypassUpgrade) {
+      router.push('/chat');
+      return;
+    }
+
+    router.push('/upgrade?flow=onboarding&tutorial=1');
   };
 
   // Handle auth success (fallback, but onAuthStateChange should handle it)
@@ -861,7 +845,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     );
   }
 
-  const renderedAppState: AppState = isChatRoute && appState === 'auth' ? 'app' : appState;
+  const renderedAppState: AppState = appState;
 
   // Show loading state
   if (renderedAppState === 'loading') {
@@ -881,8 +865,8 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     );
   }
 
-  // Show auth screen (but NEVER on /chat route - always show app for preview)
-  if (renderedAppState === 'auth' && !isChatRoute) {
+  // Show auth screen
+  if (renderedAppState === 'auth') {
     return <AuthScreen onSuccess={handleAuthSuccess} />;
   }
 
@@ -1239,3 +1223,4 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     </div>
   );
 }
+

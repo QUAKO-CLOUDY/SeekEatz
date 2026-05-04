@@ -222,7 +222,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
             const DEFAULT_PROTEIN = 150;
             const DEFAULT_CARBS = 200;
             const DEFAULT_FATS = 70;
-            const DEFAULT_SEARCH_DISTANCE = 10;
+            const DEFAULT_SEARCH_DISTANCE = 15;
 
             const supabaseProfile: Partial<UserProfile> = {
               full_name: profile.full_name || undefined,
@@ -239,9 +239,9 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
             // Merge with current userProfile to preserve any local state
             const updatedProfile = { ...userProfile, ...supabaseProfile } as UserProfile;
             
-            // If search_distance_miles is not set, default to 10 and save it
+            // If search_distance_miles is not set, default to 15 and save it
             if (!updatedProfile.search_distance_miles) {
-              updatedProfile.search_distance_miles = 10;
+              updatedProfile.search_distance_miles = 15;
               // Save the default to the database
               const dbColumns = profileToDbColumns(updatedProfile);
               (async () => {

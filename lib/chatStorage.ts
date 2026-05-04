@@ -12,7 +12,7 @@ interface StoredChatState {
   lastActiveAt: number;
 }
 
-let debounceTimer: NodeJS.Timeout | null = null;
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 /**
  * Load chat state from sessionStorage

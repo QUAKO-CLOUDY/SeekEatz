@@ -72,12 +72,12 @@ function UpgradePageContent() {
   const signUpHref = `/auth/signup?redirectTo=${encodedPostSignupUpgradePath}&switch=1${isMasterMode ? "&master=1" : ""}`;
 
   const routeAfterPlanSelection = useCallback(() => {
-    if (isFromSignup) {
-      router.push("/onboarding?afterSignup=1");
-      return;
+    if (typeof window !== "undefined" && (isFromSignup || shouldStartTutorial)) {
+      localStorage.setItem("seekeatz_start_app_tutorial", "true");
     }
+
     router.push("/chat");
-  }, [isFromSignup, router]);
+  }, [isFromSignup, shouldStartTutorial, router]);
 
   const getOnboardingFlag = useCallback(
     () =>

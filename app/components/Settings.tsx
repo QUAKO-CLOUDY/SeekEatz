@@ -153,6 +153,10 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   const notificationStorageKey = `seekeatz-notification-prefs:${userEmail || 'guest'}`;
   const subscriptionPlanLabel = getEntitlementPlanLabel(entitlement);
   const canEditProfile = entitlement.hasPremiumAccess;
+  
+  const appVersion = process.env.NEXT_PUBLIC_APP_VERSION || '1.1';
+  const appBuild = process.env.NEXT_PUBLIC_APP_BUILD || '5';
+  const appVersionLabel = `${appVersion} (${appBuild})`;
 
   const applyNotificationPreferences = (preferences: NotificationPreferences) => {
     setMealSuggestions(preferences.mealSuggestions);
@@ -1314,6 +1318,9 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
             <span className="font-medium text-red-600 dark:text-red-400">Log Out</span>
           </button>
         </div>
+          <p className="mt-4 text-center text-xs text-muted-foreground">
+            Version {appVersionLabel}
+          </p>
       </div>
       ) : (
         <div className="flex-1 overflow-y-auto bg-background px-4 py-6 pb-[calc(var(--app-nav-safe-offset)+5.5rem)] sm:px-6 sm:pb-28">
@@ -1535,3 +1542,9 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
     </div>
   );
 }
+
+
+
+
+
+

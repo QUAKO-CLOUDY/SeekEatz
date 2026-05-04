@@ -12,6 +12,10 @@ function OnboardingPageContent() {
   const routeToPlanSelection = useCallback(() => {
     router.replace("/upgrade?flow=onboarding&tutorial=1");
   }, [router]);
+  const routeToCreateAccount = useCallback(() => {
+    const redirectTo = encodeURIComponent("/upgrade?fromSignup=1");
+    router.replace(`/auth/signup?redirectTo=${redirectTo}&switch=1`);
+  }, [router]);
   const routeToAppTutorial = useCallback(() => {
     if (typeof window !== "undefined") {
       localStorage.setItem("seekeatz_start_app_tutorial", "true");
@@ -26,7 +30,9 @@ function OnboardingPageContent() {
   useEffect(() => {
     const checkOnboardingStatus = async () => {
       const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
       // Only check and redirect if user is authenticated
       if (!user) {
@@ -74,9 +80,24 @@ function OnboardingPageContent() {
     checkOnboardingStatus();
   }, [isPostSignupFlow, routeToPlanSelection]);
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     if (isPostSignupFlow) {
       routeToAppTutorial();
+      return;
+    }
+
+    try {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        routeToCreateAccount();
+        return;
+      }
+    } catch {
+      routeToCreateAccount();
       return;
     }
 
@@ -97,4 +118,3 @@ export default function OnboardingPage() {
     </Suspense>
   );
 }
-

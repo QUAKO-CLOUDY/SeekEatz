@@ -68,6 +68,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   const [userFullName, setUserFullName] = useState<string>('');
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { entitlement, refresh: refreshEntitlement } = useAccountEntitlement(true);
 
   // Helper function to safely convert number to database value (handles undefined/null/NaN)
@@ -825,26 +826,53 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
       applyNotificationPreferences(DEFAULT_NOTIFICATION_PREFERENCES);
     }
   }, [notificationStorageKey]);
-
-
   // Handle logout
   const handleLogout = async () => {
-    if (confirm('Are you sure you want to log out?')) {
-      try {
-        clearChat();
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('seekeatz_start_app_tutorial');
-        }
-        await supabase.auth.signOut();
-      } catch (error) {
-        console.error('Error signing out:', error);
-      } finally {
-        router.replace('/auth/signin?loggedOut=1');
-        router.refresh();
+    if (isLoggingOut) return;
+    if (!confirm('Are you sure you want to log out?')) return;
+
+    setIsLoggingOut(true);
+
+    try {
+      clearChat();
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('seekeatz_start_app_tutorial');
       }
+
+      let signOutError: unknown = null;
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) signOutError = error;
+      } catch (error) {
+        signOutError = error;
+      }
+
+      if (signOutError) {
+        const retry = await supabase.auth.signOut({ scope: 'global' });
+        if (retry.error) {
+          throw retry.error;
+        }
+      }
+
+      const sessionCheck = await supabase.auth.getSession();
+      if (sessionCheck.data.session) {
+        await supabase.auth.signOut();
+      }
+
+      if (typeof window !== 'undefined') {
+        window.location.assign('/auth/signin?loggedOut=1');
+        return;
+      }
+
+      router.replace('/auth/signin?loggedOut=1');
+      router.refresh();
+    } catch (error) {
+      console.error('Error signing out:', error);
+      alert('We could not complete sign out. Please try again.');
+    } finally {
+      setIsLoggingOut(false);
     }
   };
-
   const isLightTheme = theme === 'light' || resolvedTheme === 'light';
   const isDarkTheme = theme === 'dark' || resolvedTheme === 'dark';
 
@@ -1312,10 +1340,11 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
           </div>
           <button
             onClick={handleLogout}
-            className="flex w-full items-center justify-center gap-3 rounded-xl border border-red-200 bg-background/90 p-3 transition-colors hover:bg-red-50 dark:border-red-800 dark:bg-background/40 dark:hover:bg-red-950/20"
+            disabled={isLoggingOut}
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-red-200 bg-background/90 p-3 transition-colors hover:bg-red-50 dark:border-red-800 dark:bg-background/40 dark:hover:bg-red-950/20 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <LogOut className="size-4 text-red-600 dark:text-red-400" />
-            <span className="font-medium text-red-600 dark:text-red-400">Log Out</span>
+            <span className="font-medium text-red-600 dark:text-red-400">{isLoggingOut ? 'Signing out...' : 'Log Out'}</span>
           </button>
         </div>
           <p className="mt-4 text-center text-xs text-muted-foreground">
@@ -1542,9 +1571,4 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
     </div>
   );
 }
-
-
-
-
-
 

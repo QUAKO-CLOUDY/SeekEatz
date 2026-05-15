@@ -11,6 +11,7 @@ import { useChat } from "../contexts/ChatContext";
 import { getGuestSessionId, getGuestChatMessages, saveGuestChatMessages, touchGuestActivity, clearGuestSession } from "@/lib/guest-session";
 import { getRestaurantLogoUrl } from "@/lib/image-utils";
 import { getStoredLocation, storeLocation } from "@/lib/location";
+import { extractMacroConstraintsFromText } from "@/lib/extractMacroConstraintsFromText";
 import { UpgradeModal } from "./UpgradeModal";
 import {
   diversifyMealsByRestaurant,
@@ -961,53 +962,92 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   }, [messages]);
 
   // Generate a short summary line based on user query and found meals
-  const generateSummaryLine = (userQuery: string, mealCount: number): string => {
+  const formatMacroConstraintPhrases = (userQuery: string): string[] => {
+    const constraints = extractMacroConstraintsFromText(userQuery);
+    const phrases: string[] = [];
+
+    if (constraints.minCalories !== undefined) phrases.push(`at least ${constraints.minCalories} calories`);
+    if (constraints.maxCalories !== undefined) phrases.push(`under ${constraints.maxCalories} calories`);
+    if (constraints.minProtein !== undefined) phrases.push(`at least ${constraints.minProtein}g protein`);
+    if (constraints.maxProtein !== undefined) phrases.push(`under ${constraints.maxProtein}g protein`);
+    if (constraints.minCarbs !== undefined) phrases.push(`at least ${constraints.minCarbs}g carbs`);
+    if (constraints.maxCarbs !== undefined) phrases.push(`under ${constraints.maxCarbs}g carbs`);
+    if (constraints.minFats !== undefined) phrases.push(`at least ${constraints.minFats}g fat`);
+    if (constraints.maxFats !== undefined) phrases.push(`under ${constraints.maxFats}g fat`);
+
+    return phrases;
+  };
+
+  const applyMacroConstraintGuard = (meals: Meal[], userQuery: string): Meal[] => {
+    const constraints = extractMacroConstraintsFromText(userQuery);
+    const hasConstraints = Object.keys(constraints).length > 0;
+
+    if (!hasConstraints) {
+      return meals;
+    }
+
+    return meals.filter((meal) => {
+      const calories = Number(meal.calories) || 0;
+      const protein = Number(meal.protein) || 0;
+      const carbs = Number(meal.carbs) || 0;
+      const fats = Number(meal.fats) || 0;
+
+      if (constraints.minCalories !== undefined && calories < constraints.minCalories) return false;
+      if (constraints.maxCalories !== undefined && calories > constraints.maxCalories) return false;
+      if (constraints.minProtein !== undefined && protein < constraints.minProtein) return false;
+      if (constraints.maxProtein !== undefined && protein > constraints.maxProtein) return false;
+      if (constraints.minCarbs !== undefined && carbs < constraints.minCarbs) return false;
+      if (constraints.maxCarbs !== undefined && carbs > constraints.maxCarbs) return false;
+      if (constraints.minFats !== undefined && fats < constraints.minFats) return false;
+      if (constraints.maxFats !== undefined && fats > constraints.maxFats) return false;
+
+      return true;
+    });
+  };
+
+  const generateSummaryLine = (
+    userQuery: string,
+    mealCount: number,
+    variantSeed?: string
+  ): string => {
     const lowerQuery = userQuery.toLowerCase();
-
-    // Extract restaurant name if mentioned
-    const restaurantMatch = lowerQuery.match(/\b(chipotle|mcdonald|mcdonalds|subway|taco bell|pizza hut|domino|kfc|burger king|wendy|starbucks|dunkin|panera|olive garden|red lobster|outback|applebees|chilis|buffalo wild wings|panda express|papa johns|little caesars|jimmy johns|quiznos|arby|jack in the box|in-n-out|five guys|shake shack|whataburger|culvers|white castle|sonic|del taco|el pollo loco|qdoba|moe|baja fresh|rubio|baja|california pizza kitchen|cpk|p.f. chang|cheesecake factory|red robin|ihop|denny|waffle house|perkins|bob evans|cracker barrel|texas roadhouse|longhorn|outback|bonefish|flemings|ruth chris|mortons|capital grille|fogo de chao|brazilian steakhouse|benihana|hibachi|sushi|japanese|chinese|thai|vietnamese|indian|mexican|italian|greek|mediterranean|french|american|steakhouse|seafood|bbq|barbecue|grill|diner|cafe|restaurant)\b/i);
-    const restaurantName = restaurantMatch ? restaurantMatch[1].charAt(0).toUpperCase() + restaurantMatch[1].slice(1) : null;
-
-    // Extract meal type
     const hasLunch = lowerQuery.includes('lunch');
     const hasDinner = lowerQuery.includes('dinner');
     const hasBreakfast = lowerQuery.includes('breakfast');
     const mealType = hasBreakfast ? 'breakfast' : hasLunch ? 'lunch' : hasDinner ? 'dinner' : null;
 
-    // Extract calorie constraint
-    const calorieMatch = lowerQuery.match(/(?:under|below|less than|max|maximum|up to)\s*(\d+)\s*(?:calories?|cal)/i);
-    const maxCalories = calorieMatch ? parseInt(calorieMatch[1]) : null;
+    const restaurantMatch = lowerQuery.match(/\b(chipotle|mcdonald|mcdonalds|subway|taco bell|pizza hut|domino|kfc|burger king|wendy|starbucks|dunkin|panera|olive garden|red lobster|outback|applebees|chilis|buffalo wild wings|panda express|papa johns|little caesars|jimmy johns|quiznos|arby|jack in the box|in-n-out|five guys|shake shack|whataburger|culvers|white castle|sonic|del taco|el pollo loco|qdoba|moe|baja fresh|rubio|baja|california pizza kitchen|cpk|p\.f\. chang|cheesecake factory|red robin|ihop|denny|waffle house|perkins|bob evans|cracker barrel|texas roadhouse|longhorn|bonefish|flemings|ruth chris|mortons|capital grille|fogo de chao|benihana|hibachi|sushi|japanese|chinese|thai|vietnamese|indian|mexican|italian|greek|mediterranean|french|american|steakhouse|seafood|bbq|barbecue|grill|diner|cafe|restaurant)\b/i);
+    const restaurantName = restaurantMatch
+      ? restaurantMatch[1].charAt(0).toUpperCase() + restaurantMatch[1].slice(1)
+      : null;
 
-    // Extract macro constraints
-    const hasHighProtein = lowerQuery.match(/\b(high[\s-]?protein|(\d+)\+?\s*g?\s*protein|(\d+)\+?\s*grams?\s*protein)/i);
-    const hasLowCarb = lowerQuery.match(/\b(low[\s-]?carb|low[\s-]?carbs|under\s*(\d+)\s*g?\s*carb)/i);
-    const hasLowFat = lowerQuery.match(/\b(low[\s-]?fat|under\s*(\d+)\s*g?\s*fat)/i);
-    // Diet logic removed - vegetarian/vegan filtering disabled
+    const constraintPhrases = formatMacroConstraintPhrases(userQuery);
+    const constraintsClause = constraintPhrases.length > 0 ? ` with ${constraintPhrases.join(' and ')}` : '';
+    const restaurantClause = restaurantName ? ` from ${restaurantName}` : '';
+    const optionNoun = mealType ? `${mealType} options` : 'options';
 
-    // Build summary line
-    let summary = '';
-
-    if (restaurantName) {
-      summary = `Here are ${mealCount} ${mealType ? mealType + ' ' : ''}options from ${restaurantName}.`;
-    } else if (mealType && maxCalories) {
-      summary = `Found ${mealCount} ${mealType} options under ${maxCalories} calories.`;
-    } else if (mealType) {
-      summary = `Here are ${mealCount} ${mealType} options near you.`;
-    } else if (maxCalories) {
-      summary = `Found ${mealCount} options under ${maxCalories} calories.`;
-    } else if (hasHighProtein) {
-      const proteinMatch = lowerQuery.match(/(\d+)\+?\s*g?\s*protein/i);
-      const proteinAmount = proteinMatch ? proteinMatch[1] : '40';
-      summary = `Found ${mealCount} high-protein options (${proteinAmount}g+ protein).`;
-    } else if (hasLowCarb) {
-      summary = `Found ${mealCount} low-carb options.`;
-    } else if (hasLowFat) {
-      summary = `Found ${mealCount} low-fat options.`;
-    } else {
-      summary = `Here are ${mealCount} options that match your request.`;
+    if (mealCount === 0) {
+      if (constraintPhrases.length > 0) {
+        return `No meals found${constraintsClause}${restaurantClause} yet.`;
+      }
+      return `No ${optionNoun}${restaurantClause} matched that request yet.`;
     }
 
-    return summary;
+    const templates = [
+      `These ${optionNoun}${constraintsClause}${restaurantClause} match your request.`,
+      `${mealCount} ${optionNoun}${constraintsClause}${restaurantClause} are ready.`,
+      `Try these ${optionNoun}${constraintsClause}${restaurantClause}.`,
+      `${optionNoun.charAt(0).toUpperCase() + optionNoun.slice(1)}${constraintsClause}${restaurantClause}.`
+    ];
+
+    const seedBase =
+      userQuery.split('')
+        .reduce((acc, char) => acc + char.charCodeAt(0), 0) + mealCount;
+    const variant =
+      (variantSeed || '').split('')
+        .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const seed = seedBase + variant;
+    return templates[seed % templates.length];
   };
 
   const maybeHandleQueryGate = () => {
@@ -1310,14 +1350,23 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
             // Convert to Meal format (prefer flattened fields from backend)
             const parsedMeals: Meal[] = mealItems.map(mapSearchItemToMeal);
+            const constrainedMeals = applyMacroConstraintGuard(parsedMeals, trimmedText);
 
             if (parsedMeals.length > 0) {
               console.log('[AIChat] First meal from /api/chat:', parsedMeals[0]);
             }
 
+            if (parsedMeals.length !== constrainedMeals.length) {
+              console.warn('[AIChat] Client constraint guard removed meals that missed constraints:', {
+                before: parsedMeals.length,
+                after: constrainedMeals.length,
+                query: trimmedText,
+              });
+            }
+
             const diversityHistory = buildMealHistory(messages);
             const diversifiedMeals = diversifyMealsByRestaurant(
-              deduplicateMealsById(parsedMeals),
+              deduplicateMealsById(constrainedMeals),
               undefined,
               diversityHistory
             );
@@ -1331,15 +1380,15 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               filters: undefined // Can be extended if filters are passed
             } : undefined;
 
-            // Generate summary: use server message if meals array is empty, otherwise use server summary or generate from actual meals.length
-            // NEVER hardcode meal count - always use parsedMeals.length
             let summaryLine: string;
             if (message) {
-              // Always honor backend explanatory message when present.
               summaryLine = message;
             } else {
-              // Use server summary if provided, otherwise generate from actual meals.length
-              summaryLine = serverSummary || generateSummaryLine(trimmedText, diversifiedMeals.length);
+              const summaryQueryText = quickPromptText ? userVisibleText : trimmedText;
+              const hasMacroPhrases = formatMacroConstraintPhrases(summaryQueryText).length > 0;
+              summaryLine = hasMacroPhrases
+                ? generateSummaryLine(summaryQueryText, diversifiedMeals.length, quickPromptNonce)
+                : (serverSummary || generateSummaryLine(summaryQueryText, diversifiedMeals.length, quickPromptNonce));
             }
 
             const assistantMessage: ChatMessage = {
@@ -1673,7 +1722,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const quickPromptSeed = [
     {
       display: "Meal under 1000 calories",
-      prompt: "Find me a meal under 1000 calories and over 650 calories",
+      prompt: "Find me a meal under 1000 calories and over 500 calories",
       userVisibleText: "Finding meals under 1000 calories."
     },
     { display: "Breakfast", prompt: "Find me breakfast options",
@@ -1953,4 +2002,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     </div>
   );
 }
+
+
+
+
+
 

@@ -44,6 +44,15 @@ export type MealModifierContext =
   | 'sandwich'
   | 'salad'
   | 'generic';
+type ProteinFamily =
+  | 'chicken'
+  | 'beef'
+  | 'salmon'
+  | 'shrimp'
+  | 'tofu'
+  | 'pork'
+  | 'mixed'
+  | 'unknown';
 
 const PREFERRED_CATEGORY_KEYWORDS = [
   'modifier',
@@ -76,9 +85,33 @@ const SANDWICH_PATTERN =
   /\b(sandwich|club|melt|reuben|blt|burger|sub|hoagie|hero|grinder)\b/i;
 
 const SALAD_PATTERN = /\b(salad|caesar|cobb)\b/i;
+const PROTEIN_FAMILY_PATTERNS: Array<{ family: ProteinFamily; regex: RegExp }> = [
+  { family: 'chicken', regex: /\b(chicken)\b/i },
+  { family: 'beef', regex: /\b(beef|steak|ribeye|brisket)\b/i },
+  { family: 'salmon', regex: /\b(salmon)\b/i },
+  { family: 'shrimp', regex: /\b(shrimp|prawn)\b/i },
+  { family: 'tofu', regex: /\b(tofu)\b/i },
+  { family: 'pork', regex: /\b(pork)\b/i },
+];
+const MIXED_PROTEIN_PATTERN = /\b(combo|mixed|sampler|variety|surf and turf)\b/i;
 
 function categoryIncludes(category: string, value: string): boolean {
   return category.toLowerCase().includes(value.toLowerCase());
+}
+
+function inferProteinFamily(value: string): ProteinFamily {
+  if (!value) return 'unknown';
+  if (MIXED_PROTEIN_PATTERN.test(value)) return 'mixed';
+  for (const entry of PROTEIN_FAMILY_PATTERNS) {
+    if (entry.regex.test(value)) return entry.family;
+  }
+  return 'unknown';
+}
+
+function areProteinFamiliesCompatible(mealFamily: ProteinFamily, candidateFamily: ProteinFamily): boolean {
+  if (mealFamily === 'unknown' || candidateFamily === 'unknown') return true;
+  if (mealFamily === 'mixed' || candidateFamily === 'mixed') return true;
+  return mealFamily === candidateFamily;
 }
 
 export function inferMealModifierContext(mealName: string): MealModifierContext {
@@ -114,6 +147,7 @@ export function filterModifierCandidatesForMeal(
   }
 
   const context = inferMealModifierContext(mealName);
+  const mealProteinFamily = inferProteinFamily(mealName);
 
   return candidates.filter((candidate) => {
     const candidateName = candidate.name || '';
@@ -126,6 +160,18 @@ export function filterModifierCandidatesForMeal(
     const isSandwichSide = categoryIncludes(category, 'sandwich sides');
     const isOtherCategory = lowerCategory === 'other';
     const isNonModifierSide = NON_MODIFIER_ITEM_NAME_PATTERN.test(candidateName);
+    const isProteinOptionLike =
+      categoryIncludes(category, 'protein') ||
+      categoryIncludes(category, 'add') ||
+      categoryIncludes(candidate.groupName || '', 'protein') ||
+      categoryIncludes(candidate.relationType || '', 'protein') ||
+      categoryIncludes(candidate.relationType || '', 'add');
+    const candidateProteinFamily = inferProteinFamily(candidateName);
+    const shouldExcludeByProteinFamily =
+      isProteinOptionLike &&
+      mealProteinFamily !== 'unknown' &&
+      candidateProteinFamily !== 'unknown' &&
+      !areProteinFamiliesCompatible(mealProteinFamily, candidateProteinFamily);
 
     switch (context) {
       case 'sweet_breakfast':
@@ -154,6 +200,9 @@ export function filterModifierCandidatesForMeal(
         if (isSandwichSide && isNonModifierSide) {
           return false;
         }
+        if (shouldExcludeByProteinFamily) {
+          return false;
+        }
 
         return isRangeAddOn || isSideMeat || (isDressing && !isNonModifierSide);
 
@@ -161,11 +210,17 @@ export function filterModifierCandidatesForMeal(
         if (isSandwichSide && isNonModifierSide) {
           return false;
         }
+        if (shouldExcludeByProteinFamily) {
+          return false;
+        }
 
         return isRangeAddOn || isSideMeat || isDressing;
 
       default:
         if (isSandwichSide && isNonModifierSide) {
+          return false;
+        }
+        if (shouldExcludeByProteinFamily) {
           return false;
         }
 

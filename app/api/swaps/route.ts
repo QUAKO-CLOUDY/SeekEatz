@@ -43,10 +43,23 @@ const ZERO_DELTA: SwapDelta = {
 
 const FRIED_LIKE_MEAL_PATTERN = /\b(fried|deep.?fried|crispy|battered|breaded|crunchy|tenders?|tenderloin)\b/i;
 const CHICKEN_FINGER_LIKE_PATTERN = /\b(chicken\s*(fingers?|tenders?)|fingers?|tenders?|nuggets?|wings?)\b/i;
+const SEAFOOD_OR_POKE_PATTERN =
+  /\b(poke|seafood|fish|salmon|tuna|ahi|shrimp|prawn|sashimi|yellowtail|snapper|cod|tilapia|mahi|halibut|trout|eel|crab|lobster|scallop|mussels?|oyster|octopus|calamari)\b/i;
+const CHICKEN_PROTEIN_PATTERN = /\b(chicken|grilled chicken|crispy chicken|chicken breast|chicken thigh)\b/i;
+const ADD_OR_UPGRADE_PATTERN = /\b(add|extra|double|more|increase)\b/i;
 const DISALLOWED_SWAP_PHRASE_PATTERN =
   /\b(dip\s+instead\s+of\s+coating|dry\s+rub\s+instead\s+of\s+sauce)\b/i;
 const SAUCE_LIKE_PATTERN = /\b(sauce|dressing|vinaigrette|aioli|dip|spread|condiment|mayo|crema)\b/i;
 const REDUCTION_INTENT_PATTERN = /\b(on the side|light|no|skip|without|remove|less)\b/i;
+type ProteinFamily =
+  | 'chicken'
+  | 'beef'
+  | 'salmon'
+  | 'shrimp'
+  | 'tofu'
+  | 'pork'
+  | 'mixed'
+  | 'unknown';
 
 function isSauceLikeCandidate(name: string, relationType?: string): boolean {
   const normalizedRelationType = (relationType || '').toLowerCase();
@@ -55,6 +68,25 @@ function isSauceLikeCandidate(name: string, relationType?: string): boolean {
     normalizedRelationType === 'sauce_option' ||
     normalizedRelationType === 'dressing_option'
   );
+}
+
+function inferProteinFamilyFromText(value: string): ProteinFamily {
+  const normalized = (value || '').toLowerCase();
+  if (!normalized) return 'unknown';
+  if (/\b(combo|mixed|variety|sampler|surf and turf)\b/.test(normalized)) return 'mixed';
+  if (/\b(chicken)\b/.test(normalized)) return 'chicken';
+  if (/\b(steak|beef|ribeye|brisket)\b/.test(normalized)) return 'beef';
+  if (/\b(salmon)\b/.test(normalized)) return 'salmon';
+  if (/\b(shrimp|prawn)\b/.test(normalized)) return 'shrimp';
+  if (/\b(tofu)\b/.test(normalized)) return 'tofu';
+  if (/\b(pork)\b/.test(normalized)) return 'pork';
+  return 'unknown';
+}
+
+function areProteinFamiliesCompatible(mealFamily: ProteinFamily, candidateFamily: ProteinFamily): boolean {
+  if (mealFamily === 'unknown' || candidateFamily === 'unknown') return true;
+  if (mealFamily === 'mixed' || candidateFamily === 'mixed') return true;
+  return mealFamily === candidateFamily;
 }
 
 function withIfAvailable(label: string): string {
@@ -468,7 +500,8 @@ function buildSupplementalDbSwaps(
   modifierCandidates: ModifierCandidate[],
   existingDbMods: DbMappedSwap[],
   goals: MacroGoals,
-  maxCount: number
+  maxCount: number,
+  mealProteinFamily: ProteinFamily
 ): DbMappedSwap[] {
   const usedModifierIds = new Set(existingDbMods.flatMap((mod) => mod.modifierItemIds));
 
@@ -487,6 +520,16 @@ function buildSupplementalDbSwaps(
 
       if (!modifierLike) return false;
       if (candidate.macros.calories > 450 && !/\b(protein|add|side|sauce|dressing)\b/.test(relationType)) return false;
+      const candidateProteinFamily = inferProteinFamilyFromText(candidate.name || '');
+      const proteinLikeCandidate = relationType === 'protein_option' || /\b(add|protein)\b/.test(relationType);
+      if (
+        proteinLikeCandidate &&
+        mealProteinFamily !== 'unknown' &&
+        candidateProteinFamily !== 'unknown' &&
+        !areProteinFamiliesCompatible(mealProteinFamily, candidateProteinFamily)
+      ) {
+        return false;
+      }
       return true;
     })
     .map((candidate) => ({
@@ -678,11 +721,51 @@ function dedupeSwapsByLabel<T extends { label: string }>(swaps: T[]): T[] {
   return deduped;
 }
 
+function isSeafoodOrPokeMeal(mealName: string): boolean {
+  return SEAFOOD_OR_POKE_PATTERN.test((mealName || '').toLowerCase());
+}
+
+function shouldBlockChickenProteinSwapForMeal(
+  mealName: string,
+  swap: { type?: string; label?: string; swapType?: string; modifierItemIds?: string[] },
+  modifierById: Map<string, ModifierCandidate>
+): boolean {
+  if (!isSeafoodOrPokeMeal(mealName)) return false;
+
+  const label = (swap.label || '').toLowerCase();
+  const isChickenLabel = CHICKEN_PROTEIN_PATTERN.test(label);
+
+  let isChickenModifier = false;
+  if (Array.isArray(swap.modifierItemIds)) {
+    for (const id of swap.modifierItemIds) {
+      const candidate = modifierById.get(normalizeModifierId(id));
+      const candidateName = (candidate?.name || '').toLowerCase();
+      if (CHICKEN_PROTEIN_PATTERN.test(candidateName)) {
+        isChickenModifier = true;
+        break;
+      }
+    }
+  }
+
+  if (!isChickenLabel && !isChickenModifier) return false;
+
+  const type = (swap.type || '').toLowerCase();
+  const swapType = (swap.swapType || '').toLowerCase();
+  const looksLikeProteinIncrease =
+    type === 'add' ||
+    swapType === 'higherprotein' ||
+    swapType === 'proteinup' ||
+    ADD_OR_UPGRADE_PATTERN.test(label);
+
+  return looksLikeProteinIncrease;
+}
+
 function scoreDbFinalSwap(
   swap: DbMappedSwap,
   modifierById: Map<string, ModifierCandidate>,
   goals: MacroGoals,
-  mealMacros: SwapDelta
+  mealMacros: SwapDelta,
+  mealProteinFamily: ProteinFamily
 ): number {
   let score = 0;
   const hasExplicitGoals = hasExplicitMacroGoals(goals);
@@ -725,6 +808,15 @@ function scoreDbFinalSwap(
     if (relationType === 'add_on') score += 10;
     if (relationType === 'side_option') score += 6;
     if (swap.type === 'add' && SAUCE_LIKE_PATTERN.test(modifierName)) score -= 60;
+    const candidateProteinFamily = inferProteinFamilyFromText(modifierName);
+    const proteinLikeCandidate = relationType === 'protein_option' || /\b(add|protein)\b/.test(relationType);
+    if (proteinLikeCandidate && mealProteinFamily !== 'unknown' && candidateProteinFamily !== 'unknown') {
+      if (areProteinFamiliesCompatible(mealProteinFamily, candidateProteinFamily)) {
+        score += 34;
+      } else {
+        score -= 72;
+      }
+    }
   }
 
   return score;
@@ -931,6 +1023,7 @@ export async function POST(req: Request) {
       carbs: meal_macros?.carbs || 0,
       fats: mealFat,
     };
+    const mealProteinFamily = inferProteinFamilyFromText(meal_name);
 
     // Generate modifications using Hybrid Swap Engine v2
     const hybridResult = await generateHybridSwaps(
@@ -1103,6 +1196,10 @@ export async function POST(req: Request) {
       return true;
     });
 
+    const proteinGuardedDbMods = validDBMods.filter(
+      (swap) => !shouldBlockChickenProteinSwapForMeal(meal_name, swap, modifierById)
+    );
+
     // If DB-backed swaps exist, they are always the only swaps returned.
     // If none exist, use hybrid global/LLM swaps first, then fill with dish-aware generic fallbacks.
     const MAX_FINAL_SWAPS = 3;
@@ -1114,27 +1211,36 @@ export async function POST(req: Request) {
       .filter((swap) => !hasDisallowedSwapPhrase(swap.label, swap.details));
 
     const promotedHybridDbSwaps: DbMappedSwap[] = [];
-    const remainingHybridNonDb: NonDbMappedSwap[] = [];
+    const proteinGuardedRemainingHybridNonDb: NonDbMappedSwap[] = [];
     for (const swap of [...mappedHybridGlobal, ...mappedHybridLlm]) {
       const promoted = promoteNonDbSwapToDb(swap, modifierCandidates);
       if (promoted && !hasDisallowedSwapPhrase(promoted.label, promoted.details)) {
         promotedHybridDbSwaps.push(promoted);
       } else {
-        remainingHybridNonDb.push(swap);
+        proteinGuardedRemainingHybridNonDb.push(swap);
       }
     }
 
+    const proteinGuardedPromotedHybridDbSwaps = promotedHybridDbSwaps.filter(
+      (swap) => !shouldBlockChickenProteinSwapForMeal(meal_name, swap, modifierById)
+    );
+
+    const filteredRemainingHybridNonDb = proteinGuardedRemainingHybridNonDb.filter(
+      (swap) => !shouldBlockChickenProteinSwapForMeal(meal_name, swap, modifierById)
+    );
+
     const dbSeedMods = dedupeSwapsByLabel<DbMappedSwap>([
-      ...validDBMods,
-      ...promotedHybridDbSwaps,
+      ...proteinGuardedDbMods,
+      ...proteinGuardedPromotedHybridDbSwaps,
     ]);
     const supplementalDbSwaps = hasExplicitMacroGoals(macroGoals)
       ? buildSupplementalDbSwaps(
           modifierCandidates,
           dbSeedMods,
           macroGoals,
-          Math.max(0, MAX_FINAL_SWAPS - dbSeedMods.length)
-        ).filter((swap) => !hasDisallowedSwapPhrase(swap.label, swap.details))
+          Math.max(0, MAX_FINAL_SWAPS - dbSeedMods.length),
+          mealProteinFamily
+        ).filter((swap) => !hasDisallowedSwapPhrase(swap.label, swap.details)).filter((swap) => !shouldBlockChickenProteinSwapForMeal(meal_name, swap, modifierById))
       : [];
 
     const dbFinalPool = dedupeSwapsByLabel<DbMappedSwap>([
@@ -1143,7 +1249,7 @@ export async function POST(req: Request) {
     ])
       .map((swap) => ({
         swap,
-        score: scoreDbFinalSwap(swap, modifierById, macroGoals, normalizedMealMacros),
+        score: scoreDbFinalSwap(swap, modifierById, macroGoals, normalizedMealMacros, mealProteinFamily),
       }))
       .sort((a, b) => b.score - a.score)
       .map(({ swap }) => swap)
@@ -1152,7 +1258,7 @@ export async function POST(req: Request) {
     const hasDbSwaps = dbFinalPool.length > 0;
 
     const rankedHybridNonDb = dedupeSwapsByLabel(
-      remainingHybridNonDb
+      filteredRemainingHybridNonDb
         .map((swap) => ({
           swap,
           score: scoreNonDbSwapCandidate(swap, meal_name, macroGoals, normalizedMealMacros),
@@ -1217,3 +1323,5 @@ export async function POST(req: Request) {
     );
   }
 }
+
+

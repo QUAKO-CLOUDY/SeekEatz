@@ -965,13 +965,15 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const formatMacroConstraintPhrases = (userQuery: string): string[] => {
     const constraints = extractMacroConstraintsFromText(userQuery);
     const phrases: string[] = [];
+    const lowerQuery = userQuery.toLowerCase();
+    const isLowCarbIntent = /\blow carb\b/.test(lowerQuery);
 
     if (constraints.minCalories !== undefined) phrases.push(`at least ${constraints.minCalories} calories`);
     if (constraints.maxCalories !== undefined) phrases.push(`under ${constraints.maxCalories} calories`);
     if (constraints.minProtein !== undefined) phrases.push(`at least ${constraints.minProtein}g protein`);
     if (constraints.maxProtein !== undefined) phrases.push(`under ${constraints.maxProtein}g protein`);
     if (constraints.minCarbs !== undefined) phrases.push(`at least ${constraints.minCarbs}g carbs`);
-    if (constraints.maxCarbs !== undefined) phrases.push(`under ${constraints.maxCarbs}g carbs`);
+    if (constraints.maxCarbs !== undefined && !isLowCarbIntent) phrases.push(`under ${constraints.maxCarbs}g carbs`);
     if (constraints.minFats !== undefined) phrases.push(`at least ${constraints.minFats}g fat`);
     if (constraints.maxFats !== undefined) phrases.push(`under ${constraints.maxFats}g fat`);
 
@@ -1025,12 +1027,33 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     const constraintsClause = constraintPhrases.length > 0 ? ` with ${constraintPhrases.join(' and ')}` : '';
     const restaurantClause = restaurantName ? ` from ${restaurantName}` : '';
     const optionNoun = mealType ? `${mealType} options` : 'options';
+    const isLowCarbIntent = /\blow carb\b/.test(lowerQuery);
 
     if (mealCount === 0) {
+      if (isLowCarbIntent) {
+        return `No low carb meals${restaurantClause} found yet.`;
+      }
       if (constraintPhrases.length > 0) {
         return `No meals found${constraintsClause}${restaurantClause} yet.`;
       }
       return `No ${optionNoun}${restaurantClause} matched that request yet.`;
+    }
+
+    if (isLowCarbIntent) {
+      const lowCarbTemplates = [
+        `Try these low carb meals${restaurantClause}.`,
+        `Here are low carb meals${restaurantClause}.`,
+        `Low carb meal options${restaurantClause}.`,
+        `These low carb meals${restaurantClause} match your request.`
+      ];
+      const seedBase =
+        userQuery.split('')
+          .reduce((acc, char) => acc + char.charCodeAt(0), 0) + mealCount;
+      const variant =
+        (variantSeed || '').split('')
+          .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const seed = seedBase + variant;
+      return lowCarbTemplates[seed % lowCarbTemplates.length];
     }
 
     const templates = [

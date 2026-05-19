@@ -74,6 +74,7 @@
     "embla-carousel-react": "^8.6.0",
     "expo": "~55.0.18",
     "expo-dev-client": "~55.0.28",
+    "expo-notifications": "~55.0.23",
     "framer-motion": "^12.23.24",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.554.0",
@@ -115,3 +116,4 @@
     "typescript": "^5"
   }
 }
+

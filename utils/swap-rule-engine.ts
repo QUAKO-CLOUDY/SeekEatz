@@ -127,6 +127,32 @@ function normalizeSwapText(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9\s]+/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
+function stringHash(input: string): number {
+  let hash = 0;
+  for (let i = 0; i < input.length; i += 1) {
+    hash = (hash * 31 + input.charCodeAt(i)) >>> 0;
+  }
+  return hash;
+}
+
+function pickMealSpecificCandidate<T>(
+  mealName: string,
+  scored: T[],
+  getScore: (item: T) => number,
+  getKey: (item: T) => string,
+  maxWindow = 4,
+  tolerance = 0.08
+): T | undefined {
+  if (scored.length === 0) return undefined;
+  const bestScore = getScore(scored[0]);
+  const window = scored
+    .filter((item) => Math.abs(bestScore - getScore(item)) <= Math.max(0.001, Math.abs(bestScore) * tolerance))
+    .slice(0, maxWindow);
+  if (window.length === 0) return scored[0];
+  const seed = stringHash(mealName + '|' + window.map((item) => getKey(item)).join('|'));
+  return window[seed % window.length];
+}
+
 function buildAddLabel(name: string): string {
   return /^add\b/i.test(name) ? name : `Add ${name}`;
 }
@@ -232,7 +258,13 @@ function generateContextualSingleIngredientSwap(
     })
     .sort((a, b) => b.score - a.score);
 
-  const bestCandidate = contextualCandidates[0]?.candidate;
+  const pickedContextual = pickMealSpecificCandidate(
+    mealName,
+    contextualCandidates,
+    (item) => item.score,
+    (item) => item.candidate.id
+  );
+  const bestCandidate = pickedContextual?.candidate;
   if (!bestCandidate) {
     return null;
   }
@@ -360,7 +392,15 @@ function generateHigherProteinSwap(
     return b.proteinIncrease - a.proteinIncrease;
   });
 
-  const bestCandidate = scoredCandidates[0].candidate;
+  const pickedProtein = pickMealSpecificCandidate(
+    mealName,
+    scoredCandidates,
+    (item) => item.score,
+    (item) => item.candidate.id,
+    5,
+    0.12
+  );
+  const bestCandidate = (pickedProtein ?? scoredCandidates[0]).candidate;
 
   // Dev assertion: burger should never have shrimp/fish/tuna
   if (process.env.NODE_ENV === 'development' && dishType === 'burger') {
@@ -557,7 +597,15 @@ function generateLowerCaloriesSwap(
     })
     .sort((a, b) => b.score - a.score);
 
-  const bestReduceCandidate = genericReduceCandidates[0]?.candidate;
+  const pickedReduce = pickMealSpecificCandidate(
+    mealName,
+    genericReduceCandidates,
+    (item) => item.score,
+    (item) => item.candidate.id,
+    5,
+    0.12
+  );
+  const bestReduceCandidate = pickedReduce?.candidate;
   if (bestReduceCandidate) {
     const modeLabel =
       bestReduceCandidate.relationType === 'sauce_option' || bestReduceCandidate.relationType === 'dressing_option'

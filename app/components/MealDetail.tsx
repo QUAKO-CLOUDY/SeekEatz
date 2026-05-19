@@ -147,6 +147,36 @@ type DrinkSelectorProps = {
   disabled?: boolean;
 };
 
+type SideOption = {
+  id: string;
+  name: string;
+  macros: { calories: number; protein: number; carbs: number; fat: number };
+};
+
+type SideGroup = {
+  id: 'base_side_choice' | 'protein_add_on' | 'extra_sides';
+  label: string;
+  required: boolean;
+  multi: boolean;
+  defaultOptionId?: string;
+  maxSelections?: number;
+  options: SideOption[];
+};
+
+type SideCustomizationResponse = {
+  enabled: boolean;
+  reason?: string;
+  template?: string;
+  groups?: SideGroup[];
+};
+
+type SideGroupSelectorProps = {
+  group: SideGroup;
+  selectedOptionIds: string[];
+  onToggleOption: (groupId: SideGroup['id'], optionId: string) => void;
+  disabled?: boolean;
+};
+
 // --- HELPER LOGIC ---
 function scaleSwapDelta(
   delta: SwapOption['deltaMacros'],
@@ -505,6 +535,98 @@ function DrinkSelector({
   );
 }
 
+function SideGroupSelector({
+  group,
+  selectedOptionIds,
+  onToggleOption,
+  disabled = false,
+}: SideGroupSelectorProps) {
+  const selectedOptions = group.options.filter((option) => selectedOptionIds.includes(option.id));
+  const triggerLabel =
+    selectedOptions.length === 0
+      ? group.required
+        ? 'Choose one option'
+        : 'None selected'
+      : group.multi
+        ? `${selectedOptions.length} selected`
+        : selectedOptions[0].name;
+
+  if (group.options.length === 0) {
+    return null;
+  }
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          disabled={disabled}
+          className="w-full flex items-center justify-between rounded-2xl border border-border bg-muted/40 px-4 py-3 text-left text-sm text-foreground transition-colors hover:bg-muted/60 disabled:cursor-not-allowed"
+        >
+          <div>
+            <p className="font-medium">{group.label}</p>
+            <p className="text-xs text-muted-foreground">{triggerLabel}</p>
+          </div>
+          <div className="text-right">
+            {selectedOptions.length > 0 && (
+              <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-300">
+                +{selectedOptions.reduce((sum, option) => sum + (option.macros.calories || 0), 0)} cal
+              </p>
+            )}
+            <ChevronDown className="w-4 h-4 text-muted-foreground ml-auto" />
+          </div>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-[min(22rem,calc(100vw-2rem))] rounded-2xl border-border bg-card p-3">
+        <div className="space-y-2">
+          <div className="px-1 pb-1">
+            <p className="text-sm font-semibold text-card-foreground">{group.label}</p>
+            <p className="text-xs text-muted-foreground">
+              {group.multi ? 'Select one or more options.' : 'Select one option.'}
+            </p>
+          </div>
+          <div className="max-h-64 overflow-y-auto space-y-2 pr-1">
+            {group.options.map((option) => {
+              const isSelected = selectedOptionIds.includes(option.id);
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  onClick={() => onToggleOption(group.id, option.id)}
+                  className={`w-full rounded-xl border px-3 py-2 text-left transition-all ${
+                    isSelected
+                      ? 'border-indigo-500/60 bg-indigo-500/15'
+                      : 'border-border bg-muted/30 hover:bg-muted/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium text-card-foreground">{option.name}</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        {option.macros.protein || 0}g protein, {option.macros.carbs || 0}g carbs, {option.macros.fat || 0}g fat
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-300">
+                        {option.macros.calories || 0} cal
+                      </span>
+                      <span className={`flex h-5 w-5 items-center justify-center rounded-full border ${
+                        isSelected ? 'border-indigo-500 bg-indigo-500 text-white' : 'border-border text-transparent'
+                      }`}>
+                        <Check className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export function MealDetail({
   meal,
   isFavorite,
@@ -535,6 +657,9 @@ export function MealDetail({
   const [restaurantDrinks, setRestaurantDrinks] = useState<DrinkItem[]>([]);
   const [isLoadingDrinks, setIsLoadingDrinks] = useState(false);
   const [selectedDrinkIds, setSelectedDrinkIds] = useState<string[]>([]);
+  const [sideCustomization, setSideCustomization] = useState<SideCustomizationResponse | null>(null);
+  const [isLoadingSides, setIsLoadingSides] = useState(false);
+  const [selectedSideOptionIdsByGroup, setSelectedSideOptionIdsByGroup] = useState<Record<string, string[]>>({});
 
   // Manual Form State
   const [manualName, setManualName] = useState('');
@@ -859,9 +984,11 @@ export function MealDetail({
     if (!restaurant?.trim()) {
       setRestaurantDrinks([]);
       setSelectedDrinkIds([]);
+    setSelectedSideOptionIdsByGroup({});
       return;
     }
     setSelectedDrinkIds([]);
+    setSelectedSideOptionIdsByGroup({});
     setIsLoadingDrinks(true);
     fetch(`/api/drinks?restaurant=${encodeURIComponent(restaurant)}`)
       .then((res) => res.json())
@@ -871,6 +998,61 @@ export function MealDetail({
       .catch(() => setRestaurantDrinks([]))
       .finally(() => setIsLoadingDrinks(false));
   }, [meal.id, meal.restaurant_name, meal.restaurant]);
+
+  // Fetch sides customization options (currently gated to eligible Waba bowls/plates only)
+  useEffect(() => {
+    const restaurant = meal.restaurant_name || meal.restaurant;
+    if (!restaurant?.trim() || !meal.name?.trim()) {
+      setSideCustomization(null);
+      setSelectedSideOptionIdsByGroup({});
+      return;
+    }
+
+    setIsLoadingSides(true);
+    const params = new URLSearchParams({
+      restaurant,
+      mealName: meal.name,
+      calories: String(meal.calories || 0),
+      protein: String(meal.protein || 0),
+      carbs: String(meal.carbs || 0),
+      fat: String(meal.fats || 0),
+    });
+
+    fetch(`/api/sides?${params.toString()}`)
+      .then((res) => res.json())
+      .then((data: SideCustomizationResponse) => {
+        if (!data?.enabled || !Array.isArray(data.groups) || data.groups.length === 0) {
+          setSideCustomization(null);
+          setSelectedSideOptionIdsByGroup({});
+          return;
+        }
+
+        setSideCustomization(data);
+        const defaults: Record<string, string[]> = {};
+        for (const group of data.groups) {
+          if (group.required && !group.multi && group.defaultOptionId) {
+            defaults[group.id] = [group.defaultOptionId];
+          } else {
+            defaults[group.id] = [];
+          }
+        }
+        setSelectedSideOptionIdsByGroup(defaults);
+      })
+      .catch(() => {
+        setSideCustomization(null);
+        setSelectedSideOptionIdsByGroup({});
+      })
+      .finally(() => setIsLoadingSides(false));
+  }, [
+    meal.id,
+    meal.name,
+    meal.calories,
+    meal.protein,
+    meal.carbs,
+    meal.fats,
+    meal.restaurant_name,
+    meal.restaurant,
+  ]);
 
   // Sum of selected sauces' macros (for effective totals)
   const sauceMacrosSum = useMemo(() => {
@@ -906,6 +1088,58 @@ export function MealDetail({
     );
   }, [selectedDrinkIds, restaurantDrinks]);
 
+  const sideMacrosDeltaSum = useMemo(() => {
+    if (!sideCustomization?.enabled || !Array.isArray(sideCustomization.groups)) {
+      return { calories: 0, protein: 0, carbs: 0, fats: 0 };
+    }
+
+    return sideCustomization.groups.reduce(
+      (acc, group) => {
+        const selectedIds = selectedSideOptionIdsByGroup[group.id] || [];
+        const findOption = (id?: string) => group.options.find((option) => option.id === id);
+
+        if (!group.multi) {
+          const defaultOption = findOption(group.defaultOptionId);
+          const selectedOption = findOption(selectedIds[0]) || defaultOption;
+          if (!selectedOption || !defaultOption) return acc;
+
+          return {
+            calories: acc.calories + (selectedOption.macros.calories - defaultOption.macros.calories),
+            protein: acc.protein + (selectedOption.macros.protein - defaultOption.macros.protein),
+            carbs: acc.carbs + (selectedOption.macros.carbs - defaultOption.macros.carbs),
+            fats: acc.fats + (selectedOption.macros.fat - defaultOption.macros.fat),
+          };
+        }
+
+        for (const selectedId of selectedIds) {
+          const selectedOption = findOption(selectedId);
+          if (!selectedOption) continue;
+          acc.calories += selectedOption.macros.calories || 0;
+          acc.protein += selectedOption.macros.protein || 0;
+          acc.carbs += selectedOption.macros.carbs || 0;
+          acc.fats += selectedOption.macros.fat || 0;
+        }
+
+        return acc;
+      },
+      { calories: 0, protein: 0, carbs: 0, fats: 0 }
+    );
+  }, [sideCustomization, selectedSideOptionIdsByGroup]);
+  const activeSideAdjustmentsCount = useMemo(() => {
+    if (!sideCustomization?.enabled || !Array.isArray(sideCustomization.groups)) {
+      return 0;
+    }
+
+    return sideCustomization.groups.reduce((count, group) => {
+      const selectedIds = selectedSideOptionIdsByGroup[group.id] || [];
+      if (!group.multi) {
+        if (!group.defaultOptionId) return count;
+        return selectedIds[0] && selectedIds[0] !== group.defaultOptionId ? count + 1 : count;
+      }
+      return count + selectedIds.length;
+    }, 0);
+  }, [sideCustomization, selectedSideOptionIdsByGroup]);
+
   const selectedSwapDeltaSum = useMemo(() => {
     return selectedSwapIds.reduce(
       (acc, id) => {
@@ -925,15 +1159,15 @@ export function MealDetail({
     );
   }, [selectedSwapIds, selectedMealSwaps, selectedSwapQuantities]);
 
-  // Effective macros = base meal + selected swap deltas + selected sauces + selected drinks
+  // Effective macros = base meal + selected swap deltas + selected sauces + selected drinks + selected sides
   const effectiveMacros = useMemo(() => {
     return {
-      calories: Math.max(0, meal.calories + selectedSwapDeltaSum.calories + sauceMacrosSum.calories + drinkMacrosSum.calories),
-      protein: Math.max(0, meal.protein + selectedSwapDeltaSum.protein + sauceMacrosSum.protein + drinkMacrosSum.protein),
-      carbs: Math.max(0, (meal.carbs || 0) + selectedSwapDeltaSum.carbs + sauceMacrosSum.carbs + drinkMacrosSum.carbs),
-      fats: Math.max(0, (meal.fats || 0) + selectedSwapDeltaSum.fats + sauceMacrosSum.fats + drinkMacrosSum.fats),
+      calories: Math.max(0, meal.calories + selectedSwapDeltaSum.calories + sauceMacrosSum.calories + drinkMacrosSum.calories + sideMacrosDeltaSum.calories),
+      protein: Math.max(0, meal.protein + selectedSwapDeltaSum.protein + sauceMacrosSum.protein + drinkMacrosSum.protein + sideMacrosDeltaSum.protein),
+      carbs: Math.max(0, (meal.carbs || 0) + selectedSwapDeltaSum.carbs + sauceMacrosSum.carbs + drinkMacrosSum.carbs + sideMacrosDeltaSum.carbs),
+      fats: Math.max(0, (meal.fats || 0) + selectedSwapDeltaSum.fats + sauceMacrosSum.fats + drinkMacrosSum.fats + sideMacrosDeltaSum.fats),
     };
-  }, [meal.calories, meal.protein, meal.carbs, meal.fats, selectedSwapDeltaSum, sauceMacrosSum, drinkMacrosSum]);
+  }, [meal.calories, meal.protein, meal.carbs, meal.fats, selectedSwapDeltaSum, sauceMacrosSum, drinkMacrosSum, sideMacrosDeltaSum]);
 
   const totalMacros = effectiveMacros.protein + effectiveMacros.carbs + effectiveMacros.fats;
   const pPercent = totalMacros > 0 ? Math.round((effectiveMacros.protein / totalMacros) * 100) : 0;
@@ -972,6 +1206,29 @@ export function MealDetail({
     ));
   };
 
+  const toggleSideSelection = (groupId: SideGroup['id'], optionId: string) => {
+    setSelectedSideOptionIdsByGroup((prev) => {
+      const group = sideCustomization?.groups?.find((entry) => entry.id === groupId);
+      if (!group) return prev;
+
+      const current = prev[groupId] || [];
+
+      if (!group.multi) {
+        if (current[0] === optionId && !group.required) {
+          return { ...prev, [groupId]: [] };
+        }
+        return { ...prev, [groupId]: [optionId] };
+      }
+
+      if (current.includes(optionId)) {
+        return { ...prev, [groupId]: current.filter((id) => id !== optionId) };
+      }
+
+      const next = [...current, optionId];
+      const maxSelections = Math.max(1, group.maxSelections || next.length);
+      return { ...prev, [groupId]: next.slice(0, maxSelections) };
+    });
+  };
   // Dev log
   if (process.env.NODE_ENV === 'development' && logReady) {
     console.log('[calorieCalc]', { todaysRemainingNum, mealCaloriesNum, calsAfter });
@@ -1050,7 +1307,21 @@ export function MealDetail({
     // Get all selected modifier IDs (flattened)
     const selectedModifierIds = selectedSwapsData.flatMap(swap => swap.modifierItemIds);
 
-    // Create modified meal object with final macros (base + swaps + sauces)
+    const selectedSidesData = (sideCustomization?.groups || []).map((group) => ({
+      groupId: group.id,
+      groupLabel: group.label,
+      selectedOptions: group.options
+        .filter((option) => (selectedSideOptionIdsByGroup[group.id] || []).includes(option.id))
+        .map((option) => ({
+          id: option.id,
+          name: option.name,
+          macros: option.macros,
+        })),
+      defaultOptionId: group.defaultOptionId,
+      multi: group.multi,
+    }));
+
+    // Create modified meal object with final macros (base + swaps + sauces + drinks + sides)
     const modifiedMeal: Meal = {
       ...meal,
       calories: finalMacros.calories,
@@ -1068,15 +1339,17 @@ export function MealDetail({
       },
       selectedSwaps: selectedSwapsData,
       selectedModifierIds: selectedModifierIds,
+      selectedSides: selectedSidesData,
       finalMacros: finalMacros
     };
 
     // Debug log when confirming log (should match MainApp debug log)
     // Note: We don't have access to loggedMeals here, so we log what we can
-    console.log('[MealDetail] Confirming log with swaps:', {
+    console.log('[MealDetail] Confirming log with customizations:', {
       baseMealCalories: meal.calories,
       finalMealCalories: modifiedMeal.calories,
       swapsApplied: selectedSwapsData.length,
+      sideAdjustmentsApplied: activeSideAdjustmentsCount,
       logEntry,
     });
 
@@ -1088,6 +1361,7 @@ export function MealDetail({
     setSelectedSwapQuantities({});
     setSelectedSauceIds([]);
     setSelectedDrinkIds([]);
+    setSelectedSideOptionIdsByGroup({});
   };
 
   const handleManualSubmit = () => {
@@ -1174,7 +1448,7 @@ export function MealDetail({
             <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <p className="text-card-foreground text-sm font-semibold">Nutrition</p>
-                {(selectedSwapIds.length > 0 || selectedSauceIds.length > 0 || selectedDrinkIds.length > 0) && (
+                {(selectedSwapIds.length > 0 || selectedSauceIds.length > 0 || selectedDrinkIds.length > 0 || activeSideAdjustmentsCount > 0) && (
                   <span className="rounded-full border border-border bg-muted/50 px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
                     Customized
                   </span>
@@ -1268,8 +1542,41 @@ export function MealDetail({
             <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
               <div className="mb-4">
                 <p className="text-card-foreground text-sm font-semibold">Customize this meal</p>
-                <p className="mt-0.5 text-xs text-muted-foreground">Sauces, drinks, and swaps update the macros before logging.</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">Sides, sauces, drinks, and swaps update the macros before logging.</p>
               </div>
+
+              {sideCustomization?.enabled && Array.isArray(sideCustomization.groups) && sideCustomization.groups.length > 0 && (
+                <div className="border-b border-border pb-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-600 dark:text-indigo-300">
+                      <ChevronDown className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-foreground text-sm font-medium">Sides</p>
+                      <p className="text-muted-foreground text-xs">Only available for eligible Waba bowls and plates.</p>
+                    </div>
+                  </div>
+                  {isLoadingSides ? (
+                    <div className="text-center py-3 text-muted-foreground text-sm">Loading sides...</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {sideCustomization.groups.map((group) => (
+                        <SideGroupSelector
+                          key={group.id}
+                          group={group}
+                          selectedOptionIds={selectedSideOptionIdsByGroup[group.id] || []}
+                          onToggleOption={toggleSideSelection}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {activeSideAdjustmentsCount > 0 && (
+                    <p className="text-indigo-600 dark:text-indigo-300 text-xs mt-2">
+                      {sideMacrosDeltaSum.calories >= 0 ? '+' : ''}{sideMacrosDeltaSum.calories} cal from side customizations
+                    </p>
+                  )}
+                </div>
+              )}
 
               {restaurantSauces.length > 0 && (
                 <div className="border-b border-border pb-4">
@@ -1321,7 +1628,7 @@ export function MealDetail({
                 </div>
               )}
 
-              <div className={restaurantSauces.length > 0 || restaurantDrinks.length > 0 ? 'pt-4' : ''}>
+              <div className={restaurantSauces.length > 0 || restaurantDrinks.length > 0 || (sideCustomization?.enabled && Array.isArray(sideCustomization.groups) && sideCustomization.groups.length > 0) ? 'pt-4' : ''}>
                 <div className="mb-2 flex items-center gap-2">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-500/15 text-blue-600 dark:text-blue-300">
                     <ArrowRightLeft className="w-4 h-4" />
@@ -1569,6 +1876,7 @@ export function MealDetail({
                 setSelectedSwapQuantities({});
                 setSelectedSauceIds([]);
                 setSelectedDrinkIds([]);
+    setSelectedSideOptionIdsByGroup({});
               }} className="text-muted-foreground hover:text-foreground p-2">
                 <X className="w-5 h-5" />
               </button>
@@ -1582,7 +1890,7 @@ export function MealDetail({
 
             {/* Sauces and drinks in modal - same as on card */}
             <div className="relative mb-4">
-              {!isPremium && (restaurantSauces.length > 0 || restaurantDrinks.length > 0) && (
+              {!isPremium && (restaurantSauces.length > 0 || restaurantDrinks.length > 0 || (sideCustomization?.enabled && Array.isArray(sideCustomization.groups) && sideCustomization.groups.length > 0)) && (
                 <button
                   type="button"
                   onClick={() => onPremiumFeatureAttempt?.()}
@@ -1592,6 +1900,39 @@ export function MealDetail({
                     Unlock premium tools
                   </div>
                 </button>
+              )}
+
+              {sideCustomization?.enabled && Array.isArray(sideCustomization.groups) && sideCustomization.groups.length > 0 && (
+                <div className="border-b border-border pb-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-600 dark:text-indigo-300">
+                      <ChevronDown className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-foreground text-sm font-medium">Sides</p>
+                      <p className="text-muted-foreground text-xs">Only available for eligible Waba bowls and plates.</p>
+                    </div>
+                  </div>
+                  {isLoadingSides ? (
+                    <div className="text-center py-3 text-muted-foreground text-sm">Loading sides...</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {sideCustomization.groups.map((group) => (
+                        <SideGroupSelector
+                          key={group.id}
+                          group={group}
+                          selectedOptionIds={selectedSideOptionIdsByGroup[group.id] || []}
+                          onToggleOption={toggleSideSelection}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {activeSideAdjustmentsCount > 0 && (
+                    <p className="text-indigo-600 dark:text-indigo-300 text-xs mt-2">
+                      {sideMacrosDeltaSum.calories >= 0 ? '+' : ''}{sideMacrosDeltaSum.calories} cal from side customizations
+                    </p>
+                  )}
+                </div>
               )}
 
               {restaurantSauces.length > 0 && (
@@ -1727,7 +2068,7 @@ export function MealDetail({
             </div>
 
             {/* Live Macro Preview (meal + swaps + sauces + drinks) */}
-            {(selectedSwapIds.length > 0 || selectedSauceIds.length > 0 || selectedDrinkIds.length > 0) && (
+            {(selectedSwapIds.length > 0 || selectedSauceIds.length > 0 || selectedDrinkIds.length > 0 || activeSideAdjustmentsCount > 0) && (
               <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-2xl p-4 mb-6">
                 <p className="text-purple-300 text-xs mb-2 uppercase font-bold">Updated Macros</p>
                 <div className="grid grid-cols-4 gap-2 text-center">
@@ -1758,6 +2099,7 @@ export function MealDetail({
                 setSelectedSwapQuantities({});
                 setSelectedSauceIds([]);
                 setSelectedDrinkIds([]);
+    setSelectedSideOptionIdsByGroup({});
               }} className="flex-1 h-12 rounded-full bg-muted border border-border text-foreground font-medium hover:bg-muted/80">
                 Cancel
               </button>
@@ -1847,3 +2189,20 @@ export function MealDetail({
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -30,6 +30,7 @@ import {
   getLoggedMealsStorageKey,
   migrateLegacyLoggedMealsStorage,
 } from '@/lib/logged-meals-storage';
+import { clearChatState } from '@/lib/chatStorage';
 
 type View = 'main' | 'meal-detail';
 
@@ -95,6 +96,8 @@ const APP_TUTORIAL_STEPS: AppTutorialStep[] = [
 ];
 
 const ACTIVE_APP_USER_KEY = 'seekeatz_active_app_user_id';
+const APP_LAST_FOREGROUND_KEY = 'seekeatz_last_foreground_at';
+const QUERY_RESET_WINDOW_MS = 60 * 60 * 1000;
 
 function clearHomeScreenCache(): void {
   if (typeof window === 'undefined') return;
@@ -117,6 +120,14 @@ function clearHomeScreenCache(): void {
 
   localKeys.forEach((key) => localStorage.removeItem(key));
   sessionKeys.forEach((key) => sessionStorage.removeItem(key));
+}
+
+function clearFreshQueryState(): void {
+  if (typeof window === 'undefined') return;
+
+  clearHomeScreenCache();
+  clearChatState();
+  localStorage.removeItem('seekeatz_pending_chat_message');
 }
 
 function syncActiveUserCache(userId: string | undefined): void {
@@ -211,6 +222,47 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
   // Track session activity - updates on navigation and user interactions
   const { updateActivity } = useSessionActivity();
+
+  useEffect(() => {
+    if (!isMounted || typeof window === 'undefined') return;
+
+    const checkStaleStateAndReset = () => {
+      const now = Date.now();
+      const lastForegroundRaw = localStorage.getItem(APP_LAST_FOREGROUND_KEY);
+      const lastForeground = lastForegroundRaw ? Number(lastForegroundRaw) : null;
+
+      if (lastForeground && Number.isFinite(lastForeground) && now - lastForeground > QUERY_RESET_WINDOW_MS) {
+        clearFreshQueryState();
+      }
+
+      localStorage.setItem(APP_LAST_FOREGROUND_KEY, now.toString());
+    };
+
+    checkStaleStateAndReset();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkStaleStateAndReset();
+      }
+
+      if (document.visibilityState === 'hidden') {
+        localStorage.setItem(APP_LAST_FOREGROUND_KEY, Date.now().toString());
+      }
+    };
+
+    const handlePageHide = () => {
+      localStorage.setItem(APP_LAST_FOREGROUND_KEY, Date.now().toString());
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pagehide', handlePageHide);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pagehide', handlePageHide);
+    };
+  }, [isMounted]);
+
 
   // Hydration fix: Mark component as mounted on client
   useEffect(() => {
@@ -1140,6 +1192,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
               handleNavigate('chat');
             }}
             onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
+            onUsageLimitReached={() => setShowUpgradeModal(true)}
           />
         )}
         {currentView === 'meal-detail' && selectedMeal && (
@@ -1173,6 +1226,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
             onMealSelect={handleMealSelect}
             favoriteMeals={favoriteMeals}
             onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
+            onUsageLimitReached={() => setShowUpgradeModal(true)}
             onSignInRequest={() => router.push('/auth/signin')}
           />
         )}
@@ -1223,4 +1277,3 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     </div>
   );
 }
-

@@ -22,10 +22,7 @@ import {
 function SignInPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const requestedRedirectTo = searchParams.get("redirectTo") || "/chat";
-  const redirectTo = requestedRedirectTo.startsWith("/upgrade")
-    ? "/chat"
-    : requestedRedirectTo;
+  const redirectTo = searchParams.get("redirectTo") || "/upgrade?fromSignin=1";
   const isMasterMode = searchParams.get("master") === "1";
   const isSwitchAccountMode = searchParams.get("switch") === "1";
   const shouldStartTutorial = searchParams.get("tutorial") === "1";
@@ -63,7 +60,7 @@ function SignInPageContent() {
     localStorage.setItem(getLoggedMealsStorageKey(userId), JSON.stringify([]));
   };
 
-  // Check if user is already authenticated - if so, redirect to chat
+  // Check if user is already authenticated - if so, redirect to requested destination
   // Also listen for auth state changes to redirect immediately on sign-in
   useEffect(() => {
     const supabase = createClient();
@@ -77,7 +74,7 @@ function SignInPageContent() {
       }
       
       if (user && !isMasterMode && !isSwitchAccountMode) {
-        // User is already signed in, redirect to chat
+        // User is already signed in, redirect to destination
         router.replace(redirectTo);
       }
     };
@@ -118,7 +115,7 @@ function SignInPageContent() {
       }
 
       if (data.user) {
-        // Sign-in successful - update profile and navigate to chat
+        // Sign-in successful - update profile and navigate to destination
         const now = Date.now();
         const userId = data.user.id;
         
@@ -253,7 +250,7 @@ function SignInPageContent() {
         // Refresh router to ensure session is updated in all components
         router.refresh();
         
-        // Navigate to chat - the auth state change listener will unlock the chat immediately
+        // Navigate to destination - the auth state change listener will unlock the session immediately
         router.push(redirectTo);
       }
     } catch {

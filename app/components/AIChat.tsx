@@ -25,6 +25,7 @@ interface AIChatProps {
   onMealSelect?: (meal: Meal) => void;
   onToggleFavorite?: (mealId: string, meal?: Meal) => void;
   onSignInRequest?: () => void;
+  onUsageLimitReached?: () => void;
 }
 
 type PaginationFilters = Record<string, unknown>;
@@ -253,7 +254,7 @@ function toRestaurantCycleKey(value: string | null | undefined): string | null {
   return normalized && normalized.length > 0 ? normalized : null;
 }
 
-export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelect, onToggleFavorite, onSignInRequest }: AIChatProps) {
+export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelect, onToggleFavorite, onSignInRequest, onUsageLimitReached }: AIChatProps) {
   void onSignInRequest;
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
@@ -270,6 +271,13 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     [currentHour]
   );
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const openUpgradeModal = useCallback(() => {
+    if (onUsageLimitReached) {
+      onUsageLimitReached();
+      return;
+    }
+    setShowUpgradeModal(true);
+  }, [onUsageLimitReached]);
   const activeQuickPromptRef = useRef<ActiveQuickPromptState | null>(null);
   const quickPromptSeenRestaurantsRef = useRef<Map<string, Set<string>>>(new Map());
 
@@ -1201,7 +1209,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             history: routerHistory,
             quickPromptNonce,
             excludedRestaurants: quickPromptExcludedRestaurants.length > 0 ? quickPromptExcludedRestaurants : undefined,
-            limit: 10, // Default limit
+            limit: CHAT_MEALS_PAGE_SIZE,
             offset: 0, // Default offset
             userContext: {
               search_distance_miles: userProfile?.search_distance_miles,
@@ -1305,7 +1313,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         if (isUsageLimitError) {
           setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
 
-          setShowUpgradeModal(true);
+          openUpgradeModal();
           setError(serverMessage || "You've used your 2 free searches for the last 24 hours. Upgrade to continue.");
           return;
         }
@@ -1647,11 +1655,18 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         if (!response.ok) {
           const errorText = await response.text();
           let errorMessage = `Error ${response.status}: ${response.statusText}`;
+          let isUsageLimitError = response.status === 403;
           try {
             const errorJson = JSON.parse(errorText);
-            errorMessage = errorJson.error || errorMessage;
+            errorMessage = errorJson.message || errorJson.error || errorMessage;
+            if (errorJson.usageLimit === true) {
+              isUsageLimitError = true;
+            }
           } catch {
             if (errorText.trim()) errorMessage = errorText;
+          }
+          if (isUsageLimitError) {
+            openUpgradeModal();
           }
           setError(errorMessage);
           return;
@@ -1882,7 +1897,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                 <div className="flex flex-col gap-2 justify-start mb-4">
                   <button
                     onClick={() => {
-                      setShowUpgradeModal(true);
+                      openUpgradeModal();
                     }}
                     className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white rounded-lg text-sm font-medium transition-all shadow-sm text-center"
                   >
@@ -2026,9 +2041,3 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     </div>
   );
 }
-
-
-
-
-
-

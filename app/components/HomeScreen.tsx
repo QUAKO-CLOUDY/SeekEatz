@@ -80,6 +80,7 @@ type Props = {
   onNavigateToChat?: (message?: string) => void;
   onToggleFavorite?: (mealId: string, meal?: Meal) => void;
   loggedMeals?: LoggedMeal[];
+  onUsageLimitReached?: () => void;
 };
 
 type SearchMealsResponse = {
@@ -184,7 +185,7 @@ function getInitialMacroValues(userProfile: UserProfile): Record<MacroType, numb
   }
 }
 
-export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite, loggedMeals = [] }: Props) {
+export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite, loggedMeals = [], onUsageLimitReached }: Props) {
   const { updateActivity } = useSessionActivity();
   
   // Display name fallback from auth metadata/email when profile name is empty
@@ -633,7 +634,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           macroFilters: macroFilters || undefined,
           calorieMode: calorieMode || undefined,
           isHomepage: true,
-          limit: 20,
+          limit: HOME_MEALS_PAGE_SIZE,
           ...(searchKey ? { searchKey, isPagination: true, offset: nextOffset ?? 0 } : {}),
           ...(effectiveLocation ? {
             user_location_lat: effectiveLocation.latitude,
@@ -836,6 +837,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       console.error('Find meals error:', err);
       setRecommendedMeals([]);
       if (err instanceof Error && (err as Error & { usageLimit?: boolean }).usageLimit) {
+        onUsageLimitReached?.();
         setSearchError(err.message || 'You have used your 2 free searches for the last 24 hours. Upgrade to keep going.');
         return;
       }
@@ -978,6 +980,17 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           window.alert(NO_MORE_MEALS_MESSAGE);
         }
       }
+    } catch (err) {
+      console.error('Find more meals error:', err);
+      if (err instanceof Error && (err as Error & { usageLimit?: boolean }).usageLimit) {
+        onUsageLimitReached?.();
+        setSearchError(err.message || 'You have used your 2 free searches for the last 24 hours. Upgrade to keep going.');
+        return;
+      }
+      const message = err instanceof Error && err.message === 'timeout'
+        ? 'Request timed out. Please try again.'
+        : 'Failed to load more meals. Please try again.';
+      setSearchError(message);
     } finally {
       setIsLoadingMeals(false);
     }

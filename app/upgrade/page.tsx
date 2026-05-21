@@ -65,14 +65,19 @@ function UpgradePageContent() {
   const isMasterMode = searchParams.get("master") === "1";
   const shouldStartTutorial = searchParams.get("tutorial") === "1";
   const postSignupUpgradePath = "/upgrade?fromSignup=1";
-  const postAuthRedirect = "/chat";
+  const postAuthRedirect = "/upgrade?fromSignin=1";
   const encodedPostAuthRedirect = encodeURIComponent(postAuthRedirect);
   const encodedPostSignupUpgradePath = encodeURIComponent(postSignupUpgradePath);
   const signInHref = `/auth/signin?redirectTo=${encodedPostAuthRedirect}&switch=1${shouldStartTutorial ? "&tutorial=1" : ""}${isMasterMode ? "&master=1" : ""}`;
   const signUpHref = `/auth/signup?redirectTo=${encodedPostSignupUpgradePath}&switch=1${isMasterMode ? "&master=1" : ""}`;
 
   const routeAfterPlanSelection = useCallback(() => {
-    if (typeof window !== "undefined" && (isFromSignup || shouldStartTutorial)) {
+    if (isFromSignup) {
+      router.push("/onboarding?afterSignup=1");
+      return;
+    }
+
+    if (typeof window !== "undefined" && shouldStartTutorial) {
       localStorage.setItem("seekeatz_start_app_tutorial", "true");
     }
 

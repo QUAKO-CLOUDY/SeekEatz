@@ -11,7 +11,7 @@
                  "slug":  "seekeatz",
                  "ios":  {
                              "bundleIdentifier":  "com.seekeatz.app",
-                             "buildNumber": "9",
+                             "buildNumber": "10",
                              "infoPlist":  {
                                                "NSLocationWhenInUseUsageDescription": "SeekEatz uses your location to find nearby restaurants and menu items that match your nutrition goals.",
                                                "ITSAppUsesNonExemptEncryption":  false,
@@ -28,5 +28,6 @@
                  "icon":  "./assets/icon.png"
              }
 }
+
 
 

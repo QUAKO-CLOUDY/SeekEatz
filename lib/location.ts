@@ -42,3 +42,31 @@ export function storeLocation(latitude: number, longitude: number) {
   window.localStorage.setItem(LOCATION_KEY, JSON.stringify(payload));
 }
 
+export async function requestAndStoreLocation(): Promise<StoredLocation | null> {
+  if (typeof window === "undefined" || !navigator.geolocation) {
+    return null;
+  }
+
+  return new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const location: StoredLocation = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          grantedAt: Date.now(),
+        };
+
+        storeLocation(location.latitude, location.longitude);
+        resolve(location);
+      },
+      () => {
+        resolve(null);
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 10000,
+        maximumAge: 300000,
+      },
+    );
+  });
+}

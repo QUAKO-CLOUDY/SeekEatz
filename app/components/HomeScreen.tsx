@@ -12,7 +12,7 @@ import { normalizeMacros } from "@/lib/macro-utils";
 import { motion } from "framer-motion";
 import { AnimatedNumber } from "./AnimatedNumber";
 import { diversifyMealsByRestaurant } from "@/lib/restaurant-diversity";
-import { getStoredLocation, storeLocation } from "@/lib/location";
+import { getStoredLocation, requestAndStoreLocation } from "@/lib/location";
 import {
   Select,
   SelectContent,
@@ -567,24 +567,24 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       : 'No meals found. Enable location or adjust your search filters.';
   };
 
-  // Request user location on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          storeLocation(position.coords.latitude, position.coords.longitude);
-          setUserLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        (error) => {
-          console.log('Location access denied or unavailable:', error.message);
-          // Don't show error to user - radius filtering just won't work
-        }
-      );
+  const requestLocationForNearbySearch = useCallback(async () => {
+    if (userLocation) {
+      return userLocation;
     }
-  }, []);
+
+    const location = await requestAndStoreLocation();
+    if (!location) {
+      return null;
+    }
+
+    const nextLocation = {
+      latitude: location.latitude,
+      longitude: location.longitude,
+    };
+    setUserLocation(nextLocation);
+    return nextLocation;
+  }, [userLocation]);
+
 
   const searchMeals = async (
     query: string, 
@@ -609,15 +609,17 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       caloriesMax?: number;
       caloriesMin?: number;
     },
-    calorieMode?: "UNDER" | "OVER"
+    calorieMode?: "UNDER" | "OVER",
+    locationOverride?: { latitude: number; longitude: number } | null
   ): Promise<SearchMealsResponse> => {
     void _append;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout so loading doesn't hang
+    const effectiveLocation = locationOverride ?? userLocation;
 
     try {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`🔍 Search: query="${query}", radius=${distance} miles, hasLocation=${!!userLocation}`, constraints);
+        console.log(`🔍 Search: query="${query}", radius=${distance} miles, hasLocation=${!!effectiveLocation}`, constraints);
       }
 
       const res = await fetch('/api/search', {
@@ -626,24 +628,24 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         body: JSON.stringify({
           query,
           ...(distance ? { radius_miles: distance } : {}),
-          ...(userLocation ? { location: 'near me' } : {}),
+          ...(effectiveLocation ? { location: 'near me' } : {}),
           filters: filters,
           macroFilters: macroFilters || undefined,
           calorieMode: calorieMode || undefined,
           isHomepage: true,
           limit: 20,
           ...(searchKey ? { searchKey, isPagination: true, offset: nextOffset ?? 0 } : {}),
-          ...(userLocation ? {
-            user_location_lat: userLocation.latitude,
-            user_location_lng: userLocation.longitude,
+          ...(effectiveLocation ? {
+            user_location_lat: effectiveLocation.latitude,
+            user_location_lng: effectiveLocation.longitude,
           } : {}),
           userContext: {
             ...(distance ? { search_distance_miles: distance } : {}),
             ...(userProfile?.diet_type ? { diet_type: userProfile.diet_type } : {}),
             ...(userProfile?.dietary_options ? { dietary_options: userProfile.dietary_options } : {}),
-            ...(userLocation ? {
-              user_location_lat: userLocation.latitude,
-              user_location_lng: userLocation.longitude,
+            ...(effectiveLocation ? {
+              user_location_lat: effectiveLocation.latitude,
+              user_location_lng: effectiveLocation.longitude,
             } : {}),
           },
         }),
@@ -718,6 +720,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         localStorage.removeItem('seekeatz_last_search_params');
       }
 
+      const resolvedLocation = await requestLocationForNearbySearch();
       const query = "find meals";
       const calorieMode = macroDirections.calories === "below" ? "UNDER" : "OVER";
 
@@ -786,7 +789,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     }
     
       setRecommendedMeals([]);
-      const mealsResult = await searchMeals(query, activeDistance, false, undefined, undefined, undefined, filters, macroFilters, calorieMode);
+      const mealsResult = await searchMeals(query, activeDistance, false, undefined, undefined, undefined, filters, macroFilters, calorieMode, resolvedLocation);
       const meals = mealsResult.meals || [];
 
       let filteredMeals = selectedCuisine

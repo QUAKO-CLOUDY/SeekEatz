@@ -28,13 +28,18 @@ function GoogleIcon() {
   );
 }
 
+const OAUTH_GENERIC_ERROR = "Login failed. Please try again or use email login.";
+
 export function AuthProviders({
   oauthRedirectPath = "/chat",
   className = "",
   onBeforeRedirect,
 }: Props) {
   const [isLoadingProvider, setIsLoadingProvider] = useState<string | null>(null);
-  const showApple = process.env.NEXT_PUBLIC_ENABLE_APPLE_AUTH !== "false";
+  const [authError, setAuthError] = useState<string | null>(null);
+
+  // Keep social providers opt-in so App Review never sees unsupported-provider errors.
+  const showApple = process.env.NEXT_PUBLIC_ENABLE_APPLE_AUTH === "true";
   const showGoogle = process.env.NEXT_PUBLIC_ENABLE_GOOGLE_AUTH === "true";
   const hasProviders = showApple || showGoogle;
 
@@ -47,6 +52,7 @@ export function AuthProviders({
 
   const signInWithProvider = async (provider: "google" | "apple") => {
     setIsLoadingProvider(provider);
+    setAuthError(null);
 
     try {
       onBeforeRedirect?.();
@@ -59,7 +65,11 @@ export function AuthProviders({
 
       if (error) {
         console.error(`OAuth sign-in failed for ${provider}:`, error);
+        setAuthError(OAUTH_GENERIC_ERROR);
       }
+    } catch (error) {
+      console.error(`Unexpected OAuth sign-in failure for ${provider}:`, error);
+      setAuthError(OAUTH_GENERIC_ERROR);
     } finally {
       setIsLoadingProvider(null);
     }
@@ -87,6 +97,12 @@ export function AuthProviders({
           {isLoadingProvider === "google" ? "Connecting to Google..." : "Continue with Google"}
         </button>
       )}
+
+      {authError ? (
+        <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+          {authError}
+        </p>
+      ) : null}
     </div>
   );
 }

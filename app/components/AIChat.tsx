@@ -10,7 +10,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useChat } from "../contexts/ChatContext";
 import { getGuestSessionId, getGuestChatMessages, saveGuestChatMessages, touchGuestActivity, clearGuestSession } from "@/lib/guest-session";
 import { getRestaurantLogoUrl } from "@/lib/image-utils";
-import { getStoredLocation, storeLocation } from "@/lib/location";
+import { getStoredLocation, requestAndStoreLocation } from "@/lib/location";
 import { extractMacroConstraintsFromText } from "@/lib/extractMacroConstraintsFromText";
 import { UpgradeModal } from "./UpgradeModal";
 import {
@@ -433,30 +433,32 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       : null;
   });
 
-  // Get user location on mount (if permission granted)
-  useEffect(() => {
-    if (typeof window !== 'undefined' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          storeLocation(position.coords.latitude, position.coords.longitude);
-          setUserLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        (error) => {
-          // User denied location or error - silently fail (graceful fallback)
-          console.log('Location access denied or unavailable:', error.message);
-          setUserLocation(null);
-        },
-        {
-          enableHighAccuracy: false,
-          timeout: 5000,
-          maximumAge: 300000, // Cache for 5 minutes
-        }
-      );
-    }
+  const queryNeedsLocation = useCallback((queryText: string) => {
+    return /\b(near me|nearby|closest|around me|in my area|within\s+\d+\s*(mi|mile|miles|km))\b/i.test(queryText);
   }, []);
+
+  const requestLocationForNearbyIntent = useCallback(async (queryText: string) => {
+    if (!queryNeedsLocation(queryText)) {
+      return userLocation;
+    }
+
+    if (userLocation) {
+      return userLocation;
+    }
+
+    const location = await requestAndStoreLocation();
+    if (!location) {
+      return null;
+    }
+
+    const nextLocation = {
+      latitude: location.latitude,
+      longitude: location.longitude,
+    };
+    setUserLocation(nextLocation);
+    return nextLocation;
+  }, [queryNeedsLocation, userLocation]);
+
 
   // Helper to record chat activity timestamps (alias for touchGuestActivity)
   const recordActivity = useCallback(() => {
@@ -1190,6 +1192,8 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           .filter((entry) => entry.content.length > 0)
           .slice(-ROUTER_HISTORY_LIMIT);
 
+        const resolvedLocation = await requestLocationForNearbyIntent(trimmedText);
+
         response = await fetch('/api/chat', {
           method: 'POST',
           headers: {
@@ -1208,9 +1212,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
               dietary_options: userProfile?.dietary_options,
               userId: userId || currentSessionId,
               // Include location if available
-              ...(userLocation ? {
-                user_location_lat: userLocation.latitude,
-                user_location_lng: userLocation.longitude,
+              ...(resolvedLocation ? {
+                user_location_lat: resolvedLocation.latitude,
+                user_location_lng: resolvedLocation.longitude,
               } : {}),
             }
           }),

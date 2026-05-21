@@ -2,10 +2,9 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { ChevronRight, MapPin, Sparkles, Map, ShieldCheck } from "lucide-react";
+import { ChevronRight, MapPin, Sparkles, ShieldCheck } from "lucide-react";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/client";
-import { storeLocation } from "@/lib/location";
 import { bootstrapAccount } from "@/lib/bootstrap-account";
 import type { UserProfile } from "@/app/types";
 
@@ -14,13 +13,11 @@ type Props = {
   initialStep?: number;
 };
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 3;
 
 export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
   const supabase = createClient();
-  const [step, setStep] = useState(initialStep); // -1 = Welcome, 0-3 = onboarding slides
-  const [isRequestingLocation, setIsRequestingLocation] = useState(false);
-  const [locationError, setLocationError] = useState<string | null>(null);
+  const [step, setStep] = useState(initialStep); // -1 = Welcome, 0-2 = onboarding slides
 
   // Progress dots component
   const ProgressDots = ({ activeStep }: { activeStep: number }) => {
@@ -44,7 +41,7 @@ export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
         ))}
       </div>
     );
-  };
+  }
 
   if (step === -1) {
     return (
@@ -201,7 +198,7 @@ export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
               Back
             </Button>
             <Button
-              onClick={() => setStep(3)}
+              onClick={() => { void completeOnboarding(); }}
               className="h-14 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg shadow-orange-500/20 flex-[2] text-lg"
             >
               Next
@@ -213,50 +210,7 @@ export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
     );
   }
 
-  // STEP 3: Location Permission (Last step before plan selection)
-  // Once this completes, the app routes into the account / plan selection flow.
-  const handleLocationRequest = async () => {
-    setLocationError(null);
-
-    if (typeof window === "undefined" || !navigator.geolocation) {
-      setLocationError("Location is not available on this device.");
-      await completeOnboarding();
-      return;
-    }
-
-    setIsRequestingLocation(true);
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          storeLocation(position.coords.latitude, position.coords.longitude);
-          localStorage.setItem("seekeatz_location_enabled", "true");
-        } catch (e) {
-          console.error("Error storing granted location:", e);
-        } finally {
-          setIsRequestingLocation(false);
-          await completeOnboarding();
-        }
-      },
-      async (error) => {
-        console.error("Location permission error:", error);
-        setLocationError("We couldn't access your location. You can allow it later in your browser settings.");
-        setIsRequestingLocation(false);
-        await completeOnboarding();
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: 10000,
-        maximumAge: 300000,
-      }
-    );
-  };
-
-  const handleSkipLocation = async () => {
-    await completeOnboarding();
-  };
-
-  const completeOnboarding = async () => {
+  async function completeOnboarding() {
     try {
       const now = Date.now();
       
@@ -338,64 +292,6 @@ export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
       // On error, still notify parent so it can decide how to handle navigation
       onComplete();
     }
-  };
-
-  if (step === 3) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-50 via-background to-blue-50 dark:from-slate-950 dark:via-background dark:to-slate-900" />
-        <div className="absolute -top-24 right-[-4rem] h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
-        <div className="absolute -bottom-24 left-[-4rem] h-56 w-56 rounded-full bg-blue-500/20 blur-3xl" />
-
-        <div className="relative z-10 w-full max-w-md rounded-[2rem] border border-white/40 bg-white/90 p-8 text-center shadow-2xl backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
-          <div className="mb-8 flex justify-center">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full blur-2xl opacity-20 animate-pulse" />
-              <Map className="w-20 h-20 text-green-500 relative" strokeWidth={1.5} />
-            </div>
-          </div>
-
-          <h1 className="text-3xl font-bold text-foreground mb-4">Use your location</h1>
-          <p className="text-muted-foreground text-lg mb-12 leading-relaxed">
-            Allow SeekEatz to use your location to find restaurants and menu items nearby.
-          </p>
-
-          {locationError ? (
-            <p className="mb-6 rounded-2xl bg-amber-100 px-4 py-3 text-sm text-amber-800">
-              {locationError}
-            </p>
-          ) : null}
-
-          <ProgressDots activeStep={step} />
-
-          <div className="space-y-3">
-            <Button
-              onClick={handleLocationRequest}
-              disabled={isRequestingLocation}
-              className="h-14 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg shadow-green-500/20 w-full text-lg"
-            >
-              {isRequestingLocation ? "Enabling location..." : "Allow Location"}
-            </Button>
-
-            <div className="flex gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setStep(2)}
-                className="h-14 rounded-full border-muted-foreground/20 text-foreground hover:bg-muted flex-1"
-              >
-                Back
-              </Button>
-              <button
-                onClick={handleSkipLocation}
-                className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors flex-1"
-              >
-                Not now
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
   }
 
   return null;

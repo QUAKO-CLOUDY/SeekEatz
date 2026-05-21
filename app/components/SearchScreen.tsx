@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChevronRight, Sparkles, X } from 'lucide-react';
 import type { Meal } from '../types';
 import { getRestaurantLogoUrl } from '@/lib/image-utils';
+import { getStoredLocation, ensureSearchLocation } from '@/lib/location';
 import FoodCard from './FoodCard';
 
 type Props = {
@@ -111,6 +112,21 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
   const [searchKey, setSearchKey] = useState<string | undefined>(undefined);
   const [nextOffset, setNextOffset] = useState<number>(0);
   const [hasMore, setHasMore] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(() => {
+    const stored = getStoredLocation();
+    return stored
+      ? { latitude: stored.latitude, longitude: stored.longitude }
+      : null;
+  });
+
+  const ensureLocationForSearch = async () => {
+    if (userLocation) return userLocation;
+    const location = await ensureSearchLocation();
+    if (!location) return null;
+    const nextLocation = { latitude: location.latitude, longitude: location.longitude };
+    setUserLocation(nextLocation);
+    return nextLocation;
+  };
 
   async function handleSearch(e?: React.FormEvent) {
     e?.preventDefault();
@@ -123,11 +139,17 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
     setSearchKey(undefined);
     
     try {
+      const resolvedLocation = await ensureLocationForSearch();
       const res = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query,
+          ...(resolvedLocation ? { location: 'near me' } : {}),
+          ...(resolvedLocation ? {
+            user_location_lat: resolvedLocation.latitude,
+            user_location_lng: resolvedLocation.longitude,
+          } : {}),
           limit: SEARCH_SCREEN_PAGE_SIZE,
         }),
       });

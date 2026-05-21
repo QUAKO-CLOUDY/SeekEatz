@@ -10,7 +10,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useChat } from "../contexts/ChatContext";
 import { getGuestSessionId, getGuestChatMessages, saveGuestChatMessages, touchGuestActivity, clearGuestSession } from "@/lib/guest-session";
 import { getRestaurantLogoUrl } from "@/lib/image-utils";
-import { getStoredLocation, requestAndStoreLocation } from "@/lib/location";
+import { getStoredLocation, ensureSearchLocation } from "@/lib/location";
 import { extractMacroConstraintsFromText } from "@/lib/extractMacroConstraintsFromText";
 import { UpgradeModal } from "./UpgradeModal";
 import {
@@ -433,32 +433,6 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       : null;
   });
 
-  const queryNeedsLocation = useCallback((queryText: string) => {
-    return /\b(near me|nearby|closest|around me|in my area|within\s+\d+\s*(mi|mile|miles|km))\b/i.test(queryText);
-  }, []);
-
-  const requestLocationForNearbyIntent = useCallback(async (queryText: string) => {
-    if (!queryNeedsLocation(queryText)) {
-      return userLocation;
-    }
-
-    if (userLocation) {
-      return userLocation;
-    }
-
-    const location = await requestAndStoreLocation();
-    if (!location) {
-      return null;
-    }
-
-    const nextLocation = {
-      latitude: location.latitude,
-      longitude: location.longitude,
-    };
-    setUserLocation(nextLocation);
-    return nextLocation;
-  }, [queryNeedsLocation, userLocation]);
-
 
   // Helper to record chat activity timestamps (alias for touchGuestActivity)
   const recordActivity = useCallback(() => {
@@ -654,6 +628,28 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     const lowerQuery = query.toLowerCase();
     return mealKeywords.some(keyword => lowerQuery.includes(keyword));
   }, []);
+
+  const requestLocationForMealSearch = useCallback(async (shouldRequestLocation: boolean) => {
+    if (!shouldRequestLocation) {
+      return userLocation;
+    }
+
+    if (userLocation) {
+      return userLocation;
+    }
+
+    const location = await ensureSearchLocation();
+    if (!location) {
+      return null;
+    }
+
+    const nextLocation = {
+      latitude: location.latitude,
+      longitude: location.longitude,
+    };
+    setUserLocation(nextLocation);
+    return nextLocation;
+  }, [userLocation]);
 
   // Auto-scroll
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -1192,7 +1188,8 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           .filter((entry) => entry.content.length > 0)
           .slice(-ROUTER_HISTORY_LIMIT);
 
-        const resolvedLocation = await requestLocationForNearbyIntent(trimmedText);
+        const shouldRequestLocation = isMealIntentQuery(trimmedText);
+        const resolvedLocation = await requestLocationForMealSearch(shouldRequestLocation);
 
         response = await fetch('/api/chat', {
           method: 'POST',

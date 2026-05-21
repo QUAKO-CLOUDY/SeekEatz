@@ -12,7 +12,7 @@ import { normalizeMacros } from "@/lib/macro-utils";
 import { motion } from "framer-motion";
 import { AnimatedNumber } from "./AnimatedNumber";
 import { diversifyMealsByRestaurant } from "@/lib/restaurant-diversity";
-import { getStoredLocation, requestAndStoreLocation } from "@/lib/location";
+import { getStoredLocation, ensureSearchLocation } from "@/lib/location";
 import {
   Select,
   SelectContent,
@@ -572,7 +572,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       return userLocation;
     }
 
-    const location = await requestAndStoreLocation();
+    const location = await ensureSearchLocation();
     if (!location) {
       return null;
     }

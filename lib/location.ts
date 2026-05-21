@@ -5,6 +5,9 @@ export type StoredLocation = {
 };
 
 const LOCATION_KEY = "seekeatz_user_location";
+const LOCATION_SEARCH_PROMPTED_KEY = "seekeatz_location_search_prompted";
+
+let pendingLocationRequest: Promise<StoredLocation | null> | null = null;
 
 export function getStoredLocation(): StoredLocation | null {
   if (typeof window === "undefined") {
@@ -42,6 +45,22 @@ export function storeLocation(latitude: number, longitude: number) {
   window.localStorage.setItem(LOCATION_KEY, JSON.stringify(payload));
 }
 
+function hasPromptedForSearchLocation(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return window.localStorage.getItem(LOCATION_SEARCH_PROMPTED_KEY) === "true";
+}
+
+function markPromptedForSearchLocation() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  window.localStorage.setItem(LOCATION_SEARCH_PROMPTED_KEY, "true");
+}
+
 export async function requestAndStoreLocation(): Promise<StoredLocation | null> {
   if (typeof window === "undefined" || !navigator.geolocation) {
     return null;
@@ -69,4 +88,28 @@ export async function requestAndStoreLocation(): Promise<StoredLocation | null> 
       },
     );
   });
+}
+
+export async function ensureSearchLocation(): Promise<StoredLocation | null> {
+  const stored = getStoredLocation();
+  if (stored) {
+    return stored;
+  }
+
+  if (hasPromptedForSearchLocation()) {
+    return null;
+  }
+
+  if (pendingLocationRequest) {
+    return pendingLocationRequest;
+  }
+
+  markPromptedForSearchLocation();
+  pendingLocationRequest = requestAndStoreLocation();
+
+  try {
+    return await pendingLocationRequest;
+  } finally {
+    pendingLocationRequest = null;
+  }
 }

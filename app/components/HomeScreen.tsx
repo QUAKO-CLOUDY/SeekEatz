@@ -134,6 +134,7 @@ const NO_MORE_MEALS_MESSAGE =
 const HOME_MEALS_PAGE_SIZE = 4;
 const APPENDED_MEALS_DIVIDER_LABEL = "More meals";
 const DEFAULT_HOME_DISTANCE_MILES = 15;
+const FREE_SEARCH_LIMIT_MESSAGE = "You've used your 2 free searches for the day. Please come back in 24 hours when your 2 searches reset.";
 const HOME_MACRO_VALUES_SESSION_KEY = "seekeatz_home_macro_values_v2";
 const DEFAULT_HOME_MACRO_ENABLED: Record<MacroType, boolean> = {
   calories: true,
@@ -666,7 +667,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         const message = !Array.isArray(data) && data?.message ? String(data.message) : null;
         if (res.status === 504) throw new Error(message || 'Request timed out. Please try again.');
         if (res.status === 403 && !Array.isArray(data) && data?.usageLimit) {
-          const usageError = new Error(message || "You've used your 2 free searches for the last 24 hours.");
+          const usageError = new Error(FREE_SEARCH_LIMIT_MESSAGE);
           (usageError as Error & { usageLimit?: boolean }).usageLimit = true;
           throw usageError;
         }
@@ -708,30 +709,16 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     }
   };
 
-  const handleFindMeals = async () => {
-    setIsLoadingMeals(true);
-    setHasSearched(true);
-    setSearchError(null);
-    setLoadMoreNotice(null);
+  const buildActiveMacroSearchFilters = () => {
+    const calorieMode: "UNDER" | "OVER" = macroDirections.calories === "below" ? "UNDER" : "OVER";
 
-    try {
-      updateActivity();
-      setLastSearchParams(null);
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('seekeatz_last_search_params');
-      }
-
-      const resolvedLocation = await requestLocationForNearbySearch();
-      const query = "find meals";
-      const calorieMode = macroDirections.calories === "below" ? "UNDER" : "OVER";
-
-      const filters: {
+    const filters: {
       calories?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
       protein?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
       carbs?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
       fats?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
     } = {};
-    
+
     if (macroEnabled.calories) {
       filters.calories = {
         enabled: true,
@@ -760,7 +747,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         value: macroValues.fats,
       };
     }
-    
+
     const macroFilters: {
       proteinMin?: number;
       proteinMax?: number;
@@ -771,7 +758,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       caloriesMax?: number;
       caloriesMin?: number;
     } = {};
-    
+
     if (filters.calories?.enabled) {
       if (filters.calories.mode === "BELOW") macroFilters.caloriesMax = filters.calories.value;
       else macroFilters.caloriesMin = filters.calories.value;
@@ -788,21 +775,82 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       if (filters.fats.mode === "BELOW") macroFilters.fatsMax = filters.fats.value;
       else macroFilters.fatsMin = filters.fats.value;
     }
-    
+
+    return { calorieMode, filters, macroFilters };
+  };
+
+  const handleFindMeals = async () => {
+    setIsLoadingMeals(true);
+    setHasSearched(true);
+    setSearchError(null);
+    setLoadMoreNotice(null);
+
+    try {
+      updateActivity();
+      setLastSearchParams(null);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('seekeatz_last_search_params');
+      }
+
+      const resolvedLocation = await requestLocationForNearbySearch();
+      const query = "find meals";
+      const { calorieMode, filters, macroFilters } = buildActiveMacroSearchFilters();
+
       setRecommendedMeals([]);
-      const mealsResult = await searchMeals(query, activeDistance, false, undefined, undefined, undefined, filters, macroFilters, calorieMode, resolvedLocation);
-      const meals = mealsResult.meals || [];
+      let mealsResult = await searchMeals(
+        query,
+        activeDistance,
+        false,
+        undefined,
+        undefined,
+        undefined,
+        filters,
+        macroFilters,
+        calorieMode,
+        resolvedLocation,
+      );
 
       let filteredMeals = selectedCuisine
-        ? meals.filter(meal => mealMatchesCuisine(meal, selectedCuisine))
-        : meals;
+        ? mealsResult.meals.filter((meal) => mealMatchesCuisine(meal, selectedCuisine))
+        : mealsResult.meals;
       filteredMeals = filterMealsByProfile(filteredMeals, userProfile);
 
-      // Build a single diversified ordering across the full valid pool.
+      while (
+        filteredMeals.length < HOME_MEALS_PAGE_SIZE &&
+        mealsResult.hasMore &&
+        mealsResult.searchKey
+      ) {
+        const moreResult = await searchMeals(
+          query,
+          activeDistance,
+          true,
+          undefined,
+          mealsResult.searchKey,
+          mealsResult.nextOffset,
+          filters,
+          macroFilters,
+          calorieMode,
+          resolvedLocation,
+        );
+
+        let nextPageMeals = selectedCuisine
+          ? moreResult.meals.filter((meal) => mealMatchesCuisine(meal, selectedCuisine))
+          : moreResult.meals;
+        nextPageMeals = filterMealsByProfile(nextPageMeals, userProfile);
+
+        filteredMeals = deduplicateHomeMeals([...filteredMeals, ...nextPageMeals]);
+        mealsResult = {
+          ...mealsResult,
+          searchKey: moreResult.searchKey ?? mealsResult.searchKey,
+          nextOffset: moreResult.nextOffset ?? mealsResult.nextOffset,
+          hasMore: moreResult.hasMore ?? false,
+          message: mealsResult.message ?? moreResult.message,
+        };
+      }
+
       const diversifiedAll = diversifyMealsByRestaurant(filteredMeals);
       setAllSearchMeals(diversifiedAll);
 
-      // Show the first page (4 cards) from the diversified list.
       const newMeals = diversifiedAll.slice(0, HOME_MEALS_PAGE_SIZE);
       setRecommendedMeals(newMeals);
 
@@ -838,7 +886,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       setRecommendedMeals([]);
       if (err instanceof Error && (err as Error & { usageLimit?: boolean }).usageLimit) {
         onUsageLimitReached?.();
-        setSearchError(err.message || 'You have used your 2 free searches for the last 24 hours. Upgrade to keep going.');
+        setSearchError(FREE_SEARCH_LIMIT_MESSAGE);
         return;
       }
 
@@ -852,89 +900,38 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   };
 
   const handleFindMoreMeals = async () => {
-    updateActivity(); // Update activity on button click
+    updateActivity();
     setIsLoadingMeals(true);
     setLoadMoreNotice(null);
 
     try {
       let workingPool = allSearchMeals;
       const searchState = lastSearchParams;
+      let workingSearchState = searchState
+        ? {
+            searchKey: searchState.searchKey,
+            nextOffset: searchState.nextOffset,
+            hasMore: searchState.hasMore,
+            distance: searchState.distance,
+          }
+        : null;
+
       let start = recommendedMeals.length;
       let next = workingPool.slice(start, start + HOME_MEALS_PAGE_SIZE);
+      const { calorieMode, filters, macroFilters } = buildActiveMacroSearchFilters();
 
-      if (next.length === 0 && searchState?.hasMore && searchState.searchKey) {
-        const calorieMode = macroDirections.calories === "below" ? "UNDER" : "OVER";
-        const filters: {
-          calories?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
-          protein?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
-          carbs?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
-          fats?: { enabled: boolean; mode: "BELOW" | "ABOVE"; value: number };
-        } = {};
-
-        if (macroEnabled.calories) {
-          filters.calories = {
-            enabled: true,
-            mode: calorieMode === "UNDER" ? "BELOW" : "ABOVE",
-            value: macroValues.calories,
-          };
-        }
-        if (macroEnabled.protein) {
-          filters.protein = {
-            enabled: true,
-            mode: macroDirections.protein === "below" ? "BELOW" : "ABOVE",
-            value: macroValues.protein,
-          };
-        }
-        if (macroEnabled.carbs) {
-          filters.carbs = {
-            enabled: true,
-            mode: macroDirections.carbs === "below" ? "BELOW" : "ABOVE",
-            value: macroValues.carbs,
-          };
-        }
-        if (macroEnabled.fats) {
-          filters.fats = {
-            enabled: true,
-            mode: macroDirections.fats === "below" ? "BELOW" : "ABOVE",
-            value: macroValues.fats,
-          };
-        }
-
-        const macroFilters: {
-          proteinMin?: number;
-          proteinMax?: number;
-          carbsMin?: number;
-          carbsMax?: number;
-          fatsMin?: number;
-          fatsMax?: number;
-          caloriesMax?: number;
-          caloriesMin?: number;
-        } = {};
-
-        if (filters.calories?.enabled) {
-          if (filters.calories.mode === "BELOW") macroFilters.caloriesMax = filters.calories.value;
-          else macroFilters.caloriesMin = filters.calories.value;
-        }
-        if (filters.protein?.enabled) {
-          if (filters.protein.mode === "BELOW") macroFilters.proteinMax = filters.protein.value;
-          else macroFilters.proteinMin = filters.protein.value;
-        }
-        if (filters.carbs?.enabled) {
-          if (filters.carbs.mode === "BELOW") macroFilters.carbsMax = filters.carbs.value;
-          else macroFilters.carbsMin = filters.carbs.value;
-        }
-        if (filters.fats?.enabled) {
-          if (filters.fats.mode === "BELOW") macroFilters.fatsMax = filters.fats.value;
-          else macroFilters.fatsMin = filters.fats.value;
-        }
-
+      while (
+        next.length < HOME_MEALS_PAGE_SIZE &&
+        workingSearchState?.hasMore &&
+        workingSearchState.searchKey
+      ) {
         const moreResult = await searchMeals(
           "find meals",
-          searchState.distance ?? activeDistance,
+          workingSearchState.distance ?? activeDistance,
           true,
           undefined,
-          searchState.searchKey,
-          searchState.nextOffset,
+          workingSearchState.searchKey,
+          workingSearchState.nextOffset,
           filters,
           macroFilters,
           calorieMode
@@ -945,20 +942,29 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           : moreResult.meals;
         appendedMeals = filterMealsByProfile(appendedMeals, userProfile);
 
-        const appendedPool = deduplicateHomeMeals([
-          ...workingPool,
-          ...appendedMeals,
-        ]);
+        workingPool = deduplicateHomeMeals([...workingPool, ...appendedMeals]);
+        setAllSearchMeals(workingPool);
 
-        workingPool = appendedPool;
-        setAllSearchMeals(appendedPool);
-
-        const updatedSearchState = {
-          ...searchState,
-          searchKey: moreResult.searchKey ?? searchState.searchKey,
-          nextOffset: moreResult.nextOffset ?? searchState.nextOffset,
+        workingSearchState = {
+          ...workingSearchState,
+          searchKey: moreResult.searchKey ?? workingSearchState.searchKey,
+          nextOffset: moreResult.nextOffset ?? workingSearchState.nextOffset,
           hasMore: moreResult.hasMore ?? false,
         };
+
+        const updatedSearchState = {
+          ...(searchState ?? {
+            macroValues: { ...macroValues },
+            macroDirections: { ...macroDirections },
+            macroEnabled: { ...macroEnabled },
+            selectedCuisine,
+          }),
+          distance: workingSearchState.distance ?? activeDistance,
+          searchKey: workingSearchState.searchKey,
+          nextOffset: workingSearchState.nextOffset,
+          hasMore: workingSearchState.hasMore,
+        };
+
         setLastSearchParams(updatedSearchState);
         if (typeof window !== 'undefined') {
           localStorage.setItem('seekeatz_last_search_params', JSON.stringify(updatedSearchState));
@@ -974,7 +980,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         if (typeof window !== 'undefined') {
           localStorage.setItem('seekeatz_recommended_meals', JSON.stringify(updatedMeals));
         }
-      } else if (!searchState?.hasMore) {
+      } else if (!workingSearchState?.hasMore) {
         setLoadMoreNotice(NO_MORE_MEALS_MESSAGE);
         if (typeof window !== 'undefined') {
           window.alert(NO_MORE_MEALS_MESSAGE);
@@ -984,7 +990,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       console.error('Find more meals error:', err);
       if (err instanceof Error && (err as Error & { usageLimit?: boolean }).usageLimit) {
         onUsageLimitReached?.();
-        setSearchError(err.message || 'You have used your 2 free searches for the last 24 hours. Upgrade to keep going.');
+        setSearchError(FREE_SEARCH_LIMIT_MESSAGE);
         return;
       }
       const message = err instanceof Error && err.message === 'timeout'
@@ -995,7 +1001,6 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       setIsLoadingMeals(false);
     }
   };
-
   const canLoadMoreMeals =
     recommendedMeals.length < allSearchMeals.length || Boolean(lastSearchParams?.hasMore);
 

@@ -1314,7 +1314,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
 
           openUpgradeModal();
-          setError(serverMessage || "You've used your 2 free searches for the last 24 hours. Upgrade to continue.");
+          setError("You've used your 2 free searches for the day. Please come back in 24 hours when your 2 searches reset.");
           return;
         }
 

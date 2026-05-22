@@ -98,8 +98,10 @@ export default function HeroSection() {
                                 muted
                                 loop
                                 playsInline
+                                controls={false}
+                                preload="metadata"
                             >
-                                <source src="/m%20iPhone.mp4" type="video/mp4" />
+                                <source src="/videos/seekeatz-app-demo.mp4" type="video/mp4" />
                             </video>
 
                             {/* Heavy edge feathering — all four sides blend into #f0f4f8 */}

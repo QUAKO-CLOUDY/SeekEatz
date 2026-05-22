@@ -10,6 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { createClient } from '@/utils/supabase/client';
 import type { UserProfile } from '@/app/types';
 import { clearCachedEntitlement, getEntitlementPlanLabel } from '@/lib/entitlements';
+import { clearLoggedMealsStorageForUser } from '@/lib/logged-meals-storage';
+import { clearAllUserScopedItems } from '@/lib/storage';
+import { clearChatState } from '@/lib/chatStorage';
 import { useAccountEntitlement } from '@/app/hooks/useAccountEntitlement';
 import { isRevenueCatConfigured } from '@/lib/billing/apple-products';
 import {
@@ -31,6 +34,25 @@ const DIET_TYPES = [
   'Pescatarian',
 ];
 
+const APPLE_SUBSCRIPTION_MANAGEMENT_URL = 'https://apps.apple.com/account/subscriptions';
+
+function resolveAppleSubscriptionManagementUrl(url: string | null): string {
+  if (!url) {
+    return APPLE_SUBSCRIPTION_MANAGEMENT_URL;
+  }
+
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    if (host === 'apps.apple.com' || host.endsWith('.apple.com')) {
+      return url;
+    }
+  } catch {
+    // fall through to App Store fallback
+  }
+
+  return APPLE_SUBSCRIPTION_MANAGEMENT_URL;
+}
 export default function AccountEditPage() {
   const router = useRouter();
   const supabase = createClient();
@@ -117,7 +139,7 @@ export default function AccountEditPage() {
   useEffect(() => {
     const loadManagementUrl = async () => {
       if (!nativeBillingReady || !authUserId) {
-        setManagementUrl(null);
+        setManagementUrl(APPLE_SUBSCRIPTION_MANAGEMENT_URL);
         return;
       }
 
@@ -128,10 +150,10 @@ export default function AccountEditPage() {
           appUserID: authUserId,
           email: authEmail,
         });
-        setManagementUrl(url);
+        setManagementUrl(resolveAppleSubscriptionManagementUrl(url));
       } catch (err) {
         console.error('Failed to load subscription management URL:', err);
-        setManagementUrl(null);
+        setManagementUrl(APPLE_SUBSCRIPTION_MANAGEMENT_URL);
       } finally {
         setIsLoadingManagementUrl(false);
       }
@@ -228,7 +250,7 @@ export default function AccountEditPage() {
     }
 
     const confirmed = window.confirm(
-      "Delete your SeekEatz account and associated data permanently? This cannot be undone. App Store subscriptions must still be managed separately through Apple.",
+      'Delete your SeekEatz account and associated data permanently? This cannot be undone. App Store subscriptions must still be managed separately through Apple.',
     );
 
     if (!confirmed) {
@@ -247,19 +269,52 @@ export default function AccountEditPage() {
         body: JSON.stringify({ confirmationText: deleteConfirmation }),
       });
 
+      let responseBody: { error?: string } | null = null;
+      try {
+        responseBody = (await response.json()) as { error?: string };
+      } catch {
+        responseBody = null;
+      }
+
       if (!response.ok) {
-        throw new Error(`Delete failed with status ${response.status}`);
+        throw new Error(responseBody?.error || 'Failed to delete account. Please try again.');
       }
 
       clearCachedEntitlement();
-      localStorage.removeItem('userProfile');
-      localStorage.removeItem('seekeatz_start_app_tutorial');
-      await supabase.auth.signOut();
-      router.replace('/auth/signup');
+
+      if (typeof window !== 'undefined') {
+        const scopedUserId = authUserId ?? null;
+
+        clearChatState();
+        clearLoggedMealsStorageForUser(scopedUserId);
+        clearAllUserScopedItems(scopedUserId);
+
+        localStorage.removeItem('userProfile');
+        localStorage.removeItem('seekeatz_start_app_tutorial');
+        localStorage.removeItem('seekeatz_recommended_meals');
+        localStorage.removeItem('seekeatz_has_searched');
+        localStorage.removeItem('seekeatz_last_search_params');
+        localStorage.removeItem('seekeatz_pending_chat_message');
+        localStorage.removeItem('seekeatz_favorite_meals');
+        localStorage.removeItem('seekeatz_favorite_meals_data');
+        localStorage.removeItem('seekeatz_favorite_meals:guest');
+        localStorage.removeItem('seekeatz_favorite_meals_data:guest');
+
+        if (scopedUserId) {
+          localStorage.removeItem(`seekeatz_favorite_meals:${scopedUserId}`);
+          localStorage.removeItem(`seekeatz_favorite_meals_data:${scopedUserId}`);
+          localStorage.removeItem(`seekEatz_lastLogin_${scopedUserId}`);
+        }
+      }
+
+      await supabase.auth.signOut({ scope: 'global' });
+      router.replace('/auth/signin?accountDeleted=1');
       router.refresh();
     } catch (err) {
       console.error('Error deleting account:', err);
-      setDeleteError('Failed to delete account. Please try again or contact support@seekeatz.com.');
+      setDeleteError(
+        err instanceof Error ? err.message : 'Failed to delete account. Please try again.',
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -284,7 +339,7 @@ export default function AccountEditPage() {
         appUserID: authUserId,
         email: authEmail,
       });
-      setManagementUrl(url);
+      setManagementUrl(resolveAppleSubscriptionManagementUrl(url));
     } catch (err) {
       console.error('Failed to restore purchases:', err);
       setBillingError('Restore purchases failed. Try again from the iOS app or contact support@seekeatz.com.');
@@ -294,14 +349,11 @@ export default function AccountEditPage() {
   };
 
   const handleManageSubscription = async () => {
-    if (!managementUrl) {
-      setBillingError('No active App Store subscription was found to manage yet.');
-      return;
-    }
+    const appStoreManagementUrl = resolveAppleSubscriptionManagementUrl(managementUrl);
 
     try {
       setBillingError(null);
-      await openExternalUrl(managementUrl);
+      await openExternalUrl(appStoreManagementUrl);
     } catch (err) {
       console.error('Failed to open subscription management URL:', err);
       setBillingError('Unable to open App Store subscription management.');
@@ -374,7 +426,7 @@ export default function AccountEditPage() {
 
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 {!entitlement.hasPremiumAccess
-                  ? 'Free accounts get 2 searches every 24 hours across Home and AI Chat. Restore a previous purchase here or upgrade inside the iOS app.'
+                  ? 'Free accounts get 2 searches every 24 hours across Home and AI Chat. Restore previous purchases or choose an in-app plan here.'
                   : entitlement.billingStatus === 'trialing' && entitlement.trialExpiresAt
                     ? `Your waitlist free month is active through ${new Date(entitlement.trialExpiresAt).toLocaleDateString()}.`
                     : 'Your premium access is active. You can restore purchases or open App Store subscription management below.'}
@@ -589,7 +641,7 @@ export default function AccountEditPage() {
           </Button>
         </div>
 
-        <div className="rounded-3xl border border-red-200 bg-red-50/70 p-6 shadow-sm dark:border-red-900 dark:bg-red-950/15">
+        <div id="delete-account" className="rounded-3xl border border-red-200 bg-red-50/70 p-6 shadow-sm dark:border-red-900 dark:bg-red-950/15">
           <div className="flex items-start gap-3">
             <div className="mt-1 flex size-10 items-center justify-center rounded-xl border border-red-200 bg-white text-red-600 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400">
               <AlertTriangle className="size-5" />
@@ -624,7 +676,7 @@ export default function AccountEditPage() {
                   type="button"
                   variant="outline"
                   onClick={() => void handleDeleteAccount()}
-                  disabled={isDeleting}
+                  disabled={isDeleting || deleteConfirmation !== 'DELETE'}
                   className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950/20"
                 >
                   {isDeleting ? (
@@ -647,3 +699,4 @@ export default function AccountEditPage() {
     </div>
   );
 }
+

@@ -22,10 +22,11 @@ import {
 function SignInPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/upgrade?fromSignin=1";
+  const redirectTo = searchParams.get("redirectTo") || "/chat";
   const isMasterMode = searchParams.get("master") === "1";
   const isSwitchAccountMode = searchParams.get("switch") === "1";
   const shouldStartTutorial = searchParams.get("tutorial") === "1";
+  const accountDeleted = searchParams.get("accountDeleted") === "1";
   const devMasterEmail =
     process.env.NEXT_PUBLIC_ENABLE_MASTER_LOGIN === "true"
       ? process.env.NEXT_PUBLIC_MASTER_LOGIN_EMAIL ?? ""
@@ -312,6 +313,12 @@ function SignInPageContent() {
           <h1 className="text-3xl font-bold text-black mb-2">Welcome Back</h1>
           <p className="text-black">Sign in to continue to SeekEatz</p>
         </div>
+
+        {accountDeleted && (
+          <div className="mb-5 rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            Your account has been deleted.
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>

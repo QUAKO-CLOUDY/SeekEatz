@@ -217,12 +217,17 @@ function UpgradePageContent() {
                   ? `Current plan: ${getEntitlementPlanLabel(entitlement)}`
                   : "Choose your plan and start finding meals instantly."}
               </p>
+              {isSignedIn && entitlement.hasPremiumAccess ? (
+                <div className="mt-3 inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-emerald-700">
+                  Premium active
+                </div>
+              ) : null}
               {isSignedIn ? (
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
                   {entitlement.hasPremiumAccess
                     ? entitlement.billingStatus === "trialing" && entitlement.trialExpiresAt
                       ? `Your waitlist free month is active through ${new Date(entitlement.trialExpiresAt).toLocaleDateString()}.`
-                      : "Premium is active on this account."
+                      : "Premium active."
                     : "Pick a plan below to unlock unlimited access."}
                 </p>
               ) : null}
@@ -306,9 +311,9 @@ function UpgradePageContent() {
                         plan.id === "free"
                           ? false
                           : isSignedIn
-                            ? !iapReady ||
-                              entitlement.hasPremiumAccess ||
-                              pendingPlanId !== null
+                            ? entitlement.hasPremiumAccess
+                              ? false
+                              : !iapReady || pendingPlanId !== null
                             : false
                       }
                       onClick={() => {
@@ -330,8 +335,13 @@ function UpgradePageContent() {
                         }
 
                         if (plan.id === "monthly" || plan.id === "yearly") {
+                          if (entitlement.hasPremiumAccess) {
+                            router.push("/settings/account");
+                            return;
+                          }
+
                           if (!isNativeApp()) {
-                            setBillingError("Purchases are completed in the iOS app. Open SeekEatz on iPhone to finish upgrading.");
+                            setBillingError("In-app purchases are unavailable right now. Please try again.");
                             return;
                           }
                           void handlePurchase(plan.id);
@@ -344,14 +354,14 @@ function UpgradePageContent() {
                           ? "Continue"
                           : plan.cta
                         : entitlement.hasPremiumAccess
-                        ? "Current plan active"
+                        ? "Manage in App Store"
                         : !isSignedIn
                           ? plan.cta
                           : pendingPlanId === plan.id
                             ? "Processing..."
                             : iapReady && isNativeApp()
                             ? plan.cta
-                            : "Finish purchase in the iOS app"}
+                            : "In-app purchase unavailable"}
                     </button>
                   </div>
                 </div>
@@ -398,7 +408,7 @@ function UpgradePageContent() {
 
             {iapReady && !isNativeApp() && (
               <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                Purchases run inside the iOS app shell. The web app keeps the upgrade UI and account state in sync, but billing is completed natively.
+                In-app purchases are unavailable on this device.
               </div>
             )}
           </div>
@@ -415,3 +425,4 @@ export default function UpgradePage() {
     </Suspense>
   );
 }
+

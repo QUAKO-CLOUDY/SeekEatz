@@ -2,15 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  User, 
-  CreditCard, 
-  HelpCircle, 
-  LogOut, 
-  ChevronRight, 
-  Edit, 
-  Sun, 
-  Moon, 
+
+import {
+  User,
+  CreditCard,
+  HelpCircle,
+  LogOut,
+  Trash2,
+  ChevronRight,
+  Edit,
+  Sun,
+  Moon,
   FileText,
   Shield,
   MessageCircle,
@@ -1272,7 +1274,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                   : 'Manage your plan details or review upgrade options on the subscription screen.'}
             </p>
             <Button
-              onClick={() => router.push('/upgrade')}
+              onClick={() => router.push(entitlement.hasPremiumAccess ? '/settings/account' : '/upgrade')}
               className="mt-4 w-full"
             >
               {!entitlement.hasPremiumAccess ? 'View Plans' : 'Manage Subscription'}
@@ -1335,17 +1337,28 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
           <div className="mb-4 space-y-1">
             <h2 className="text-base font-semibold text-foreground">Account</h2>
             <p className="text-sm text-muted-foreground">
-              Sign out of your account on this device.
+              Manage sign-out and account deletion.
             </p>
           </div>
-          <button
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            className="flex w-full items-center justify-center gap-3 rounded-xl border border-red-200 bg-background/90 p-3 transition-colors hover:bg-red-50 dark:border-red-800 dark:bg-background/40 dark:hover:bg-red-950/20 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            <LogOut className="size-4 text-red-600 dark:text-red-400" />
-            <span className="font-medium text-red-600 dark:text-red-400">{isLoggingOut ? 'Signing out...' : 'Log Out'}</span>
-          </button>
+
+          <div className="space-y-3">
+            <button
+              onClick={() => router.push('/settings/account#delete-account')}
+              className="flex w-full items-center justify-center gap-3 rounded-xl border border-red-200 bg-background/90 p-3 transition-colors hover:bg-red-50 dark:border-red-800 dark:bg-background/40 dark:hover:bg-red-950/20"
+            >
+              <Trash2 className="size-4 text-red-600 dark:text-red-400" />
+              <span className="font-medium text-red-600 dark:text-red-400">Delete Account</span>
+            </button>
+
+            <button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="flex w-full items-center justify-center gap-3 rounded-xl border border-red-200 bg-background/90 p-3 transition-colors hover:bg-red-50 dark:border-red-800 dark:bg-background/40 dark:hover:bg-red-950/20 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <LogOut className="size-4 text-red-600 dark:text-red-400" />
+              <span className="font-medium text-red-600 dark:text-red-400">{isLoggingOut ? 'Signing out...' : 'Log Out'}</span>
+            </button>
+          </div>
         </div>
           <p className="mt-4 text-center text-xs text-muted-foreground">
             Version {appVersionLabel}

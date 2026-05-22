@@ -1274,7 +1274,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                   : 'Manage your plan details or review upgrade options on the subscription screen.'}
             </p>
             <Button
-              onClick={() => router.push(entitlement.hasPremiumAccess ? '/settings/account' : '/upgrade')}
+              onClick={() => router.push('/upgrade')}
               className="mt-4 w-full"
             >
               {!entitlement.hasPremiumAccess ? 'View Plans' : 'Manage Subscription'}

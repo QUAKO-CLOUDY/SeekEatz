@@ -19,14 +19,19 @@ function isMissingSchemaError(error: unknown): boolean {
   }
 
   const candidate = error as { code?: string; message?: string };
+  const message = candidate.message?.toLowerCase() ?? "";
   return (
     candidate.code === "42P01" ||
     candidate.code === "42703" ||
     candidate.code === "PGRST204" ||
-    candidate.message?.toLowerCase().includes("does not exist") === true ||
-    candidate.message?.toLowerCase().includes("column") === true
+    candidate.code === "PGRST205" ||
+    message.includes("does not exist") ||
+    message.includes("column") ||
+    message.includes("schema cache") ||
+    message.includes("could not find the table")
   );
 }
+
 function isAuthUserNotFoundError(error: unknown): boolean {
   if (!error || typeof error !== "object") {
     return false;
@@ -40,6 +45,39 @@ function isAuthUserNotFoundError(error: unknown): boolean {
     message.includes("user not found") ||
     message.includes("not found")
   );
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    if (error.message.includes("Supabase admin client is not configured")) {
+      return "Account deletion is temporarily unavailable. Please contact support@seekeatz.com.";
+    }
+
+    return error.message;
+  }
+
+  if (error && typeof error === "object") {
+    const candidate = error as {
+      message?: string;
+      details?: string;
+      hint?: string;
+      code?: string;
+    };
+
+    const parts = [candidate.message, candidate.details, candidate.hint]
+      .filter((value): value is string => typeof value === "string" && value.trim().length > 0)
+      .map((value) => value.trim());
+
+    if (parts.length > 0) {
+      return parts.join(" ");
+    }
+
+    if (candidate.code) {
+      return `Account deletion failed (${candidate.code}).`;
+    }
+  }
+
+  return "Failed to delete account";
 }
 
 async function deleteRowsIfPresent(
@@ -122,10 +160,7 @@ export async function POST(request: Request) {
 
     const admin = createAdminClient();
 
-    for (const table of USER_OWNED_TABLES) {
-      await deleteRowsIfPresent(admin, table, "user_id", user.id);
-    }
-
+    // Collect cross-table references before deleting parent rows.
     const sessionIds = await selectValuesIfPresent(
       admin,
       "chat_sessions",
@@ -133,7 +168,6 @@ export async function POST(request: Request) {
       "user_id",
       user.id,
     );
-    await deleteRowsByValuesIfPresent(admin, "messages", "session_id", sessionIds);
 
     const conversationIds = await selectValuesIfPresent(
       admin,
@@ -142,30 +176,30 @@ export async function POST(request: Request) {
       "user_id",
       user.id,
     );
-    await deleteRowsByValuesIfPresent(
-      admin,
-      "messages",
-      "conversation_id",
-      conversationIds,
-    );
+
+    await deleteRowsByValuesIfPresent(admin, "messages", "session_id", sessionIds);
+    await deleteRowsByValuesIfPresent(admin, "messages", "conversation_id", conversationIds);
+
+    for (const table of USER_OWNED_TABLES) {
+      await deleteRowsIfPresent(admin, table, "user_id", user.id);
+    }
 
     await deleteRowsIfPresent(admin, "profiles", "id", user.id);
 
-    const { error: deleteUserError } = await admin.auth.admin.deleteUser(user.id);
-    if (deleteUserError && !isAuthUserNotFoundError(deleteUserError)) {
-      throw deleteUserError;
+    const { error: hardDeleteError } = await admin.auth.admin.deleteUser(user.id);
+    if (hardDeleteError && !isAuthUserNotFoundError(hardDeleteError)) {
+      const { error: softDeleteError } = await admin.auth.admin.deleteUser(user.id, true);
+      if (softDeleteError && !isAuthUserNotFoundError(softDeleteError)) {
+        throw softDeleteError;
+      }
     }
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (error) {
     console.error("Failed to delete account:", error);
     return NextResponse.json(
-      { error: "Failed to delete account" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }
 }
-
-
-
-

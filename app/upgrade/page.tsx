@@ -311,9 +311,7 @@ function UpgradePageContent() {
                         plan.id === "free"
                           ? false
                           : isSignedIn
-                            ? entitlement.hasPremiumAccess
-                              ? false
-                              : !iapReady || pendingPlanId !== null
+                            ? pendingPlanId !== null
                             : false
                       }
                       onClick={() => {
@@ -335,13 +333,8 @@ function UpgradePageContent() {
                         }
 
                         if (plan.id === "monthly" || plan.id === "yearly") {
-                          if (entitlement.hasPremiumAccess) {
-                            router.push("/settings/account");
-                            return;
-                          }
-
                           if (!isNativeApp()) {
-                            setBillingError("In-app purchases are unavailable right now. Please try again.");
+                            setBillingError("Purchases are available only in the iOS app.");
                             return;
                           }
                           void handlePurchase(plan.id);
@@ -353,15 +346,11 @@ function UpgradePageContent() {
                         ? isSignedIn
                           ? "Continue"
                           : plan.cta
-                        : entitlement.hasPremiumAccess
-                        ? "Manage in App Store"
                         : !isSignedIn
                           ? plan.cta
                           : pendingPlanId === plan.id
                             ? "Processing..."
-                            : iapReady && isNativeApp()
-                            ? plan.cta
-                            : "In-app purchase unavailable"}
+                            : plan.cta}
                     </button>
                   </div>
                 </div>

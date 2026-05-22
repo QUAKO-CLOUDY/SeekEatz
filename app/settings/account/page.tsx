@@ -6,7 +6,6 @@ import { ArrowLeft, Save, AlertTriangle, Trash2, CreditCard, RefreshCw, External
 import { Button } from '@/app/components/ui/button';
 import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
 import { createClient } from '@/utils/supabase/client';
 import type { UserProfile } from '@/app/types';
 import { clearCachedEntitlement, getEntitlementPlanLabel } from '@/lib/entitlements';
@@ -20,19 +19,6 @@ import {
   restoreRevenueCatPurchases,
 } from '@/lib/billing/revenuecat-client';
 import { isNativeApp, openExternalUrl } from '@/lib/native-runtime';
-
-const DIET_TYPES = [
-  'None',
-  'Balanced',
-  'Vegetarian',
-  'Vegan',
-  'Keto',
-  'Paleo',
-  'Low-Carb',
-  'High-Protein',
-  'Mediterranean',
-  'Pescatarian',
-];
 
 const APPLE_SUBSCRIPTION_MANAGEMENT_URL = 'https://apps.apple.com/account/subscriptions';
 
@@ -269,15 +255,31 @@ export default function AccountEditPage() {
         body: JSON.stringify({ confirmationText: deleteConfirmation }),
       });
 
-      let responseBody: { error?: string } | null = null;
-      try {
-        responseBody = (await response.json()) as { error?: string };
-      } catch {
-        responseBody = null;
+      let serverError: string | null = null;
+      const responseContentType = response.headers.get('content-type') || '';
+
+      if (responseContentType.includes('application/json')) {
+        try {
+          const responseBody = (await response.json()) as { error?: string };
+          serverError = responseBody?.error ?? null;
+        } catch {
+          serverError = null;
+        }
+      } else {
+        try {
+          const responseText = (await response.text()).trim();
+          if (responseText && !responseText.startsWith('<!DOCTYPE')) {
+            serverError = responseText;
+          }
+        } catch {
+          serverError = null;
+        }
       }
 
       if (!response.ok) {
-        throw new Error(responseBody?.error || 'Failed to delete account. Please try again.');
+        throw new Error(
+          serverError || `Failed to delete account (HTTP ${response.status}). Please try again.`,
+        );
       }
 
       clearCachedEntitlement();
@@ -481,7 +483,7 @@ export default function AccountEditPage() {
                     onClick={() => router.push('/upgrade')}
                     className="w-full"
                   >
-                    Open Upgrade Screen
+                    View Plans
                   </Button>
                 )}
 
@@ -490,37 +492,9 @@ export default function AccountEditPage() {
                     {billingError}
                   </div>
                 ) : null}
-
-                {!nativeBillingReady ? (
-                  <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/20 dark:text-amber-200">
-                    Subscription purchases and restore flow run inside the iOS app shell after RevenueCat and App Store products are fully configured.
-                  </div>
-                ) : null}
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Profile */}
-        <div className="bg-card border rounded-3xl p-6 shadow-sm">
-          <Label htmlFor="dietType" className="text-base font-semibold mb-4 block">
-            Diet Type
-          </Label>
-          <Select
-            value={profile.diet_type ?? 'None'}
-            onValueChange={(value) => setProfile(prev => ({ ...prev, diet_type: value }))}
-          >
-            <SelectTrigger id="dietType" className="h-12">
-              <SelectValue placeholder="Select diet type" />
-            </SelectTrigger>
-            <SelectContent>
-              {DIET_TYPES.map((diet) => (
-                <SelectItem key={diet} value={diet}>
-                  {diet}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
 
         {/* Calorie Target */}
@@ -618,7 +592,7 @@ export default function AccountEditPage() {
           <Button
             variant="outline"
             onClick={() => router.back()}
-            className="flex-1 h-12 rounded-full"
+            className="flex-1 h-12 rounded-full text-black hover:text-black"
           >
             Cancel
           </Button>

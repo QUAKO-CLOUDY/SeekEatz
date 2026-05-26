@@ -1003,6 +1003,9 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   };
   const canLoadMoreMeals =
     recommendedMeals.length < allSearchMeals.length || Boolean(lastSearchParams?.hasMore);
+  const shouldShowInlineSearchError =
+    Boolean(searchError) && !(hasSearched && recommendedMeals.length === 0);
+
 
   const resultsConstraintSummary = useMemo(() => {
     const searchMacroValues = lastSearchParams?.macroValues ?? macroValues;
@@ -1320,7 +1323,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
             {HOME_SEARCH_STATUS_MESSAGES[loadingStatusIndex]}
           </motion.p>
         )}
-        {searchError && (
+        {shouldShowInlineSearchError && (
           <p className="mt-3 text-sm text-destructive text-center max-w-md mx-auto px-4">
             {searchError}
           </p>

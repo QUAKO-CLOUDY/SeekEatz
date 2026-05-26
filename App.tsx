@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import { ActivityIndicator, AppState, AppStateStatus, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, AppState, AppStateStatus, Linking, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
 import { WebView, type WebViewMessageEvent } from "react-native-webview";
 import * as Notifications from "expo-notifications";
 
@@ -408,16 +408,37 @@ export default function App() {
     await syncSchedules();
   }, [cancelManagedNotificationsByKind, scheduleProgressReminder, syncSchedules]);
 
+  const openExternalUrl = useCallback(async (url: string) => {
+    if (!/^https?:\/\//i.test(url)) {
+      return;
+    }
+
+    try {
+      await Linking.openURL(url);
+    } catch (error) {
+      console.warn("Failed to open external URL:", error);
+    }
+  }, []);
   const handleWebViewMessage = useCallback(async (event: WebViewMessageEvent) => {
     try {
-      const parsed = JSON.parse(event.nativeEvent.data) as { type?: string; payload?: SnapshotPayload };
+      const parsed = JSON.parse(event.nativeEvent.data) as {
+        type?: string;
+        payload?: SnapshotPayload;
+        url?: string;
+      };
+
       if (parsed.type === "seekeatz_snapshot" && parsed.payload) {
         await handleSnapshotMessage(parsed.payload);
+        return;
+      }
+
+      if (parsed.type === "open_external_url" && typeof parsed.url === "string") {
+        await openExternalUrl(parsed.url);
       }
     } catch {
       // Ignore non-JSON postMessage payloads
     }
-  }, [handleSnapshotMessage]);
+  }, [handleSnapshotMessage, openExternalUrl]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
@@ -454,6 +475,7 @@ export default function App() {
       <WebView
         source={{ uri: webAppUrl }}
         originWhitelist={["*"]}
+        contentMode="mobile"
         hideKeyboardAccessoryView
         javaScriptEnabled
         domStorageEnabled
@@ -503,3 +525,4 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
 });
+

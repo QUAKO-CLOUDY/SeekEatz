@@ -1,33 +1,31 @@
 {
-    "expo":  {
-                 "name":  "SeekEatz",
-                 "version":  "1.1",
-                 "extra":  {
-                               "eas":  {
-                                           "projectId":  "bb1eee24-f509-4d2f-9a34-e13148f99473"
-                                       }
-                           },
-                 "owner":  "seekeatzs-organization",
-                 "slug":  "seekeatz",
-                 "ios":  {
-                             "bundleIdentifier":  "com.seekeatz.app",
-                             "buildNumber": "12",
-                             "infoPlist":  {
-                                               "NSLocationWhenInUseUsageDescription": "SeekEatz uses your location to find nearby restaurants and menu items that match your nutrition goals.",
-                                               "ITSAppUsesNonExemptEncryption":  false,
-                                               "NSUserNotificationsUsageDescription":  "SeekEatz sends optional reminders, daily summaries, and meal suggestions based on your settings."
-                                           },
-                             "icon":  "./assets/icon.png"
-                         },
-                 "android":  {
-                                 "package":  "com.seekeatz.app"
-                             },
-                 "plugins":  [
-                                 "expo-notifications"
-                             ],
-                 "icon":  "./assets/icon.png"
-             }
+  "expo": {
+    "name": "SeekEatz",
+    "version": "1.1",
+    "extra": {
+      "eas": {
+        "projectId": "bb1eee24-f509-4d2f-9a34-e13148f99473"
+      }
+    },
+    "owner": "seekeatzs-organization",
+    "slug": "seekeatz",
+    "ios": {
+      "bundleIdentifier": "com.seekeatz.app",
+      "buildNumber": "14",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "SeekEatz uses your location to find nearby restaurants and menu items that match your nutrition goals.",
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSUserNotificationsUsageDescription": "SeekEatz sends optional reminders, daily summaries, and meal suggestions based on your settings."
+      },
+      "icon": "./assets/icon.png"
+    },
+    "android": {
+      "package": "com.seekeatz.app"
+    },
+    "plugins": [
+      "expo-notifications"
+    ],
+    "icon": "./assets/icon.png"
+  }
 }
-
-
-

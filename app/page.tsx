@@ -27,9 +27,17 @@ function persistOnboardingComplete(userId?: string): void {
   }
 }
 
+
+function getInitialStatusText(): string {
+  if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('previewSplash') === '1') {
+    return 'Splash preview mode';
+  }
+
+  return 'Loading your experience';
+}
 export default function RootPage() {
   const router = useRouter();
-  const [statusText, setStatusText] = useState('Loading your experience');
+  const [statusText, setStatusText] = useState(getInitialStatusText);
 
   useEffect(() => {
     let isActive = true;
@@ -39,7 +47,6 @@ export default function RootPage() {
       new URLSearchParams(window.location.search).get('previewSplash') === '1';
 
     if (isSplashPreview) {
-      setStatusText('Splash preview mode');
       return () => {
         isActive = false;
       };
@@ -118,3 +125,4 @@ export default function RootPage() {
 
   return <LaunchSplash statusText={statusText} />;
 }
+

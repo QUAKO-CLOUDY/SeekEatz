@@ -14,34 +14,37 @@ type Props = {
 };
 
 const TOTAL_STEPS = 3;
+type ProgressDotsProps = {
+  activeStep: number;
+};
+
+function ProgressDots({ activeStep }: ProgressDotsProps) {
+  return (
+    <div className="flex gap-2 justify-center mb-8">
+      {Array.from({ length: TOTAL_STEPS }).map((_, index) => (
+        <div
+          key={index}
+          className={`h-2 w-12 rounded-full transition-all ${
+            index === activeStep
+              ? index === 0
+                ? "bg-gradient-to-r from-teal-500 to-blue-500"
+                : index === 1
+                ? "bg-gradient-to-r from-purple-500 to-pink-500"
+                : index === 2
+                ? "bg-gradient-to-r from-orange-500 to-amber-500"
+                : "bg-gradient-to-r from-green-500 to-emerald-500"
+              : "bg-muted"
+          }`}
+        />
+      ))}
+    </div>
+  );
+}
 
 export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
   const supabase = createClient();
   const [step, setStep] = useState(initialStep); // -1 = Welcome, 0-2 = onboarding slides
 
-  // Progress dots component
-  const ProgressDots = ({ activeStep }: { activeStep: number }) => {
-    return (
-      <div className="flex gap-2 justify-center mb-8">
-        {Array.from({ length: TOTAL_STEPS }).map((_, index) => (
-          <div
-            key={index}
-            className={`h-2 w-12 rounded-full transition-all ${
-              index === activeStep
-                ? index === 0
-                  ? "bg-gradient-to-r from-teal-500 to-blue-500"
-                  : index === 1
-                  ? "bg-gradient-to-r from-purple-500 to-pink-500"
-                  : index === 2
-                  ? "bg-gradient-to-r from-orange-500 to-amber-500"
-                  : "bg-gradient-to-r from-green-500 to-emerald-500"
-                : "bg-muted"
-            }`}
-          />
-        ))}
-      </div>
-    );
-  }
 
   if (step === -1) {
     return (
@@ -296,3 +299,4 @@ export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
 
   return null;
 }
+

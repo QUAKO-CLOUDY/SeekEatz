@@ -16,6 +16,10 @@ import {
 } from "@/lib/billing/revenuecat-client";
 import { isNativeApp } from "@/lib/native-runtime";
 
+const PRIVACY_POLICY_URL = "https://seekeatz.com/legal/privacy";
+const TERMS_OF_USE_URL =
+  "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
+
 const premiumBenefits = [
   "Unlimited home search and AI chat",
   "Smarter, goal-based results",
@@ -127,6 +131,35 @@ function UpgradePageContent() {
     return () => subscription.unsubscribe();
   }, [getOnboardingFlag, refresh]);
   const iapReady = isRevenueCatConfigured();
+
+  const openExternalLegalUrl = useCallback((url: string) => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (isNativeApp()) {
+      const nativeBridge = (
+        window as Window & {
+          ReactNativeWebView?: { postMessage?: (message: string) => void };
+        }
+      ).ReactNativeWebView;
+
+      if (nativeBridge?.postMessage) {
+        nativeBridge.postMessage(
+          JSON.stringify({
+            type: "open_external_url",
+            url,
+          }),
+        );
+        return;
+      }
+    }
+
+    const popup = window.open(url, "_blank", "noopener,noreferrer");
+    if (!popup) {
+      window.location.href = url;
+    }
+  }, []);
 
   const handlePurchase = useCallback(
     async (planId: "monthly" | "yearly") => {
@@ -400,6 +433,29 @@ function UpgradePageContent() {
                 In-app purchases are unavailable on this device.
               </div>
             )}
+
+            <div className="rounded-2xl border border-border bg-background/80 px-4 py-3">
+              <div className="flex items-center justify-center gap-4 text-sm">
+                <button
+                  type="button"
+                  onClick={() => openExternalLegalUrl(PRIVACY_POLICY_URL)}
+                  className="font-medium text-cyan-700 underline underline-offset-2 hover:text-cyan-800"
+                >
+                  Privacy Policy
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openExternalLegalUrl(TERMS_OF_USE_URL)}
+                  className="font-medium text-cyan-700 underline underline-offset-2 hover:text-cyan-800"
+                >
+                  Terms of Use
+                </button>
+              </div>
+            </div>
+
+            <p className="text-center text-xs text-muted-foreground">
+              Auto-renewing subscription. Payment is charged to your Apple ID account at confirmation of purchase. Subscription automatically renews unless canceled at least 24 hours before the end of the current billing period.
+            </p>
           </div>
         </div>
       </div>

@@ -222,6 +222,7 @@ export interface RetrievalDebugInfo {
     matchedRestaurantCount: number;
     filteredOutCount: number;
     returnedWithinRadius: number;
+    outsideRadiusFallbackUsed?: boolean;
     error?: string;
   };
 }
@@ -432,6 +433,7 @@ export async function retrieveMealsWithClient(
               matchedRestaurantCount: nearbyFilter.matches.length,
               filteredOutCount: nearbyFilter.filteredOutCount,
               returnedWithinRadius: 0,
+              outsideRadiusFallbackUsed: false,
               error: nearbyFilter.error,
             },
           }
@@ -463,17 +465,24 @@ export async function retrieveMealsWithClient(
   const excludedRestaurantNames = toNormalizedRestaurantNameSet(
     searchParams.excludedRestaurants
   );
-  const applyRestaurantScopeFilters = (items: RawResult[]): RawResult[] =>
-    applyExcludedRestaurantFilter(
-      applyResolvedRestaurantFilter(
-        applyNearbyRestaurantFilter(items, nearbyFilter),
-        {
-          restaurantId: searchParams.restaurantId,
-          restaurantNames: filterResult.resolvedRestaurantNames,
-        }
-      ),
+  const applyRestaurantScopeFilters = (
+    items: RawResult[],
+    options: { includeNearby?: boolean } = {}
+  ): RawResult[] => {
+    const includeNearby = options.includeNearby !== false;
+
+    const afterNearby = includeNearby
+      ? applyNearbyRestaurantFilter(items, nearbyFilter)
+      : items;
+
+    return applyExcludedRestaurantFilter(
+      applyResolvedRestaurantFilter(afterNearby, {
+        restaurantId: searchParams.restaurantId,
+        restaurantNames: filterResult.resolvedRestaurantNames,
+      }),
       excludedRestaurantNames
     );
+  };
   const effectiveFilterParams: RPCParams = macroOnlyHomeFiltering
     ? {
         ...filterResult.params,
@@ -640,9 +649,11 @@ export async function retrieveMealsWithClient(
     !options.disableSemanticFallback &&
     shouldUseSemanticFallback(parsed, deterministicFiltered.length, deterministicThreshold);
 
+  let vectorRawResults: RawResult[] = [];
+
   if (semanticFallbackTriggered) {
-    vectorResults = await runVectorSearch(supabase, parsed);
-    vectorResults = applyRestaurantScopeFilters(vectorResults);
+    vectorRawResults = await runVectorSearch(supabase, parsed);
+    vectorResults = applyRestaurantScopeFilters(vectorRawResults);
     vectorResults = applyPostRetrievalFilters(vectorResults, parsed, effectiveDietaryKeywords, {
       macroOnly: macroOnlyHomeFiltering,
     });
@@ -656,12 +667,53 @@ export async function retrieveMealsWithClient(
     undefined
   );
   let fallbackMessage: string | undefined;
+  let outsideRadiusFallbackUsed = false;
+
+  if (ranked.length === 0 && nearbyFilter.requested) {
+    const outsideRadiusDeterministic = applyPostRetrievalFilters(
+      applyRestaurantScopeFilters(deterministicSearch.results, { includeNearby: false }),
+      parsed,
+      effectiveDietaryKeywords,
+      { macroOnly: macroOnlyHomeFiltering }
+    );
+
+    const outsideRadiusVector = vectorRawResults.length
+      ? applyPostRetrievalFilters(
+          applyRestaurantScopeFilters(vectorRawResults, { includeNearby: false }),
+          parsed,
+          effectiveDietaryKeywords,
+          { macroOnly: macroOnlyHomeFiltering }
+        )
+      : [];
+
+    const outsideRadiusRanked = mergeAndDeduplicate(
+      outsideRadiusDeterministic,
+      outsideRadiusVector,
+      parsed,
+      undefined
+    );
+
+    if (outsideRadiusRanked.length > 0) {
+      ranked = outsideRadiusRanked;
+      outsideRadiusFallbackUsed = true;
+      fallbackMessage = 'Showing meals outside your radius.';
+    }
+  }
 
   if (ranked.length === 0) {
+    const fallbackDeterministicCandidates = nearbyFilter.requested
+      ? applyRestaurantScopeFilters(deterministicSearch.results, { includeNearby: false })
+      : deterministicResults;
+    const fallbackVectorCandidates = nearbyFilter.requested
+      ? (vectorRawResults.length
+          ? applyRestaurantScopeFilters(vectorRawResults, { includeNearby: false })
+          : [])
+      : vectorResults;
+
     const fallback = buildClosestConstraintFallback({
       parsed,
-      deterministicCandidates: deterministicResults,
-      vectorCandidates: vectorResults,
+      deterministicCandidates: fallbackDeterministicCandidates,
+      vectorCandidates: fallbackVectorCandidates,
       dietaryKeywords: effectiveDietaryKeywords,
       macroOnly: macroOnlyHomeFiltering,
       fallbackLimit: targetResultWindow,
@@ -669,7 +721,10 @@ export async function retrieveMealsWithClient(
 
     if (fallback.items.length > 0) {
       ranked = fallback.items;
-      fallbackMessage = fallback.message;
+      fallbackMessage = nearbyFilter.requested
+        ? `Showing meals outside your radius.${fallback.message ? ` ${fallback.message}` : ''}`
+        : fallback.message;
+      outsideRadiusFallbackUsed = nearbyFilter.requested;
     }
   }
 
@@ -764,6 +819,7 @@ export async function retrieveMealsWithClient(
           matchedRestaurantCount: nearbyFilter.matches.length,
           filteredOutCount: nearbyFilter.filteredOutCount,
           returnedWithinRadius: meals.filter((meal) => meal.distance !== undefined).length,
+          outsideRadiusFallbackUsed,
           error: nearbyFilter.error,
         },
       }
@@ -779,7 +835,7 @@ export async function retrieveMealsWithClient(
     parsedQuery: parsed,
     message:
       fallbackMessage ??
-      (meals.length === 0 ? buildNoMatchesMessage(parsed) : undefined),
+      (meals.length === 0 ? buildNoMatchesMessage(parsed, nearbyFilter) : undefined),
     debugInfo,
   };
 }
@@ -2302,8 +2358,33 @@ function getConstraintDescription(parsed: ParsedQuery): string {
   return `${parts.slice(0, -1).join(', ')} and ${parts[parts.length - 1]}`;
 }
 
-function buildNoMatchesMessage(parsed: ParsedQuery): string {
+function buildNoMatchesMessage(
+  parsed: ParsedQuery,
+  nearbyFilter?: Pick<NearbyFilterContext, 'requested' | 'radiusMiles' | 'matches'>
+): string {
   const description = getConstraintDescription(parsed);
+
+  if (nearbyFilter?.requested) {
+    const roundedRadius =
+      typeof nearbyFilter.radiusMiles === 'number' && Number.isFinite(nearbyFilter.radiusMiles)
+        ? Math.round(nearbyFilter.radiusMiles)
+        : undefined;
+    const radiusText =
+      roundedRadius !== undefined
+        ? ` within ${roundedRadius} ${roundedRadius === 1 ? 'mile' : 'miles'}`
+        : '';
+
+    if ((nearbyFilter.matches?.length ?? 0) === 0) {
+      return `No restaurants found${radiusText}. Try increasing your distance.`;
+    }
+
+    if (description === 'those constraints') {
+      return `No nearby meals found${radiusText} yet.`;
+    }
+
+    return `No nearby meals found${radiusText} with ${description} yet.`;
+  }
+
   if (description === 'those constraints') {
     return 'No verified matches found for that request yet.';
   }
@@ -3201,3 +3282,4 @@ export async function searchHandler(
     debugInfo: result.debugInfo,
   };
 }
+

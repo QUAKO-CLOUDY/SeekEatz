@@ -28,6 +28,23 @@ const premiumBenefits = [
   "Save and log your meals",
 ];
 
+function toUserFacingBillingError(message: string): string {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("revenuecat is not fully configured yet")) {
+    return "Purchases are temporarily unavailable right now. Please try again shortly.";
+  }
+
+  if (
+    normalized.includes("no monthly package is available") ||
+    normalized.includes("no yearly package is available")
+  ) {
+    return "Subscriptions are not available right now. Please try again shortly.";
+  }
+
+  return message;
+}
+
 const planCards = [
   {
     id: "monthly",
@@ -54,7 +71,6 @@ const planCards = [
     cta: "Create Free Account",
   },
 ];
-
 function UpgradePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -180,7 +196,7 @@ function UpgradePageContent() {
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "Purchase could not be completed.";
-        setBillingError(message);
+        setBillingError(toUserFacingBillingError(message));
       } finally {
         setPendingPlanId(null);
       }
@@ -204,7 +220,7 @@ function UpgradePageContent() {
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Restore purchases failed.";
-      setBillingError(message);
+      setBillingError(toUserFacingBillingError(message));
     } finally {
       setIsRestoringPurchases(false);
     }
@@ -344,7 +360,7 @@ function UpgradePageContent() {
                         plan.id === "free"
                           ? false
                           : isSignedIn
-                            ? pendingPlanId !== null
+                            ? pendingPlanId !== null || (isNativeApp() && !iapReady)
                             : false
                       }
                       onClick={() => {
@@ -368,6 +384,10 @@ function UpgradePageContent() {
                         if (plan.id === "monthly" || plan.id === "yearly") {
                           if (!isNativeApp()) {
                             setBillingError("Purchases are available only in the iOS app.");
+                            return;
+                          }
+                          if (!iapReady) {
+                            setBillingError("Purchases are temporarily unavailable right now. Please try again shortly.");
                             return;
                           }
                           void handlePurchase(plan.id);
@@ -427,6 +447,12 @@ function UpgradePageContent() {
                 {billingError}
               </div>
             ) : null}
+
+            {isSignedIn && isNativeApp() && !iapReady && !entitlement.hasPremiumAccess && (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                Subscriptions are temporarily unavailable. Please try again shortly.
+              </div>
+            )}
 
             {iapReady && !isNativeApp() && (
               <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">

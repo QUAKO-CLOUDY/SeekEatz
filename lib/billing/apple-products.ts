@@ -27,6 +27,8 @@ export const APPLE_PRODUCT_CATALOG: AppleProductCatalog = {
     productId: readFirstNonEmptyEnv(
       "NEXT_PUBLIC_APPLE_IAP_MONTHLY_PRODUCT_ID",
       "NEXT_PUBLIC_REVENUECAT_MONTHLY_PRODUCT_ID",
+      "EXPO_PUBLIC_APPLE_IAP_MONTHLY_PRODUCT_ID",
+      "EXPO_PUBLIC_REVENUECAT_MONTHLY_PRODUCT_ID",
     ),
   },
   yearly: {
@@ -34,6 +36,8 @@ export const APPLE_PRODUCT_CATALOG: AppleProductCatalog = {
     productId: readFirstNonEmptyEnv(
       "NEXT_PUBLIC_APPLE_IAP_YEARLY_PRODUCT_ID",
       "NEXT_PUBLIC_REVENUECAT_YEARLY_PRODUCT_ID",
+      "EXPO_PUBLIC_APPLE_IAP_YEARLY_PRODUCT_ID",
+      "EXPO_PUBLIC_REVENUECAT_YEARLY_PRODUCT_ID",
     ),
   },
 };
@@ -42,15 +46,26 @@ export function getRevenueCatIosPublicSdkKey(): string | null {
   return readFirstNonEmptyEnv(
     "NEXT_PUBLIC_REVENUECAT_IOS_PUBLIC_SDK_KEY",
     "NEXT_PUBLIC_REVENUECAT_API_KEY",
+    "EXPO_PUBLIC_REVENUECAT_IOS_PUBLIC_SDK_KEY",
+    "EXPO_PUBLIC_REVENUECAT_API_KEY",
   );
 }
 
 export function getRevenueCatEntitlementId(): string {
-  return process.env.NEXT_PUBLIC_REVENUECAT_ENTITLEMENT_ID?.trim() || "premium";
+  return (
+    readFirstNonEmptyEnv(
+      "NEXT_PUBLIC_REVENUECAT_ENTITLEMENT_ID",
+      "EXPO_PUBLIC_REVENUECAT_ENTITLEMENT_ID",
+    ) || "premium"
+  );
 }
 
 export function isAppleIapConfigured(): boolean {
-  const readyFlag = process.env.NEXT_PUBLIC_APPLE_IAP_READY?.trim().toLowerCase();
+  const readyFlag = readFirstNonEmptyEnv(
+    "NEXT_PUBLIC_APPLE_IAP_READY",
+    "EXPO_PUBLIC_APPLE_IAP_READY",
+  )?.toLowerCase();
+
   if (readyFlag === "false" || readyFlag === "0") {
     return false;
   }
@@ -60,8 +75,12 @@ export function isAppleIapConfigured(): boolean {
   return true;
 }
 
+function isApplePublicSdkKey(value: string | null): boolean {
+  return Boolean(value && value.startsWith("appl_"));
+}
+
 export function isRevenueCatConfigured(): boolean {
-  return isAppleIapConfigured() && Boolean(getRevenueCatIosPublicSdkKey());
+  return isAppleIapConfigured() && isApplePublicSdkKey(getRevenueCatIosPublicSdkKey());
 }
 
 export function getAppleProductIdForTier(
@@ -69,3 +88,4 @@ export function getAppleProductIdForTier(
 ): string | null {
   return APPLE_PRODUCT_CATALOG[tier].productId;
 }
+

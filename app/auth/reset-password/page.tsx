@@ -22,24 +22,84 @@ function ResetPasswordPageContent() {
 
   useEffect(() => {
     const supabase = createClient();
+    let cancelled = false;
+    let settled = false;
 
-    const loadSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setHasRecoverySession(Boolean(data.session));
+    const finish = (ok: boolean, message?: string) => {
+      if (cancelled || settled) return;
+      settled = true;
+      setHasRecoverySession(ok);
+      if (!ok && message) {
+        setError(message);
+      }
       setIsLoadingSession(false);
     };
 
-    loadSession();
+    const invalidLinkMessage =
+      "This reset link is invalid or has expired. Request a new one from the sign in page.";
+
+    const establishRecoverySession = async () => {
+      const url = new URL(window.location.href);
+      const hashParams = new URLSearchParams(url.hash.replace(/^#/, ""));
+
+      // Surface explicit errors Supabase appends to the redirect (expired link,
+      // redirect URL not allow-listed, etc.) instead of failing silently.
+      const errorDescription =
+        url.searchParams.get("error_description") ?? hashParams.get("error_description");
+      if (errorDescription) {
+        finish(false, decodeURIComponent(errorDescription.replace(/\+/g, " ")));
+        return;
+      }
+
+      // Already have a session (e.g. detectSessionInUrl resolved before we ran).
+      const { data: existing } = await supabase.auth.getSession();
+      if (existing.session) {
+        finish(true);
+        return;
+      }
+
+      // Preferred, cross-browser recovery: token hash + verifyOtp. Works even
+      // when the email link opens in a different browser than the one that
+      // requested the reset (the iOS WebView -> Safari case).
+      const tokenHash = url.searchParams.get("token_hash");
+      const type = url.searchParams.get("type");
+      if (tokenHash && (type === "recovery" || type === null)) {
+        const { error: otpError } = await supabase.auth.verifyOtp({
+          type: "recovery",
+          token_hash: tokenHash,
+        });
+        finish(!otpError, otpError ? invalidLinkMessage : undefined);
+        return;
+      }
+
+      // PKCE (?code=) and implicit (#access_token=) links are auto-exchanged by
+      // the Supabase client (detectSessionInUrl). Give it a moment, then confirm
+      // a session exists rather than guessing.
+      if (url.searchParams.get("code") || hashParams.get("access_token")) {
+        setTimeout(async () => {
+          if (cancelled || settled) return;
+          const { data } = await supabase.auth.getSession();
+          finish(Boolean(data.session), data.session ? undefined : invalidLinkMessage);
+        }, 1500);
+        return;
+      }
+
+      // No recovery parameters present at all.
+      finish(false);
+    };
+
+    void establishRecoverySession();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
-        setHasRecoverySession(true);
+        finish(true);
       }
     });
 
     return () => {
+      cancelled = true;
       subscription.unsubscribe();
     };
   }, []);

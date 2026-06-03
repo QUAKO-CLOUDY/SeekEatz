@@ -5,7 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Check, Crown } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { AuthProviders } from "@/app/components/AuthProviders";
-import { MONTHLY_PLAN_PRICE, YEARLY_PLAN_PRICE, getEntitlementPlanLabel } from "@/lib/entitlements";
+import {
+  type AppEntitlement,
+  MONTHLY_PLAN_PRICE,
+  YEARLY_PLAN_PRICE,
+  getEntitlementPlanLabel,
+  writeCachedEntitlement,
+} from "@/lib/entitlements";
 import { useAccountEntitlement } from "@/app/hooks/useAccountEntitlement";
 import { bootstrapAccount } from "@/lib/bootstrap-account";
 import { getFreeTierPlanDetails } from "@/lib/free-tier";
@@ -83,7 +89,18 @@ function UpgradePageContent() {
   const [billingMessage, setBillingMessage] = useState<string | null>(null);
   const [pendingPlanId, setPendingPlanId] = useState<string | null>(null);
   const [isRestoringPurchases, setIsRestoringPurchases] = useState(false);
-  const { entitlement, refresh } = useAccountEntitlement(true);
+  const { entitlement, refresh, setEntitlement } = useAccountEntitlement(true);
+
+  const applyEntitlement = useCallback(
+    (next: AppEntitlement | null | undefined) => {
+      if (!next) {
+        return;
+      }
+      setEntitlement(next);
+      writeCachedEntitlement(next);
+    },
+    [setEntitlement],
+  );
   const isMasterMode = searchParams.get("master") === "1";
   const shouldStartTutorial = searchParams.get("tutorial") === "1";
   const postSignupUpgradePath = "/upgrade?fromSignup=1";
@@ -192,11 +209,14 @@ function UpgradePageContent() {
         setBillingError(null);
         setBillingMessage(null);
         setPendingPlanId(planId);
-        await purchaseRevenueCatTier({
+        const purchase = await purchaseRevenueCatTier({
           tier: planId,
           appUserID: authUserId,
           email: authEmail,
         });
+        // Update app state immediately from the synced entitlement so premium
+        // unlocks without an app restart, then re-confirm against the server.
+        applyEntitlement(purchase?.synced?.entitlement as AppEntitlement | undefined);
         await refresh();
         routeAfterPlanSelection();
       } catch (error) {
@@ -207,7 +227,7 @@ function UpgradePageContent() {
         setPendingPlanId(null);
       }
     },
-    [authEmail, authUserId, refresh, routeAfterPlanSelection],
+    [applyEntitlement, authEmail, authUserId, refresh, routeAfterPlanSelection],
   );
 
   const handleRestorePurchases = useCallback(async () => {
@@ -219,10 +239,11 @@ function UpgradePageContent() {
       setBillingError(null);
       setBillingMessage(null);
       setIsRestoringPurchases(true);
-      await restoreRevenueCatPurchases({
+      const restore = await restoreRevenueCatPurchases({
         appUserID: authUserId,
         email: authEmail,
       });
+      applyEntitlement(restore?.synced?.entitlement as AppEntitlement | undefined);
       const restored = await refresh();
 
       if (restored.hasPremiumAccess) {
@@ -237,7 +258,7 @@ function UpgradePageContent() {
     } finally {
       setIsRestoringPurchases(false);
     }
-  }, [authEmail, authUserId, refresh]);
+  }, [applyEntitlement, authEmail, authUserId, refresh]);
 
   const handleBack = useCallback(() => {
     if (typeof window !== "undefined" && window.history.length > 1) {

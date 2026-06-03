@@ -536,17 +536,45 @@ export default function App() {
         }
 
         const result = await Purchases.purchasePackage(packageToPurchase);
+
+        // Immediately refresh customerInfo so the entitlement reflects the
+        // purchase that just completed (the purchase result can lag behind).
+        let customerInfo = result.customerInfo;
+        try {
+          customerInfo = await Purchases.getCustomerInfo();
+        } catch (refreshError) {
+          console.warn("[billing][native] getCustomerInfo after purchase failed", refreshError);
+        }
+
+        const entitlementId =
+          process.env.EXPO_PUBLIC_REVENUECAT_ENTITLEMENT_ID?.trim() || "premium";
+        console.log("[billing][native] purchase success", {
+          productIdentifier: result.productIdentifier,
+          activeEntitlementKeys: Object.keys(customerInfo?.entitlements?.active ?? {}),
+          premiumIsActive:
+            customerInfo?.entitlements?.active?.[entitlementId]?.isActive === true,
+        });
+
         postBillingResponseToWebView({
           type: "seekeatz_native_billing_response",
           requestId,
           ok: true,
-          payload: result,
+          payload: { customerInfo, productIdentifier: result.productIdentifier },
         });
         return;
       }
 
       if (request.type === "revenuecat_restore") {
-        const customerInfo = await Purchases.restorePurchases();
+        await Purchases.restorePurchases();
+        // Re-fetch the canonical customerInfo after restore.
+        const customerInfo = await Purchases.getCustomerInfo();
+        const entitlementId =
+          process.env.EXPO_PUBLIC_REVENUECAT_ENTITLEMENT_ID?.trim() || "premium";
+        console.log("[billing][native] restore success", {
+          activeEntitlementKeys: Object.keys(customerInfo?.entitlements?.active ?? {}),
+          premiumIsActive:
+            customerInfo?.entitlements?.active?.[entitlementId]?.isActive === true,
+        });
         postBillingResponseToWebView({
           type: "seekeatz_native_billing_response",
           requestId,

@@ -8,7 +8,12 @@ import { Input } from '@/app/components/ui/input';
 import { Label } from '@/app/components/ui/label';
 import { createClient } from '@/utils/supabase/client';
 import type { UserProfile } from '@/app/types';
-import { clearCachedEntitlement, getEntitlementPlanLabel } from '@/lib/entitlements';
+import {
+  type AppEntitlement,
+  clearCachedEntitlement,
+  getEntitlementPlanLabel,
+  writeCachedEntitlement,
+} from '@/lib/entitlements';
 import { clearLoggedMealsStorageForUser } from '@/lib/logged-meals-storage';
 import { clearAllUserScopedItems } from '@/lib/storage';
 import { clearChatState } from '@/lib/chatStorage';
@@ -42,7 +47,7 @@ function resolveAppleSubscriptionManagementUrl(url: string | null): string {
 export default function AccountEditPage() {
   const router = useRouter();
   const supabase = createClient();
-  const { entitlement, refresh: refreshEntitlement } = useAccountEntitlement(true);
+  const { entitlement, refresh: refreshEntitlement, setEntitlement } = useAccountEntitlement(true);
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -334,10 +339,15 @@ export default function AccountEditPage() {
       setBillingError(null);
       setBillingMessage(null);
       setIsRestoringPurchases(true);
-      await restoreRevenueCatPurchases({
+      const restore = await restoreRevenueCatPurchases({
         appUserID: authUserId,
         email: authEmail,
       });
+      const syncedEntitlement = restore?.synced?.entitlement as AppEntitlement | undefined;
+      if (syncedEntitlement) {
+        setEntitlement(syncedEntitlement);
+        writeCachedEntitlement(syncedEntitlement);
+      }
       const restored = await refreshEntitlement();
 
       try {

@@ -248,46 +248,102 @@ function selectSubscriptionByKnownProducts(
   return null;
 }
 
+function logCustomerInfo(context: string, customerInfo: CustomerInfo): void {
+  const entitlementId = getRevenueCatEntitlementId();
+  const active = customerInfo.entitlements?.active ?? {};
+  console.log(`[billing] ${context} customerInfo received`, {
+    entitlementId,
+    activeEntitlementKeys: Object.keys(active),
+    premiumIsActive: selectPremiumEntitlement(customerInfo)?.isActive === true,
+  });
+}
+
 function selectPremiumEntitlement(
   customerInfo: CustomerInfo,
 ): PurchasesEntitlementInfo | null {
   const entitlementId = getRevenueCatEntitlementId();
-  return (
-    customerInfo.entitlements.active[entitlementId] ??
-    customerInfo.entitlements.all[entitlementId] ??
-    null
-  );
+  const active = customerInfo.entitlements?.active ?? {};
+  const all = customerInfo.entitlements?.all ?? {};
+
+  // 1) Exact match on the configured entitlement id (e.g. "premium").
+  const exact = active[entitlementId] ?? all[entitlementId] ?? null;
+  if (exact) {
+    return exact;
+  }
+
+  // 2) Case-insensitive fallback so a casing change in RevenueCat
+  //    ("Premium" -> "premium") can never silently lock users out.
+  const lowerId = entitlementId.toLowerCase();
+  const activeKey = Object.keys(active).find((key) => key.toLowerCase() === lowerId);
+  if (activeKey) {
+    return active[activeKey];
+  }
+  const allKey = Object.keys(all).find((key) => key.toLowerCase() === lowerId);
+  if (allKey) {
+    return all[allKey];
+  }
+
+  // 3) Premium is our only entitlement; if exactly one is active, trust it.
+  const activeKeys = Object.keys(active);
+  if (activeKeys.length === 1) {
+    return active[activeKeys[0]];
+  }
+
+  return null;
 }
 
 function buildAppStoreSyncPayload(
   customerInfo: CustomerInfo,
 ): AppStoreSyncPayload | null {
+  const entitlementId = getRevenueCatEntitlementId();
   const entitlement = selectPremiumEntitlement(customerInfo);
+  const activeEntitlementKeys = Object.keys(customerInfo.entitlements?.active ?? {});
+  const premiumActive = entitlement?.isActive === true;
+
+  console.log("[billing] entitlement check", {
+    entitlementId,
+    activeEntitlementKeys,
+    matchedEntitlement: entitlement?.identifier ?? null,
+    premiumIsActive: premiumActive,
+  });
+
   const subscription =
     (entitlement?.productIdentifier
-      ? customerInfo.subscriptionsByProductIdentifier[entitlement.productIdentifier]
+      ? customerInfo.subscriptionsByProductIdentifier?.[entitlement.productIdentifier]
       : null) ?? selectSubscriptionByKnownProducts(customerInfo);
 
   const productId = entitlement?.productIdentifier ?? subscription?.productIdentifier ?? null;
-  const latestTransactionId = subscription?.storeTransactionId ?? null;
-  if (!productId || !latestTransactionId) {
+
+  // Only skip the sync when there is genuinely no premium signal at all.
+  // Previously we also required a store transaction id, which StoreKit /
+  // sandbox / TestFlight purchases frequently omit — that silently left paying
+  // users on the free tier. Premium access is now driven by entitlement.isActive.
+  if (!premiumActive && !productId) {
     return null;
   }
 
+  // Prefer a real store transaction id, but never block the sync on it. Fall
+  // back to a stable synthetic id so the upsert (keyed on transaction id) runs.
+  const resolvedProductId =
+    productId ?? getAppleProductIdForTier("monthly") ?? entitlementId;
+  const latestTransactionId =
+    subscription?.storeTransactionId ??
+    `${entitlement?.identifier ?? entitlementId}:${resolvedProductId}`;
+
   let status: AppStoreSyncPayload["status"] = "inactive";
-  if (entitlement?.isActive) {
-    status = entitlement.periodType === "TRIAL" ? "trialing" : "active";
+  if (premiumActive) {
+    status = entitlement?.periodType === "TRIAL" ? "trialing" : "active";
   } else if (subscription?.billingIssuesDetectedAt) {
     status = "past_due";
   } else if (subscription?.unsubscribeDetectedAt) {
     status = "canceled";
   }
 
-  return {
-    entitlementIdentifier: entitlement?.identifier ?? getRevenueCatEntitlementId(),
+  const payload: AppStoreSyncPayload = {
+    entitlementIdentifier: entitlement?.identifier ?? entitlementId,
     originalTransactionId: latestTransactionId,
     latestTransactionId,
-    productId,
+    productId: resolvedProductId,
     environment:
       entitlement?.isSandbox || subscription?.isSandbox ? "sandbox" : "production",
     status,
@@ -295,11 +351,25 @@ function buildAppStoreSyncPayload(
     autoRenewStatus: entitlement?.willRenew ?? subscription?.willRenew ?? null,
     rawCustomerInfo: customerInfo,
   };
+
+  console.log("[billing] app store sync payload", {
+    status: payload.status,
+    productId: payload.productId,
+    entitlementIdentifier: payload.entitlementIdentifier,
+    environment: payload.environment,
+    hasStoreTransactionId: Boolean(subscription?.storeTransactionId),
+  });
+
+  return payload;
 }
 
 export async function syncRevenueCatCustomerInfoToBackend(customerInfo: CustomerInfo) {
   const payload = buildAppStoreSyncPayload(customerInfo);
   if (!payload) {
+    console.warn(
+      "[billing] No premium entitlement detected in customerInfo; skipping backend sync.",
+      { activeEntitlementKeys: Object.keys(customerInfo.entitlements?.active ?? {}) },
+    );
     return null;
   }
 
@@ -315,7 +385,14 @@ export async function syncRevenueCatCustomerInfoToBackend(customerInfo: Customer
     throw new Error(`App Store sync failed with status ${response.status}`);
   }
 
-  return response.json();
+  const result = await response.json();
+  console.log("[billing] backend entitlement after sync", {
+    billingTier: result?.entitlement?.billingTier,
+    billingStatus: result?.entitlement?.billingStatus,
+    hasPremiumAccess: result?.entitlement?.hasPremiumAccess,
+  });
+
+  return result;
 }
 
 function findPackageForTier(
@@ -371,6 +448,7 @@ export async function purchaseRevenueCatTier(params: {
       throw new Error("Native purchase did not return customer info.");
     }
 
+    logCustomerInfo("purchase", nativePayload.customerInfo);
     const synced = await syncRevenueCatCustomerInfoToBackend(nativePayload.customerInfo);
     return {
       result: nativePayload,
@@ -411,6 +489,7 @@ export async function restoreRevenueCatPurchases(params: {
       throw new Error("Restore did not return customer info.");
     }
 
+    logCustomerInfo("restore", nativePayload.customerInfo);
     const synced = await syncRevenueCatCustomerInfoToBackend(nativePayload.customerInfo);
     return {
       result: nativePayload,

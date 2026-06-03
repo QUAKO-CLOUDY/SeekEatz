@@ -54,6 +54,7 @@ export default function AccountEditPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [billingError, setBillingError] = useState<string | null>(null);
+  const [billingMessage, setBillingMessage] = useState<string | null>(null);
   const [managementUrl, setManagementUrl] = useState<string | null>(null);
   const [authUserId, setAuthUserId] = useState<string | null>(null);
   const [authEmail, setAuthEmail] = useState<string | null>(null);
@@ -324,24 +325,36 @@ export default function AccountEditPage() {
 
   const handleRestorePurchases = async () => {
     if (!authUserId) {
+      setBillingMessage(null);
       setBillingError('Sign in again before restoring purchases.');
       return;
     }
 
     try {
       setBillingError(null);
+      setBillingMessage(null);
       setIsRestoringPurchases(true);
       await restoreRevenueCatPurchases({
         appUserID: authUserId,
         email: authEmail,
       });
-      await refreshEntitlement();
+      const restored = await refreshEntitlement();
 
-      const url = await getRevenueCatManagementUrl({
-        appUserID: authUserId,
-        email: authEmail,
-      });
-      setManagementUrl(resolveAppleSubscriptionManagementUrl(url));
+      try {
+        const url = await getRevenueCatManagementUrl({
+          appUserID: authUserId,
+          email: authEmail,
+        });
+        setManagementUrl(resolveAppleSubscriptionManagementUrl(url));
+      } catch (urlError) {
+        console.warn('Could not refresh subscription management URL after restore:', urlError);
+      }
+
+      if (restored.hasPremiumAccess) {
+        setBillingMessage('Purchases restored. Your premium access is active.');
+      } else {
+        setBillingMessage('No previous purchases were found on this Apple ID.');
+      }
     } catch (err) {
       console.error('Failed to restore purchases:', err);
       setBillingError('Restore purchases failed. Try again from the iOS app or contact support@seekeatz.com.');
@@ -355,6 +368,7 @@ export default function AccountEditPage() {
 
     try {
       setBillingError(null);
+      setBillingMessage(null);
       await openExternalUrl(appStoreManagementUrl);
     } catch (err) {
       console.error('Failed to open subscription management URL:', err);
@@ -486,6 +500,12 @@ export default function AccountEditPage() {
                     View Plans
                   </Button>
                 )}
+
+                {billingMessage ? (
+                  <div className="rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-green-700 dark:border-green-900 dark:bg-green-950/20 dark:text-green-300">
+                    {billingMessage}
+                  </div>
+                ) : null}
 
                 {billingError ? (
                   <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-600 dark:border-red-900 dark:bg-red-950/20 dark:text-red-300">

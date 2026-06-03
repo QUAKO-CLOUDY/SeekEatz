@@ -89,6 +89,85 @@ type RevenueCatModule = {
 let purchasesModulePromise: Promise<RevenueCatModule> | null = null;
 let configurePromise: Promise<void> | null = null;
 
+type NativeBillingRequestType =
+  | "revenuecat_purchase"
+  | "revenuecat_restore"
+  | "revenuecat_customer_info";
+
+type NativeBillingResponse = {
+  requestId?: string;
+  ok?: boolean;
+  payload?: unknown;
+  error?: string;
+};
+
+type NativeBillingWindow = Window & {
+  ReactNativeWebView?: {
+    postMessage?: (message: string) => void;
+  };
+};
+
+export function isNativeBillingBridgeAvailable(): boolean {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return Boolean((window as NativeBillingWindow).ReactNativeWebView?.postMessage);
+}
+
+function requestNativeBilling(
+  type: NativeBillingRequestType,
+  params: {
+    appUserID: string;
+    email?: string | null;
+    tier?: AppleProductTier;
+  },
+): Promise<unknown> {
+  if (!isNativeBillingBridgeAvailable()) {
+    return Promise.reject(new Error("Native billing bridge is unavailable."));
+  }
+
+  const requestId =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+  return new Promise((resolve, reject) => {
+    const timeoutId = window.setTimeout(() => {
+      window.removeEventListener("seekeatz_native_billing_response", handleResponse);
+      reject(new Error("Native billing request timed out."));
+    }, 90000);
+
+    const handleResponse = (event: Event) => {
+      const detail = (event as CustomEvent<NativeBillingResponse>).detail;
+      if (detail?.requestId !== requestId) {
+        return;
+      }
+
+      window.clearTimeout(timeoutId);
+      window.removeEventListener("seekeatz_native_billing_response", handleResponse);
+
+      if (detail.ok) {
+        resolve(detail.payload);
+        return;
+      }
+
+      reject(new Error(detail.error || "Native billing request failed."));
+    };
+
+    window.addEventListener("seekeatz_native_billing_response", handleResponse);
+    (window as NativeBillingWindow).ReactNativeWebView?.postMessage?.(
+      JSON.stringify({
+        type,
+        requestId,
+        appUserID: params.appUserID,
+        email: params.email ?? null,
+        tier: params.tier,
+      }),
+    );
+  });
+}
+
 async function getRevenueCatModule(): Promise<RevenueCatModule> {
   if (!purchasesModulePromise) {
     purchasesModulePromise = (new Function(
@@ -218,7 +297,7 @@ function buildAppStoreSyncPayload(
   };
 }
 
-async function syncCustomerInfoToBackend(customerInfo: CustomerInfo) {
+export async function syncRevenueCatCustomerInfoToBackend(customerInfo: CustomerInfo) {
   const payload = buildAppStoreSyncPayload(customerInfo);
   if (!payload) {
     return null;
@@ -282,6 +361,24 @@ export async function purchaseRevenueCatTier(params: {
   appUserID: string;
   email?: string | null;
 }) {
+  if (isNativeBillingBridgeAvailable()) {
+    const nativePayload = (await requestNativeBilling("revenuecat_purchase", params)) as {
+      customerInfo?: CustomerInfo;
+      productIdentifier?: string;
+    };
+
+    if (!nativePayload.customerInfo) {
+      throw new Error("Native purchase did not return customer info.");
+    }
+
+    const synced = await syncRevenueCatCustomerInfoToBackend(nativePayload.customerInfo);
+    return {
+      result: nativePayload,
+      synced,
+      billingTier: getBillingTierFromAppleProductId(nativePayload.productIdentifier),
+    };
+  }
+
   await configureRevenueCat(params.appUserID, params.email);
   const { default: Purchases } = await getRevenueCatModule();
 
@@ -292,7 +389,7 @@ export async function purchaseRevenueCatTier(params: {
   }
 
   const result = await Purchases.purchasePackage(aPackage);
-  const synced = await syncCustomerInfoToBackend(result.customerInfo);
+  const synced = await syncRevenueCatCustomerInfoToBackend(result.customerInfo);
 
   return {
     result,
@@ -305,11 +402,27 @@ export async function restoreRevenueCatPurchases(params: {
   appUserID: string;
   email?: string | null;
 }) {
+  if (isNativeBillingBridgeAvailable()) {
+    const nativePayload = (await requestNativeBilling("revenuecat_restore", params)) as {
+      customerInfo?: CustomerInfo;
+    };
+
+    if (!nativePayload.customerInfo) {
+      throw new Error("Restore did not return customer info.");
+    }
+
+    const synced = await syncRevenueCatCustomerInfoToBackend(nativePayload.customerInfo);
+    return {
+      result: nativePayload,
+      synced,
+    };
+  }
+
   await configureRevenueCat(params.appUserID, params.email);
   const { default: Purchases } = await getRevenueCatModule();
 
   const result = await Purchases.restorePurchases();
-  const synced = await syncCustomerInfoToBackend(result.customerInfo);
+  const synced = await syncRevenueCatCustomerInfoToBackend(result.customerInfo);
 
   return {
     result,
@@ -321,6 +434,18 @@ export async function getRevenueCatCustomerInfo(params: {
   appUserID: string;
   email?: string | null;
 }) {
+  if (isNativeBillingBridgeAvailable()) {
+    const nativePayload = (await requestNativeBilling("revenuecat_customer_info", params)) as {
+      customerInfo?: CustomerInfo;
+    };
+
+    if (!nativePayload.customerInfo) {
+      throw new Error("Customer info was not returned by native billing.");
+    }
+
+    return nativePayload.customerInfo;
+  }
+
   await configureRevenueCat(params.appUserID, params.email);
   const { default: Purchases } = await getRevenueCatModule();
   return Purchases.getCustomerInfo();

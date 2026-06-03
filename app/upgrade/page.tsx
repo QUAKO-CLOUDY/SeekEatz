@@ -11,6 +11,7 @@ import { bootstrapAccount } from "@/lib/bootstrap-account";
 import { getFreeTierPlanDetails } from "@/lib/free-tier";
 import { isRevenueCatConfigured } from "@/lib/billing/apple-products";
 import {
+  isNativeBillingBridgeAvailable,
   purchaseRevenueCatTier,
   restoreRevenueCatPurchases,
 } from "@/lib/billing/revenuecat-client";
@@ -79,6 +80,7 @@ function UpgradePageContent() {
   const [authUserId, setAuthUserId] = useState<string | null>(null);
   const [authEmail, setAuthEmail] = useState<string | null>(null);
   const [billingError, setBillingError] = useState<string | null>(null);
+  const [billingMessage, setBillingMessage] = useState<string | null>(null);
   const [pendingPlanId, setPendingPlanId] = useState<string | null>(null);
   const [isRestoringPurchases, setIsRestoringPurchases] = useState(false);
   const { entitlement, refresh } = useAccountEntitlement(true);
@@ -146,7 +148,10 @@ function UpgradePageContent() {
 
     return () => subscription.unsubscribe();
   }, [getOnboardingFlag, refresh]);
-  const iapReady = isRevenueCatConfigured();
+  const nativeApp = isNativeApp();
+  const iapReady = nativeApp
+    ? isNativeBillingBridgeAvailable() || isRevenueCatConfigured()
+    : isRevenueCatConfigured();
 
   const openExternalLegalUrl = useCallback((url: string) => {
     if (typeof window === "undefined") {
@@ -185,6 +190,7 @@ function UpgradePageContent() {
 
       try {
         setBillingError(null);
+        setBillingMessage(null);
         setPendingPlanId(planId);
         await purchaseRevenueCatTier({
           tier: planId,
@@ -211,12 +217,19 @@ function UpgradePageContent() {
 
     try {
       setBillingError(null);
+      setBillingMessage(null);
       setIsRestoringPurchases(true);
       await restoreRevenueCatPurchases({
         appUserID: authUserId,
         email: authEmail,
       });
-      await refresh();
+      const restored = await refresh();
+
+      if (restored.hasPremiumAccess) {
+        setBillingMessage("Purchases restored. Your premium access is active.");
+      } else {
+        setBillingMessage("No previous purchases were found on this Apple ID.");
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Restore purchases failed.";
@@ -247,7 +260,7 @@ function UpgradePageContent() {
           Back
         </button>
 
-        <div className="rounded-[2rem] border border-border bg-card p-8 shadow-xl">
+        <div className="rounded-[2rem] border border-border bg-card p-5 shadow-xl sm:p-8">
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 text-white shadow-lg shadow-cyan-500/25">
             <Crown className="h-7 w-7" />
           </div>
@@ -286,7 +299,7 @@ function UpgradePageContent() {
               {planCards.map((plan) => (
                 <div
                   key={plan.id}
-                  className={`flex min-h-0 w-full flex-col self-stretch rounded-[1.75rem] border p-5 ${
+                  className={`flex min-h-0 w-full flex-col self-stretch overflow-hidden rounded-[1.75rem] border p-4 sm:p-5 ${
                     plan.id === "free"
                       ? "border-border bg-background/80"
                       : plan.id === "yearly"
@@ -294,7 +307,7 @@ function UpgradePageContent() {
                         : "border-border bg-background/80"
                   }`}
                 >
-                  <div className="shrink-0 space-y-2">
+                  <div className="shrink-0 space-y-3">
                     {/* Same layout height on all cards: invisible copy reserves space on Free/Monthly */}
                     <div className="flex items-center justify-center">
                       {plan.badge ? (
@@ -310,17 +323,11 @@ function UpgradePageContent() {
                         </span>
                       )}
                     </div>
-                    <div className="flex min-h-[2.75rem] items-center justify-between gap-2">
+                    <div className="flex min-h-[3.75rem] flex-col items-start justify-center gap-1 border-b border-border/60 pb-3">
                       <p className="min-w-0 text-base font-semibold leading-tight text-foreground">
                         {plan.name}
                       </p>
-                      <p
-                        className={`tabular-nums font-semibold text-foreground ${
-                          plan.id === "yearly"
-                            ? "min-w-0 text-right text-[clamp(10px,0.95vw,13px)] leading-tight tracking-tight whitespace-nowrap"
-                            : "shrink-0 text-sm leading-none"
-                        }`}
-                      >
+                      <p className="w-full break-words text-sm font-semibold leading-snug tracking-tight text-foreground tabular-nums">
                         {plan.price}
                       </p>
                     </div>
@@ -440,6 +447,12 @@ function UpgradePageContent() {
               >
                 {isRestoringPurchases ? "Restoring purchases..." : "Restore purchases"}
               </button>
+            ) : null}
+
+            {billingMessage ? (
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                {billingMessage}
+              </div>
             ) : null}
 
             {billingError ? (

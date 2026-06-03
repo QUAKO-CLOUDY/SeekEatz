@@ -5,10 +5,28 @@
   },
   "build": {
     "development": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_WEB_APP_URL": "https://seekeatz.com",
+        "EXPO_PUBLIC_APPLE_IAP_READY": "true",
+        "EXPO_PUBLIC_REVENUECAT_IOS_PUBLIC_SDK_KEY": "appl_IEPYSJDLDeqypBSYXDrcOmSWTQO",
+        "EXPO_PUBLIC_REVENUECAT_API_KEY": "appl_IEPYSJDLDeqypBSYXDrcOmSWTQO",
+        "EXPO_PUBLIC_REVENUECAT_ENTITLEMENT_ID": "premium",
+        "EXPO_PUBLIC_APPLE_IAP_MONTHLY_PRODUCT_ID": "com.seekeatz.app.premium.monthly",
+        "EXPO_PUBLIC_APPLE_IAP_YEARLY_PRODUCT_ID": "com.seekeatz.app.premium.yearly"
+      }
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_WEB_APP_URL": "https://seekeatz.com",
+        "EXPO_PUBLIC_APPLE_IAP_READY": "true",
+        "EXPO_PUBLIC_REVENUECAT_IOS_PUBLIC_SDK_KEY": "appl_IEPYSJDLDeqypBSYXDrcOmSWTQO",
+        "EXPO_PUBLIC_REVENUECAT_API_KEY": "appl_IEPYSJDLDeqypBSYXDrcOmSWTQO",
+        "EXPO_PUBLIC_REVENUECAT_ENTITLEMENT_ID": "premium",
+        "EXPO_PUBLIC_APPLE_IAP_MONTHLY_PRODUCT_ID": "com.seekeatz.app.premium.monthly",
+        "EXPO_PUBLIC_APPLE_IAP_YEARLY_PRODUCT_ID": "com.seekeatz.app.premium.yearly"
+      }
     },
     "production": {
       "env": {
@@ -16,7 +34,14 @@
         "NPM_CONFIG_FETCH_TIMEOUT": "600000",
         "NPM_CONFIG_FETCH_RETRY_MINTIMEOUT": "20000",
         "NPM_CONFIG_FETCH_RETRY_FACTOR": "2",
-        "NPM_CONFIG_FETCH_RETRIES": "5"
+        "NPM_CONFIG_FETCH_RETRIES": "5",
+        "EXPO_PUBLIC_WEB_APP_URL": "https://seekeatz.com",
+        "EXPO_PUBLIC_APPLE_IAP_READY": "true",
+        "EXPO_PUBLIC_REVENUECAT_IOS_PUBLIC_SDK_KEY": "appl_IEPYSJDLDeqypBSYXDrcOmSWTQO",
+        "EXPO_PUBLIC_REVENUECAT_API_KEY": "appl_IEPYSJDLDeqypBSYXDrcOmSWTQO",
+        "EXPO_PUBLIC_REVENUECAT_ENTITLEMENT_ID": "premium",
+        "EXPO_PUBLIC_APPLE_IAP_MONTHLY_PRODUCT_ID": "com.seekeatz.app.premium.monthly",
+        "EXPO_PUBLIC_APPLE_IAP_YEARLY_PRODUCT_ID": "com.seekeatz.app.premium.yearly"
       }
     }
   },

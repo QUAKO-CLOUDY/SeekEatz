@@ -2,10 +2,27 @@ import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import { ActivityIndicator, AppState, AppStateStatus, Linking, SafeAreaView, StatusBar, StyleSheet, Text, View } from "react-native";
 import { WebView, type WebViewMessageEvent } from "react-native-webview";
 import * as Notifications from "expo-notifications";
+import Purchases, { LOG_LEVEL } from "react-native-purchases";
 
 const DEFAULT_WEB_APP_URL = "https://seekeatz.com";
 const webAppUrl = process.env.EXPO_PUBLIC_WEB_APP_URL?.trim() || DEFAULT_WEB_APP_URL;
 const isValidUrl = /^https?:\/\//i.test(webAppUrl);
+const revenueCatIosPublicSdkKey =
+  process.env.EXPO_PUBLIC_REVENUECAT_IOS_PUBLIC_SDK_KEY?.trim() ||
+  process.env.EXPO_PUBLIC_REVENUECAT_API_KEY?.trim() ||
+  "";
+const revenueCatMonthlyProductId =
+  process.env.EXPO_PUBLIC_APPLE_IAP_MONTHLY_PRODUCT_ID?.trim() ||
+  process.env.EXPO_PUBLIC_REVENUECAT_MONTHLY_PRODUCT_ID?.trim() ||
+  "";
+const revenueCatYearlyProductId =
+  process.env.EXPO_PUBLIC_APPLE_IAP_YEARLY_PRODUCT_ID?.trim() ||
+  process.env.EXPO_PUBLIC_REVENUECAT_YEARLY_PRODUCT_ID?.trim() ||
+  "";
+const revenueCatIapReady =
+  process.env.EXPO_PUBLIC_APPLE_IAP_READY?.trim().toLowerCase() !== "false" &&
+  process.env.EXPO_PUBLIC_APPLE_IAP_READY?.trim() !== "0" &&
+  revenueCatIosPublicSdkKey.startsWith("appl_");
 
 type NotificationPreferences = {
   mealSuggestions: boolean;
@@ -44,6 +61,22 @@ type SnapshotPayload = {
   recommendedMeals?: MealSummary[];
   lastActivityAt?: string | null;
   ts?: number;
+};
+
+type NativeBillingRequest = {
+  type?: string;
+  requestId?: string;
+  tier?: "monthly" | "yearly";
+  appUserID?: string;
+  email?: string | null;
+};
+
+type NativeBillingResponse = {
+  type: "seekeatz_native_billing_response";
+  requestId: string;
+  ok: boolean;
+  payload?: unknown;
+  error?: string;
 };
 
 const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
@@ -256,6 +289,7 @@ true;
 `;
 
 export default function App() {
+  const webViewRef = useRef<WebView>(null);
   const prefsRef = useRef<NotificationPreferences>(DEFAULT_NOTIFICATION_PREFERENCES);
   const snapshotRef = useRef<SnapshotPayload | null>(null);
   const reminderIndexRef = useRef(0);
@@ -419,12 +453,138 @@ export default function App() {
       console.warn("Failed to open external URL:", error);
     }
   }, []);
+
+  const postBillingResponseToWebView = useCallback((response: NativeBillingResponse) => {
+    const script = `
+      window.dispatchEvent(new CustomEvent('seekeatz_native_billing_response', {
+        detail: ${JSON.stringify(response)}
+      }));
+      true;
+    `;
+    webViewRef.current?.injectJavaScript(script);
+  }, []);
+
+  const ensureRevenueCatConfigured = useCallback(async (appUserID: string, email?: string | null) => {
+    if (!revenueCatIapReady) {
+      throw new Error("RevenueCat is not fully configured in the native app.");
+    }
+
+    const isConfigured = await Purchases.isConfigured();
+    if (!isConfigured) {
+      await Purchases.setLogLevel(LOG_LEVEL.INFO);
+      Purchases.configure({
+        apiKey: revenueCatIosPublicSdkKey,
+        appUserID,
+        shouldShowInAppMessagesAutomatically: true,
+      });
+    }
+
+    const currentAppUserID = await Purchases.getAppUserID();
+    if (currentAppUserID !== appUserID) {
+      await Purchases.logIn(appUserID);
+    }
+
+    if (email) {
+      await Purchases.setEmail(email);
+    }
+  }, []);
+
+  const getRevenueCatPackageForTier = useCallback(async (tier: "monthly" | "yearly") => {
+    const offerings = await Purchases.getOfferings();
+    const currentOffering = offerings.current;
+    if (!currentOffering) {
+      return null;
+    }
+
+    if (tier === "monthly" && currentOffering.monthly) {
+      return currentOffering.monthly;
+    }
+
+    if (tier === "yearly" && currentOffering.annual) {
+      return currentOffering.annual;
+    }
+
+    const productId = tier === "monthly" ? revenueCatMonthlyProductId : revenueCatYearlyProductId;
+    if (!productId) {
+      return null;
+    }
+
+    return (
+      currentOffering.availablePackages.find(
+        (entry) => entry.product.identifier === productId,
+      ) ?? null
+    );
+  }, []);
+
+  const handleNativeBillingRequest = useCallback(async (request: NativeBillingRequest) => {
+    const requestId = request.requestId;
+    if (!requestId || !request.appUserID) {
+      return;
+    }
+
+    try {
+      await ensureRevenueCatConfigured(request.appUserID, request.email);
+
+      if (request.type === "revenuecat_purchase") {
+        if (request.tier !== "monthly" && request.tier !== "yearly") {
+          throw new Error("Missing purchase tier.");
+        }
+
+        const packageToPurchase = await getRevenueCatPackageForTier(request.tier);
+        if (!packageToPurchase) {
+          throw new Error(`No ${request.tier} package is available in RevenueCat.`);
+        }
+
+        const result = await Purchases.purchasePackage(packageToPurchase);
+        postBillingResponseToWebView({
+          type: "seekeatz_native_billing_response",
+          requestId,
+          ok: true,
+          payload: result,
+        });
+        return;
+      }
+
+      if (request.type === "revenuecat_restore") {
+        const customerInfo = await Purchases.restorePurchases();
+        postBillingResponseToWebView({
+          type: "seekeatz_native_billing_response",
+          requestId,
+          ok: true,
+          payload: { customerInfo },
+        });
+        return;
+      }
+
+      if (request.type === "revenuecat_customer_info") {
+        const customerInfo = await Purchases.getCustomerInfo();
+        postBillingResponseToWebView({
+          type: "seekeatz_native_billing_response",
+          requestId,
+          ok: true,
+          payload: { customerInfo },
+        });
+      }
+    } catch (error) {
+      postBillingResponseToWebView({
+        type: "seekeatz_native_billing_response",
+        requestId,
+        ok: false,
+        error: error instanceof Error ? error.message : "Native billing request failed.",
+      });
+    }
+  }, [ensureRevenueCatConfigured, getRevenueCatPackageForTier, postBillingResponseToWebView]);
+
   const handleWebViewMessage = useCallback(async (event: WebViewMessageEvent) => {
     try {
       const parsed = JSON.parse(event.nativeEvent.data) as {
         type?: string;
         payload?: SnapshotPayload;
         url?: string;
+        requestId?: string;
+        tier?: "monthly" | "yearly";
+        appUserID?: string;
+        email?: string | null;
       };
 
       if (parsed.type === "seekeatz_snapshot" && parsed.payload) {
@@ -434,11 +594,20 @@ export default function App() {
 
       if (parsed.type === "open_external_url" && typeof parsed.url === "string") {
         await openExternalUrl(parsed.url);
+        return;
+      }
+
+      if (
+        parsed.type === "revenuecat_purchase" ||
+        parsed.type === "revenuecat_restore" ||
+        parsed.type === "revenuecat_customer_info"
+      ) {
+        await handleNativeBillingRequest(parsed);
       }
     } catch {
       // Ignore non-JSON postMessage payloads
     }
-  }, [handleSnapshotMessage, openExternalUrl]);
+  }, [handleNativeBillingRequest, handleSnapshotMessage, openExternalUrl]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
@@ -473,12 +642,16 @@ export default function App() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <WebView
+        ref={webViewRef}
         source={{ uri: webAppUrl }}
         originWhitelist={["*"]}
         contentMode="mobile"
         hideKeyboardAccessoryView
         javaScriptEnabled
         domStorageEnabled
+        sharedCookiesEnabled
+        thirdPartyCookiesEnabled
+        cacheEnabled
         startInLoadingState
         allowsBackForwardNavigationGestures
         onMessage={handleWebViewMessage}

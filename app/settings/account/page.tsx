@@ -21,6 +21,7 @@ import { useAccountEntitlement } from '@/app/hooks/useAccountEntitlement';
 import { isRevenueCatConfigured } from '@/lib/billing/apple-products';
 import {
   getRevenueCatManagementUrl,
+  isNativeBillingBridgeAvailable,
   reconcileRevenueCatEntitlement,
   restoreRevenueCatPurchases,
 } from '@/lib/billing/revenuecat-client';
@@ -65,7 +66,12 @@ export default function AccountEditPage() {
   const [authUserId, setAuthUserId] = useState<string | null>(null);
   const [authEmail, setAuthEmail] = useState<string | null>(null);
   const subscriptionPlanLabel = getEntitlementPlanLabel(entitlement);
-  const nativeBillingReady = isNativeApp() && isRevenueCatConfigured();
+  // Drive native billing off the actual bridge first. isRevenueCatConfigured()
+  // depends on NEXT_PUBLIC_* web env that may be absent on the deployed site,
+  // which previously skipped the entitlement reconcile and left paying users on
+  // the free tier even though RevenueCat had granted premium.
+  const nativeBillingReady =
+    isNativeApp() && (isNativeBillingBridgeAvailable() || isRevenueCatConfigured());
   
   const [profile, setProfile] = useState<UserProfile>({
     goal: 'maintain',

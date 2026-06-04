@@ -60,8 +60,12 @@ function SignInPageContent() {
   const [resetPasswordMessage, setResetPasswordMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isResettingPassword, setIsResettingPassword] = useState(false);
-  const encodedRedirectTo = encodeURIComponent(redirectTo);
-  const upgradeHref = `/upgrade?redirectTo=${encodedRedirectTo}${shouldStartTutorial ? "&tutorial=1" : ""}${isMasterMode ? "&master=1" : ""}`;
+  // "Sign up" must open the create-account screen first. After the account is
+  // created, signup redirects to the premium screen (/upgrade?fromSignup=1),
+  // which then routes into onboarding. Pointing this at /upgrade directly made
+  // the subscription screen appear twice (once before and once after signup).
+  const postSignupUpgradePath = "/upgrade?fromSignup=1";
+  const signUpHref = `/auth/signup?redirectTo=${encodeURIComponent(postSignupUpgradePath)}&switch=1${shouldStartTutorial ? "&tutorial=1" : ""}${isMasterMode ? "&master=1" : ""}`;
 
   const resetSavedMealStorageForUser = (userId: string) => {
     if (typeof window === "undefined") return;
@@ -420,7 +424,7 @@ function SignInPageContent() {
         <p className="text-black text-sm text-center mt-6">
           Don&apos;t have an account?{" "}
           <button
-            onClick={() => router.push(upgradeHref)}
+            onClick={() => router.push(signUpHref)}
             className="text-cyan-600 hover:text-cyan-700 font-medium"
           >
             Sign up

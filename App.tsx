@@ -465,12 +465,22 @@ export default function App() {
   }, []);
 
   const ensureRevenueCatConfigured = useCallback(async (appUserID: string, email?: string | null) => {
+    // Safe to log: only the first 8 chars of the publishable key, never the full value.
+    const keyPreview = revenueCatIosPublicSdkKey
+      ? `${revenueCatIosPublicSdkKey.slice(0, 8)}...`
+      : "(empty)";
+
     if (!revenueCatIapReady) {
+      console.warn("[billing][native] RevenueCat not configured", {
+        keyPreview,
+        startsWithAppl: revenueCatIosPublicSdkKey.startsWith("appl_"),
+        iapReady: revenueCatIapReady,
+      });
       throw new Error("RevenueCat is not fully configured in the native app.");
     }
 
-    const isConfigured = await Purchases.isConfigured();
-    if (!isConfigured) {
+    const alreadyConfigured = await Purchases.isConfigured();
+    if (!alreadyConfigured) {
       await Purchases.setLogLevel(LOG_LEVEL.INFO);
       Purchases.configure({
         apiKey: revenueCatIosPublicSdkKey,
@@ -479,10 +489,32 @@ export default function App() {
       });
     }
 
+    const initialized = await Purchases.isConfigured();
+    console.log("[billing][native] RevenueCat configure", {
+      keyPreview,
+      startsWithAppl: revenueCatIosPublicSdkKey.startsWith("appl_"),
+      wasAlreadyConfigured: alreadyConfigured,
+      initialized,
+    });
+
     const currentAppUserID = await Purchases.getAppUserID();
+    console.log("[billing][native] appUserID before login", {
+      currentAppUserID,
+      requestedAppUserID: appUserID,
+      isAnonymous: currentAppUserID?.startsWith("$RCAnonymousID:") ?? false,
+    });
+
     if (currentAppUserID !== appUserID) {
       await Purchases.logIn(appUserID);
     }
+
+    const appUserIDAfterLogin = await Purchases.getAppUserID();
+    console.log("[billing][native] appUserID after login", {
+      appUserIDAfterLogin,
+      requestedAppUserID: appUserID,
+      matchesSupabaseUser: appUserIDAfterLogin === appUserID,
+      isAnonymous: appUserIDAfterLogin?.startsWith("$RCAnonymousID:") ?? false,
+    });
 
     if (email) {
       await Purchases.setEmail(email);
@@ -535,6 +567,14 @@ export default function App() {
           throw new Error(`No ${request.tier} package is available in RevenueCat.`);
         }
 
+        const appUserIDBeforePurchase = await Purchases.getAppUserID();
+        console.log("[billing][native] appUserID before purchase", {
+          appUserIDBeforePurchase,
+          requestedAppUserID: request.appUserID,
+          matchesSupabaseUser: appUserIDBeforePurchase === request.appUserID,
+          isAnonymous: appUserIDBeforePurchase?.startsWith("$RCAnonymousID:") ?? false,
+        });
+
         const result = await Purchases.purchasePackage(packageToPurchase);
 
         // Immediately refresh customerInfo so the entitlement reflects the
@@ -546,10 +586,15 @@ export default function App() {
           console.warn("[billing][native] getCustomerInfo after purchase failed", refreshError);
         }
 
+        const appUserIDAfterPurchase = await Purchases.getAppUserID();
         const entitlementId =
           process.env.EXPO_PUBLIC_REVENUECAT_ENTITLEMENT_ID?.trim() || "premium";
         console.log("[billing][native] purchase success", {
           productIdentifier: result.productIdentifier,
+          appUserIDAfterPurchase,
+          requestedAppUserID: request.appUserID,
+          matchesSupabaseUser: appUserIDAfterPurchase === request.appUserID,
+          originalAppUserId: customerInfo?.originalAppUserId,
           activeEntitlementKeys: Object.keys(customerInfo?.entitlements?.active ?? {}),
           premiumIsActive:
             customerInfo?.entitlements?.active?.[entitlementId]?.isActive === true,
@@ -568,9 +613,14 @@ export default function App() {
         await Purchases.restorePurchases();
         // Re-fetch the canonical customerInfo after restore.
         const customerInfo = await Purchases.getCustomerInfo();
+        const appUserIDAfterRestore = await Purchases.getAppUserID();
         const entitlementId =
           process.env.EXPO_PUBLIC_REVENUECAT_ENTITLEMENT_ID?.trim() || "premium";
         console.log("[billing][native] restore success", {
+          appUserIDAfterRestore,
+          requestedAppUserID: request.appUserID,
+          matchesSupabaseUser: appUserIDAfterRestore === request.appUserID,
+          originalAppUserId: customerInfo?.originalAppUserId,
           activeEntitlementKeys: Object.keys(customerInfo?.entitlements?.active ?? {}),
           premiumIsActive:
             customerInfo?.entitlements?.active?.[entitlementId]?.isActive === true,

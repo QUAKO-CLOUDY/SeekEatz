@@ -2,7 +2,7 @@
 
 import { Suspense, useState, FormEvent, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { Label } from "@/app/components/ui/label";
 import { Input } from "@/app/components/ui/input";
@@ -18,6 +18,28 @@ import {
   clearLoggedMealsStorageForUser,
   getLoggedMealsStorageKey,
 } from "@/lib/logged-meals-storage";
+
+/**
+ * Resolves a promise but never hangs longer than `ms`. Used so flaky mobile
+ * network calls during post-sign-in setup can't leave the button stuck on
+ * "Signing in...". The session is already established at this point, so timing
+ * out these non-critical side effects is safe.
+ */
+async function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | null> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race<T | null>([
+      promise,
+      new Promise<null>((resolve) => {
+        timer = setTimeout(() => resolve(null), ms);
+      }),
+    ]);
+  } finally {
+    if (timer) {
+      clearTimeout(timer);
+    }
+  }
+}
 
 function SignInPageContent() {
   const router = useRouter();
@@ -154,11 +176,17 @@ function SignInPageContent() {
         // Check existing profile in database
         let hasCompletedOnboarding = false;
         try {
-          const { data: profileData } = await supabase
-            .from("profiles")
-            .select("has_completed_onboarding, user_profile")
-            .eq("id", userId)
-            .single();
+          const profileResult = await withTimeout(
+            Promise.resolve(
+              supabase
+                .from("profiles")
+                .select("has_completed_onboarding, user_profile")
+                .eq("id", userId)
+                .single(),
+            ),
+            6000,
+          );
+          const profileData = profileResult?.data;
           
           if (profileData) {
             didLoadExistingProfile = true;
@@ -177,9 +205,10 @@ function SignInPageContent() {
           resetSavedMealStorageForUser(userId);
         }
         
-        // Claim anonymous data (saved_meals, daily_logs, user_favorites)
+        // Claim anonymous data (saved_meals, daily_logs, user_favorites).
+        // Bounded so a stalled request can't hang the sign-in button.
         try {
-          await claimAnonymousData();
+          await withTimeout(claimAnonymousData(), 6000);
         } catch (claimError) {
           console.error('Error claiming anonymous data:', claimError);
           // Don't block signin flow if claim fails
@@ -236,12 +265,15 @@ function SignInPageContent() {
               ? { full_name: data.user.user_metadata.full_name as string }
               : undefined;
 
-          const bootstrapResult = await bootstrapAccount({
-            profile: profileForBootstrap,
-            hasCompletedOnboarding: !!(profile || hasCompletedOnboarding),
-          });
+          const bootstrapResult = await withTimeout(
+            bootstrapAccount({
+              profile: profileForBootstrap,
+              hasCompletedOnboarding: !!(profile || hasCompletedOnboarding),
+            }),
+            6000,
+          );
 
-          if (bootstrapResult.waitlistGrantApplied) {
+          if (bootstrapResult?.waitlistGrantApplied) {
             localStorage.setItem("seekeatz_waitlist_trial_activated", "true");
           }
         } catch (bootstrapError) {
@@ -294,21 +326,6 @@ function SignInPageContent() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-6">
       <div className="w-full max-w-md">
-        <button
-          type="button"
-          onClick={() => {
-            if (typeof window !== "undefined" && window.history.length > 1) {
-              router.back();
-              return;
-            }
-            router.push("/");
-          }}
-          className="mb-5 inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-3.5 py-2 text-sm font-medium text-black transition-colors hover:bg-gray-50"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </button>
-
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-black mb-2">Welcome Back</h1>
           <p className="text-black">Sign in to continue to SeekEatz</p>

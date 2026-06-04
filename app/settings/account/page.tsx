@@ -21,6 +21,7 @@ import { useAccountEntitlement } from '@/app/hooks/useAccountEntitlement';
 import { isRevenueCatConfigured } from '@/lib/billing/apple-products';
 import {
   getRevenueCatManagementUrl,
+  reconcileRevenueCatEntitlement,
   restoreRevenueCatPurchases,
 } from '@/lib/billing/revenuecat-client';
 import { isNativeApp, openExternalUrl } from '@/lib/native-runtime';
@@ -138,6 +139,26 @@ export default function AccountEditPage() {
       try {
         setIsLoadingManagementUrl(true);
         setBillingError(null);
+
+        // Reconcile against RevenueCat so an already-active subscription
+        // upgrades the account/profile even if the original purchase sync
+        // never landed (e.g. StoreKit "already subscribed").
+        try {
+          const reconciled = await reconcileRevenueCatEntitlement({
+            appUserID: authUserId,
+            email: authEmail,
+          });
+          const syncedEntitlement = reconciled?.synced?.entitlement as
+            | AppEntitlement
+            | undefined;
+          if (syncedEntitlement) {
+            setEntitlement(syncedEntitlement);
+            writeCachedEntitlement(syncedEntitlement);
+          }
+        } catch (reconcileError) {
+          console.warn('Entitlement reconcile on settings load skipped:', reconcileError);
+        }
+
         const url = await getRevenueCatManagementUrl({
           appUserID: authUserId,
           email: authEmail,
@@ -152,7 +173,7 @@ export default function AccountEditPage() {
     };
 
     void loadManagementUrl();
-  }, [authEmail, authUserId, nativeBillingReady]);
+  }, [authEmail, authUserId, nativeBillingReady, setEntitlement]);
 
   const handleSave = async () => {
     setIsSaving(true);

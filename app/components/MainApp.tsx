@@ -13,7 +13,6 @@ import AIChat from './AIChat';
 import { MealDetail } from './MealDetail';
 import { SearchScreen } from './SearchScreen';
 import { OnboardingFlow } from './OnboardingFlow';
-import { AuthScreen } from './AuthScreen';
 import { UpgradeModal } from './UpgradeModal';
 import { AppTutorialOverlay, type AppTutorialStep } from './AppTutorialOverlay';
 import type { UserProfile, Meal } from '../types';
@@ -270,6 +269,14 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       setIsMounted(true);
     });
   }, []);
+
+  // Send unauthenticated users to the single (white) "Welcome Back" sign-in
+  // page instead of an in-app auth screen.
+  useEffect(() => {
+    if (appState === 'auth') {
+      router.replace('/auth/signin');
+    }
+  }, [appState, router]);
 
   useEffect(() => {
     if (!isMounted) return;
@@ -584,6 +591,20 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         retries++;
       }
 
+      // Fallback: getUser() makes a network call that can fail transiently when
+      // iOS reloads the WebView on resume. Never sign out a user who still has a
+      // valid persisted session — trust the locally stored session in that case.
+      if (!user) {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.user) {
+            user = session.user;
+          }
+        } catch (sessionError) {
+          console.warn("getSession fallback failed in MainApp:", sessionError);
+        }
+      }
+
       // If we have a user but no onboarding flag, check the database
       if (user && !isOnboarded) {
         setCurrentUserId(user.id); // Track current user ID
@@ -862,10 +883,6 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   };
 
   // Handle auth success (fallback, but onAuthStateChange should handle it)
-  const handleAuthSuccess = () => {
-    setAppState('app');
-  };
-
   const handleTutorialNext = () => {
     if (tutorialStepIndex >= APP_TUTORIAL_STEPS.length - 1) {
       setIsTutorialActive(false);
@@ -917,9 +934,14 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     );
   }
 
-  // Show auth screen
+  // Unauthenticated: a redirect to /auth/signin is triggered by the effect
+  // above. Render a loading placeholder while navigation happens.
   if (renderedAppState === 'auth') {
-    return <AuthScreen onSuccess={handleAuthSuccess} />;
+    return (
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+        <div className="text-cyan-400 text-lg">Loading...</div>
+      </div>
+    );
   }
 
   // If we reach here, appState is 'app' - render the main app UI

@@ -19,6 +19,7 @@ import { isRevenueCatConfigured } from "@/lib/billing/apple-products";
 import {
   isNativeBillingBridgeAvailable,
   purchaseRevenueCatTier,
+  reconcileRevenueCatEntitlement,
   restoreRevenueCatPurchases,
 } from "@/lib/billing/revenuecat-client";
 import { isNativeApp } from "@/lib/native-runtime";
@@ -54,13 +55,6 @@ function toUserFacingBillingError(message: string): string {
 
 const planCards = [
   {
-    id: "monthly",
-    name: "Monthly",
-    price: `$${MONTHLY_PLAN_PRICE.toFixed(2)}/month`,
-    description: "Flexible monthly billing with full premium access.",
-    cta: "Purchase Monthly",
-  },
-  {
     id: "yearly",
     name: "Yearly",
     price: `$${YEARLY_PLAN_PRICE.toFixed(2)}/year`,
@@ -68,6 +62,13 @@ const planCards = [
     details: "Full access to all features and updates year-round.",
     cta: "Purchase Yearly",
     badge: "Best value",
+  },
+  {
+    id: "monthly",
+    name: "Monthly",
+    price: `$${MONTHLY_PLAN_PRICE.toFixed(2)}/month`,
+    description: "Flexible monthly billing with full premium access.",
+    cta: "Purchase Monthly",
   },
   {
     id: "free",
@@ -146,6 +147,21 @@ function UpgradePageContent() {
         } catch (error) {
           console.warn("Upgrade bootstrap skipped:", error);
         }
+
+        // Reconcile against RevenueCat on load so a user who already owns an
+        // active subscription (StoreKit "already subscribed") gets upgraded
+        // without needing to purchase again.
+        if (isNativeApp() && (isNativeBillingBridgeAvailable() || isRevenueCatConfigured())) {
+          try {
+            const reconciled = await reconcileRevenueCatEntitlement({
+              appUserID: user.id,
+              email: user.email ?? null,
+            });
+            applyEntitlement(reconciled?.synced?.entitlement as AppEntitlement | undefined);
+          } catch (error) {
+            console.warn("Entitlement reconcile skipped:", error);
+          }
+        }
       }
     };
 
@@ -164,7 +180,7 @@ function UpgradePageContent() {
     });
 
     return () => subscription.unsubscribe();
-  }, [getOnboardingFlag, refresh]);
+  }, [applyEntitlement, getOnboardingFlag, refresh]);
   const nativeApp = isNativeApp();
   const iapReady = nativeApp
     ? isNativeBillingBridgeAvailable() || isRevenueCatConfigured()
@@ -220,6 +236,27 @@ function UpgradePageContent() {
         await refresh();
         routeAfterPlanSelection();
       } catch (error) {
+        // The user may already own this subscription ("already subscribed").
+        // Reconcile from RevenueCat customerInfo before surfacing an error so
+        // an existing active entitlement still upgrades the account.
+        try {
+          const reconciled = await reconcileRevenueCatEntitlement({
+            appUserID: authUserId,
+            email: authEmail,
+          });
+          const reconciledEntitlement = reconciled?.synced?.entitlement as
+            | AppEntitlement
+            | undefined;
+          if (reconciledEntitlement?.hasPremiumAccess) {
+            applyEntitlement(reconciledEntitlement);
+            await refresh();
+            routeAfterPlanSelection();
+            return;
+          }
+        } catch (reconcileError) {
+          console.warn("Reconcile after purchase error failed:", reconcileError);
+        }
+
         const message =
           error instanceof Error ? error.message : "Purchase could not be completed.";
         setBillingError(toUserFacingBillingError(message));
@@ -317,11 +354,20 @@ function UpgradePageContent() {
             </div>
 
             <div className="grid auto-rows-fr gap-4 md:grid-cols-3 md:items-stretch">
-              {planCards.map((plan) => (
+              {planCards.map((plan) => {
+                const isCurrentPlan =
+                  isSignedIn &&
+                  entitlement.hasPremiumAccess &&
+                  (plan.id === "monthly" || plan.id === "yearly") &&
+                  entitlement.billingTier === plan.id;
+
+                return (
                 <div
                   key={plan.id}
                   className={`flex min-h-0 w-full flex-col self-stretch overflow-hidden rounded-[1.75rem] border p-4 sm:p-5 ${
-                    plan.id === "free"
+                    isCurrentPlan
+                      ? "border-emerald-400 bg-gradient-to-br from-emerald-50 via-white to-emerald-50 shadow-lg shadow-emerald-100/70 ring-2 ring-emerald-400/40"
+                      : plan.id === "free"
                       ? "border-border bg-background/80"
                       : plan.id === "yearly"
                         ? "border-cyan-300 bg-gradient-to-br from-cyan-50 via-white to-blue-50 shadow-lg shadow-cyan-100/70"
@@ -385,13 +431,18 @@ function UpgradePageContent() {
                     <button
                       type="button"
                       disabled={
-                        plan.id === "free"
+                        isCurrentPlan
+                          ? true
+                          : plan.id === "free"
                           ? false
                           : isSignedIn
                             ? pendingPlanId !== null || (isNativeApp() && !iapReady)
                             : false
                       }
                       onClick={() => {
+                        if (isCurrentPlan) {
+                          return;
+                        }
                         if (plan.id === "free") {
                           if (isSignedIn) {
                             routeAfterPlanSelection();
@@ -421,9 +472,15 @@ function UpgradePageContent() {
                           void handlePurchase(plan.id);
                         }
                       }}
-                      className="w-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 px-5 py-4 text-base font-semibold text-white shadow-lg shadow-cyan-500/25 disabled:cursor-not-allowed disabled:opacity-50"
+                      className={`w-full rounded-full px-5 py-4 text-base font-semibold text-white shadow-lg disabled:cursor-not-allowed ${
+                        isCurrentPlan
+                          ? "bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-emerald-500/25 disabled:opacity-100"
+                          : "bg-gradient-to-r from-cyan-500 to-blue-600 shadow-cyan-500/25 disabled:opacity-50"
+                      }`}
                     >
-                      {plan.id === "free"
+                      {isCurrentPlan
+                        ? "Purchased"
+                        : plan.id === "free"
                         ? isSignedIn
                           ? "Continue"
                           : plan.cta
@@ -435,7 +492,8 @@ function UpgradePageContent() {
                     </button>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             {!isSignedIn ? (

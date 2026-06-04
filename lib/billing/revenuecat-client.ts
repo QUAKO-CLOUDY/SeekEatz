@@ -537,3 +537,20 @@ export async function getRevenueCatManagementUrl(params: {
   const customerInfo = await getRevenueCatCustomerInfo(params);
   return customerInfo.managementURL ?? null;
 }
+
+/**
+ * Pulls the live RevenueCat customerInfo and syncs it to the backend without
+ * triggering a purchase. This reconciles users who already own an active
+ * subscription (RevenueCat returns "already subscribed" on re-purchase) so
+ * their Supabase profile/entitlement is upgraded even when no new purchase
+ * transaction is generated.
+ */
+export async function reconcileRevenueCatEntitlement(params: {
+  appUserID: string;
+  email?: string | null;
+}) {
+  const customerInfo = await getRevenueCatCustomerInfo(params);
+  logCustomerInfo("reconcile", customerInfo);
+  const synced = await syncRevenueCatCustomerInfoToBackend(customerInfo);
+  return { customerInfo, synced };
+}

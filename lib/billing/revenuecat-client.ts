@@ -37,6 +37,7 @@ type PurchasesSubscriptionInfo = {
 };
 
 type CustomerInfo = {
+  originalAppUserId?: string | null;
   entitlements: {
     active: Record<string, PurchasesEntitlementInfo>;
     all: Record<string, PurchasesEntitlementInfo>;
@@ -323,12 +324,19 @@ function buildAppStoreSyncPayload(
   }
 
   // Prefer a real store transaction id, but never block the sync on it. Fall
-  // back to a stable synthetic id so the upsert (keyed on transaction id) runs.
+  // back to a synthetic id so the upsert (keyed on transaction id) runs.
+  //
+  // IMPORTANT: the synthetic id must be unique per RevenueCat user. The DB has
+  // a UNIQUE constraint on the transaction id, so a non-user-scoped fallback
+  // (e.g. "premium:com.seekeatz.app.premium.monthly") collides the moment a
+  // second account syncs — the write fails and that user is silently stuck on
+  // free. Scoping by originalAppUserId guarantees uniqueness per account.
   const resolvedProductId =
     productId ?? getAppleProductIdForTier("monthly") ?? entitlementId;
+  const syntheticOwnerId = customerInfo.originalAppUserId ?? entitlementId;
   const latestTransactionId =
     subscription?.storeTransactionId ??
-    `${entitlement?.identifier ?? entitlementId}:${resolvedProductId}`;
+    `${syntheticOwnerId}:${entitlement?.identifier ?? entitlementId}:${resolvedProductId}`;
 
   let status: AppStoreSyncPayload["status"] = "inactive";
   if (premiumActive) {

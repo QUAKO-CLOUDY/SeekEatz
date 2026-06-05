@@ -25,12 +25,16 @@ type AppStoreSubscriptionUpsert = {
   updated_at: string;
 };
 
-type ProfileSubscriptionUpdate = {
+type ProfilePremiumUpdate = {
   billing_provider: "app_store";
   subscription_tier: ReturnType<typeof getBillingTierFromAppleProductId>;
   subscription_status: AppStoreSyncPayload["status"];
   trial_source: null;
   trial_expires_at: string | null;
+  updated_at: string;
+};
+
+type ProfileAppStoreMetadataUpdate = {
   app_store_product_id: string;
   app_store_original_transaction_id: string;
   app_store_environment: AppStoreSyncPayload["environment"];
@@ -109,44 +113,92 @@ export async function POST(request: Request) {
       raw_payload: payload.rawCustomerInfo ?? null,
       updated_at: nowIso,
     };
-    const profileUpdate: ProfileSubscriptionUpdate = {
+
+    // Best-effort: record the raw subscription in the history table. This is
+    // useful for auditing but must NEVER block granting premium — if the table
+    // is missing or the transaction id collides, we still upgrade the profile.
+    try {
+      const { error: subscriptionUpsertError } = await (
+        admin.from("app_store_subscriptions" as never) as unknown as {
+          upsert: (
+            values: AppStoreSubscriptionUpsert,
+            options?: { onConflict?: string },
+          ) => Promise<{ error: unknown }>;
+        }
+      ).upsert(subscriptionRecord, { onConflict: "original_transaction_id" });
+
+      if (subscriptionUpsertError) {
+        console.error(
+          "[app-store-sync] subscription history upsert failed (non-fatal):",
+          subscriptionUpsertError,
+        );
+      }
+    } catch (subscriptionUpsertThrow) {
+      console.error(
+        "[app-store-sync] subscription history upsert threw (non-fatal):",
+        subscriptionUpsertThrow,
+      );
+    }
+
+    // Core premium flag. This is what actually unlocks the app, so it MUST
+    // succeed. It only touches the base subscription columns to minimise the
+    // chance of a schema mismatch silently locking out a paying user.
+    const profilePremiumUpdate: ProfilePremiumUpdate = {
       billing_provider: "app_store",
       subscription_tier: billingTier,
       subscription_status: payload.status,
       trial_source: null,
       trial_expires_at: payload.status === "trialing" ? payload.expiresAt : null,
-      app_store_product_id: payload.productId,
-      app_store_original_transaction_id: payload.originalTransactionId,
-      app_store_environment: payload.environment,
-      app_store_last_verified_at: nowIso,
       updated_at: nowIso,
     };
 
-    const { error: subscriptionUpsertError } = await (
-      admin.from("app_store_subscriptions" as never) as unknown as {
-        upsert: (
-          values: AppStoreSubscriptionUpsert,
-          options?: { onConflict?: string },
-        ) => Promise<{ error: unknown }>;
-      }
-    ).upsert(subscriptionRecord, { onConflict: "original_transaction_id" });
-
-    if (subscriptionUpsertError) {
-      throw subscriptionUpsertError;
-    }
-
-    const { error: profileUpdateError } = await (
+    const { error: profilePremiumError } = await (
       admin.from("profiles" as never) as unknown as {
-        update: (values: ProfileSubscriptionUpdate) => {
+        update: (values: ProfilePremiumUpdate) => {
           eq: (column: string, value: string) => Promise<{ error: unknown }>;
         };
       }
     )
-      .update(profileUpdate)
+      .update(profilePremiumUpdate)
       .eq("id", user.id);
 
-    if (profileUpdateError) {
-      throw profileUpdateError;
+    if (profilePremiumError) {
+      throw profilePremiumError;
+    }
+
+    // Best-effort: App Store metadata columns. These have a UNIQUE index on the
+    // transaction id and may not exist on older schemas, so a failure here must
+    // not undo the premium grant above.
+    try {
+      const profileMetadataUpdate: ProfileAppStoreMetadataUpdate = {
+        app_store_product_id: payload.productId,
+        app_store_original_transaction_id: payload.originalTransactionId,
+        app_store_environment: payload.environment,
+        app_store_last_verified_at: nowIso,
+        updated_at: nowIso,
+      };
+
+      const { error: profileMetadataError } = await (
+        admin.from("profiles" as never) as unknown as {
+          update: (values: ProfileAppStoreMetadataUpdate) => {
+            eq: (column: string, value: string) => Promise<{ error: unknown }>;
+          };
+        }
+      )
+        .update(profileMetadataUpdate)
+        .eq("id", user.id);
+
+      if (profileMetadataError) {
+        console.error(
+          "[app-store-sync] profile metadata update failed (non-fatal):",
+          profileMetadataError,
+        );
+      }
+    } catch (profileMetadataThrow) {
+      console.error(
+        "[app-store-sync] profile metadata update threw (non-fatal):",
+        profileMetadataThrow,
+      );
     }
 
     const [{ data: profile }, usageResult] = await Promise.all([

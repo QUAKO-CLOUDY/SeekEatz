@@ -22,6 +22,8 @@ import { useNutrition } from '../contexts/NutritionContext'; // Import to sync l
 import { hasDevFullAccess, setDevFullAccess } from '@/lib/onboarding-flow';
 import { clearCachedEntitlement } from '@/lib/entitlements';
 import { useAccountEntitlement } from '@/app/hooks/useAccountEntitlement';
+import { isNativeApp } from '@/lib/native-runtime';
+import { reconcileRevenueCatEntitlement } from '@/lib/billing/revenuecat-client';
 import { bootstrapAccount } from '@/lib/bootstrap-account';
 import { isFullAccessEmail } from '@/lib/full-access';
 import {
@@ -192,6 +194,33 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   const [isTutorialActive, setIsTutorialActive] = useState(false);
   const [tutorialStepIndex, setTutorialStepIndex] = useState(0);
   const { entitlement, refresh: refreshEntitlement } = useAccountEntitlement(isMounted);
+
+  // On startup (and whenever the signed-in user changes) reconcile the live
+  // RevenueCat entitlement into Supabase so a paying user gets premium access
+  // app-wide without having to open the Settings or Upgrade screen first.
+  useEffect(() => {
+    if (!isMounted || !hasHydratedCurrentUser || !currentUserId) return;
+    if (!isNativeApp()) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        await reconcileRevenueCatEntitlement({
+          appUserID: currentUserId,
+          email: currentUserEmail ?? null,
+        });
+        if (!cancelled) {
+          await refreshEntitlement();
+        }
+      } catch (error) {
+        console.warn('Startup entitlement reconcile skipped:', error);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isMounted, hasHydratedCurrentUser, currentUserId, currentUserEmail, refreshEntitlement]);
   const favoriteMealsStorageKey = currentUserId
     ? `seekeatz_favorite_meals:${currentUserId}`
     : 'seekeatz_favorite_meals:guest';

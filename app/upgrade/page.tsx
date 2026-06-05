@@ -112,13 +112,13 @@ function UpgradePageContent() {
   const signUpHref = `/auth/signup?redirectTo=${encodedPostSignupUpgradePath}&switch=1${isMasterMode ? "&master=1" : ""}`;
 
   const routeAfterPlanSelection = useCallback(() => {
-    if (isFromSignup) {
-      router.push("/onboarding?afterSignup=1");
-      return;
-    }
-
-    if (typeof window !== "undefined" && shouldStartTutorial) {
+    // The intro onboarding slides are shown once before account creation, so
+    // after a brand-new user picks a plan we go straight into the in-app
+    // tutorial rather than repeating onboarding.
+    if (typeof window !== "undefined" && (isFromSignup || shouldStartTutorial)) {
       localStorage.setItem("seekeatz_start_app_tutorial", "true");
+      localStorage.removeItem("seekeatz_current_screen");
+      localStorage.removeItem("seekeatz_nav_history");
     }
 
     router.push("/chat");

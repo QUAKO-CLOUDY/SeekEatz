@@ -157,8 +157,15 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   const subscriptionPlanLabel = getEntitlementPlanLabel(entitlement);
   const canEditProfile = entitlement.hasPremiumAccess;
   
-  const appVersion = process.env.NEXT_PUBLIC_APP_VERSION || '1.1';
-  const appBuild = process.env.NEXT_PUBLIC_APP_BUILD || '5';
+  // Prefer the real native version/build injected by the iOS shell so this
+  // label always matches the installed TestFlight/App Store build. Falls back
+  // to env vars (web) and finally to the values in app.json.
+  const nativeAppVersion =
+    typeof window !== 'undefined' ? (window as { __APP_VERSION__?: string }).__APP_VERSION__ : undefined;
+  const nativeAppBuild =
+    typeof window !== 'undefined' ? (window as { __APP_BUILD__?: string }).__APP_BUILD__ : undefined;
+  const appVersion = nativeAppVersion || process.env.NEXT_PUBLIC_APP_VERSION || '1.1';
+  const appBuild = nativeAppBuild || process.env.NEXT_PUBLIC_APP_BUILD || '18';
   const appVersionLabel = `${appVersion} (${appBuild})`;
 
   const applyNotificationPreferences = (preferences: NotificationPreferences) => {

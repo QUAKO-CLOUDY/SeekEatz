@@ -3,6 +3,10 @@ import { ActivityIndicator, AppState, AppStateStatus, Linking, SafeAreaView, Sta
 import { WebView, type WebViewMessageEvent } from "react-native-webview";
 import * as Notifications from "expo-notifications";
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
+import appConfig from "./app.json";
+
+const APP_VERSION = appConfig?.expo?.version ?? "";
+const APP_BUILD = appConfig?.expo?.ios?.buildNumber ?? "";
 
 const DEFAULT_WEB_APP_URL = "https://seekeatz.com";
 const webAppUrl = process.env.EXPO_PUBLIC_WEB_APP_URL?.trim() || DEFAULT_WEB_APP_URL;
@@ -704,6 +708,14 @@ export default function App() {
 
   const injectedJavaScript = useMemo(() => INJECTED_SNAPSHOT_SCRIPT, []);
 
+  const injectedBeforeLoad = useMemo(
+    () =>
+      `(function(){try{window.__SEEKEATZ_NATIVE__=true;window.__APP_VERSION__=${JSON.stringify(
+        APP_VERSION,
+      )};window.__APP_BUILD__=${JSON.stringify(APP_BUILD)};}catch(_){}})();true;`,
+    [],
+  );
+
   if (!isValidUrl) {
     return (
       <SafeAreaView style={styles.errorContainer}>
@@ -733,6 +745,7 @@ export default function App() {
         startInLoadingState
         allowsBackForwardNavigationGestures
         onMessage={handleWebViewMessage}
+        injectedJavaScriptBeforeContentLoaded={injectedBeforeLoad}
         injectedJavaScript={injectedJavaScript}
         renderLoading={() => (
           <View style={styles.loader}>

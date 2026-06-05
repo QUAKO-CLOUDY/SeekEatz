@@ -459,6 +459,16 @@ export default function AccountEditPage() {
           </div>
         )}
 
+        {/* TEMPORARY: billing diagnostics. Remove once subscriptions are confirmed. */}
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => router.push('/debug/billing')}
+          className="w-full border-dashed"
+        >
+          Open billing diagnostics
+        </Button>
+
         <div className="bg-card border rounded-3xl p-6 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="mt-1 flex size-10 items-center justify-center rounded-xl border border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-300">

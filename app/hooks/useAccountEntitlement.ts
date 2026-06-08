@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AppEntitlement } from "@/lib/entitlements";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import {
   GUEST_ENTITLEMENT,
   readCachedEntitlement,
@@ -24,7 +25,7 @@ export function useAccountEntitlement(enabled = true) {
 
     try {
       setIsLoading(true);
-      const response = await fetch("/api/account/entitlement", {
+      const response = await authenticatedFetch("/api/account/entitlement", {
         method: "GET",
         cache: "no-store",
       });
@@ -35,11 +36,26 @@ export function useAccountEntitlement(enabled = true) {
 
       const nextEntitlement = (await response.json()) as AppEntitlement;
 
+      const current = entitlementRef.current;
+
       // A transient unauthenticated response (e.g. a momentarily missing
       // session cookie inside the WebView) must NOT downgrade a user we already
       // know is signed in — otherwise a paying user can flicker back to "Free".
-      if (!nextEntitlement.isAuthenticated && entitlementRef.current.isAuthenticated) {
-        return entitlementRef.current;
+      if (!nextEntitlement.isAuthenticated && current.isAuthenticated) {
+        return current;
+      }
+
+      // Same user, server came back "free" but we already unlocked premium
+      // locally (RevenueCat reconcile). Keep premium until a successful server
+      // read confirms the downgrade.
+      if (
+        nextEntitlement.isAuthenticated &&
+        !nextEntitlement.hasPremiumAccess &&
+        current.isAuthenticated &&
+        current.userId === nextEntitlement.userId &&
+        current.hasPremiumAccess
+      ) {
+        return current;
       }
 
       setEntitlement(nextEntitlement);

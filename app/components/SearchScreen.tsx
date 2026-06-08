@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChevronRight, Sparkles, X } from 'lucide-react';
 import type { Meal } from '../types';
 import { getRestaurantLogoUrl } from '@/lib/image-utils';
+import { authenticatedFetch } from '@/lib/authenticated-fetch';
 import { getStoredLocation, ensureSearchLocation } from '@/lib/location';
 import FoodCard from './FoodCard';
 
@@ -140,7 +141,7 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
     
     try {
       const resolvedLocation = await ensureLocationForSearch();
-      const res = await fetch('/api/search', {
+      const res = await authenticatedFetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -203,7 +204,7 @@ export function SearchScreen({ onMealSelect, onBack }: Props) {
     setLoadingMore(true);
 
     try {
-      const res = await fetch('/api/search', {
+      const res = await authenticatedFetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

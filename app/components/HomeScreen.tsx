@@ -3,6 +3,7 @@
 import Image from "next/image";
 import React, { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import { Search, Loader2, MapPin } from "lucide-react";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { createClient } from "@/utils/supabase/client";
 import { MealCard } from "./MealCard";
 import type { UserProfile, Meal } from "../types";
@@ -624,7 +625,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         console.log(`🔍 Search: query="${query}", radius=${distance} miles, hasLocation=${!!effectiveLocation}`, constraints);
       }
 
-      const res = await fetch('/api/search', {
+      const res = await authenticatedFetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

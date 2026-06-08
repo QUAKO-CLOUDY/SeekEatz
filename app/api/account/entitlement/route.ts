@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/server";
+import { getRequestUser } from "@/utils/supabase/request-user";
 import {
   buildEntitlement,
   type EntitlementProfileRow,
@@ -11,12 +11,9 @@ function getUsageWindowStartIso() {
   return new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { supabase, user } = await getRequestUser(request);
 
     if (!user) {
       return NextResponse.json(GUEST_ENTITLEMENT, { status: 200 });

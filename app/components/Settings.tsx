@@ -30,8 +30,20 @@ import { createClient } from '@/utils/supabase/client';
 import type { UserProfile } from '../types';
 import { requestNotificationPermission, sendMealSuggestionNotification } from '@/utils/notifications';
 import cavaData from '@/data/jsons/cava_raw.json';
-import { getEntitlementPlanLabel } from '@/lib/entitlements';
+import {
+  buildEntitlement,
+  getEntitlementPlanLabel,
+  writeCachedEntitlement,
+  type AppEntitlement,
+} from '@/lib/entitlements';
 import { useAccountEntitlement } from '@/app/hooks/useAccountEntitlement';
+import { getBillingTierFromAppleProductId } from '@/lib/billing/app-store-sync';
+import {
+  isNativeBillingBridgeAvailable,
+  reconcileRevenueCatEntitlement,
+} from '@/lib/billing/revenuecat-client';
+import { isRevenueCatConfigured } from '@/lib/billing/apple-products';
+import { isNativeApp } from '@/lib/native-runtime';
 
 type Props = {
   userProfile: UserProfile;
@@ -66,12 +78,13 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   const { clearChat } = useChat();
   
   // User data state
+  const [userId, setUserId] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string>('');
   const [userFullName, setUserFullName] = useState<string>('');
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { entitlement, refresh: refreshEntitlement } = useAccountEntitlement(true);
+  const { entitlement, refresh: refreshEntitlement, setEntitlement } = useAccountEntitlement(true);
 
   // Helper function to safely convert number to database value (handles undefined/null/NaN)
   // Returns: valid number or null (never undefined, NaN, or string)
@@ -193,6 +206,47 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
     return () => window.clearTimeout(timeoutId);
   }, [saveSuccessMessage]);
 
+  // Reconcile RevenueCat on Settings open so the plan label and profile-edit
+  // gate reflect premium even when a transient server read comes back "free".
+  useEffect(() => {
+    if (!userId || !isNativeApp()) return;
+    if (!isNativeBillingBridgeAvailable() && !isRevenueCatConfigured()) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const reconciled = await reconcileRevenueCatEntitlement({
+          appUserID: userId,
+          email: userEmail || null,
+        });
+        if (cancelled) return;
+
+        const syncedEntitlement = reconciled?.synced?.entitlement as AppEntitlement | undefined;
+        if (syncedEntitlement?.hasPremiumAccess) {
+          setEntitlement(syncedEntitlement);
+          writeCachedEntitlement(syncedEntitlement);
+        } else if (reconciled?.premiumActive) {
+          const premiumEntitlement = buildEntitlement({
+            user: { id: userId, email: userEmail || undefined },
+            profile: {
+              has_completed_onboarding: true,
+              subscription_tier: getBillingTierFromAppleProductId(reconciled.premiumProductId),
+              subscription_status: 'active',
+            },
+          });
+          setEntitlement(premiumEntitlement);
+          writeCachedEntitlement(premiumEntitlement);
+        }
+      } catch (error) {
+        console.warn('Settings entitlement reconcile skipped:', error);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [userId, userEmail, setEntitlement]);
+
   // Load user profile data from Supabase on mount and when component becomes visible
   useEffect(() => {
     const loadUserData = async () => {
@@ -200,6 +254,7 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
+          setUserId(user.id);
           setUserEmail(user.email || '');
           
           // Load profile from Supabase profiles table (using flat columns)

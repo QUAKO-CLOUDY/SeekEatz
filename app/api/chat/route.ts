@@ -928,10 +928,16 @@ export async function POST(req: Request) {
       });
     }
 
-    // 2. Initialize Supabase
-    let supabase;
+    // 2. Initialize Supabase + resolve user (cookie session, Bearer fallback)
+    let supabase: Awaited<ReturnType<typeof createClient>>;
+    let user = null;
+    let shouldRecordMeteredUsage = false;
+    let hasRecordedMeteredUsage = false;
     try {
-      supabase = await createClient();
+      const { getRequestUser } = await import('@/utils/supabase/request-user');
+      const resolved = await getRequestUser(req);
+      supabase = resolved.supabase;
+      user = resolved.user;
     } catch (supabaseError) {
       console.error('Supabase initialization error:', supabaseError);
       return NextResponse.json({
@@ -943,17 +949,6 @@ export async function POST(req: Request) {
         status: 500,
         headers: createResponseHeaders(false, 'ERROR', 'none')
       });
-    }
-
-    // 3. Auth & Usage Check
-    let user = null;
-    let shouldRecordMeteredUsage = false;
-    let hasRecordedMeteredUsage = false;
-    try {
-      const { data } = await supabase.auth.getUser();
-      user = data.user;
-    } catch (authError) {
-      console.warn('Auth check warning:', authError);
     }
 
     if (user) {

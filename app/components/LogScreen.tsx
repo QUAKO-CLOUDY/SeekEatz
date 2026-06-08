@@ -289,8 +289,8 @@ export function LogScreen({
                 </button>
 
                 {loggedDates.length > 0 && (
-                  <div className="mt-2 max-h-40 overflow-y-auto space-y-1">
-                    {loggedDates.slice(0, 7).map((date) => (
+                  <div className="mt-2 max-h-56 overflow-y-auto space-y-1">
+                    {loggedDates.map((date) => (
                       <button
                         key={date}
                         onClick={() => {

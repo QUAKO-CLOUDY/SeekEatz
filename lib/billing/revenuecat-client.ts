@@ -11,6 +11,7 @@ import {
   type AppStoreSyncPayload,
   getBillingTierFromAppleProductId,
 } from "@/lib/billing/app-store-sync";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { isNativeApp } from "@/lib/native-runtime";
 
 type PurchasesEntitlementInfo = {
@@ -381,7 +382,7 @@ export async function syncRevenueCatCustomerInfoToBackend(customerInfo: Customer
     return null;
   }
 
-  const response = await fetch("/api/account/app-store/sync", {
+  const response = await authenticatedFetch("/api/account/app-store/sync", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

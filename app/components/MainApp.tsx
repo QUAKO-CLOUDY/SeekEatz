@@ -200,6 +200,10 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   const [isTutorialActive, setIsTutorialActive] = useState(false);
   const [tutorialStepIndex, setTutorialStepIndex] = useState(0);
   const { entitlement, refresh: refreshEntitlement, setEntitlement } = useAccountEntitlement(isMounted);
+  // Hide premium lock icons until we've finished resolving entitlement on
+  // native. Prevents a brief flash of yellow locks while RevenueCat reconcile
+  // is still in flight.
+  const [entitlementResolved, setEntitlementResolved] = useState(() => !isNativeApp());
 
   // On startup (and whenever the signed-in user changes) reconcile the live
   // RevenueCat entitlement into Supabase so a paying user gets premium access
@@ -211,8 +215,12 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   // guarantees a paying user is never locked out by a backend hiccup.
   useEffect(() => {
     if (!isMounted || !hasHydratedCurrentUser || !currentUserId) return;
-    if (!isNativeApp()) return;
+    if (!isNativeApp()) {
+      setEntitlementResolved(true);
+      return;
+    }
 
+    setEntitlementResolved(false);
     let cancelled = false;
     (async () => {
       try {
@@ -246,6 +254,10 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         }
       } catch (error) {
         console.warn('Startup entitlement reconcile skipped:', error);
+      } finally {
+        if (!cancelled) {
+          setEntitlementResolved(true);
+        }
       }
     })();
 
@@ -378,7 +390,8 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     ? `seekeatz_app_tutorial_completed_${currentUserId}`
     : 'seekeatz_app_tutorial_completed_guest';
   const hasFullAccess = entitlement.hasPremiumAccess || isMasterAccount || devFullAccess;
-  const isRestrictedAccount = !!currentUserId && !hasFullAccess;
+  const isRestrictedAccount =
+    !!currentUserId && !hasFullAccess && entitlementResolved;
 
   useEffect(() => {
     if (!isMounted) return;

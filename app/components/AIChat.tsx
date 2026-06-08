@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { MealCard } from "./MealCard";
 import type { Meal, UserProfile } from "../types";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { createClient } from "@/utils/supabase/client";
 import { useTheme } from "../contexts/ThemeContext";
 import { useChat } from "../contexts/ChatContext";
@@ -1199,7 +1200,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         const shouldRequestLocation = isMealIntentQuery(trimmedText);
         const resolvedLocation = await requestLocationForMealSearch(shouldRequestLocation);
 
-        response = await fetch('/api/chat', {
+        response = await authenticatedFetch('/api/chat', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1644,7 +1645,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           limit: CHAT_MEALS_PAGE_SIZE,
         };
 
-        const response = await fetch('/api/search', {
+        const response = await authenticatedFetch('/api/search', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

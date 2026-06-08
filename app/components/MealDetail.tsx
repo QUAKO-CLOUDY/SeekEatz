@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AnimatedNumber } from './AnimatedNumber';
+import { authenticatedFetch } from '@/lib/authenticated-fetch';
 import type { Meal, UserProfile } from '../types';
 import type { LoggedMeal } from './LogScreen';
 import { LogoImage } from './ui/LogoImage';
@@ -894,7 +895,7 @@ export function MealDetail({
       setIsLoadingSimilar(true);
       try {
         // Search for meals from the same restaurant
-        const res = await fetch('/api/search', {
+        const res = await authenticatedFetch('/api/search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query: meal.restaurant }),

@@ -22,18 +22,16 @@ export async function POST(req: Request) {
 
     const searchParams = await buildSearchParams(normalizedInput);
 
-    const { createClient } = await import('@/utils/supabase/server');
+    const { getRequestUser } = await import('@/utils/supabase/request-user');
     const { hasRemainingUsage, incrementUsageCount } = await import('@/lib/usage-cookie');
 
-    const supabase = await createClient();
-    const authPromise = supabase.auth.getUser();
     const authWithTimeout = Promise.race([
-      authPromise,
+      getRequestUser(req),
       new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error('Auth timeout')), 8000)
       ),
     ]);
-    const { data: { user } } = await authWithTimeout;
+    const { supabase, user } = await authWithTimeout;
 
     let shouldRecordMeteredUsage = false;
 

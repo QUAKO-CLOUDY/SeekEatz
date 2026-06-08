@@ -82,7 +82,6 @@ type Props = {
   onToggleFavorite?: (mealId: string, meal?: Meal) => void;
   loggedMeals?: LoggedMeal[];
   onUsageLimitReached?: () => void;
-  isPremium?: boolean;
 };
 
 type SearchMealsResponse = {
@@ -188,7 +187,7 @@ function getInitialMacroValues(userProfile: UserProfile): Record<MacroType, numb
   }
 }
 
-export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite, loggedMeals = [], onUsageLimitReached, isPremium = false }: Props) {
+export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onToggleFavorite, loggedMeals = [], onUsageLimitReached }: Props) {
   const { updateActivity } = useSessionActivity();
   
   // Display name fallback from auth metadata/email when profile name is empty
@@ -887,10 +886,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       console.error('Find meals error:', err);
       setRecommendedMeals([]);
       if (err instanceof Error && (err as Error & { usageLimit?: boolean }).usageLimit) {
-        if (!isPremium) {
-          onUsageLimitReached?.();
-          setSearchError(FREE_SEARCH_LIMIT_MESSAGE);
-        }
+        onUsageLimitReached?.();
+        setSearchError(FREE_SEARCH_LIMIT_MESSAGE);
         return;
       }
 
@@ -993,10 +990,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     } catch (err) {
       console.error('Find more meals error:', err);
       if (err instanceof Error && (err as Error & { usageLimit?: boolean }).usageLimit) {
-        if (!isPremium) {
-          onUsageLimitReached?.();
-          setSearchError(FREE_SEARCH_LIMIT_MESSAGE);
-        }
+        onUsageLimitReached?.();
+        setSearchError(FREE_SEARCH_LIMIT_MESSAGE);
         return;
       }
       const message = err instanceof Error && err.message === 'timeout'

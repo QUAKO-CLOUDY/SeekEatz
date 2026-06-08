@@ -1296,7 +1296,6 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
             }}
             onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
             onUsageLimitReached={() => setShowUpgradeModal(true)}
-            isPremium={hasFullAccess}
           />
         )}
         {currentView === 'meal-detail' && selectedMeal && (
@@ -1332,7 +1331,6 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
             onToggleFavorite={(mealId, meal) => handleToggleFavorite(mealId, meal)}
             onUsageLimitReached={() => setShowUpgradeModal(true)}
             onSignInRequest={() => router.push('/auth/signin')}
-            isPremium={hasFullAccess}
           />
         )}
         {currentScreen === 'favorites' && (

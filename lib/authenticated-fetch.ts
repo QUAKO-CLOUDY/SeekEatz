@@ -13,13 +13,11 @@ export async function authenticatedFetch(
 
   try {
     const supabase = createClient();
-    // Validate the session so the bearer token we send is current, not stale.
-    const [{ data: { user } }, { data: { session } }] = await Promise.all([
-      supabase.auth.getUser(),
-      supabase.auth.getSession(),
-    ]);
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
 
-    if (user && session?.access_token) {
+    if (session?.access_token) {
       headers.set("Authorization", `Bearer ${session.access_token}`);
     }
   } catch {

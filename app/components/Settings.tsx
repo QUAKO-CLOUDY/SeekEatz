@@ -1289,7 +1289,9 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
             <div className="flex items-center justify-between">
               <div>
                 <Label htmlFor="progressReminders" className="text-foreground">Progress Reminders</Label>
-                <p className="text-sm text-muted-foreground">Remind me to log my meals</p>
+                <p className="text-sm text-muted-foreground">
+                  One gentle nudge per day if you use the app but haven&apos;t logged a meal yet
+                </p>
               </div>
               <Switch
                 id="progressReminders"

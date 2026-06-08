@@ -64,6 +64,7 @@ type SnapshotPayload = {
   loggedMeals?: LoggedMeal[];
   recommendedMeals?: MealSummary[];
   lastActivityAt?: string | null;
+  progressReminderDay?: string | null;
   ts?: number;
 };
 
@@ -90,10 +91,14 @@ const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
 };
 
 const PROGRESS_REMINDER_LINES = [
-  "Don't forget to log your last meal.",
-  "Quick reminder: log your latest meal so your totals stay accurate.",
-  "Keep your day on track. Log your most recent meal.",
-  "Small step: log your last meal to keep your progress dialed in.",
+  "Don't forget to log your meal — it only takes a few seconds.",
+  "Quick check-in: log what you ate so your macros stay accurate.",
+  "You opened SeekEatz today — tap Log to record your meal.",
+  "Keep your streak going. Log your meal before the day gets away.",
+  "Small step, big impact: log your meal to stay on track.",
+  "Your progress counts when you log it. Don't forget today's meal.",
+  "Haven't logged yet? Add your meal and keep your totals dialed in.",
+  "A logged meal is a tracked win. Take a moment to log yours.",
 ];
 
 Notifications.setNotificationHandler({
@@ -272,6 +277,7 @@ const INJECTED_SNAPSHOT_SCRIPT = `
           loggedMeals: loggedMeals,
           recommendedMeals: recommendedMeals.slice(0, 30),
           lastActivityAt: localStorage.getItem('seekEatz_lastActivity'),
+          progressReminderDay: localStorage.getItem('seekeatz_progress_reminder_day'),
           ts: Date.now(),
         }
       };
@@ -297,9 +303,8 @@ export default function App() {
   const prefsRef = useRef<NotificationPreferences>(DEFAULT_NOTIFICATION_PREFERENCES);
   const snapshotRef = useRef<SnapshotPayload | null>(null);
   const reminderIndexRef = useRef(0);
+  const progressReminderDayRef = useRef<string | null>(null);
   const appStateRef = useRef<AppStateStatus>(AppState.currentState);
-  const lastActivityMsRef = useRef(0);
-  const lastLoggedCountRef = useRef(0);
   const scheduleSignatureRef = useRef<string>("");
 
   const cancelManagedNotificationsByKind = useCallback(async (kind: string) => {
@@ -362,32 +367,95 @@ export default function App() {
     });
   }, [cancelManagedNotificationsByKind]);
 
-  const scheduleProgressReminder = useCallback(async () => {
-    await cancelManagedNotificationsByKind("progress-reminder");
+  const persistProgressReminderDay = useCallback((day: string) => {
+    progressReminderDayRef.current = day;
+    const script = `
+      try { localStorage.setItem('seekeatz_progress_reminder_day', ${JSON.stringify(day)}); } catch (_) {}
+      true;
+    `;
+    webViewRef.current?.injectJavaScript(script);
+  }, []);
 
-    if (!prefsRef.current.progressReminders) {
-      return;
-    }
+  const scheduleProgressReminder = useCallback(
+    async (scheduledForDay: string) => {
+      await cancelManagedNotificationsByKind("progress-reminder");
 
-    const line = PROGRESS_REMINDER_LINES[reminderIndexRef.current % PROGRESS_REMINDER_LINES.length];
-    reminderIndexRef.current += 1;
+      if (!prefsRef.current.progressReminders) {
+        return;
+      }
 
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "SeekEatz reminder",
-        body: line,
-        data: {
-          seekeatzManaged: true,
-          kind: "progress-reminder",
+      const line =
+        PROGRESS_REMINDER_LINES[reminderIndexRef.current % PROGRESS_REMINDER_LINES.length];
+      reminderIndexRef.current += 1;
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "SeekEatz reminder",
+          body: line,
+          data: {
+            seekeatzManaged: true,
+            kind: "progress-reminder",
+            scheduledForDay,
+          },
         },
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-        seconds: 45 * 60,
-        repeats: false,
-      },
-    });
-  }, [cancelManagedNotificationsByKind]);
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+          seconds: 45 * 60,
+          repeats: false,
+        },
+      });
+
+      persistProgressReminderDay(scheduledForDay);
+    },
+    [cancelManagedNotificationsByKind, persistProgressReminderDay],
+  );
+
+  const maybeScheduleProgressReminder = useCallback(
+    async (snapshot: SnapshotPayload | null) => {
+      if (!snapshot || !prefsRef.current.progressReminders) {
+        await cancelManagedNotificationsByKind("progress-reminder");
+        return;
+      }
+
+      const today = localDateKey();
+      const todayTotals = summarizeTotals(snapshot);
+
+      // User already logged a meal today — no reminder needed.
+      if (todayTotals.count > 0) {
+        await cancelManagedNotificationsByKind("progress-reminder");
+        return;
+      }
+
+      const storedDay =
+        snapshot.progressReminderDay ?? progressReminderDayRef.current ?? null;
+
+      // At most one progress reminder per calendar day.
+      if (storedDay === today) {
+        return;
+      }
+
+      const pending = await Notifications.getAllScheduledNotificationsAsync();
+      const alreadyScheduled = pending.some((request) => {
+        const data = request.content.data as Record<string, unknown> | undefined;
+        return (
+          data?.seekeatzManaged === true &&
+          data?.kind === "progress-reminder" &&
+          data?.scheduledForDay === today
+        );
+      });
+      if (alreadyScheduled) {
+        return;
+      }
+
+      const permission = await ensureNotificationPermission();
+      if (!permission) {
+        return;
+      }
+
+      await scheduleProgressReminder(today);
+    },
+    [cancelManagedNotificationsByKind, scheduleProgressReminder],
+  );
 
   const syncSchedules = useCallback(async () => {
     const snapshot = snapshotRef.current;
@@ -427,24 +495,16 @@ export default function App() {
       progressReminders: incomingPrefs.progressReminders === true,
     };
 
-    const activityMs = toNumber(snapshot.lastActivityAt);
-    const loggedCount = Array.isArray(snapshot.loggedMeals) ? snapshot.loggedMeals.length : 0;
-
-    if (prefsRef.current.progressReminders && activityMs > 0 && activityMs > lastActivityMsRef.current) {
-      lastActivityMsRef.current = activityMs;
-      const permission = await ensureNotificationPermission();
-      if (permission) {
-        await scheduleProgressReminder();
-      }
+    if (snapshot.progressReminderDay) {
+      progressReminderDayRef.current = snapshot.progressReminderDay;
     }
 
-    if (loggedCount > lastLoggedCountRef.current) {
-      await cancelManagedNotificationsByKind("progress-reminder");
-    }
-    lastLoggedCountRef.current = loggedCount;
+    // If the user opened/used the app today but hasn't logged a meal yet,
+    // schedule a single rotating reminder for later today (once per day max).
+    await maybeScheduleProgressReminder(snapshot);
 
     await syncSchedules();
-  }, [cancelManagedNotificationsByKind, scheduleProgressReminder, syncSchedules]);
+  }, [maybeScheduleProgressReminder, syncSchedules]);
 
   const openExternalUrl = useCallback(async (url: string) => {
     if (!/^https?:\/\//i.test(url)) {
@@ -698,13 +758,14 @@ export default function App() {
 
       if (wasBackground && nextAppState === "active") {
         void syncSchedules();
+        void maybeScheduleProgressReminder(snapshotRef.current);
       }
     });
 
     return () => {
       subscription.remove();
     };
-  }, [syncSchedules]);
+  }, [maybeScheduleProgressReminder, syncSchedules]);
 
   const injectedJavaScript = useMemo(() => INJECTED_SNAPSHOT_SCRIPT, []);
 

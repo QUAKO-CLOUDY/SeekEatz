@@ -1,15 +1,13 @@
 import { searchHandler } from '@/lib/retrieval/retrieval-engine';
 import { buildSearchParams } from '@/lib/search-utils';
-import { buildEntitlement, type EntitlementProfileRow, FREE_DAILY_QUERY_LIMIT, PROFILE_ENTITLEMENT_SELECT } from '@/lib/entitlements';
+import { FREE_DAILY_QUERY_LIMIT } from '@/lib/entitlements';
 import { getFreeTierCreateAccountLimitMessage, getFreeTierUpgradeLimitMessage } from '@/lib/free-tier';
+import { getAuthenticatedEntitlement } from '@/lib/server-request-entitlement';
+import { createAdminClient } from '@/utils/supabase/admin';
 
 export const dynamic = 'force-dynamic';
 
 const SEARCH_TIMEOUT_MS = 22000; // 22s server timeout (client uses 25s)
-
-function getUsageWindowStartIso() {
-  return new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-}
 
 export async function POST(req: Request) {
   try {
@@ -22,42 +20,21 @@ export async function POST(req: Request) {
 
     const searchParams = await buildSearchParams(normalizedInput);
 
-    const { getRequestUser } = await import('@/utils/supabase/request-user');
     const { hasRemainingUsage, incrementUsageCount } = await import('@/lib/usage-cookie');
 
     const authWithTimeout = Promise.race([
-      getRequestUser(req),
+      getAuthenticatedEntitlement(req),
       new Promise<never>((_, reject) =>
         setTimeout(() => reject(new Error('Auth timeout')), 8000)
       ),
     ]);
-    const { supabase, user } = await authWithTimeout;
+    const { user, entitlement } = await authWithTimeout;
 
     let shouldRecordMeteredUsage = false;
 
     if (user) {
-      const [{ data: profile }, usageResult] = await Promise.all([
-        supabase
-          .from('profiles')
-          .select(PROFILE_ENTITLEMENT_SELECT)
-          .eq('id', user.id)
-          .maybeSingle(),
-        supabase
-          .from('usage_events')
-          .select('id', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .eq('event_type', 'metered_query')
-          .gte('created_at', getUsageWindowStartIso()),
-      ]);
-
-      const entitlement = buildEntitlement({
-        user,
-        profile: profile as EntitlementProfileRow | null,
-        queriesUsedToday: usageResult.count ?? 0,
-      });
-
       if (!entitlement.hasPremiumAccess) {
-        if ((usageResult.count ?? 0) >= FREE_DAILY_QUERY_LIMIT) {
+        if ((entitlement.remainingQueriesToday ?? FREE_DAILY_QUERY_LIMIT) <= 0) {
           const limitMessage = getFreeTierUpgradeLimitMessage();
           return Response.json({
             error: 'Usage limit reached',
@@ -91,7 +68,8 @@ export async function POST(req: Request) {
 
     if (shouldRecordMeteredUsage) {
       if (user) {
-        await supabase.from('usage_events').insert({
+        const admin = createAdminClient();
+        await admin.from('usage_events').insert({
           user_id: user.id,
           event_type: 'metered_query',
           metadata: { source: 'api_search' },

@@ -27,6 +27,7 @@ interface AIChatProps {
   onToggleFavorite?: (mealId: string, meal?: Meal) => void;
   onSignInRequest?: () => void;
   onUsageLimitReached?: () => void;
+  isPremium?: boolean;
 }
 
 type PaginationFilters = Record<string, unknown>;
@@ -255,7 +256,7 @@ function toRestaurantCycleKey(value: string | null | undefined): string | null {
   return normalized && normalized.length > 0 ? normalized : null;
 }
 
-export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelect, onToggleFavorite, onSignInRequest, onUsageLimitReached }: AIChatProps) {
+export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelect, onToggleFavorite, onSignInRequest, onUsageLimitReached, isPremium = false }: AIChatProps) {
   void onSignInRequest;
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
@@ -273,12 +274,15 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   );
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const openUpgradeModal = useCallback(() => {
+    if (isPremium) {
+      return;
+    }
     if (onUsageLimitReached) {
       onUsageLimitReached();
       return;
     }
     setShowUpgradeModal(true);
-  }, [onUsageLimitReached]);
+  }, [isPremium, onUsageLimitReached]);
   const activeQuickPromptRef = useRef<ActiveQuickPromptState | null>(null);
   const quickPromptSeenRestaurantsRef = useRef<Map<string, Set<string>>>(new Map());
 
@@ -1314,8 +1318,13 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         if (isUsageLimitError) {
           setMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
 
-          openUpgradeModal();
-          setError("You've used your 2 free searches for the day. Please come back in 24 hours when your 2 searches reset.");
+          if (isPremium) {
+            console.warn('[AIChat] Unexpected usage limit response for premium user');
+            setError('Search failed. Please try again.');
+          } else {
+            openUpgradeModal();
+            setError("You've used your 2 free searches for the day. Please come back in 24 hours when your 2 searches reset.");
+          }
           return;
         }
 
@@ -1666,7 +1675,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           } catch {
             if (errorText.trim()) errorMessage = errorText;
           }
-          if (isUsageLimitError) {
+          if (isUsageLimitError && !isPremium) {
             openUpgradeModal();
           }
           setError(errorMessage);

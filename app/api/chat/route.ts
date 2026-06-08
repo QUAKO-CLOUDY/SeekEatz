@@ -10,8 +10,9 @@ import { resolveRestaurantUniversal, isRestaurantOnlyQuery } from '@/lib/restaur
 import { extractMacroConstraintsFromText, hasConstraints } from '@/lib/extractMacroConstraintsFromText';
 import { isSmoothieLikeText } from '@/lib/smoothie-search';
 import { hasRemainingUsage, incrementUsageCount } from '@/lib/usage-cookie';
-import { buildEntitlement, type EntitlementProfileRow, FREE_DAILY_QUERY_LIMIT, PROFILE_ENTITLEMENT_SELECT } from '@/lib/entitlements';
+import { FREE_DAILY_QUERY_LIMIT } from '@/lib/entitlements';
 import { getFreeTierCreateAccountLimitMessage, getFreeTierUpgradeLimitMessage } from '@/lib/free-tier';
+import { getRequestEntitlement } from '@/lib/request-entitlement';
 import type { Meal } from '@/app/types';
 
 export const maxDuration = 30;
@@ -21,27 +22,16 @@ type MealSearchResponse = Awaited<ReturnType<typeof searchHandler>> & {
   restaurant?: string;
 };
 
-function getUsageWindowStartIso() {
-  return new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-}
-
-async function getMeteredQueryCountForToday(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
-  const { count } = await supabase
-    .from('usage_events')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .eq('event_type', 'metered_query')
-    .gte('created_at', getUsageWindowStartIso());
-
-  return count ?? 0;
-}
-
 async function recordMeteredQuery(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
-  await supabase.from('usage_events').insert({
-    user_id: userId,
-    event_type: 'metered_query',
-    metadata: { source: 'api_chat' },
-  });
+  try {
+    await supabase.from('usage_events').insert({
+      user_id: userId,
+      event_type: 'metered_query',
+      metadata: { source: 'api_chat' },
+    });
+  } catch (error) {
+    console.error('Failed to record metered chat usage:', error);
+  }
 }
 
 /**
@@ -928,48 +918,38 @@ export async function POST(req: Request) {
       });
     }
 
-    // 2. Initialize Supabase + resolve user (cookie session, Bearer fallback)
+    // 2. Initialize Supabase + resolve user entitlement
     let supabase: Awaited<ReturnType<typeof createClient>>;
     let user = null;
     let shouldRecordMeteredUsage = false;
     let hasRecordedMeteredUsage = false;
     try {
-      const { getRequestUser } = await import('@/utils/supabase/request-user');
-      const resolved = await getRequestUser(req);
-      supabase = resolved.supabase;
+      const resolved = await getRequestEntitlement(req);
+      supabase = resolved.supabase as Awaited<ReturnType<typeof createClient>>;
       user = resolved.user;
-    } catch (supabaseError) {
-      console.error('Supabase initialization error:', supabaseError);
-      return NextResponse.json({
-        error: true,
-        message: "Failed to initialize database connection.",
-        mode: "text",
-        answer: "I'm having trouble connecting to the database. Please try again."
-      }, {
-        status: 500,
-        headers: createResponseHeaders(false, 'ERROR', 'none')
-      });
-    }
 
-    if (user) {
-      const [{ data: profile }, meteredCount] = await Promise.all([
-        supabase
-          .from('profiles')
-          .select(PROFILE_ENTITLEMENT_SELECT)
-          .eq('id', user.id)
-          .maybeSingle(),
-        getMeteredQueryCountForToday(supabase, user.id),
-      ]);
+      if (user) {
+        if (!resolved.entitlement.hasPremiumAccess) {
+          if ((resolved.entitlement.remainingQueriesToday ?? FREE_DAILY_QUERY_LIMIT) <= 0) {
+            const limitMessage = getFreeTierUpgradeLimitMessage();
+            return NextResponse.json({
+              error: true,
+              message: limitMessage,
+              mode: "text",
+              answer: limitMessage,
+              usageLimit: true
+            }, {
+              status: 403,
+              headers: createResponseHeaders(false, 'ERROR', 'none')
+            });
+          }
 
-      const entitlement = buildEntitlement({
-        user,
-        profile: profile as EntitlementProfileRow | null,
-        queriesUsedToday: meteredCount,
-      });
-
-      if (!entitlement.hasPremiumAccess) {
-        if (meteredCount >= FREE_DAILY_QUERY_LIMIT) {
-          const limitMessage = getFreeTierUpgradeLimitMessage();
+          shouldRecordMeteredUsage = true;
+        }
+      } else {
+        const allowed = await hasRemainingUsage();
+        if (!allowed) {
+          const limitMessage = getFreeTierCreateAccountLimitMessage();
           return NextResponse.json({
             error: true,
             message: limitMessage,
@@ -984,23 +964,17 @@ export async function POST(req: Request) {
 
         shouldRecordMeteredUsage = true;
       }
-    } else {
-      const allowed = await hasRemainingUsage();
-      if (!allowed) {
-        const limitMessage = getFreeTierCreateAccountLimitMessage();
-        return NextResponse.json({
-          error: true,
-          message: limitMessage,
-          mode: "text",
-          answer: limitMessage,
-          usageLimit: true
-        }, {
-          status: 403,
-          headers: createResponseHeaders(false, 'ERROR', 'none')
-        });
-      }
-
-      shouldRecordMeteredUsage = true;
+    } catch (supabaseError) {
+      console.error('Supabase initialization error:', supabaseError);
+      return NextResponse.json({
+        error: true,
+        message: "Failed to initialize database connection.",
+        mode: "text",
+        answer: "I'm having trouble connecting to the database. Please try again."
+      }, {
+        status: 500,
+        headers: createResponseHeaders(false, 'ERROR', 'none')
+      });
     }
 
     const recordUsageIfNeeded = async () => {

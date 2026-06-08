@@ -141,9 +141,11 @@ function UpgradePageContent() {
       setAuthUserId(user?.id ?? null);
       setAuthEmail(user?.email ?? null);
       if (user) {
+        let alreadyPremium = false;
         try {
           await bootstrapAccount({ hasCompletedOnboarding: getOnboardingFlag() });
-          await refresh();
+          const refreshed = await refresh();
+          alreadyPremium = refreshed?.hasPremiumAccess === true;
         } catch (error) {
           console.warn("Upgrade bootstrap skipped:", error);
         }
@@ -157,10 +159,23 @@ function UpgradePageContent() {
               appUserID: user.id,
               email: user.email ?? null,
             });
-            applyEntitlement(reconciled?.synced?.entitlement as AppEntitlement | undefined);
+            const reconciledEntitlement = reconciled?.synced?.entitlement as
+              | AppEntitlement
+              | undefined;
+            applyEntitlement(reconciledEntitlement);
+            if (reconciledEntitlement?.hasPremiumAccess || reconciled?.premiumActive) {
+              alreadyPremium = true;
+            }
           } catch (error) {
             console.warn("Entitlement reconcile skipped:", error);
           }
+        }
+
+        // A returning subscriber should never be asked to pick a plan. If they
+        // already have premium when this paywall loads (e.g. routed here by the
+        // sign-in flow), send them straight into the app.
+        if (alreadyPremium) {
+          router.replace("/chat");
         }
       }
     };
@@ -180,7 +195,7 @@ function UpgradePageContent() {
     });
 
     return () => subscription.unsubscribe();
-  }, [applyEntitlement, getOnboardingFlag, refresh]);
+  }, [applyEntitlement, getOnboardingFlag, refresh, router]);
   const nativeApp = isNativeApp();
   const iapReady = nativeApp
     ? isNativeBillingBridgeAvailable() || isRevenueCatConfigured()

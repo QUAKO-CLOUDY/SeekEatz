@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, FormEvent, useEffect } from "react";
+import { Suspense, useState, FormEvent, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
@@ -60,6 +60,10 @@ function SignInPageContent() {
   const [resetPasswordMessage, setResetPasswordMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isResettingPassword, setIsResettingPassword] = useState(false);
+  // While a password sign-in is being processed, handleSubmit decides where to
+  // navigate (returning users go straight to the app). Guard the auth listener
+  // so it doesn't race ahead and push the user to the paywall first.
+  const passwordSignInActive = useRef(false);
   // "Sign up" must open the create-account screen first. After the account is
   // created, signup redirects to the premium screen (/upgrade?fromSignup=1),
   // which then routes into onboarding. Pointing this at /upgrade directly made
@@ -112,7 +116,11 @@ function SignInPageContent() {
     // Listen for auth state changes (e.g., when sign-in succeeds)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
-        // Sign-in successful - redirect to chat
+        // For password sign-in, handleSubmit owns the post-login navigation so
+        // it can send returning users to the app instead of the paywall.
+        if (passwordSignInActive.current) {
+          return;
+        }
         router.replace(redirectTo);
       }
     });
@@ -127,6 +135,7 @@ function SignInPageContent() {
     setError(null);
     setResetPasswordMessage(null);
     setIsLoading(true);
+    passwordSignInActive.current = true;
 
     try {
       const supabase = createClient();
@@ -230,7 +239,12 @@ function SignInPageContent() {
         // Update localStorage
         localStorage.setItem(`seekEatz_lastLogin_${userId}`, now.toString());
         localStorage.setItem("seekEatz_lastLogin", now.toString());
-        if (shouldStartTutorial) {
+        // A returning user who already finished onboarding should land in the
+        // app — never the upgrade/paywall or tutorial — even if they arrived
+        // here via the onboarding -> sign up -> "sign in" link (which carries a
+        // redirectTo of /upgrade and a tutorial flag).
+        const isReturningUser = didLoadExistingProfile && hasCompletedOnboarding;
+        if (shouldStartTutorial && !isReturningUser) {
           localStorage.setItem("seekeatz_start_app_tutorial", "true");
           localStorage.removeItem(`seekeatz_app_tutorial_completed_${userId}`);
         }
@@ -286,13 +300,16 @@ function SignInPageContent() {
         
         // Refresh router to ensure session is updated in all components
         router.refresh();
-        
-        // Navigate to destination - the auth state change listener will unlock the session immediately
-        router.push(redirectTo);
+
+        // Returning users go straight to the app; brand-new users follow the
+        // intended redirect (which may be the upgrade/paywall flow).
+        const destination = isReturningUser ? "/chat" : redirectTo;
+        router.push(destination);
       }
     } catch {
       setError("An unexpected error occurred. Please try again.");
       setIsLoading(false);
+      passwordSignInActive.current = false;
     }
   };
 

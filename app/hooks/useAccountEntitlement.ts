@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { AppEntitlement } from "@/lib/entitlements";
 import {
   GUEST_ENTITLEMENT,
@@ -11,6 +11,11 @@ import {
 export function useAccountEntitlement(enabled = true) {
   const [entitlement, setEntitlement] = useState<AppEntitlement>(() => readCachedEntitlement());
   const [isLoading, setIsLoading] = useState(enabled);
+  const entitlementRef = useRef(entitlement);
+
+  useEffect(() => {
+    entitlementRef.current = entitlement;
+  }, [entitlement]);
 
   const refresh = useCallback(async () => {
     if (!enabled) {
@@ -29,6 +34,14 @@ export function useAccountEntitlement(enabled = true) {
       }
 
       const nextEntitlement = (await response.json()) as AppEntitlement;
+
+      // A transient unauthenticated response (e.g. a momentarily missing
+      // session cookie inside the WebView) must NOT downgrade a user we already
+      // know is signed in — otherwise a paying user can flicker back to "Free".
+      if (!nextEntitlement.isAuthenticated && entitlementRef.current.isAuthenticated) {
+        return entitlementRef.current;
+      }
+
       setEntitlement(nextEntitlement);
       writeCachedEntitlement(nextEntitlement);
       return nextEntitlement;

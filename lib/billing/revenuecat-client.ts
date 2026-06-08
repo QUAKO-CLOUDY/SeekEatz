@@ -559,6 +559,9 @@ export async function reconcileRevenueCatEntitlement(params: {
 }) {
   const customerInfo = await getRevenueCatCustomerInfo(params);
   logCustomerInfo("reconcile", customerInfo);
+  const premiumEntitlement = selectPremiumEntitlement(customerInfo);
+  const premiumActive = premiumEntitlement?.isActive === true;
+  const premiumProductId = premiumEntitlement?.productIdentifier ?? null;
   const synced = await syncRevenueCatCustomerInfoToBackend(customerInfo);
-  return { customerInfo, synced };
+  return { customerInfo, synced, premiumActive, premiumProductId };
 }

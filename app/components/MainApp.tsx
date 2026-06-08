@@ -20,10 +20,16 @@ import type { LoggedMeal } from './LogScreen';
 import { useSessionActivity } from '../hooks/useSessionActivity';
 import { useNutrition } from '../contexts/NutritionContext'; // Import to sync loggedMeals with context
 import { hasDevFullAccess, setDevFullAccess } from '@/lib/onboarding-flow';
-import { clearCachedEntitlement } from '@/lib/entitlements';
+import {
+  buildEntitlement,
+  clearCachedEntitlement,
+  writeCachedEntitlement,
+  type AppEntitlement,
+} from '@/lib/entitlements';
 import { useAccountEntitlement } from '@/app/hooks/useAccountEntitlement';
 import { isNativeApp } from '@/lib/native-runtime';
 import { reconcileRevenueCatEntitlement } from '@/lib/billing/revenuecat-client';
+import { getBillingTierFromAppleProductId } from '@/lib/billing/app-store-sync';
 import { bootstrapAccount } from '@/lib/bootstrap-account';
 import { isFullAccessEmail } from '@/lib/full-access';
 import {
@@ -193,11 +199,16 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   const [devFullAccess, setDevFullAccessState] = useState(false);
   const [isTutorialActive, setIsTutorialActive] = useState(false);
   const [tutorialStepIndex, setTutorialStepIndex] = useState(0);
-  const { entitlement, refresh: refreshEntitlement } = useAccountEntitlement(isMounted);
+  const { entitlement, refresh: refreshEntitlement, setEntitlement } = useAccountEntitlement(isMounted);
 
   // On startup (and whenever the signed-in user changes) reconcile the live
   // RevenueCat entitlement into Supabase so a paying user gets premium access
   // app-wide without having to open the Settings or Upgrade screen first.
+  //
+  // RevenueCat is treated as the source of truth on-device: if it reports an
+  // active premium entitlement we unlock immediately, even if the server read
+  // comes back as "free" (e.g. a transiently missing session cookie). This
+  // guarantees a paying user is never locked out by a backend hiccup.
   useEffect(() => {
     if (!isMounted || !hasHydratedCurrentUser || !currentUserId) return;
     if (!isNativeApp()) return;
@@ -205,11 +216,32 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     let cancelled = false;
     (async () => {
       try {
-        await reconcileRevenueCatEntitlement({
-          appUserID: currentUserId,
-          email: currentUserEmail ?? null,
-        });
-        if (!cancelled) {
+        const { synced, premiumActive, premiumProductId } =
+          await reconcileRevenueCatEntitlement({
+            appUserID: currentUserId,
+            email: currentUserEmail ?? null,
+          });
+        if (cancelled) return;
+
+        const syncedEntitlement = synced?.entitlement as AppEntitlement | undefined;
+
+        if (syncedEntitlement?.hasPremiumAccess) {
+          setEntitlement(syncedEntitlement);
+          writeCachedEntitlement(syncedEntitlement);
+        } else if (premiumActive) {
+          // RevenueCat says this user owns premium but the backend read did
+          // not reflect it — trust RevenueCat and unlock locally.
+          const premiumEntitlement = buildEntitlement({
+            user: { id: currentUserId, email: currentUserEmail ?? undefined },
+            profile: {
+              has_completed_onboarding: true,
+              subscription_tier: getBillingTierFromAppleProductId(premiumProductId),
+              subscription_status: 'active',
+            },
+          });
+          setEntitlement(premiumEntitlement);
+          writeCachedEntitlement(premiumEntitlement);
+        } else {
           await refreshEntitlement();
         }
       } catch (error) {
@@ -220,7 +252,14 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     return () => {
       cancelled = true;
     };
-  }, [isMounted, hasHydratedCurrentUser, currentUserId, currentUserEmail, refreshEntitlement]);
+  }, [
+    isMounted,
+    hasHydratedCurrentUser,
+    currentUserId,
+    currentUserEmail,
+    refreshEntitlement,
+    setEntitlement,
+  ]);
   const favoriteMealsStorageKey = currentUserId
     ? `seekeatz_favorite_meals:${currentUserId}`
     : 'seekeatz_favorite_meals:guest';

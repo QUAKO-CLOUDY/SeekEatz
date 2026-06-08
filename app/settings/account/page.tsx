@@ -10,10 +10,12 @@ import { createClient } from '@/utils/supabase/client';
 import type { UserProfile } from '@/app/types';
 import {
   type AppEntitlement,
+  buildEntitlement,
   clearCachedEntitlement,
   getEntitlementPlanLabel,
   writeCachedEntitlement,
 } from '@/lib/entitlements';
+import { getBillingTierFromAppleProductId } from '@/lib/billing/app-store-sync';
 import { clearLoggedMealsStorageForUser } from '@/lib/logged-meals-storage';
 import { clearAllUserScopedItems } from '@/lib/storage';
 import { clearChatState } from '@/lib/chatStorage';
@@ -157,7 +159,25 @@ export default function AccountEditPage() {
           const syncedEntitlement = reconciled?.synced?.entitlement as
             | AppEntitlement
             | undefined;
-          if (syncedEntitlement) {
+          if (syncedEntitlement?.hasPremiumAccess) {
+            setEntitlement(syncedEntitlement);
+            writeCachedEntitlement(syncedEntitlement);
+          } else if (reconciled?.premiumActive) {
+            // RevenueCat says premium is active but the backend read didn't
+            // reflect it — trust RevenueCat so the user isn't shown "Free".
+            const premiumEntitlement = buildEntitlement({
+              user: { id: authUserId, email: authEmail ?? undefined },
+              profile: {
+                has_completed_onboarding: true,
+                subscription_tier: getBillingTierFromAppleProductId(
+                  reconciled.premiumProductId,
+                ),
+                subscription_status: 'active',
+              },
+            });
+            setEntitlement(premiumEntitlement);
+            writeCachedEntitlement(premiumEntitlement);
+          } else if (syncedEntitlement) {
             setEntitlement(syncedEntitlement);
             writeCachedEntitlement(syncedEntitlement);
           }

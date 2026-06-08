@@ -83,6 +83,7 @@ function UpgradePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isFromSignup = searchParams.get("fromSignup") === "1";
+  const isFromSignin = searchParams.get("fromSignin") === "1";
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [authUserId, setAuthUserId] = useState<string | null>(null);
   const [authEmail, setAuthEmail] = useState<string | null>(null);
@@ -171,10 +172,11 @@ function UpgradePageContent() {
           }
         }
 
-        // A returning subscriber should never be asked to pick a plan. If they
-        // already have premium when this paywall loads (e.g. routed here by the
-        // sign-in flow), send them straight into the app.
-        if (alreadyPremium) {
+        // A returning subscriber routed here by the auth flow should never be
+        // asked to pick a plan — send them straight into the app. We only skip
+        // for the post-auth flows so a premium user who intentionally opens the
+        // plans screen (e.g. "Manage Subscription") still sees it.
+        if (alreadyPremium && (isFromSignup || isFromSignin)) {
           router.replace("/chat");
         }
       }
@@ -195,7 +197,7 @@ function UpgradePageContent() {
     });
 
     return () => subscription.unsubscribe();
-  }, [applyEntitlement, getOnboardingFlag, refresh, router]);
+  }, [applyEntitlement, getOnboardingFlag, refresh, router, isFromSignup, isFromSignin]);
   const nativeApp = isNativeApp();
   const iapReady = nativeApp
     ? isNativeBillingBridgeAvailable() || isRevenueCatConfigured()

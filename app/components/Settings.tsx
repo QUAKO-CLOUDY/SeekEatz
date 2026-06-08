@@ -848,25 +848,23 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
         localStorage.removeItem('seekeatz_start_app_tutorial');
       }
 
-      let signOutError: unknown = null;
+      // Clear the local session first. This is local-only (no network), so it
+      // completes instantly and reliably even on a flaky connection — which is
+      // what was previously leaving the button stuck on the loading spinner.
       try {
-        const { error } = await supabase.auth.signOut();
-        if (error) signOutError = error;
+        await supabase.auth.signOut({ scope: 'local' });
       } catch (error) {
-        signOutError = error;
+        console.warn('Local sign out failed:', error);
       }
 
-      if (signOutError) {
-        const retry = await supabase.auth.signOut({ scope: 'global' });
-        if (retry.error) {
-          throw retry.error;
-        }
-      }
-
-      const sessionCheck = await supabase.auth.getSession();
-      if (sessionCheck.data.session) {
-        await supabase.auth.signOut();
-      }
+      // Best-effort: revoke the session server-side too, but never let a stalled
+      // network request block logout. Fire-and-forget with a short timeout.
+      void Promise.race([
+        supabase.auth.signOut({ scope: 'global' }),
+        new Promise((resolve) => setTimeout(resolve, 3000)),
+      ]).catch(() => {
+        /* ignore — local session is already cleared */
+      });
 
       if (typeof window !== 'undefined') {
         window.location.assign('/auth/signin?loggedOut=1');

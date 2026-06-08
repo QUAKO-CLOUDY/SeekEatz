@@ -137,6 +137,13 @@ const HOME_MEALS_PAGE_SIZE = 4;
 const APPENDED_MEALS_DIVIDER_LABEL = "More meals";
 const DEFAULT_HOME_DISTANCE_MILES = 15;
 const FREE_SEARCH_LIMIT_MESSAGE = "You've used your 2 free searches for the day. Please come back in 24 hours when your 2 searches reset.";
+
+function createHomeSearchShuffleNonce(): string {
+  return (
+    globalThis.crypto?.randomUUID?.() ??
+    `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
+  );
+}
 const HOME_MACRO_VALUES_SESSION_KEY = "seekeatz_home_macro_values_v2";
 const DEFAULT_HOME_MACRO_ENABLED: Record<MacroType, boolean> = {
   calories: true,
@@ -638,7 +645,9 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           calorieMode: calorieMode || undefined,
           isHomepage: true,
           limit: HOME_MEALS_PAGE_SIZE,
-          ...(searchKey ? { searchKey, isPagination: true, offset: nextOffset ?? 0 } : {}),
+          ...(searchKey
+            ? { searchKey, isPagination: true, offset: nextOffset ?? 0 }
+            : { shuffleNonce: createHomeSearchShuffleNonce() }),
           ...(effectiveLocation ? {
             user_location_lat: effectiveLocation.latitude,
             user_location_lng: effectiveLocation.longitude,

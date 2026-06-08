@@ -3093,6 +3093,13 @@ function buildBroadenedParams(params: RPCParams, parsed: ParsedQuery): RPCParams
   return null;
 }
 
+function createShuffleNonce(): string {
+  return (
+    globalThis.crypto?.randomUUID?.() ??
+    `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
+  );
+}
+
 function prepareSearchContext(searchParams: SearchParams): PreparedSearchContext {
   if (searchParams.searchKey && searchParams.isPagination) {
     const originalParams = decodeSearchKey(searchParams.searchKey);
@@ -3115,13 +3122,18 @@ function prepareSearchContext(searchParams: SearchParams): PreparedSearchContext
     isSmoothieLikeText(searchParams.query ?? '') &&
     !hasMacroConstraints(searchParams);
 
+  const isFreshSearch = !searchParams.isPagination;
+  const shouldShuffleFreshResults =
+    isFreshSearch &&
+    (shouldRandomizeSmoothies ||
+      searchParams.isHomepage ||
+      Boolean(searchParams.shuffleNonce));
+
   const originalParams: SearchParams = {
     ...searchParams,
-    ...(shouldRandomizeSmoothies
+    ...(shouldShuffleFreshResults
       ? {
-          shuffleNonce:
-            globalThis.crypto?.randomUUID?.() ??
-            `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`,
+          shuffleNonce: searchParams.shuffleNonce ?? createShuffleNonce(),
         }
       : {}),
     offset: DEFAULT_OFFSET,
@@ -3130,7 +3142,7 @@ function prepareSearchContext(searchParams: SearchParams): PreparedSearchContext
   };
 
   return {
-    effectiveParams: searchParams,
+    effectiveParams: originalParams,
     searchKey: encodeSearchKey(originalParams),
     originalParams,
   };

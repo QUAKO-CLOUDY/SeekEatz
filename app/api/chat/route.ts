@@ -10,9 +10,12 @@ import { resolveRestaurantUniversal, isRestaurantOnlyQuery } from '@/lib/restaur
 import { extractMacroConstraintsFromText, hasConstraints } from '@/lib/extractMacroConstraintsFromText';
 import { isSmoothieLikeText } from '@/lib/smoothie-search';
 import { hasRemainingUsage, incrementUsageCount } from '@/lib/usage-cookie';
-import { FREE_DAILY_QUERY_LIMIT } from '@/lib/entitlements';
+import { buildEntitlement, FREE_DAILY_QUERY_LIMIT } from '@/lib/entitlements';
 import { getFreeTierCreateAccountLimitMessage, getFreeTierUpgradeLimitMessage } from '@/lib/free-tier';
-import { getRequestEntitlement } from '@/lib/request-entitlement';
+import {
+  confirmPremiumBeforeLimitBlock,
+  loadEntitlementData,
+} from '@/lib/request-entitlement';
 import type { Meal } from '@/app/types';
 
 export const maxDuration = 30;
@@ -924,46 +927,10 @@ export async function POST(req: Request) {
     let shouldRecordMeteredUsage = false;
     let hasRecordedMeteredUsage = false;
     try {
-      const resolved = await getRequestEntitlement(req);
+      const { getRequestUser } = await import('@/utils/supabase/request-user');
+      const resolved = await getRequestUser(req);
       supabase = resolved.supabase as Awaited<ReturnType<typeof createClient>>;
       user = resolved.user;
-
-      if (user) {
-        if (!resolved.entitlement.hasPremiumAccess) {
-          if ((resolved.entitlement.remainingQueriesToday ?? FREE_DAILY_QUERY_LIMIT) <= 0) {
-            const limitMessage = getFreeTierUpgradeLimitMessage();
-            return NextResponse.json({
-              error: true,
-              message: limitMessage,
-              mode: "text",
-              answer: limitMessage,
-              usageLimit: true
-            }, {
-              status: 403,
-              headers: createResponseHeaders(false, 'ERROR', 'none')
-            });
-          }
-
-          shouldRecordMeteredUsage = true;
-        }
-      } else {
-        const allowed = await hasRemainingUsage();
-        if (!allowed) {
-          const limitMessage = getFreeTierCreateAccountLimitMessage();
-          return NextResponse.json({
-            error: true,
-            message: limitMessage,
-            mode: "text",
-            answer: limitMessage,
-            usageLimit: true
-          }, {
-            status: 403,
-            headers: createResponseHeaders(false, 'ERROR', 'none')
-          });
-        }
-
-        shouldRecordMeteredUsage = true;
-      }
     } catch (supabaseError) {
       console.error('Supabase initialization error:', supabaseError);
       return NextResponse.json({
@@ -975,6 +942,59 @@ export async function POST(req: Request) {
         status: 500,
         headers: createResponseHeaders(false, 'ERROR', 'none')
       });
+    }
+
+    if (user) {
+      try {
+        const { profile, queriesUsedToday } = await loadEntitlementData(supabase, user.id);
+        let entitlement = buildEntitlement({ user, profile, queriesUsedToday });
+
+        if (!entitlement.hasPremiumAccess) {
+          const wouldBlock =
+            (entitlement.remainingQueriesToday ?? FREE_DAILY_QUERY_LIMIT) <= 0;
+
+          if (wouldBlock) {
+            entitlement = await confirmPremiumBeforeLimitBlock(user, entitlement);
+          }
+
+          if (!entitlement.hasPremiumAccess) {
+            if ((entitlement.remainingQueriesToday ?? FREE_DAILY_QUERY_LIMIT) <= 0) {
+              const limitMessage = getFreeTierUpgradeLimitMessage();
+              return NextResponse.json({
+                error: true,
+                message: limitMessage,
+                mode: "text",
+                answer: limitMessage,
+                usageLimit: true
+              }, {
+                status: 403,
+                headers: createResponseHeaders(false, 'ERROR', 'none')
+              });
+            }
+
+            shouldRecordMeteredUsage = true;
+          }
+        }
+      } catch (entitlementError) {
+        console.error('Chat entitlement check failed, allowing request:', entitlementError);
+      }
+    } else {
+      const allowed = await hasRemainingUsage();
+      if (!allowed) {
+        const limitMessage = getFreeTierCreateAccountLimitMessage();
+        return NextResponse.json({
+          error: true,
+          message: limitMessage,
+          mode: "text",
+          answer: limitMessage,
+          usageLimit: true
+        }, {
+          status: 403,
+          headers: createResponseHeaders(false, 'ERROR', 'none')
+        });
+      }
+
+      shouldRecordMeteredUsage = true;
     }
 
     const recordUsageIfNeeded = async () => {

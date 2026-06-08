@@ -1,8 +1,11 @@
 import { searchHandler } from '@/lib/retrieval/retrieval-engine';
 import { buildSearchParams } from '@/lib/search-utils';
-import { FREE_DAILY_QUERY_LIMIT } from '@/lib/entitlements';
+import { buildEntitlement, FREE_DAILY_QUERY_LIMIT } from '@/lib/entitlements';
 import { getFreeTierCreateAccountLimitMessage, getFreeTierUpgradeLimitMessage } from '@/lib/free-tier';
-import { getRequestEntitlement } from '@/lib/request-entitlement';
+import {
+  confirmPremiumBeforeLimitBlock,
+  loadEntitlementData,
+} from '@/lib/request-entitlement';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,30 +22,42 @@ export async function POST(req: Request) {
 
     const searchParams = await buildSearchParams(normalizedInput);
 
+    const { getRequestUser } = await import('@/utils/supabase/request-user');
     const { hasRemainingUsage, incrementUsageCount } = await import('@/lib/usage-cookie');
 
-    const authWithTimeout = Promise.race([
-      getRequestEntitlement(req),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Auth timeout')), 8000)
-      ),
-    ]);
-    const { supabase, user, entitlement } = await authWithTimeout;
+    const { supabase, user } = await getRequestUser(req);
 
     let shouldRecordMeteredUsage = false;
 
     if (user) {
-      if (!entitlement.hasPremiumAccess) {
-        if ((entitlement.remainingQueriesToday ?? FREE_DAILY_QUERY_LIMIT) <= 0) {
-          const limitMessage = getFreeTierUpgradeLimitMessage();
-          return Response.json({
-            error: 'Usage limit reached',
-            message: limitMessage,
-            usageLimit: true
-          }, { status: 403 });
-        }
+      try {
+        const { profile, queriesUsedToday } = await loadEntitlementData(supabase, user.id);
+        let entitlement = buildEntitlement({ user, profile, queriesUsedToday });
 
-        shouldRecordMeteredUsage = true;
+        if (!entitlement.hasPremiumAccess) {
+          const wouldBlock =
+            (entitlement.remainingQueriesToday ?? FREE_DAILY_QUERY_LIMIT) <= 0;
+
+          if (wouldBlock) {
+            entitlement = await confirmPremiumBeforeLimitBlock(user, entitlement);
+          }
+
+          if (!entitlement.hasPremiumAccess) {
+            if ((entitlement.remainingQueriesToday ?? FREE_DAILY_QUERY_LIMIT) <= 0) {
+              const limitMessage = getFreeTierUpgradeLimitMessage();
+              return Response.json({
+                error: 'Usage limit reached',
+                message: limitMessage,
+                usageLimit: true
+              }, { status: 403 });
+            }
+
+            shouldRecordMeteredUsage = true;
+          }
+        }
+      } catch (entitlementError) {
+        // Do not block search when entitlement reads fail (common in WebView).
+        console.error('Search entitlement check failed, allowing request:', entitlementError);
       }
     } else {
       const allowed = await hasRemainingUsage();
@@ -84,7 +99,7 @@ export async function POST(req: Request) {
     return Response.json(result);
   } catch (error) {
     console.error('Search Route API Error:', error);
-    const isTimeout = error instanceof Error && (error.message === 'Auth timeout' || error.message === 'Search timeout');
+    const isTimeout = error instanceof Error && error.message === 'Search timeout';
     return Response.json(
       { error: isTimeout ? 'Request timed out' : 'Internal Server Error' },
       { status: isTimeout ? 504 : 500 }

@@ -13,7 +13,7 @@ function getUsageWindowStartIso() {
   return new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 }
 
-async function loadEntitlementData(
+export async function loadEntitlementData(
   supabase: SupabaseClient,
   userId: string,
 ): Promise<{ profile: EntitlementProfileRow | null; queriesUsedToday: number }> {
@@ -37,7 +37,11 @@ async function loadEntitlementData(
   };
 }
 
-async function loadEntitlementDataAdmin(
+/**
+ * Service-role read used only as a last check before blocking a signed-in user.
+ * Avoids running this on every request (which was slowing search and causing timeouts).
+ */
+export async function loadEntitlementDataAdmin(
   userId: string,
 ): Promise<{ profile: EntitlementProfileRow | null; queriesUsedToday: number } | null> {
   try {
@@ -61,16 +65,11 @@ async function loadEntitlementDataAdmin(
       queriesUsedToday: usageResult.count ?? 0,
     };
   } catch (error) {
-    console.error("[entitlement] Admin fallback unavailable:", error);
+    console.error("[entitlement] Admin read unavailable:", error);
     return null;
   }
 }
 
-/**
- * Resolve the signed-in user and entitlement for API routes.
- * Uses a bearer-authenticated Supabase client when cookies are missing, with
- * a service-role fallback only when the user would otherwise look non-premium.
- */
 export async function getRequestEntitlement(request: Request): Promise<{
   supabase: SupabaseClient;
   user: User | null;
@@ -82,27 +81,31 @@ export async function getRequestEntitlement(request: Request): Promise<{
     return { supabase, user: null, entitlement: GUEST_ENTITLEMENT };
   }
 
-  let { profile, queriesUsedToday } = await loadEntitlementData(supabase, user.id);
-  let entitlement = buildEntitlement({ user, profile, queriesUsedToday });
-
-  if (!entitlement.hasPremiumAccess) {
-    const adminData = await loadEntitlementDataAdmin(user.id);
-    if (adminData) {
-      const adminEntitlement = buildEntitlement({
-        user,
-        profile: adminData.profile,
-        queriesUsedToday: adminData.queriesUsedToday,
-      });
-
-      if (adminEntitlement.hasPremiumAccess) {
-        entitlement = adminEntitlement;
-      } else if (!profile && adminData.profile) {
-        entitlement = adminEntitlement;
-        profile = adminData.profile;
-        queriesUsedToday = adminData.queriesUsedToday;
-      }
-    }
-  }
+  const { profile, queriesUsedToday } = await loadEntitlementData(supabase, user.id);
+  const entitlement = buildEntitlement({ user, profile, queriesUsedToday });
 
   return { supabase, user, entitlement };
+}
+
+/**
+ * Re-check subscription status via service role before returning a 403 limit response.
+ */
+export async function confirmPremiumBeforeLimitBlock(
+  user: User,
+  entitlement: AppEntitlement,
+): Promise<AppEntitlement> {
+  if (entitlement.hasPremiumAccess) {
+    return entitlement;
+  }
+
+  const adminData = await loadEntitlementDataAdmin(user.id);
+  if (!adminData) {
+    return entitlement;
+  }
+
+  return buildEntitlement({
+    user,
+    profile: adminData.profile,
+    queriesUsedToday: adminData.queriesUsedToday,
+  });
 }

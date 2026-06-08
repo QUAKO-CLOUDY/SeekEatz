@@ -91,9 +91,9 @@ const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
 };
 
 const PROGRESS_REMINDER_LINES = [
-  "Don't forget to log your meal — it only takes a few seconds.",
+  "Don't forget to log your meal, it only takes a few seconds.",
   "Quick check-in: log what you ate so your macros stay accurate.",
-  "You opened SeekEatz today — tap Log to record your meal.",
+  "You opened SeekEatz today. Tap Log to record your meal.",
   "Keep your streak going. Log your meal before the day gets away.",
   "Small step, big impact: log your meal to stay on track.",
   "Your progress counts when you log it. Don't forget today's meal.",

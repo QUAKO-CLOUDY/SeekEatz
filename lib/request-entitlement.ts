@@ -17,7 +17,7 @@ export async function loadEntitlementData(
   supabase: SupabaseClient,
   userId: string,
 ): Promise<{ profile: EntitlementProfileRow | null; queriesUsedToday: number }> {
-  const [{ data: profile }, usageResult] = await Promise.all([
+  const [profileResult, usageResult] = await Promise.all([
     supabase
       .from("profiles")
       .select(PROFILE_ENTITLEMENT_SELECT)
@@ -31,8 +31,16 @@ export async function loadEntitlementData(
       .gte("created_at", getUsageWindowStartIso()),
   ]);
 
+  if (profileResult.error) {
+    console.error("[entitlement] Profile read failed:", profileResult.error.message);
+  }
+
+  if (usageResult.error) {
+    console.error("[entitlement] Usage read failed:", usageResult.error.message);
+  }
+
   return {
-    profile: profile as EntitlementProfileRow | null,
+    profile: profileResult.data as EntitlementProfileRow | null,
     queriesUsedToday: usageResult.count ?? 0,
   };
 }
@@ -46,7 +54,7 @@ export async function loadEntitlementDataAdmin(
 ): Promise<{ profile: EntitlementProfileRow | null; queriesUsedToday: number } | null> {
   try {
     const admin = createAdminClient();
-    const [{ data: profile }, usageResult] = await Promise.all([
+    const [profileResult, usageResult] = await Promise.all([
       admin
         .from("profiles")
         .select(PROFILE_ENTITLEMENT_SELECT)
@@ -60,8 +68,13 @@ export async function loadEntitlementDataAdmin(
         .gte("created_at", getUsageWindowStartIso()),
     ]);
 
+    if (profileResult.error) {
+      console.error("[entitlement] Admin profile read failed:", profileResult.error.message);
+      return null;
+    }
+
     return {
-      profile: profile as EntitlementProfileRow | null,
+      profile: profileResult.data as EntitlementProfileRow | null,
       queriesUsedToday: usageResult.count ?? 0,
     };
   } catch (error) {

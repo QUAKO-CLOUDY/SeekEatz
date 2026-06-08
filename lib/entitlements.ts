@@ -38,8 +38,10 @@ export type AppEntitlement = {
 
 export const ENTITLEMENT_CACHE_KEY = "seekeatz_account_entitlement";
 
+// Only columns that exist in production profiles. has_completed_onboarding is
+// read separately where needed — including it here breaks every entitlement
+// query on databases that have not run the onboarding migration yet.
 export const PROFILE_ENTITLEMENT_SELECT = [
-  "has_completed_onboarding",
   "subscription_tier",
   "subscription_status",
   "trial_source",

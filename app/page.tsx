@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { LaunchSplash } from './components/LaunchSplash';
+import { resolveSigninDestination } from '@/lib/post-auth-routing';
 
 const SPLASH_MIN_DURATION_MS = 3650;
 const SPLASH_SEEN_KEY = 'seekeatz_has_seen_launch_splash_v1';
@@ -67,24 +68,11 @@ export default function RootPage() {
         } = await supabase.auth.getUser();
 
         if (user && !justLoggedOut) {
-          let hasCompletedOnboarding = readOnboardingCompleteFromLocal();
-
-          try {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('has_completed_onboarding')
-              .eq('id', user.id)
-              .maybeSingle();
-
-            if (profile?.has_completed_onboarding) {
-              hasCompletedOnboarding = true;
-              persistOnboardingComplete(user.id);
-            }
-          } catch {
-            // Fallback to local state when profile lookup fails.
-          }
-
-          destination = hasCompletedOnboarding ? '/chat' : '/onboarding';
+          persistOnboardingComplete(user.id);
+          destination = await resolveSigninDestination({
+            fallbackRedirect: '/chat',
+            isReturningUser: true,
+          });
         } else {
           const hasCompletedOnboarding = readOnboardingCompleteFromLocal();
 

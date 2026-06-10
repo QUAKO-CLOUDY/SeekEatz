@@ -4,6 +4,7 @@ import { Suspense, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { OnboardingFlow } from "@/app/components/OnboardingFlow";
+import { resolveSigninDestination } from "@/lib/post-auth-routing";
 
 function OnboardingPageContent() {
   const router = useRouter();
@@ -96,12 +97,16 @@ function OnboardingPageContent() {
         routeToCreateAccount();
         return;
       }
+
+      const destination = await resolveSigninDestination({
+        fallbackRedirect: "/upgrade?fromSignup=1",
+        isReturningUser: false,
+      });
+      router.replace(destination);
+      return;
     } catch {
       routeToCreateAccount();
-      return;
     }
-
-    routeToPlanSelection();
   };
 
   return (

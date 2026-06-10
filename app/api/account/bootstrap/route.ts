@@ -5,8 +5,8 @@ import {
   buildEntitlement,
   type EntitlementProfileRow,
   PROFILE_ENTITLEMENT_SELECT,
-  WAITLIST_TRIAL_DAYS,
 } from "@/lib/entitlements";
+import { getWaitlistTrialExpiresAtIso } from "@/lib/waitlist-trial";
 import { normalizeEmail } from "@/lib/full-access";
 import { sendWaitlistFreeMonthGrantedEmail } from "@/lib/email/resend";
 
@@ -29,13 +29,9 @@ type BootstrapBody = {
 type WaitlistFreeMonthRow = {
   id: string;
   is_free_month: boolean | null;
+  redeemed_at: string | null;
+  redeemed_by_user_id: string | null;
 };
-
-function addDaysIso(days: number) {
-  const now = new Date();
-  now.setDate(now.getDate() + days);
-  return now.toISOString();
-}
 
 function shouldSendWaitlistGrantEmails() {
   return process.env.SEND_WAITLIST_GRANT_EMAILS === "true";
@@ -47,15 +43,10 @@ function mapProfilePayload(body: BootstrapBody) {
     return {};
   }
 
-  const update: Record<string, unknown> = {
-    user_profile: profile,
-  };
+  const update: Record<string, unknown> = {};
 
   if (profile.full_name) {
     update.full_name = profile.full_name;
-  }
-  if (body.hasCompletedOnboarding) {
-    update.has_completed_onboarding = true;
   }
   if (profile.goal) {
     update.goal = profile.goal;
@@ -114,50 +105,74 @@ export async function POST(request: Request) {
 
     const profileUpdate: Record<string, unknown> = {
       id: user.id,
-      email: normalizedEmail,
-      last_login: nowIso,
       updated_at: nowIso,
       ...mapProfilePayload(body),
     };
 
-    if (body.hasCompletedOnboarding) {
-      profileUpdate.has_completed_onboarding = true;
-    }
-
     let waitlistGrantApplied = false;
 
-    if (normalizedEmail && !typedCurrentProfile?.waitlist_free_month_redeemed_at) {
+    let waitlistEntryId: string | null = null;
+
+    if (normalizedEmail) {
       const { data: waitlistEntry } = await adminDb
         .from("waitlist_signups")
-        .select("id, is_free_month")
+        .select("id, is_free_month, redeemed_at, redeemed_by_user_id")
         .eq("email", normalizedEmail)
         .maybeSingle();
       const typedWaitlistEntry = waitlistEntry as WaitlistFreeMonthRow | null;
 
+      const hasActiveWaitlistTrial =
+        typedCurrentProfile?.subscription_status === "trialing" &&
+        typedCurrentProfile?.trial_source === "waitlist";
+
       const alreadyPremium =
         typedCurrentProfile?.subscription_status === "active" ||
-        typedCurrentProfile?.subscription_status === "trialing";
+        (typedCurrentProfile?.subscription_status === "trialing" && !hasActiveWaitlistTrial);
 
-      if (typedWaitlistEntry?.is_free_month && !alreadyPremium) {
+      const waitlistRedemptionAvailable =
+        !typedWaitlistEntry?.redeemed_at ||
+        typedWaitlistEntry.redeemed_by_user_id === user.id;
+
+      const waitlistTrialMissingOnProfile =
+        typedWaitlistEntry?.is_free_month === true &&
+        !hasActiveWaitlistTrial &&
+        waitlistRedemptionAvailable &&
+        !typedCurrentProfile?.waitlist_free_month_redeemed_at;
+
+      if (waitlistTrialMissingOnProfile && !alreadyPremium) {
         profileUpdate.subscription_tier = "monthly";
         profileUpdate.subscription_status = "trialing";
         profileUpdate.trial_source = "waitlist";
-        profileUpdate.trial_expires_at = addDaysIso(WAITLIST_TRIAL_DAYS);
+        profileUpdate.trial_expires_at = getWaitlistTrialExpiresAtIso();
         profileUpdate.waitlist_free_month_redeemed_at = nowIso;
         profileUpdate.waitlist_free_month_email = normalizedEmail;
         waitlistGrantApplied = true;
-
-        await adminDb
-          .from("waitlist_signups")
-          .update({
-            redeemed_at: nowIso,
-            redeemed_by_user_id: user.id,
-          })
-          .eq("id", typedWaitlistEntry.id);
+        waitlistEntryId = typedWaitlistEntry?.id ?? null;
       }
     }
 
-    await adminDb.from("profiles").upsert(profileUpdate, { onConflict: "id" });
+    const { error: profileUpsertError } = await adminDb
+      .from("profiles")
+      .upsert(profileUpdate, { onConflict: "id" });
+
+    if (profileUpsertError) {
+      console.error("Failed to upsert profile during bootstrap:", profileUpsertError);
+      throw profileUpsertError;
+    }
+
+    if (waitlistGrantApplied && waitlistEntryId) {
+      const { error: waitlistUpdateError } = await adminDb
+        .from("waitlist_signups")
+        .update({
+          redeemed_at: nowIso,
+          redeemed_by_user_id: user.id,
+        })
+        .eq("id", waitlistEntryId);
+
+      if (waitlistUpdateError) {
+        console.error("Failed to mark waitlist redemption:", waitlistUpdateError);
+      }
+    }
 
     const { data: refreshedProfile } = await adminDb
       .from("profiles")

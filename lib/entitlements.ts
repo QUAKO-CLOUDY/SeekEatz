@@ -66,7 +66,7 @@ export const GUEST_ENTITLEMENT: AppEntitlement = {
   remainingQueriesToday: FREE_DAILY_QUERY_LIMIT,
 };
 
-function isTrialStillActive(trialExpiresAt?: string | null): boolean {
+export function isTrialStillActive(trialExpiresAt?: string | null): boolean {
   if (!trialExpiresAt) {
     return false;
   }
@@ -79,43 +79,23 @@ function isTrialStillActive(trialExpiresAt?: string | null): boolean {
   return timestamp > Date.now();
 }
 
-export function buildEntitlement(args: {
-  user?: Pick<User, "id" | "email"> | null;
+export function hasActiveWaitlistTrialOnProfile(
+  profile?: EntitlementProfileRow | null,
+): boolean {
+  return (
+    profile?.subscription_status === "trialing" &&
+    profile?.trial_source === "waitlist" &&
+    isTrialStillActive(profile?.trial_expires_at)
+  );
+}
+
+function buildProfileEntitlement(args: {
+  user: Pick<User, "id" | "email">;
   profile?: EntitlementProfileRow | null;
   queriesUsedToday?: number | null;
 }): AppEntitlement {
-  const user = args.user ?? null;
-  const profile = args.profile ?? null;
-  const normalizedEmail = normalizeEmail(user?.email);
-
-  if (!user) {
-    return {
-      ...GUEST_ENTITLEMENT,
-      remainingQueriesToday:
-        args.queriesUsedToday == null
-          ? GUEST_ENTITLEMENT.remainingQueriesToday
-          : Math.max(0, FREE_DAILY_QUERY_LIMIT - args.queriesUsedToday),
-    };
-  }
-
-  if (isFullAccessEmail(normalizedEmail)) {
-    return {
-      isAuthenticated: true,
-      userId: user.id,
-      email: normalizedEmail,
-      hasCompletedOnboarding: profile?.has_completed_onboarding === true,
-      billingTier: "yearly",
-      billingStatus: "active",
-      trialSource: null,
-      trialExpiresAt: null,
-      hasPremiumAccess: true,
-      dailyQueryLimit: null,
-      waitlistFreeMonthRedeemedAt: profile?.waitlist_free_month_redeemed_at ?? null,
-      waitlistFreeMonthEmail: profile?.waitlist_free_month_email ?? null,
-      remainingQueriesToday: null,
-    };
-  }
-
+  const { user, profile } = args;
+  const normalizedEmail = normalizeEmail(user.email);
   const storedTier = profile?.subscription_tier ?? "free";
   const storedStatus = profile?.subscription_status ?? "inactive";
   const trialIsActive = storedStatus === "trialing" && isTrialStillActive(profile?.trial_expires_at);
@@ -142,6 +122,59 @@ export function buildEntitlement(args: {
         ? null
         : Math.max(0, FREE_DAILY_QUERY_LIMIT - args.queriesUsedToday),
   };
+}
+
+export function buildEntitlement(args: {
+  user?: Pick<User, "id" | "email"> | null;
+  profile?: EntitlementProfileRow | null;
+  queriesUsedToday?: number | null;
+}): AppEntitlement {
+  const user = args.user ?? null;
+  const profile = args.profile ?? null;
+  const normalizedEmail = normalizeEmail(user?.email);
+
+  if (!user) {
+    return {
+      ...GUEST_ENTITLEMENT,
+      remainingQueriesToday:
+        args.queriesUsedToday == null
+          ? GUEST_ENTITLEMENT.remainingQueriesToday
+          : Math.max(0, FREE_DAILY_QUERY_LIMIT - args.queriesUsedToday),
+    };
+  }
+
+  // Waitlist trial on the profile wins over dev master / reviewer full access.
+  if (hasActiveWaitlistTrialOnProfile(profile)) {
+    return buildProfileEntitlement({
+      user,
+      profile,
+      queriesUsedToday: args.queriesUsedToday,
+    });
+  }
+
+  if (isFullAccessEmail(normalizedEmail)) {
+    return {
+      isAuthenticated: true,
+      userId: user.id,
+      email: normalizedEmail,
+      hasCompletedOnboarding: profile?.has_completed_onboarding === true,
+      billingTier: "yearly",
+      billingStatus: "active",
+      trialSource: null,
+      trialExpiresAt: null,
+      hasPremiumAccess: true,
+      dailyQueryLimit: null,
+      waitlistFreeMonthRedeemedAt: profile?.waitlist_free_month_redeemed_at ?? null,
+      waitlistFreeMonthEmail: profile?.waitlist_free_month_email ?? null,
+      remainingQueriesToday: null,
+    };
+  }
+
+  return buildProfileEntitlement({
+    user,
+    profile,
+    queriesUsedToday: args.queriesUsedToday,
+  });
 }
 
 export function getEntitlementPlanLabel(entitlement: AppEntitlement): string {

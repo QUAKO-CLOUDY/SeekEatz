@@ -12,6 +12,7 @@ import { getGuestChatForMigration, clearGuestSessionFull } from "@/lib/guest-ses
 import { claimAnonymousData } from "@/lib/claim-anon-data";
 import { AuthProviders } from "@/app/components/AuthProviders";
 import { bootstrapAccount } from "@/lib/bootstrap-account";
+import { resolveSignupDestination } from "@/lib/post-auth-routing";
 import { getFreeTierSignupDescription } from "@/lib/free-tier";
 import type { UserProfile } from "@/app/types";
 import {
@@ -380,18 +381,22 @@ function SignupPageContent() {
         }),
       );
 
+      let bootstrapResult: Awaited<ReturnType<typeof bootstrapAccount>> | null = null;
+
       try {
-        const bootstrapResult = await bootstrapAccount({
+        bootstrapResult = await bootstrapAccount({
           profile: profileForBootstrap,
           hasCompletedOnboarding: true,
         });
-
-        if (bootstrapResult.waitlistGrantApplied) {
-          localStorage.setItem("seekeatz_waitlist_trial_activated", "true");
-        }
       } catch (bootstrapError) {
         console.warn("Account bootstrap failed after signup:", bootstrapError);
       }
+
+      const destination = await resolveSignupDestination({
+        userId,
+        fallbackRedirect: redirectTo,
+        bootstrapResult,
+      });
 
       // Wait for propagation
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -399,7 +404,7 @@ function SignupPageContent() {
       await new Promise(resolve => setTimeout(resolve, 300));
 
       // Navigate with the app router so native shells keep control.
-      router.replace(redirectTo);
+      router.replace(destination);
       router.refresh();
     } catch (err: unknown) {
       setOtpError(getErrorMessage(err, "Verification failed. Please try again."));

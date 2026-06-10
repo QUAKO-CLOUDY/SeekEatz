@@ -1,5 +1,6 @@
 import dotenv from "dotenv";
 import { createAdminClient } from "@/utils/supabase/admin";
+import { getAppStoreUrl } from "@/lib/app-store";
 import { sendWaitlistLaunchEmail } from "@/lib/email/resend";
 
 dotenv.config({ path: ".env.local" });
@@ -27,7 +28,7 @@ function parseArgs(argv: string[]): CliOptions {
     limit != null && Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : null;
 
   const appUrlArg = argv.find((arg) => arg.startsWith("--app-url="));
-  const appUrl = appUrlArg?.split("=")[1]?.trim() || "https://www.seekeatz.com";
+  const appUrl = appUrlArg?.split("=")[1]?.trim() || getAppStoreUrl();
 
   return {
     shouldSend,

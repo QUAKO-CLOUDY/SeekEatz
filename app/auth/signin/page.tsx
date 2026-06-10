@@ -12,6 +12,7 @@ import { claimAnonymousData } from "@/lib/claim-anon-data";
 import { AuthProviders } from "@/app/components/AuthProviders";
 import { setDevFullAccess } from "@/lib/onboarding-flow";
 import { bootstrapAccount } from "@/lib/bootstrap-account";
+import { resolveSigninDestination } from "@/lib/post-auth-routing";
 import { isFullAccessEmail } from "@/lib/full-access";
 import type { UserProfile } from "@/app/types";
 import {
@@ -105,13 +106,16 @@ function SignInPageContent() {
       }
       
       if (user && !isMasterMode && !isSwitchAccountMode) {
-        // User is already signed in, redirect to destination
-        router.replace(redirectTo);
+        const destination = await resolveSigninDestination({
+          fallbackRedirect: redirectTo,
+          isReturningUser: true,
+        });
+        router.replace(destination);
       }
     };
     
     // Check immediately
-    checkAuth();
+    void checkAuth();
     
     // Listen for auth state changes (e.g., when sign-in succeeds)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -121,7 +125,12 @@ function SignInPageContent() {
         if (passwordSignInActive.current) {
           return;
         }
-        router.replace(redirectTo);
+        void resolveSigninDestination({
+          fallbackRedirect: redirectTo,
+          isReturningUser: true,
+        }).then((destination) => {
+          router.replace(destination);
+        });
       }
     });
     
@@ -283,17 +292,13 @@ function SignInPageContent() {
               ? { full_name: data.user.user_metadata.full_name as string }
               : undefined;
 
-          const bootstrapResult = await withTimeout(
+          await withTimeout(
             bootstrapAccount({
               profile: profileForBootstrap,
               hasCompletedOnboarding: !!(profile || hasCompletedOnboarding),
             }),
             6000,
           );
-
-          if (bootstrapResult?.waitlistGrantApplied) {
-            localStorage.setItem("seekeatz_waitlist_trial_activated", "true");
-          }
         } catch (bootstrapError) {
           console.warn("Account bootstrap failed after sign-in:", bootstrapError);
         }
@@ -301,9 +306,10 @@ function SignInPageContent() {
         // Refresh router to ensure session is updated in all components
         router.refresh();
 
-        // Returning users go straight to the app; brand-new users follow the
-        // intended redirect (which may be the upgrade/paywall flow).
-        const destination = isReturningUser ? "/chat" : redirectTo;
+        const destination = await resolveSigninDestination({
+          fallbackRedirect: redirectTo,
+          isReturningUser,
+        });
         router.push(destination);
       }
     } catch {

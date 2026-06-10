@@ -2,7 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Check, Crown } from "lucide-react";
+import { ArrowLeft, Check, Crown, Loader2 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { AuthProviders } from "@/app/components/AuthProviders";
 import {
@@ -23,18 +23,15 @@ import {
   restoreRevenueCatPurchases,
 } from "@/lib/billing/revenuecat-client";
 import { isNativeApp } from "@/lib/native-runtime";
+import {
+  WAITLIST_WELCOME_PATH,
+  shouldShowWaitlistWelcomeScreen,
+} from "@/lib/waitlist-welcome";
+import { PREMIUM_PLAN_BENEFITS } from "@/lib/premium-benefits";
 
 const PRIVACY_POLICY_URL = "https://seekeatz.com/legal/privacy";
 const TERMS_OF_USE_URL =
   "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
-
-const premiumBenefits = [
-  "Unlimited home search and AI chat",
-  "Smarter, goal-based results",
-  "Access to full database",
-  "AI-powered swaps",
-  "Save and log your meals",
-];
 
 function toUserFacingBillingError(message: string): string {
   const normalized = message.toLowerCase();
@@ -91,6 +88,9 @@ function UpgradePageContent() {
   const [billingMessage, setBillingMessage] = useState<string | null>(null);
   const [pendingPlanId, setPendingPlanId] = useState<string | null>(null);
   const [isRestoringPurchases, setIsRestoringPurchases] = useState(false);
+  const [isCheckingPostAuth, setIsCheckingPostAuth] = useState(
+    () => isFromSignup || isFromSignin,
+  );
   const { entitlement, refresh, setEntitlement } = useAccountEntitlement(true);
 
   const applyEntitlement = useCallback(
@@ -143,12 +143,18 @@ function UpgradePageContent() {
       setAuthEmail(user?.email ?? null);
       if (user) {
         let alreadyPremium = false;
+        let refreshedEntitlement: AppEntitlement | null = null;
         try {
-          await bootstrapAccount({ hasCompletedOnboarding: getOnboardingFlag() });
-          const refreshed = await refresh();
-          alreadyPremium = refreshed?.hasPremiumAccess === true;
+          const bootstrapResult = await bootstrapAccount({
+            hasCompletedOnboarding: getOnboardingFlag(),
+          });
+          refreshedEntitlement = bootstrapResult.entitlement;
+          alreadyPremium = refreshedEntitlement.hasPremiumAccess === true;
+          applyEntitlement(refreshedEntitlement);
         } catch (error) {
           console.warn("Upgrade bootstrap skipped:", error);
+          refreshedEntitlement = (await refresh()) ?? null;
+          alreadyPremium = refreshedEntitlement?.hasPremiumAccess === true;
         }
 
         // Reconcile against RevenueCat on load so a user who already owns an
@@ -172,17 +178,29 @@ function UpgradePageContent() {
           }
         }
 
-        // A returning subscriber routed here by the auth flow should never be
-        // asked to pick a plan — send them straight into the app. We only skip
-        // for the post-auth flows so a premium user who intentionally opens the
-        // plans screen (e.g. "Manage Subscription") still sees it.
+        // Post-auth users should never flash the paywall. Waitlist trial users
+        // are sent to the one-time welcome screen; everyone else goes to chat.
+        if (
+          isFromSignup &&
+          refreshedEntitlement &&
+          shouldShowWaitlistWelcomeScreen(user.id, refreshedEntitlement)
+        ) {
+          router.replace(WAITLIST_WELCOME_PATH);
+          return;
+        }
+
         if (alreadyPremium && (isFromSignup || isFromSignin)) {
           router.replace("/chat");
+          return;
         }
+      }
+
+      if (isFromSignup || isFromSignin) {
+        setIsCheckingPostAuth(false);
       }
     };
 
-    loadUser();
+    void loadUser();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsSignedIn(!!session?.user);
@@ -323,6 +341,14 @@ function UpgradePageContent() {
     router.push(isSignedIn ? "/settings" : "/");
   }, [isSignedIn, router]);
 
+  if (isCheckingPostAuth) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-cyan-500" aria-label="Loading" />
+      </div>
+    );
+  }
+
   return (
     <div className="h-full overflow-y-auto overscroll-contain bg-background text-foreground">
       <div className="mx-auto flex min-h-full w-full max-w-3xl flex-col justify-start px-4 py-6 sm:px-6 sm:py-10">
@@ -429,7 +455,7 @@ function UpgradePageContent() {
                           <p className="px-1 text-sm leading-6 text-muted-foreground">{plan.details}</p>
                         ) : null}
                         <div className="mt-4 space-y-3 text-sm text-muted-foreground">
-                          {premiumBenefits.map((benefit) => (
+                          {PREMIUM_PLAN_BENEFITS.map((benefit) => (
                             <div key={benefit} className="flex items-center gap-3">
                               <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cyan-500/15 text-cyan-500">
                                 <Check className="h-4 w-4" />

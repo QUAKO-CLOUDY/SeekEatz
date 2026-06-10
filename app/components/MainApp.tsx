@@ -14,6 +14,7 @@ import { MealDetail } from './MealDetail';
 import { SearchScreen } from './SearchScreen';
 import { OnboardingFlow } from './OnboardingFlow';
 import { UpgradeModal } from './UpgradeModal';
+import { WaitlistTrialEndedModal } from './WaitlistTrialEndedModal';
 import { AppTutorialOverlay, type AppTutorialStep } from './AppTutorialOverlay';
 import type { UserProfile, Meal } from '../types';
 import type { LoggedMeal } from './LogScreen';
@@ -29,6 +30,11 @@ import {
 import { useAccountEntitlement } from '@/app/hooks/useAccountEntitlement';
 import { isNativeApp } from '@/lib/native-runtime';
 import { reconcileRevenueCatEntitlement } from '@/lib/billing/revenuecat-client';
+import { hasPendingWaitlistWelcome } from '@/lib/waitlist-welcome';
+import {
+  markWaitlistTrialEndedPopupSeen,
+  shouldShowWaitlistTrialEndedPopup,
+} from '@/lib/waitlist-trial';
 import { getBillingTierFromAppleProductId } from '@/lib/billing/app-store-sync';
 import { bootstrapAccount } from '@/lib/bootstrap-account';
 import { isFullAccessEmail } from '@/lib/full-access';
@@ -195,6 +201,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
   const [currentUserEmail, setCurrentUserEmail] = useState<string | undefined>(undefined);
   const [hasHydratedCurrentUser, setHasHydratedCurrentUser] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [showWaitlistTrialEndedModal, setShowWaitlistTrialEndedModal] = useState(false);
   const [postLogChoice, setPostLogChoice] = useState<PostLogChoiceState | null>(null);
   const [devFullAccess, setDevFullAccessState] = useState(false);
   const [isTutorialActive, setIsTutorialActive] = useState(false);
@@ -272,6 +279,24 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     refreshEntitlement,
     setEntitlement,
   ]);
+
+  useEffect(() => {
+    if (!isMounted || !entitlementResolved || !currentUserId) {
+      return;
+    }
+
+    if (
+      typeof window !== "undefined" &&
+      window.location.pathname === "/waitlist-welcome"
+    ) {
+      return;
+    }
+
+    if (hasPendingWaitlistWelcome(currentUserId)) {
+      router.replace("/waitlist-welcome");
+    }
+  }, [currentUserId, entitlementResolved, isMounted, router]);
+
   const favoriteMealsStorageKey = currentUserId
     ? `seekeatz_favorite_meals:${currentUserId}`
     : 'seekeatz_favorite_meals:guest';
@@ -416,6 +441,25 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       setTutorialStepIndex(0);
     });
   }, [appState, currentUserId, isMounted]);
+
+  useEffect(() => {
+    if (!isMounted || appState !== 'app' || !entitlementResolved || !currentUserId) {
+      return;
+    }
+
+    if (shouldShowWaitlistTrialEndedPopup(currentUserId, entitlement)) {
+      startTransition(() => {
+        setShowWaitlistTrialEndedModal(true);
+      });
+    }
+  }, [appState, currentUserId, entitlement, entitlementResolved, isMounted]);
+
+  const handleWaitlistTrialEndedDismiss = useCallback(() => {
+    if (currentUserId) {
+      markWaitlistTrialEndedPopupSeen(currentUserId);
+    }
+    setShowWaitlistTrialEndedModal(false);
+  }, [currentUserId]);
 
   useEffect(() => {
     if (!isTutorialActive) return;
@@ -686,39 +730,23 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         }
       }
 
-      // If we have a user but no onboarding flag, check the database
-      if (user && !isOnboarded) {
-        setCurrentUserId(user.id); // Track current user ID
-        try {
-          const { data: profileData } = await supabase
-            .from("profiles")
-            .select("has_completed_onboarding")
-            .eq("id", user.id)
-            .single();
-
-          if (profileData?.has_completed_onboarding) {
-            // Set localStorage flags
-            if (typeof window !== 'undefined') {
-              localStorage.setItem(`seekEatz_hasCompletedOnboarding_${user.id}`, "true");
-              localStorage.setItem("hasCompletedOnboarding", "true");
-            }
-            // User is onboarded - show app
-            setAppState('app');
-            return;
-          }
-        } catch (error) {
-          console.warn("Could not check onboarding status:", error);
-        }
-      }
-
-      // Track user ID if user exists
+      // Signed-in users should never repeat onboarding slides in the app shell.
       if (user) {
         setCurrentUserId(user.id);
         setCurrentUserEmail(user.email);
-      } else {
-        setCurrentUserId(undefined);
-        setCurrentUserEmail(undefined);
+
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(`seekEatz_hasCompletedOnboarding_${user.id}`, "true");
+          localStorage.setItem("hasCompletedOnboarding", "true");
+          localStorage.setItem("onboarded", "true");
+        }
+
+        setAppState('app');
+        return;
       }
+
+      setCurrentUserId(undefined);
+      setCurrentUserEmail(undefined);
 
       // Only set state if we haven't already been set by auth state change listener
       // This prevents overriding a successful sign-in
@@ -830,13 +858,15 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
 
         if (profileData) {
           setUserProfile(profileData);
-          // Update app state based on onboarding status
-          if (profileData.has_completed_onboarding) {
-            setAppState('app');
-          } else {
-            setAppState('onboarding');
-          }
         }
+
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(`seekEatz_hasCompletedOnboarding_${session.user.id}`, "true");
+          localStorage.setItem("hasCompletedOnboarding", "true");
+          localStorage.setItem("onboarded", "true");
+        }
+
+        setAppState('app');
       } else if (event === 'SIGNED_OUT') {
         // User signed out - reset to default profile
         setCurrentUserId(undefined);
@@ -1369,6 +1399,10 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
         open={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
         subtitle="Premium is where SeekEatz becomes your decision system: unlimited searches, AI swaps, meal logging, and saved meals."
+      />
+      <WaitlistTrialEndedModal
+        open={showWaitlistTrialEndedModal}
+        onDismiss={handleWaitlistTrialEndedDismiss}
       />
       {renderPostLogChoiceSheet()}
       {isTutorialActive ? (

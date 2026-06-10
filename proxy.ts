@@ -76,12 +76,9 @@ export async function proxy(request: NextRequest) {
     publicPrefixPaths.some(prefix => pathname.startsWith(prefix)) ||
     pathname.startsWith('/auth/'); // Auth pages are always public
 
-  // If it's a public route, allow access without auth check
+  // If it's a public route, allow access without auth check.
+  // Auth pages handle their own post-login routing (including waitlist welcome).
   if (isPublicRoute) {
-    // Optional: Redirect logged-in users away from auth pages (but allow them to access other public routes)
-    if (user && (pathname.startsWith('/auth/signin') || pathname.startsWith('/auth/signup'))) {
-      return NextResponse.redirect(new URL('/chat', request.url));
-    }
     return response;
   }
 

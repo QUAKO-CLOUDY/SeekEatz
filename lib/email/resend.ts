@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { getAppStoreUrl } from "@/lib/app-store";
 
 const DEFAULT_FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
 
@@ -88,30 +89,32 @@ export async function sendWaitlistLaunchEmail({
   appUrl,
 }: WaitlistLaunchEmailInput) {
   const resend = getResendClient();
-  const safeAppUrl = appUrl?.trim() || "https://www.seekeatz.com";
+  const safeAppUrl = appUrl?.trim() || getAppStoreUrl();
 
   return resend.emails.send({
     from: DEFAULT_FROM_EMAIL,
     to,
-    subject: "Your SeekEatz free month is ready",
+    subject: "SeekEatz is live — your free month is ready",
     html: `
       <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827;">
-        <h1 style="font-size:24px;margin:0 0 12px;">You’re in: 1 month of SeekEatz Premium is free</h1>
-        <p style="margin:0 0 12px;">Thanks for joining the waitlist.</p>
+        <h1 style="font-size:24px;margin:0 0 12px;">SeekEatz is live on the App Store</h1>
+        <p style="margin:0 0 12px;">Thanks for joining the waitlist. Your 1-month Premium trial is ready.</p>
         <p style="margin:0 0 12px;">
-          Use this same email address when you create your account and we will automatically unlock your free month.
+          <strong>Important:</strong> when you create your account in the app, use this same email address
+          (<strong>${to}</strong>) and we will automatically unlock your free month.
         </p>
+        <p style="margin:0 0 12px;">No coupon code is required.</p>
         <p style="margin:0 0 20px;">
-          No coupon code is required.
+          Download SeekEatz from the App Store, create your account, and start finding meals that fit your goals.
         </p>
         <a
           href="${safeAppUrl}"
           style="display:inline-block;background:#111827;color:#ffffff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600;"
         >
-          Start with SeekEatz
+          Download on the App Store
         </a>
       </div>
     `,
-    text: `You’re in: 1 month of SeekEatz Premium is free.\n\nUse this same email address when you create your account and we will automatically unlock your free month.\nNo coupon code is required.\n\nStart: ${safeAppUrl}`,
+    text: `SeekEatz is live on the App Store.\n\nThanks for joining the waitlist. Your 1-month Premium trial is ready.\n\nImportant: when you create your account in the app, use this same email address (${to}) and we will automatically unlock your free month.\nNo coupon code is required.\n\nDownload on the App Store: ${safeAppUrl}`,
   });
 }

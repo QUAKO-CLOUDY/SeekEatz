@@ -12,6 +12,7 @@
     "test:retrieval-live": "node scripts/run-ts-script.cjs scripts/test-retrieval-live.ts",
     "email:waitlist:launch:dry": "node scripts/run-ts-script.cjs scripts/send-waitlist-launch-email.ts",
     "email:waitlist:launch": "node scripts/run-ts-script.cjs scripts/send-waitlist-launch-email.ts --send",
+    "email:waitlist:launch:test": "node scripts/run-ts-script.cjs scripts/send-waitlist-launch-test.ts",
     "backfill:retrieval": "node scripts/run-ts-script.cjs scripts/backfill-retrieval-metadata.ts",
     "audit:restaurant-logos": "node scripts/run-ts-script.cjs scripts/audit-restaurant-logos.ts",
     "audit:restaurant-search": "node scripts/run-ts-script.cjs scripts/audit-restaurant-search.ts",

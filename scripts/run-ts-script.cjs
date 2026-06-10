@@ -4,6 +4,8 @@ const Module = require('module');
 const ts = require('typescript');
 
 const projectRoot = path.resolve(__dirname, '..');
+
+require('dotenv').config({ path: path.join(projectRoot, '.env.local') });
 const originalResolveFilename = Module._resolveFilename;
 
 Module._resolveFilename = function patchedResolve(request, parent, isMain, options) {

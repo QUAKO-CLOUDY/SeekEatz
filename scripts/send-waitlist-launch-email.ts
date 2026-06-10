@@ -82,9 +82,12 @@ async function main() {
 
   if (!options.shouldSend) {
     console.log("Dry run only. Add --send to deliver emails.");
-    console.log("Sample recipients:");
+    console.log("Sample recipients (first 20):");
     for (const recipient of dedupedEmails.slice(0, 20)) {
       console.log(`- ${recipient}`);
+    }
+    if (dedupedEmails.length > 20) {
+      console.log(`... and ${dedupedEmails.length - 20} more`);
     }
     return;
   }

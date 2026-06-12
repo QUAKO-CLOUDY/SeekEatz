@@ -331,14 +331,18 @@ function SignInPageContent() {
 
     try {
       setIsResettingPassword(true);
-      const supabase = createClient();
-      const redirectToReset = `${window.location.origin}/auth/reset-password`;
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-        redirectTo: redirectToReset,
+      const response = await fetch("/api/auth/password-reset", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: normalizedEmail }),
       });
 
-      if (resetError) {
-        setError(resetError.message);
+      const payload = (await response.json().catch(() => null)) as
+        | { ok?: boolean; error?: string }
+        | null;
+
+      if (!response.ok || !payload?.ok) {
+        setError(payload?.error ?? "Could not send reset link. Please try again.");
         return;
       }
 

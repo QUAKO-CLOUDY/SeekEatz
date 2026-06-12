@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { getAppStoreUrl } from "@/lib/app-store";
+import { buildPasswordResetEmailContent } from "@/lib/email/password-reset-template";
 import { buildWaitlistLaunchEmailContent } from "@/lib/email/waitlist-launch-template";
 
 export function getResendFromEmail(): string {
@@ -93,6 +94,24 @@ export async function sendWaitlistFreeMonthGrantedEmail({
       </div>
     `,
     text: `You got your SeekEatz free month.\n\nThanks for joining the waitlist.\n${trialEndLine}\n\nOpen SeekEatz: ${safeAppUrl}`,
+  });
+}
+
+type PasswordResetEmailInput = {
+  to: string;
+  resetLink: string;
+};
+
+export async function sendPasswordResetEmail({ to, resetLink }: PasswordResetEmailInput) {
+  const resend = getResendClient();
+  const content = buildPasswordResetEmailContent({ resetLink });
+
+  return resend.emails.send({
+    from: getResendFromEmail(),
+    to,
+    subject: content.subject,
+    html: content.html,
+    text: content.text,
   });
 }
 

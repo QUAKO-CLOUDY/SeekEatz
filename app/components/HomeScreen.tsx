@@ -134,6 +134,7 @@ type SearchApiResponse = {
 const NO_MORE_MEALS_MESSAGE =
   "There are no more meals that fit these constraints in our database. Please change the restrictions to get access to more mealcards.";
 const HOME_MEALS_PAGE_SIZE = 4;
+const MAX_HOME_SEARCH_PAGES = 20;
 const APPENDED_MEALS_DIVIDER_LABEL = "More meals";
 const DEFAULT_HOME_DISTANCE_MILES = 15;
 const FREE_SEARCH_LIMIT_MESSAGE = "You've used your 2 free searches for the day. Please come back in 24 hours when your 2 searches reset.";
@@ -424,7 +425,9 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
 
     return meals.filter((meal) => {
       if (meal.distance === undefined || meal.distance === null || Number.isNaN(meal.distance)) {
-        return false;
+        // Server already applied nearby filtering when location was sent; keep meals
+        // that lack client-side distance metadata (common when restaurant coords are missing).
+        return true;
       }
 
       return meal.distance <= radiusMiles;
@@ -826,11 +829,14 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         : mealsResult.meals;
       filteredMeals = filterMealsByProfile(filteredMeals, userProfile);
 
+      let pagesFetched = 0;
       while (
         filteredMeals.length < HOME_MEALS_PAGE_SIZE &&
         mealsResult.hasMore &&
-        mealsResult.searchKey
+        mealsResult.searchKey &&
+        pagesFetched < MAX_HOME_SEARCH_PAGES
       ) {
+        pagesFetched += 1;
         const moreResult = await searchMeals(
           query,
           activeDistance,
@@ -935,11 +941,14 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       let next = workingPool.slice(start, start + HOME_MEALS_PAGE_SIZE);
       const { calorieMode, filters, macroFilters } = buildActiveMacroSearchFilters();
 
+      let loadMorePagesFetched = 0;
       while (
         next.length < HOME_MEALS_PAGE_SIZE &&
         workingSearchState?.hasMore &&
-        workingSearchState.searchKey
+        workingSearchState.searchKey &&
+        loadMorePagesFetched < MAX_HOME_SEARCH_PAGES
       ) {
+        loadMorePagesFetched += 1;
         const moreResult = await searchMeals(
           "find meals",
           workingSearchState.distance ?? activeDistance,

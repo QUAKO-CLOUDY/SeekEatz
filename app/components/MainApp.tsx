@@ -127,6 +127,7 @@ function clearHomeScreenCache(): void {
   const sessionKeys = [
     'seekeatz_home_macro_values_v2',
     'seekeatz_home_distance_override',
+    'seekeatz_chat_distance_override',
     'seekeatz_home_scroll_position',
     'seekeatz_last_clicked_meal_id',
   ];

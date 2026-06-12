@@ -18,6 +18,7 @@ import {
   diversifyMealsByRestaurant,
   type RestaurantDiversityHistory,
 } from "@/lib/restaurant-diversity";
+import { SearchRadiusSelect } from "./SearchRadiusSelect";
 
 interface AIChatProps {
   userId?: string;
@@ -106,6 +107,8 @@ const CHAT_MEALS_REDUCED_PAGE_SIZE = 2;
 const CHAT_MEALS_REDUCED_PAGE_START_CLICK = 5; // 5th click and onward
 const APPENDED_MEALS_DIVIDER_LABEL = "More meals";
 const ROUTER_HISTORY_LIMIT = 8;
+const DEFAULT_DISTANCE_MILES = 15;
+const CHAT_DISTANCE_OVERRIDE_KEY = 'seekeatz_chat_distance_override';
 
 function getChatGreeting(): string {
   const hour = new Date().getHours();
@@ -272,6 +275,21 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     () => buildInputPlaceholder(new Date(new Date().setHours(currentHour))),
     [currentHour]
   );
+  const [distanceOverride, setDistanceOverride] = useState<number | null>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem(CHAT_DISTANCE_OVERRIDE_KEY);
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          console.error('Failed to parse chat distance override:', e);
+        }
+      }
+    }
+    return null;
+  });
+  const activeDistance = distanceOverride ?? userProfile?.search_distance_miles ?? DEFAULT_DISTANCE_MILES;
+
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const openUpgradeModal = useCallback(() => {
     if (isPremium) {
@@ -1201,7 +1219,8 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           .filter((entry) => entry.content.length > 0)
           .slice(-ROUTER_HISTORY_LIMIT);
 
-        const shouldRequestLocation = isMealIntentQuery(trimmedText);
+        const isMealIntent = isMealIntentQuery(trimmedText);
+        const shouldRequestLocation = isMealIntent;
         const resolvedLocation = await requestLocationForMealSearch(shouldRequestLocation);
 
         response = await authenticatedFetch('/api/chat', {
@@ -1217,14 +1236,15 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             limit: CHAT_MEALS_PAGE_SIZE,
             offset: 0, // Default offset
             userContext: {
-              search_distance_miles: userProfile?.search_distance_miles,
               diet_type: userProfile?.diet_type,
               dietary_options: userProfile?.dietary_options,
               userId: userId || currentSessionId,
-              // Include location if available
-              ...(resolvedLocation ? {
-                user_location_lat: resolvedLocation.latitude,
-                user_location_lng: resolvedLocation.longitude,
+              ...(isMealIntent ? {
+                search_distance_miles: activeDistance,
+                ...(resolvedLocation ? {
+                  user_location_lat: resolvedLocation.latitude,
+                  user_location_lng: resolvedLocation.longitude,
+                } : {}),
               } : {}),
             }
           }),
@@ -1788,11 +1808,20 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
   return (
     <div className={`flex flex-col h-full relative ${isDark ? 'bg-gray-950' : 'bg-gray-50'}`}>
-      <div className={`p-4 shadow-sm border-b sticky top-0 z-10 ${isDark ? 'bg-gray-900 border-gray-800' : 'bg-white border-gray-200'}`}>
-        <h1 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-800'}`}>
+      <header className="relative z-10 flex items-center justify-between gap-2 p-4 shadow-sm border-b border-border sticky top-0 bg-background text-foreground">
+        <h1 className="min-w-0 truncate text-xl font-bold text-foreground">
           SeekEatz <span className={`text-xs px-2 py-1 rounded-full align-middle ${isDark ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-100 text-blue-600'}`}>Meal Search Concierge</span>
         </h1>
-      </div>
+        <SearchRadiusSelect
+          value={activeDistance}
+          onValueChange={(miles) => {
+            setDistanceOverride(miles);
+            if (typeof window !== 'undefined') {
+              sessionStorage.setItem(CHAT_DISTANCE_OVERRIDE_KEY, JSON.stringify(miles));
+            }
+          }}
+        />
+      </header>
 
       <div
         ref={messagesContainerRef}

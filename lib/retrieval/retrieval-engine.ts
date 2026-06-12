@@ -13,6 +13,7 @@ import {
 import { ResponseFormatter } from './response-formatter';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { calculateDistanceMiles } from '@/lib/distance-utils';
+import { resolveLiveNearbyRestaurantMatches } from '@/lib/google-places-nearby';
 import { hasMacroConstraints, isSmoothieLikeText } from '@/lib/smoothie-search';
 
 const DEFAULT_LIMIT = 5;
@@ -218,7 +219,7 @@ export interface RetrievalDebugInfo {
   location?: {
     requested: boolean;
     radiusMiles?: number;
-    source: 'disabled' | 'find_restaurants_near' | 'restaurants_table' | 'no_matches';
+    source: 'disabled' | 'google_places_live' | 'find_restaurants_near' | 'restaurants_table' | 'no_matches';
     matchedRestaurantCount: number;
     filteredOutCount: number;
     returnedWithinRadius: number;
@@ -293,7 +294,7 @@ interface NearbyRestaurantMatch {
 interface NearbyFilterContext {
   requested: boolean;
   radiusMiles?: number;
-  source: 'disabled' | 'find_restaurants_near' | 'restaurants_table' | 'no_matches';
+  source: 'disabled' | 'google_places_live' | 'find_restaurants_near' | 'restaurants_table' | 'no_matches';
   matches: NearbyRestaurantMatch[];
   byRestaurantId: Map<string, NearbyRestaurantMatch>;
   byRestaurantName: Map<string, NearbyRestaurantMatch>;
@@ -906,6 +907,22 @@ async function resolveNearbyRestaurants(
     byRestaurantName: new Map(),
     filteredOutCount: 0,
   };
+
+  try {
+    const liveMatches = await resolveLiveNearbyRestaurantMatches(supabase, location);
+    if (liveMatches.length > 0) {
+      const matches: NearbyRestaurantMatch[] = liveMatches.map((match) => ({
+        restaurantId: match.restaurantId,
+        restaurantName: match.restaurantName,
+        distanceMiles: match.distanceMiles,
+        latitude: match.latitude,
+        longitude: match.longitude,
+      }));
+      return buildNearbyFilterContext(baseContext, 'google_places_live', matches);
+    }
+  } catch (error) {
+    baseContext.error = error instanceof Error ? error.message : String(error);
+  }
 
   try {
     const rpcResult = await supabase.rpc('find_restaurants_near', {

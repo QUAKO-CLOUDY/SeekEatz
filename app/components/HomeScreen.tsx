@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import React, { useMemo, useState, useRef, useEffect, useCallback } from "react";
-import { Search, Loader2, MapPin } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { createClient } from "@/utils/supabase/client";
 import { MealCard } from "./MealCard";
@@ -14,13 +14,7 @@ import { motion } from "framer-motion";
 import { AnimatedNumber } from "./AnimatedNumber";
 import { diversifyMealsByRestaurant } from "@/lib/restaurant-diversity";
 import { getStoredLocation, ensureSearchLocation } from "@/lib/location";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
+import { SearchRadiusSelect } from "./SearchRadiusSelect";
 import {
   Popover,
   PopoverContent,
@@ -1135,10 +1129,9 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
             className="h-20 sm:h-24 w-auto object-contain"
           />
         </div>
-        <Select
-          value={activeDistance.toString()}
-          onValueChange={(value) => {
-            const miles = Number(value);
+        <SearchRadiusSelect
+          value={activeDistance}
+          onValueChange={(miles) => {
             setHomeDistanceOverride(miles);
             if (typeof window !== 'undefined') {
               sessionStorage.setItem('seekeatz_home_distance_override', JSON.stringify(miles));
@@ -1148,19 +1141,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
             setSearchError(null);
             setLoadMoreNotice(null);
           }}
-        >
-          <SelectTrigger className="h-7 w-auto min-w-[50px] sm:h-7 sm:min-w-[55px] px-1 sm:px-1.5 rounded-full border-border bg-muted/50 hover:bg-muted text-[10px] font-medium gap-0.5 opacity-90">
-            <MapPin className="w-2.5 h-2.5 shrink-0" />
-            <SelectValue className="text-[10px]">{activeDistance} mi</SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {[1, 2, 5, 10, 15, 20].map((distance) => (
-              <SelectItem key={distance} value={distance.toString()}>
-                {distance} {distance === 1 ? 'mile' : 'miles'}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        />
       </header>
 
       {/* Hero: greeting + tagline – userName from profile or auth (login/signup) */}

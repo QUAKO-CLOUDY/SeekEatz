@@ -425,8 +425,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
 
     return meals.filter((meal) => {
       if (meal.distance === undefined || meal.distance === null || Number.isNaN(meal.distance)) {
-        // Server already applied nearby filtering when location was sent; keep meals
-        // that lack client-side distance metadata (common when restaurant coords are missing).
+        // Home search no longer falls back to nationwide results on the server, so keep
+        // nearby meals that lack client-side distance metadata.
         return true;
       }
 
@@ -855,6 +855,11 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           : moreResult.meals;
         nextPageMeals = filterMealsByProfile(nextPageMeals, userProfile);
 
+        if (nextPageMeals.length === 0) {
+          break;
+        }
+
+        const previousCount = filteredMeals.length;
         filteredMeals = deduplicateHomeMeals([...filteredMeals, ...nextPageMeals]);
         mealsResult = {
           ...mealsResult,
@@ -863,6 +868,10 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           hasMore: moreResult.hasMore ?? false,
           message: mealsResult.message ?? moreResult.message,
         };
+
+        if (filteredMeals.length === previousCount) {
+          break;
+        }
       }
 
       const diversifiedAll = diversifyMealsByRestaurant(filteredMeals);

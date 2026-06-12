@@ -23,6 +23,11 @@ interface RestaurantMeta {
   longitude?: number;
 }
 
+export type NearbyDistanceHints = {
+  byRestaurantId: Map<string, number>;
+  byRestaurantName: Map<string, number>;
+};
+
 export class ResponseFormatter {
   private restaurantCache: Map<string, RestaurantMeta> = new Map();
 
@@ -34,14 +39,15 @@ export class ResponseFormatter {
    */
   async format(
     items: RawResult[],
-    userLocation?: { lat: number; lng: number }
+    userLocation?: { lat: number; lng: number },
+    nearbyDistances?: NearbyDistanceHints
   ): Promise<Meal[]> {
     if (items.length === 0) return [];
 
     // Batch-fetch restaurant meta for all unique restaurant_ids
     await this.prefetchRestaurantMeta(items);
 
-    return items.map(item => this.toMeal(item, userLocation));
+    return items.map(item => this.toMeal(item, userLocation, nearbyDistances));
   }
 
   private async prefetchRestaurantMeta(items: RawResult[]) {
@@ -70,20 +76,33 @@ export class ResponseFormatter {
     }
   }
 
-  private toMeal(item: RawResult, userLocation?: { lat: number; lng: number }): Meal {
+  private toMeal(
+    item: RawResult,
+    userLocation?: { lat: number; lng: number },
+    nearbyDistances?: NearbyDistanceHints
+  ): Meal {
     const macros = item.macros ?? {};
     const restaurantMeta = this.restaurantCache.get(item.restaurant_id) ?? {};
     const restaurantName = item.restaurant_name || restaurantMeta.name || '';
     const restaurantLogoUrl = restaurantMeta.logo_url;
     const latitude = restaurantMeta.latitude;
     const longitude = restaurantMeta.longitude;
-    const distance =
+    let distance =
       userLocation && latitude !== undefined && longitude !== undefined
         ? calculateDistanceMiles(
             { latitude: userLocation.lat, longitude: userLocation.lng },
             { latitude, longitude }
           )
         : undefined;
+
+    if (distance === undefined && nearbyDistances) {
+      if (item.restaurant_id) {
+        distance = nearbyDistances.byRestaurantId.get(item.restaurant_id);
+      }
+      if (distance === undefined && restaurantName) {
+        distance = nearbyDistances.byRestaurantName.get(restaurantName.trim().toLowerCase());
+      }
+    }
 
     const meal: Meal = {
       id:               String(item.id),

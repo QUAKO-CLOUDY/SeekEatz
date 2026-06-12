@@ -669,7 +669,7 @@ export async function retrieveMealsWithClient(
   let fallbackMessage: string | undefined;
   let outsideRadiusFallbackUsed = false;
 
-  if (ranked.length === 0 && nearbyFilter.requested) {
+  if (ranked.length === 0 && nearbyFilter.requested && !macroOnlyHomeFiltering) {
     const outsideRadiusDeterministic = applyPostRetrievalFilters(
       applyRestaurantScopeFilters(deterministicSearch.results, { includeNearby: false }),
       parsed,
@@ -700,7 +700,7 @@ export async function retrieveMealsWithClient(
     }
   }
 
-  if (ranked.length === 0) {
+  if (ranked.length === 0 && !macroOnlyHomeFiltering) {
     const fallbackDeterministicCandidates = nearbyFilter.requested
       ? applyRestaurantScopeFilters(deterministicSearch.results, { includeNearby: false })
       : deterministicResults;
@@ -764,7 +764,17 @@ export async function retrieveMealsWithClient(
   const formatterLocation = requestedLocation
     ? { lat: requestedLocation.lat, lng: requestedLocation.lng }
     : options.userLocation;
-  const meals = await formatter.format(paged, formatterLocation);
+  const nearbyDistances = nearbyFilter.requested
+    ? {
+        byRestaurantId: new Map(
+          [...nearbyFilter.byRestaurantId.entries()].map(([id, match]) => [id, match.distanceMiles])
+        ),
+        byRestaurantName: new Map(
+          [...nearbyFilter.byRestaurantName.entries()].map(([name, match]) => [name, match.distanceMiles])
+        ),
+      }
+    : undefined;
+  const meals = await formatter.format(paged, formatterLocation, nearbyDistances);
   const hasMore = offset + limit < totalCount;
   const nextOffset = hasMore ? offset + limit : offset;
 

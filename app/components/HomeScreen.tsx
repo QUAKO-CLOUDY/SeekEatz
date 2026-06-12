@@ -417,28 +417,6 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   // Keep home aligned with the rest of the app when the profile distance is missing.
   const activeDistance = homeDistanceOverride ?? userProfile.search_distance_miles ?? DEFAULT_HOME_DISTANCE_MILES;
 
-  const applyDistanceWindow = useCallback((meals: Meal[], radiusMiles: number): Meal[] => {
-    const hasLocationContext = Boolean(getStoredLocation());
-    if (!hasLocationContext) {
-      return meals;
-    }
-
-    return meals.filter((meal) => {
-      if (meal.distance === undefined || meal.distance === null || Number.isNaN(meal.distance)) {
-        // Home search no longer falls back to nationwide results on the server, so keep
-        // nearby meals that lack client-side distance metadata.
-        return true;
-      }
-
-      return meal.distance <= radiusMiles;
-    });
-  }, []);
-
-  useEffect(() => {
-    setRecommendedMeals((prev) => applyDistanceWindow(prev, activeDistance));
-    setAllSearchMeals((prev) => applyDistanceWindow(prev, activeDistance));
-  }, [activeDistance, applyDistanceWindow]);
-
   const config = MACRO_CONFIG[macro];
   const currentValue = macroValues[macro];
 
@@ -704,8 +682,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         normalizedResults = data.results;
       }
       
-      // Convert to Meal type. Home should respect only active macro constraints.
-      const meals = applyDistanceWindow(normalizedResults.map(convertToMeal), distance ?? activeDistance);
+      // Trust server-side radius filtering; avoid double-filtering by distance on the client.
+      const meals = normalizedResults.map(convertToMeal);
       
       return {
         meals,
@@ -1165,6 +1143,10 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
             if (typeof window !== 'undefined') {
               sessionStorage.setItem('seekeatz_home_distance_override', JSON.stringify(miles));
             }
+            setRecommendedMeals([]);
+            setAllSearchMeals([]);
+            setSearchError(null);
+            setLoadMoreNotice(null);
           }}
         >
           <SelectTrigger className="h-7 w-auto min-w-[50px] sm:h-7 sm:min-w-[55px] px-1 sm:px-1.5 rounded-full border-border bg-muted/50 hover:bg-muted text-[10px] font-medium gap-0.5 opacity-90">

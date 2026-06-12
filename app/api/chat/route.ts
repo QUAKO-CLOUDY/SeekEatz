@@ -1691,6 +1691,18 @@ export async function POST(req: Request) {
           ...(requestUserContext ?? {}),
           ...(requestedRadiusMiles !== undefined ? { search_distance_miles: requestedRadiusMiles } : {}),
         };
+        const hasUserLocation =
+          normalizedChatUserContext.user_location_lat !== undefined &&
+          normalizedChatUserContext.user_location_lng !== undefined;
+        const profileRadiusMiles =
+          typeof normalizedChatUserContext.search_distance_miles === 'number' &&
+          Number.isFinite(normalizedChatUserContext.search_distance_miles) &&
+          normalizedChatUserContext.search_distance_miles > 0
+            ? normalizedChatUserContext.search_distance_miles
+            : undefined;
+        const shouldUseNearbySearch =
+          hasLocationRequest || (hasUserLocation && profileRadiusMiles !== undefined);
+        const effectiveRadiusMiles = requestedRadiusMiles ?? profileRadiusMiles;
 
         // Build normalized SearchParams using unified function
         // CRITICAL: Merge extracted constraints into search params BEFORE calling buildSearchParams
@@ -1711,8 +1723,8 @@ export async function POST(req: Request) {
           restaurantId: restaurantId, // Pass restaurant_id when available
           restaurant: validatedConstraints.restaurant,
           restaurantVariants: restaurantVariants, // Pass variants for filtering
-          location: hasLocationRequest ? 'near me' : undefined,
-          radius_miles: requestedRadiusMiles,
+          location: shouldUseNearbySearch ? 'near me' : undefined,
+          radius_miles: shouldUseNearbySearch ? effectiveRadiusMiles : requestedRadiusMiles,
           userContext: Object.keys(normalizedChatUserContext).length > 0
             ? normalizedChatUserContext
             : undefined,

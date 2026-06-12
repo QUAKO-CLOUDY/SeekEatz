@@ -669,7 +669,10 @@ export async function retrieveMealsWithClient(
   let fallbackMessage: string | undefined;
   let outsideRadiusFallbackUsed = false;
 
-  if (ranked.length === 0 && nearbyFilter.requested && !macroOnlyHomeFiltering) {
+  const hasNoLocalRestaurantCoverage =
+    nearbyFilter.requested && nearbyFilter.matches.length === 0;
+
+  if (ranked.length === 0 && hasNoLocalRestaurantCoverage) {
     const outsideRadiusDeterministic = applyPostRetrievalFilters(
       applyRestaurantScopeFilters(deterministicSearch.results, { includeNearby: false }),
       parsed,
@@ -696,11 +699,13 @@ export async function retrieveMealsWithClient(
     if (outsideRadiusRanked.length > 0) {
       ranked = outsideRadiusRanked;
       outsideRadiusFallbackUsed = true;
-      fallbackMessage = 'Showing meals outside your radius.';
+      fallbackMessage = macroOnlyHomeFiltering
+        ? 'No restaurants found near you yet. Showing popular meals while we expand coverage in your area.'
+        : 'Showing meals outside your radius.';
     }
   }
 
-  if (ranked.length === 0 && !macroOnlyHomeFiltering) {
+  if (ranked.length === 0 && hasNoLocalRestaurantCoverage) {
     const fallbackDeterministicCandidates = nearbyFilter.requested
       ? applyRestaurantScopeFilters(deterministicSearch.results, { includeNearby: false })
       : deterministicResults;
@@ -722,7 +727,9 @@ export async function retrieveMealsWithClient(
     if (fallback.items.length > 0) {
       ranked = fallback.items;
       fallbackMessage = nearbyFilter.requested
-        ? `Showing meals outside your radius.${fallback.message ? ` ${fallback.message}` : ''}`
+        ? macroOnlyHomeFiltering
+          ? `No restaurants found near you yet. Showing popular meals while we expand coverage in your area.${fallback.message ? ` ${fallback.message}` : ''}`
+          : `Showing meals outside your radius.${fallback.message ? ` ${fallback.message}` : ''}`
         : fallback.message;
       outsideRadiusFallbackUsed = nearbyFilter.requested;
     }

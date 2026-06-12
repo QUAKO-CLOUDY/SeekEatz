@@ -353,7 +353,10 @@ export async function retrieveMealsWithClient(
   const formatter = new ResponseFormatter(supabase);
   const requestedLocation = getRequestedLocation(searchParams, options.userLocation);
   const nearbyFilter = requestedLocation
-    ? await resolveNearbyRestaurants(supabase, requestedLocation)
+    ? await resolveNearbyRestaurants(supabase, requestedLocation, {
+        nearbyMatchesSnapshot: searchParams.nearbyMatchesSnapshot,
+        skipLiveLookup: Boolean(searchParams.isPagination),
+      })
     : createDisabledNearbyFilter();
 
   const rawQuery = searchParams.query ?? '';
@@ -843,12 +846,18 @@ export async function retrieveMealsWithClient(
       }
     : undefined;
 
+  const responseSearchKey = buildSearchKeyWithNearbySnapshot(
+    prepared,
+    nearbyFilter,
+    searchParams.isPagination,
+  );
+
   return {
     meals,
     totalCount,
     hasMore,
     nextOffset,
-    searchKey: prepared.searchKey,
+    searchKey: responseSearchKey,
     usedVector,
     parsedQuery: parsed,
     message:
@@ -894,9 +903,28 @@ function createDisabledNearbyFilter(): NearbyFilterContext {
   };
 }
 
+function buildNearbyFilterFromSnapshot(
+  baseContext: NearbyFilterContext,
+  snapshot: NonNullable<SearchParams['nearbyMatchesSnapshot']>,
+  source: NearbyFilterContext['source'] = 'google_places_live',
+): NearbyFilterContext {
+  const matches: NearbyRestaurantMatch[] = snapshot.map((entry) => ({
+    restaurantId: entry.restaurantId,
+    restaurantName: entry.restaurantName,
+    distanceMiles: entry.distanceMiles,
+    latitude: entry.latitude,
+    longitude: entry.longitude,
+  }));
+  return buildNearbyFilterContext(baseContext, source, matches);
+}
+
 async function resolveNearbyRestaurants(
   supabase: SupabaseClient,
-  location: RequestedLocation
+  location: RequestedLocation,
+  options: {
+    nearbyMatchesSnapshot?: SearchParams['nearbyMatchesSnapshot'];
+    skipLiveLookup?: boolean;
+  } = {},
 ): Promise<NearbyFilterContext> {
   const baseContext: NearbyFilterContext = {
     requested: true,
@@ -908,20 +936,26 @@ async function resolveNearbyRestaurants(
     filteredOutCount: 0,
   };
 
-  try {
-    const liveMatches = await resolveLiveNearbyRestaurantMatches(supabase, location);
-    if (liveMatches.length > 0) {
-      const matches: NearbyRestaurantMatch[] = liveMatches.map((match) => ({
-        restaurantId: match.restaurantId,
-        restaurantName: match.restaurantName,
-        distanceMiles: match.distanceMiles,
-        latitude: match.latitude,
-        longitude: match.longitude,
-      }));
-      return buildNearbyFilterContext(baseContext, 'google_places_live', matches);
+  if (options.nearbyMatchesSnapshot?.length) {
+    return buildNearbyFilterFromSnapshot(baseContext, options.nearbyMatchesSnapshot);
+  }
+
+  if (!options.skipLiveLookup) {
+    try {
+      const liveMatches = await resolveLiveNearbyRestaurantMatches(supabase, location);
+      if (liveMatches.length > 0) {
+        const matches: NearbyRestaurantMatch[] = liveMatches.map((match) => ({
+          restaurantId: match.restaurantId,
+          restaurantName: match.restaurantName,
+          distanceMiles: match.distanceMiles,
+          latitude: match.latitude,
+          longitude: match.longitude,
+        }));
+        return buildNearbyFilterContext(baseContext, 'google_places_live', matches);
+      }
+    } catch (error) {
+      baseContext.error = error instanceof Error ? error.message : String(error);
     }
-  } catch (error) {
-    baseContext.error = error instanceof Error ? error.message : String(error);
   }
 
   try {
@@ -3184,6 +3218,47 @@ function prepareSearchContext(searchParams: SearchParams): PreparedSearchContext
 
 function encodeSearchKey(params: SearchParams): string {
   return Buffer.from(JSON.stringify(params), 'utf8').toString('base64url');
+}
+
+function buildNearbyMatchesSnapshot(
+  nearbyFilter: NearbyFilterContext,
+): SearchParams['nearbyMatchesSnapshot'] | undefined {
+  if (!nearbyFilter.requested || nearbyFilter.matches.length === 0) {
+    return undefined;
+  }
+
+  return nearbyFilter.matches
+    .filter(
+      (match): match is NearbyRestaurantMatch & { latitude: number; longitude: number } =>
+        match.latitude !== undefined && match.longitude !== undefined,
+    )
+    .map((match) => ({
+      restaurantId: match.restaurantId,
+      restaurantName: match.restaurantName,
+      distanceMiles: match.distanceMiles,
+      latitude: match.latitude,
+      longitude: match.longitude,
+    }));
+}
+
+function buildSearchKeyWithNearbySnapshot(
+  prepared: PreparedSearchContext,
+  nearbyFilter: NearbyFilterContext,
+  isPagination?: boolean,
+): string {
+  if (isPagination || prepared.originalParams.nearbyMatchesSnapshot?.length) {
+    return prepared.searchKey;
+  }
+
+  const snapshot = buildNearbyMatchesSnapshot(nearbyFilter);
+  if (!snapshot) {
+    return prepared.searchKey;
+  }
+
+  return encodeSearchKey({
+    ...prepared.originalParams,
+    nearbyMatchesSnapshot: snapshot,
+  });
 }
 
 function decodeSearchKey(searchKey: string): SearchParams | null {

@@ -4,6 +4,7 @@ import { normalizeRestaurantName } from '@/lib/restaurant-resolver';
 
 const PLACES_BASE = 'https://places.googleapis.com/v1';
 const CACHE_TYPE = 'live_brand_nearby_v1';
+const AGGREGATE_CACHE_TYPE = 'live_brand_nearby_aggregate_v1';
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const MISS_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const BRAND_SEARCH_CONCURRENCY = 12;
@@ -31,6 +32,7 @@ type CachedBrandPlace = {
 };
 
 const memoryCache = new Map<string, { expiresAt: number; value: CachedBrandPlace }>();
+const aggregateMemoryCache = new Map<string, { expiresAt: number; matches: LiveNearbyRestaurantMatch[] }>();
 
 function getApiKey(): string | null {
   const key = process.env.GOOGLE_PLACES_API_KEY?.trim();
@@ -43,6 +45,92 @@ function buildLocationBucket(lat: number, lng: number, radiusMiles: number): str
 
 function buildCacheKey(bucket: string, brandName: string): string {
   return `${CACHE_TYPE}:${bucket}:${normalizeRestaurantName(brandName)}`;
+}
+
+function buildAggregateCacheKey(bucket: string): string {
+  return `${AGGREGATE_CACHE_TYPE}:${bucket}`;
+}
+
+function readAggregateMemoryCache(bucket: string): LiveNearbyRestaurantMatch[] | null {
+  const hit = aggregateMemoryCache.get(buildAggregateCacheKey(bucket));
+  if (hit && hit.expiresAt > Date.now()) {
+    return hit.matches;
+  }
+  return null;
+}
+
+function writeAggregateMemoryCache(bucket: string, matches: LiveNearbyRestaurantMatch[]) {
+  aggregateMemoryCache.set(buildAggregateCacheKey(bucket), {
+    expiresAt: Date.now() + CACHE_TTL_MS,
+    matches,
+  });
+}
+
+async function readAggregateSupabaseCache(
+  _supabase: SupabaseClient,
+  bucket: string,
+): Promise<LiveNearbyRestaurantMatch[] | null> {
+  try {
+    const { createAdminClient } = await import('@/utils/supabase/admin');
+    const admin = createAdminClient();
+    const nowIso = new Date().toISOString();
+    const { data, error } = await admin
+      .from('cache_entries')
+      .select('results_json')
+      .eq('cache_key', buildAggregateCacheKey(bucket))
+      .eq('cache_type', AGGREGATE_CACHE_TYPE)
+      .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
+      .maybeSingle();
+
+    if (error || !data?.results_json) {
+      return null;
+    }
+
+    const payload = data.results_json as { matches?: LiveNearbyRestaurantMatch[] };
+    return Array.isArray(payload.matches) ? payload.matches : null;
+  } catch {
+    return null;
+  }
+}
+
+async function writeAggregateSupabaseCache(
+  supabase: SupabaseClient,
+  bucket: string,
+  matches: LiveNearbyRestaurantMatch[],
+): Promise<void> {
+  try {
+    const { createAdminClient } = await import('@/utils/supabase/admin');
+    const admin = createAdminClient();
+    const expiresAt = new Date(Date.now() + CACHE_TTL_MS).toISOString();
+    const cacheKey = buildAggregateCacheKey(bucket);
+
+    const { data: existing } = await admin
+      .from('cache_entries')
+      .select('id')
+      .eq('cache_key', cacheKey)
+      .eq('cache_type', AGGREGATE_CACHE_TYPE)
+      .maybeSingle();
+
+    const row = {
+      cache_key: cacheKey,
+      cache_type: AGGREGATE_CACHE_TYPE,
+      results_json: { matches },
+      expires_at: expiresAt,
+      hit_count: 0,
+    };
+
+    if (existing?.id) {
+      await admin.from('cache_entries').update(row).eq('id', existing.id);
+      return;
+    }
+
+    await admin.from('cache_entries').insert(row);
+  } catch (error) {
+    console.warn(
+      '[google-places-nearby] Aggregate cache write skipped:',
+      error instanceof Error ? error.message : error,
+    );
+  }
 }
 
 async function buildRestaurantIndex(supabase: SupabaseClient): Promise<RestaurantIndexEntry[]> {
@@ -210,6 +298,18 @@ export async function resolveLiveNearbyRestaurantMatches(
     return [];
   }
 
+  const bucket = buildLocationBucket(location.lat, location.lng, location.radiusMiles);
+  const memoryHit = readAggregateMemoryCache(bucket);
+  if (memoryHit) {
+    return memoryHit;
+  }
+
+  const supabaseHit = await readAggregateSupabaseCache(supabase, bucket);
+  if (supabaseHit) {
+    writeAggregateMemoryCache(bucket, supabaseHit);
+    return supabaseHit;
+  }
+
   const restaurantIndex = await buildRestaurantIndex(supabase);
   if (restaurantIndex.length === 0) {
     return [];
@@ -253,5 +353,8 @@ export async function resolveLiveNearbyRestaurantMatches(
     }
   }
 
-  return matches.sort((a, b) => a.distanceMiles - b.distanceMiles);
+  const sortedMatches = matches.sort((a, b) => a.distanceMiles - b.distanceMiles);
+  writeAggregateMemoryCache(bucket, sortedMatches);
+  void writeAggregateSupabaseCache(supabase, bucket, sortedMatches);
+  return sortedMatches;
 }

@@ -96,4 +96,12 @@ export interface SearchParams {
   isPagination?: boolean;
   isHomepage?: boolean;
   calorieMode?: "UNDER" | "OVER";
+  /** Frozen nearby restaurant matches from the first page — reused on pagination. */
+  nearbyMatchesSnapshot?: Array<{
+    restaurantId?: string;
+    restaurantName: string;
+    distanceMiles: number;
+    latitude: number;
+    longitude: number;
+  }>;
 }

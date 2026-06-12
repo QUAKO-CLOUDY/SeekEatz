@@ -1672,15 +1672,25 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           searchKey: workingContext.searchKey,
           offset: workingContext.nextOffset,
           limit: CHAT_MEALS_PAGE_SIZE,
+          isPagination: true,
         };
 
-        const response = await authenticatedFetch('/api/search', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+        let response: Response;
+        try {
+          response = await authenticatedFetch('/api/search', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+            signal: controller.signal,
+          });
+        } finally {
+          clearTimeout(timeoutId);
+        }
 
         if (!response.ok) {
           const errorText = await response.text();
@@ -1780,7 +1790,12 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       }));
     } catch (err) {
       console.error('Error loading more meals:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load more meals';
+      const errorMessage =
+        err instanceof Error && err.name === 'AbortError'
+          ? 'Request timed out. Please try again.'
+          : err instanceof Error
+            ? err.message
+            : 'Failed to load more meals';
       setError(errorMessage);
     } finally {
       setIsLoading(false);

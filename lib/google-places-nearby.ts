@@ -246,7 +246,12 @@ export async function resolveLiveNearbyRestaurantMatches(
     },
   );
 
-  return brandResults
-    .filter((match): match is LiveNearbyRestaurantMatch => match !== null)
-    .sort((a, b) => a.distanceMiles - b.distanceMiles);
+  const matches: LiveNearbyRestaurantMatch[] = [];
+  for (const match of brandResults) {
+    if (match !== null) {
+      matches.push(match);
+    }
+  }
+
+  return matches.sort((a, b) => a.distanceMiles - b.distanceMiles);
 }

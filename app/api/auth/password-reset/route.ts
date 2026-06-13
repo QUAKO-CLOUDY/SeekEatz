@@ -110,7 +110,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const resetLink = data.properties?.action_link;
+    const hashedToken = data.properties?.hashed_token;
+    const resetLink = hashedToken
+      ? `${redirectTo}?token_hash=${encodeURIComponent(hashedToken)}&type=recovery`
+      : data.properties?.action_link;
     if (!resetLink) {
       console.error("[password-reset] generateLink returned no action_link");
       return NextResponse.json(
@@ -130,6 +133,14 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    if (error instanceof Error && error.message.includes("Supabase admin client is not configured")) {
+      console.error("[password-reset] missing SUPABASE_SERVICE_ROLE_KEY");
+      return NextResponse.json(
+        { ok: false, error: "Password reset is temporarily unavailable. Please contact support." },
+        { status: 503 },
+      );
+    }
+
     console.error("[password-reset] unexpected error:", error);
     return NextResponse.json(
       { ok: false, error: "Could not send reset link. Please try again." },

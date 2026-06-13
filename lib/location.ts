@@ -104,12 +104,35 @@ export async function ensureSearchLocation(): Promise<StoredLocation | null> {
     return pendingLocationRequest;
   }
 
-  markPromptedForSearchLocation();
-  pendingLocationRequest = requestAndStoreLocation();
+  pendingLocationRequest = (async () => {
+    try {
+      return await requestAndStoreLocation();
+    } finally {
+      markPromptedForSearchLocation();
+      pendingLocationRequest = null;
+    }
+  })();
 
-  try {
-    return await pendingLocationRequest;
-  } finally {
-    pendingLocationRequest = null;
+  return pendingLocationRequest;
+}
+
+export function clearLocationSearchPrompt(): void {
+  if (typeof window === "undefined") {
+    return;
   }
+
+  window.localStorage.removeItem(LOCATION_SEARCH_PROMPTED_KEY);
+}
+
+export async function refreshSearchLocation(): Promise<StoredLocation | null> {
+  clearLocationSearchPrompt();
+  return requestAndStoreLocation();
+}
+
+export function getLocationAccessState(): "enabled" | "disabled" | "unsupported" {
+  if (typeof window === "undefined" || !navigator.geolocation) {
+    return "unsupported";
+  }
+
+  return getStoredLocation() ? "enabled" : "disabled";
 }

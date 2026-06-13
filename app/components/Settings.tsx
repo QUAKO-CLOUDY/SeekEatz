@@ -19,6 +19,7 @@ import {
   Save,
   X,
   ArrowLeft,
+  MapPin,
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Switch } from './ui/switch';
@@ -44,6 +45,10 @@ import {
 } from '@/lib/billing/revenuecat-client';
 import { isRevenueCatConfigured } from '@/lib/billing/apple-products';
 import { isNativeApp } from '@/lib/native-runtime';
+import {
+  getLocationAccessState,
+  refreshSearchLocation,
+} from '@/lib/location';
 
 type Props = {
   userProfile: UserProfile;
@@ -84,6 +89,9 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [saveSuccessMessage, setSaveSuccessMessage] = useState<string | null>(null);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [locationAccessState, setLocationAccessState] = useState<'enabled' | 'disabled' | 'unsupported'>('disabled');
+  const [isRefreshingLocation, setIsRefreshingLocation] = useState(false);
+  const [locationMessage, setLocationMessage] = useState<string | null>(null);
   const { entitlement, refresh: refreshEntitlement, setEntitlement } = useAccountEntitlement(true);
 
   // Helper function to safely convert number to database value (handles undefined/null/NaN)
@@ -246,6 +254,34 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
       cancelled = true;
     };
   }, [userId, userEmail, setEntitlement]);
+
+  useEffect(() => {
+    setLocationAccessState(getLocationAccessState());
+  }, []);
+
+  const handleEnableLocation = async () => {
+    setLocationMessage(null);
+    setIsRefreshingLocation(true);
+
+    try {
+      const location = await refreshSearchLocation();
+      const nextState = getLocationAccessState();
+      setLocationAccessState(nextState);
+
+      if (location) {
+        setLocationMessage('Location enabled. Nearby meal search is now active.');
+        return;
+      }
+
+      setLocationMessage(
+        isNativeApp()
+          ? 'Location is still off. Open your device Settings, find SeekEatz, and set Location to While Using the App. Then return here and tap Enable Location again.'
+          : 'Location access was not granted. Allow location in your browser site settings, then tap Enable Location again.',
+      );
+    } finally {
+      setIsRefreshingLocation(false);
+    }
+  };
 
   // Load user profile data from Supabase on mount and when component becomes visible
   useEffect(() => {
@@ -1257,6 +1293,63 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
                 <div className={`size-3 rounded-full ${isDarkTheme ? 'bg-sky-500' : 'bg-border'}`}></div>
               </div>
             </button>
+          </div>
+        </div>
+
+        {/* Location Section */}
+        <div className="rounded-2xl border border-border/70 bg-card p-6 shadow-sm">
+          <div className="mb-4 flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-base font-semibold text-foreground">Location Services</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Used to show restaurants and meals near you on Home and AI Chat.
+              </p>
+            </div>
+            <div className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${
+              locationAccessState === 'enabled'
+                ? 'bg-emerald-500/10 text-emerald-600'
+                : 'bg-muted text-muted-foreground'
+            }`}>
+              <MapPin className="size-4" />
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-border/70 bg-background/60 p-4">
+            <p className="text-sm font-medium text-foreground">
+              {locationAccessState === 'enabled'
+                ? 'Location enabled'
+                : locationAccessState === 'unsupported'
+                  ? 'Location not supported on this device'
+                  : 'Location disabled'}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {locationAccessState === 'enabled'
+                ? 'Nearby search will use your current area when you look for meals.'
+                : 'Enable location to filter meal results to restaurants around you.'}
+            </p>
+
+            {locationAccessState !== 'unsupported' && (
+              <Button
+                type="button"
+                onClick={handleEnableLocation}
+                disabled={isRefreshingLocation}
+                className="mt-4 h-10 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 px-5 text-sm font-medium text-white hover:from-cyan-600 hover:to-blue-700 disabled:opacity-60"
+              >
+                {isRefreshingLocation
+                  ? 'Checking location...'
+                  : locationAccessState === 'enabled'
+                    ? 'Update Location'
+                    : 'Enable Location'}
+              </Button>
+            )}
+
+            {locationMessage && (
+              <p className={`mt-3 text-sm ${
+                locationAccessState === 'enabled' ? 'text-emerald-600' : 'text-amber-700'
+              }`}>
+                {locationMessage}
+              </p>
+            )}
           </div>
         </div>
 

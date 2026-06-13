@@ -26,6 +26,10 @@ interface RestaurantMeta {
 export type NearbyDistanceHints = {
   byRestaurantId: Map<string, number>;
   byRestaurantName: Map<string, number>;
+  byRestaurantCoords?: {
+    byRestaurantId: Map<string, { latitude: number; longitude: number }>;
+    byRestaurantName: Map<string, { latitude: number; longitude: number }>;
+  };
 };
 
 export class ResponseFormatter {
@@ -85,23 +89,41 @@ export class ResponseFormatter {
     const restaurantMeta = this.restaurantCache.get(item.restaurant_id) ?? {};
     const restaurantName = item.restaurant_name || restaurantMeta.name || '';
     const restaurantLogoUrl = restaurantMeta.logo_url;
-    const latitude = restaurantMeta.latitude;
-    const longitude = restaurantMeta.longitude;
-    let distance =
-      userLocation && latitude !== undefined && longitude !== undefined
-        ? calculateDistanceMiles(
-            { latitude: userLocation.lat, longitude: userLocation.lng },
-            { latitude, longitude }
-          )
-        : undefined;
+    const normalizedRestaurantName = restaurantName.trim().toLowerCase();
 
-    if (distance === undefined && nearbyDistances) {
+    let distance: number | undefined;
+    let latitude: number | undefined;
+    let longitude: number | undefined;
+
+    if (nearbyDistances) {
       if (item.restaurant_id) {
         distance = nearbyDistances.byRestaurantId.get(item.restaurant_id);
+        const coords = nearbyDistances.byRestaurantCoords?.byRestaurantId.get(item.restaurant_id);
+        if (coords) {
+          latitude = coords.latitude;
+          longitude = coords.longitude;
+        }
       }
-      if (distance === undefined && restaurantName) {
-        distance = nearbyDistances.byRestaurantName.get(restaurantName.trim().toLowerCase());
+      if (distance === undefined && normalizedRestaurantName) {
+        distance = nearbyDistances.byRestaurantName.get(normalizedRestaurantName);
+        const coords = nearbyDistances.byRestaurantCoords?.byRestaurantName.get(normalizedRestaurantName);
+        if (coords) {
+          latitude = coords.latitude;
+          longitude = coords.longitude;
+        }
       }
+    }
+
+    if (distance === undefined && userLocation && restaurantMeta.latitude !== undefined && restaurantMeta.longitude !== undefined) {
+      distance = calculateDistanceMiles(
+        { latitude: userLocation.lat, longitude: userLocation.lng },
+        { latitude: restaurantMeta.latitude, longitude: restaurantMeta.longitude }
+      );
+      latitude = restaurantMeta.latitude;
+      longitude = restaurantMeta.longitude;
+    } else if (latitude === undefined && restaurantMeta.latitude !== undefined) {
+      latitude = restaurantMeta.latitude;
+      longitude = restaurantMeta.longitude;
     }
 
     const meal: Meal = {

@@ -676,7 +676,9 @@ export async function retrieveMealsWithClient(
   const hasNoLocalRestaurantCoverage =
     nearbyFilter.requested && nearbyFilter.matches.length === 0;
 
-  if (ranked.length === 0 && hasNoLocalRestaurantCoverage) {
+  const allowOutsideRadiusFallback = nearbyFilter.requested && !macroOnlyHomeFiltering;
+
+  if (ranked.length === 0 && hasNoLocalRestaurantCoverage && allowOutsideRadiusFallback) {
     const outsideRadiusDeterministic = applyPostRetrievalFilters(
       applyRestaurantScopeFilters(deterministicSearch.results, { includeNearby: false }),
       parsed,
@@ -709,7 +711,7 @@ export async function retrieveMealsWithClient(
     }
   }
 
-  if (ranked.length === 0 && hasNoLocalRestaurantCoverage) {
+  if (ranked.length === 0 && hasNoLocalRestaurantCoverage && allowOutsideRadiusFallback) {
     const fallbackDeterministicCandidates = nearbyFilter.requested
       ? applyRestaurantScopeFilters(deterministicSearch.results, { includeNearby: false })
       : deterministicResults;
@@ -783,9 +785,27 @@ export async function retrieveMealsWithClient(
         byRestaurantName: new Map(
           [...nearbyFilter.byRestaurantName.entries()].map(([name, match]) => [name, match.distanceMiles])
         ),
+        byRestaurantCoords: {
+          byRestaurantId: new Map(
+            [...nearbyFilter.byRestaurantId.entries()]
+              .filter(([, match]) => match.latitude !== undefined && match.longitude !== undefined)
+              .map(([id, match]) => [id, { latitude: match.latitude!, longitude: match.longitude! }])
+          ),
+          byRestaurantName: new Map(
+            [...nearbyFilter.byRestaurantName.entries()]
+              .filter(([, match]) => match.latitude !== undefined && match.longitude !== undefined)
+              .map(([name, match]) => [name, { latitude: match.latitude!, longitude: match.longitude! }])
+          ),
+        },
       }
     : undefined;
-  const meals = await formatter.format(paged, formatterLocation, nearbyDistances);
+  let meals = await formatter.format(paged, formatterLocation, nearbyDistances);
+
+  if (nearbyFilter.requested && nearbyFilter.radiusMiles) {
+    meals = meals.filter(
+      (meal) => meal.distance === undefined || meal.distance <= nearbyFilter.radiusMiles!
+    );
+  }
   const hasMore = offset + limit < totalCount;
   const nextOffset = hasMore ? offset + limit : offset;
 

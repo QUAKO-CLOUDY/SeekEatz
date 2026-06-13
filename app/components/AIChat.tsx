@@ -12,6 +12,7 @@ import { useChat } from "../contexts/ChatContext";
 import { getGuestSessionId, getGuestChatMessages, saveGuestChatMessages, touchGuestActivity, clearGuestSession } from "@/lib/guest-session";
 import { getRestaurantLogoUrl } from "@/lib/image-utils";
 import { getStoredLocation, ensureSearchLocation, resetPendingLocationRequest } from "@/lib/location";
+import { APP_SUSPEND_RESUME_EVENT } from "@/lib/app-suspend-recovery";
 import { extractMacroConstraintsFromText } from "@/lib/extractMacroConstraintsFromText";
 import { UpgradeModal } from "./UpgradeModal";
 import {
@@ -522,10 +523,15 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       }
     };
 
+    const handleSuspendResume = () => {
+      resetChatRequestState('js-resumed');
+    };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('pageshow', handlePageShow);
     window.addEventListener('focus', handleFocus);
     window.addEventListener('seekeatz:app-state', handleNativeAppState as EventListener);
+    window.addEventListener(APP_SUSPEND_RESUME_EVENT, handleSuspendResume);
 
     // Poll visibility — WKWebView does not always emit visibilitychange on resume.
     const pollId = window.setInterval(() => {
@@ -546,6 +552,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       window.removeEventListener('pageshow', handlePageShow);
       window.removeEventListener('focus', handleFocus);
       window.removeEventListener('seekeatz:app-state', handleNativeAppState as EventListener);
+      window.removeEventListener(APP_SUSPEND_RESUME_EVENT, handleSuspendResume);
       window.clearInterval(pollId);
     };
   }, [resetChatRequestState]);

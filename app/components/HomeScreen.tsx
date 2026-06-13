@@ -13,7 +13,8 @@ import { normalizeMacros } from "@/lib/macro-utils";
 import { motion } from "framer-motion";
 import { AnimatedNumber } from "./AnimatedNumber";
 import { diversifyMealsByRestaurant } from "@/lib/restaurant-diversity";
-import { getStoredLocation, ensureSearchLocation } from "@/lib/location";
+import { getStoredLocation, ensureSearchLocation, resetPendingLocationRequest } from "@/lib/location";
+import { APP_SUSPEND_RESUME_EVENT } from "@/lib/app-suspend-recovery";
 import { SearchRadiusSelect } from "./SearchRadiusSelect";
 import {
   Popover,
@@ -289,6 +290,36 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   const containerRef = useRef<HTMLDivElement>(null);
   const mealsSectionRef = useRef<HTMLDivElement>(null);
   const hasRestoredScrollRef = useRef(false);
+  const homeSearchAbortRef = useRef<AbortController | null>(null);
+  const isLoadingMealsRef = useRef(isLoadingMeals);
+
+  useEffect(() => {
+    isLoadingMealsRef.current = isLoadingMeals;
+  }, [isLoadingMeals]);
+
+  const resetHomeSearchState = useCallback((reason: string) => {
+    console.log(`[HomeScreen] resetHomeSearchState (${reason})`);
+    resetPendingLocationRequest();
+    if (homeSearchAbortRef.current) {
+      try {
+        homeSearchAbortRef.current.abort();
+      } catch {
+        // ignore
+      }
+      homeSearchAbortRef.current = null;
+    }
+    setIsLoadingMeals(false);
+  }, []);
+
+  useEffect(() => {
+    const handleSuspendResume = () => {
+      resetHomeSearchState('js-resumed');
+    };
+    window.addEventListener(APP_SUSPEND_RESUME_EVENT, handleSuspendResume);
+    return () => {
+      window.removeEventListener(APP_SUSPEND_RESUME_EVENT, handleSuspendResume);
+    };
+  }, [resetHomeSearchState]);
   
   // Prevent browser scroll restoration
   useEffect(() => {
@@ -599,7 +630,15 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     locationOverride?: { latitude: number; longitude: number } | null
   ): Promise<SearchMealsResponse> => {
     void _append;
+    if (homeSearchAbortRef.current) {
+      try {
+        homeSearchAbortRef.current.abort();
+      } catch {
+        // ignore
+      }
+    }
     const controller = new AbortController();
+    homeSearchAbortRef.current = controller;
     const timeoutId = setTimeout(() => controller.abort(), 25000); // 25s timeout so loading doesn't hang
     const effectiveLocation = locationOverride ?? userLocation;
 
@@ -688,6 +727,9 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       };
     } catch (error) {
       clearTimeout(timeoutId);
+      if (homeSearchAbortRef.current === controller) {
+        homeSearchAbortRef.current = null;
+      }
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error('timeout');
       }
@@ -766,6 +808,9 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   };
 
   const handleFindMeals = async () => {
+    if (isLoadingMeals) {
+      resetHomeSearchState('find-meals-retry');
+    }
     setIsLoadingMeals(true);
     setHasSearched(true);
     setSearchError(null);
@@ -902,6 +947,9 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   };
 
   const handleFindMoreMeals = async () => {
+    if (isLoadingMeals) {
+      resetHomeSearchState('load-more-retry');
+    }
     updateActivity();
     setIsLoadingMeals(true);
     setLoadMoreNotice(null);
@@ -1397,7 +1445,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
               <div className="mt-6 px-4 pb-24" style={{ paddingBottom: `calc(2rem + env(safe-area-inset-bottom, 0px))` }}>
                 <button
                   onClick={handleFindMoreMeals}
-                  disabled={isLoadingMeals || !canLoadMoreMeals}
+                  disabled={!canLoadMoreMeals}
                   className="w-full max-w-md mx-auto h-12 sm:h-14 rounded-2xl bg-muted border border-border text-sm sm:text-[15px] font-medium text-foreground flex items-center justify-center gap-2 hover:bg-muted/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoadingMeals ? (

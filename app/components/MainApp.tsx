@@ -44,6 +44,7 @@ import {
   migrateLegacyLoggedMealsStorage,
 } from '@/lib/logged-meals-storage';
 import { clearChatState } from '@/lib/chatStorage';
+import { startAppSuspendRecovery } from '@/lib/app-suspend-recovery';
 
 type View = 'main' | 'meal-detail';
 
@@ -374,6 +375,7 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     startTransition(() => {
       setIsMounted(true);
     });
+    startAppSuspendRecovery();
   }, []);
 
   // Send unauthenticated users to the single (white) "Welcome Back" sign-in

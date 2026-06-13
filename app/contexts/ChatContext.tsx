@@ -38,7 +38,7 @@ const ChatContext = createContext<ChatContextValue | undefined>(undefined);
 
 const INACTIVITY_TIMEOUT_MS = 45 * 60 * 1000; // 45 minutes
 const INACTIVITY_CHECK_INTERVAL_MS = 60 * 1000; // Check every 60 seconds
-const STALE_LOADING_TIMEOUT_MS = 2 * 60 * 1000; // Reset stuck spinner after 2 minutes
+const STALE_LOADING_TIMEOUT_MS = 30 * 1000; // Reset stuck spinner after 30 seconds
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
   const loadingSinceRef = React.useRef<number | null>(null);

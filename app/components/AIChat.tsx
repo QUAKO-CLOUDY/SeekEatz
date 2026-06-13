@@ -446,14 +446,19 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const abortControllerRef = useRef<AbortController | null>(null);
   const loadingStartedAtRef = useRef<number | null>(null);
   const hiddenAtRef = useRef<number | null>(null);
+  const isLoadingRef = useRef(isLoading);
+  const prevVisibilityRef = useRef(
+    typeof document !== 'undefined' ? document.visibilityState : 'visible'
+  );
   const [isAtBottom, setIsAtBottom] = useState(true);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  const clearStaleLoadingState = useCallback((reason: string) => {
-    if (!isLoading && !abortControllerRef.current) {
-      return;
-    }
-    console.log(`[AIChat] Clearing stale loading state (${reason})`);
+  useEffect(() => {
+    isLoadingRef.current = isLoading;
+  }, [isLoading]);
+
+  const resetChatRequestState = useCallback((reason: string) => {
+    console.log(`[AIChat] resetChatRequestState (${reason})`);
     resetPendingLocationRequest();
     if (abortControllerRef.current) {
       try {
@@ -465,7 +470,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     }
     loadingStartedAtRef.current = null;
     setIsLoading(false);
-  }, [isLoading, setIsLoading]);
+  }, [setIsLoading]);
 
   // Safety: Reset isLoading on mount in case a previous in-flight request
   // was killed by a browser refresh (the finally block never ran).
@@ -478,59 +483,72 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Mobile WebViews often preserve React state without remounting after the app
-  // is backgrounded/killed. In-flight fetches may never reach finally(), leaving
-  // isLoading stuck true. Clear stale loading when the app resumes.
+  // Mobile WebViews (especially iOS React Native) often suspend JS without firing
+  // visibility events reliably. Abort in-flight work when backgrounded so the UI
+  // is never stuck on "Thinking..." when the user returns.
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
         hiddenAtRef.current = Date.now();
+        resetChatRequestState('visibility-hidden');
         return;
       }
-      if (document.visibilityState !== 'visible') {
-        return;
-      }
-      const hiddenMs = hiddenAtRef.current ? Date.now() - hiddenAtRef.current : 0;
-      const loadingAge = loadingStartedAtRef.current
-        ? Date.now() - loadingStartedAtRef.current
-        : 0;
       hiddenAtRef.current = null;
-      if (
-        isLoading &&
-        (hiddenMs >= 500 || loadingAge >= 15000 || !abortControllerRef.current)
-      ) {
-        clearStaleLoadingState('app-resume');
+      if (isLoadingRef.current) {
+        resetChatRequestState('visibility-visible');
       }
     };
 
     const handlePageShow = () => {
-      const loadingAge = loadingStartedAtRef.current
-        ? Date.now() - loadingStartedAtRef.current
-        : 0;
-      if (isLoading && (loadingAge >= 5000 || !abortControllerRef.current)) {
-        clearStaleLoadingState('pageshow');
+      if (isLoadingRef.current) {
+        resetChatRequestState('pageshow');
       }
     };
 
     const handleFocus = () => {
-      const loadingAge = loadingStartedAtRef.current
-        ? Date.now() - loadingStartedAtRef.current
-        : 0;
-      if (isLoading && loadingAge >= 15000) {
-        clearStaleLoadingState('window-focus');
+      if (isLoadingRef.current) {
+        resetChatRequestState('window-focus');
+      }
+    };
+
+    const handleNativeAppState = (event: Event) => {
+      const state = (event as CustomEvent<{ state?: string }>).detail?.state;
+      if (state === 'background' || state === 'inactive') {
+        resetChatRequestState('native-background');
+        return;
+      }
+      if (state === 'active' && isLoadingRef.current) {
+        resetChatRequestState('native-active');
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('pageshow', handlePageShow);
     window.addEventListener('focus', handleFocus);
+    window.addEventListener('seekeatz:app-state', handleNativeAppState as EventListener);
+
+    // Poll visibility — WKWebView does not always emit visibilitychange on resume.
+    const pollId = window.setInterval(() => {
+      const current = document.visibilityState;
+      const previous = prevVisibilityRef.current;
+      if (current !== previous) {
+        prevVisibilityRef.current = current;
+        if (current === 'hidden') {
+          resetChatRequestState('visibility-poll-hidden');
+        } else if (isLoadingRef.current) {
+          resetChatRequestState('visibility-poll-visible');
+        }
+      }
+    }, 400);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('pageshow', handlePageShow);
       window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('seekeatz:app-state', handleNativeAppState as EventListener);
+      window.clearInterval(pollId);
     };
-  }, [isLoading, clearStaleLoadingState]);
+  }, [resetChatRequestState]);
 
   // Watchdog: if loading exceeds the request timeout, force-reset even without
   // visibility events (common in native WebView shells).
@@ -545,14 +563,14 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         : 0;
       if (loadingAge >= 46000) {
         setError('Request timed out. Please try again.');
-        clearStaleLoadingState('loading-watchdog');
+        resetChatRequestState('loading-watchdog');
       }
     }, 5000);
 
     return () => {
       window.clearInterval(intervalId);
     };
-  }, [isLoading, clearStaleLoadingState]);
+  }, [isLoading, resetChatRequestState]);
 
   // User location state (for nearby meal filtering)
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(() => {
@@ -1240,7 +1258,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     }
 
     if (isLoading) {
-      clearStaleLoadingState('send-retry');
+      resetChatRequestState('send-retry');
     }
 
     if (quickPromptText) {
@@ -1733,7 +1751,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   // Handle quick prompt
   const sendQuickPrompt = async (promptText: string, visibleText?: string) => {
     if (isLoading) {
-      clearStaleLoadingState('quick-prompt-retry');
+      resetChatRequestState('quick-prompt-retry');
     }
 
     const userFacingText = visibleText?.trim() || promptText;
@@ -1762,7 +1780,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const loadMoreMeals = async (messageId: string, context: MealSearchContext) => {
     if (!context.hasMore) return;
     if (isLoading) {
-      clearStaleLoadingState('load-more-retry');
+      resetChatRequestState('load-more-retry');
     }
 
     // Record activity when user loads more meals
@@ -2062,7 +2080,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
                           loadMoreMeals(m.id, m.mealSearchContext);
                         }
                       }}
-                      disabled={isLoading}
+                      disabled={showUpgradeModal}
                       className="px-3 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-lg text-xs font-medium transition-all disabled:cursor-not-allowed"
                     >
                       {isLoading ? 'Loading...' : 'Load more meals'}

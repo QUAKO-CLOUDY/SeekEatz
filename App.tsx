@@ -756,6 +756,9 @@ export default function App() {
       const wasBackground = appStateRef.current.match(/inactive|background/);
       appStateRef.current = nextAppState;
 
+      const lifecycleScript = `(function(){try{window.dispatchEvent(new CustomEvent('seekeatz:app-state',{detail:{state:${JSON.stringify(nextAppState)}}}));}catch(_){}})();true;`;
+      webViewRef.current?.injectJavaScript(lifecycleScript);
+
       if (wasBackground && nextAppState === "active") {
         void syncSchedules();
         void maybeScheduleProgressReminder(snapshotRef.current);

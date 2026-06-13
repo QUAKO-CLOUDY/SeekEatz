@@ -38,8 +38,11 @@ const ChatContext = createContext<ChatContextValue | undefined>(undefined);
 
 const INACTIVITY_TIMEOUT_MS = 45 * 60 * 1000; // 45 minutes
 const INACTIVITY_CHECK_INTERVAL_MS = 60 * 1000; // Check every 60 seconds
+const STALE_LOADING_TIMEOUT_MS = 2 * 60 * 1000; // Reset stuck spinner after 2 minutes
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
+  const loadingSinceRef = React.useRef<number | null>(null);
+
   // Initialize state from sessionStorage
   const [state, setState] = useState<ChatState>(() => {
     if (typeof window === 'undefined') {
@@ -147,11 +150,24 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
         if (timeSinceActivity > INACTIVITY_TIMEOUT_MS && prev.messages.length > 0) {
           // Clear chat due to inactivity
           clearChatState();
+          loadingSinceRef.current = null;
           return {
             messages: [],
             visibleMealsCount: {},
             isLoading: false,
             lastActiveAt: Date.now(),
+          };
+        }
+
+        if (
+          prev.isLoading &&
+          loadingSinceRef.current &&
+          now - loadingSinceRef.current > STALE_LOADING_TIMEOUT_MS
+        ) {
+          loadingSinceRef.current = null;
+          return {
+            ...prev,
+            isLoading: false,
           };
         }
 
@@ -192,6 +208,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   }, [updateActivity]);
 
   const setIsLoading = useCallback((loading: boolean) => {
+    loadingSinceRef.current = loading ? Date.now() : null;
     setState(prev => ({
       ...prev,
       isLoading: loading,
@@ -199,6 +216,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const clearChat = useCallback(() => {
+    loadingSinceRef.current = null;
     setState({
       messages: [],
       visibleMealsCount: {},

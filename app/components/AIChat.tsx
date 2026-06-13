@@ -11,7 +11,7 @@ import { useTheme } from "../contexts/ThemeContext";
 import { useChat } from "../contexts/ChatContext";
 import { getGuestSessionId, getGuestChatMessages, saveGuestChatMessages, touchGuestActivity, clearGuestSession } from "@/lib/guest-session";
 import { getRestaurantLogoUrl } from "@/lib/image-utils";
-import { getStoredLocation, ensureSearchLocation } from "@/lib/location";
+import { getStoredLocation, ensureSearchLocation, resetPendingLocationRequest } from "@/lib/location";
 import { extractMacroConstraintsFromText } from "@/lib/extractMacroConstraintsFromText";
 import { UpgradeModal } from "./UpgradeModal";
 import {
@@ -454,6 +454,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       return;
     }
     console.log(`[AIChat] Clearing stale loading state (${reason})`);
+    resetPendingLocationRequest();
     if (abortControllerRef.current) {
       try {
         abortControllerRef.current.abort();
@@ -469,6 +470,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   // Safety: Reset isLoading on mount in case a previous in-flight request
   // was killed by a browser refresh (the finally block never ran).
   useEffect(() => {
+    resetPendingLocationRequest();
     setIsLoading(false);
     // Also abort any lingering request (ref is reset on remount)
     abortControllerRef.current = null;
@@ -489,24 +491,66 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
         return;
       }
       const hiddenMs = hiddenAtRef.current ? Date.now() - hiddenAtRef.current : 0;
+      const loadingAge = loadingStartedAtRef.current
+        ? Date.now() - loadingStartedAtRef.current
+        : 0;
       hiddenAtRef.current = null;
-      if (hiddenMs >= 1000 && (isLoading || abortControllerRef.current)) {
+      if (
+        isLoading &&
+        (hiddenMs >= 500 || loadingAge >= 15000 || !abortControllerRef.current)
+      ) {
         clearStaleLoadingState('app-resume');
       }
     };
 
     const handlePageShow = () => {
-      if (isLoading || abortControllerRef.current) {
+      const loadingAge = loadingStartedAtRef.current
+        ? Date.now() - loadingStartedAtRef.current
+        : 0;
+      if (isLoading && (loadingAge >= 5000 || !abortControllerRef.current)) {
         clearStaleLoadingState('pageshow');
+      }
+    };
+
+    const handleFocus = () => {
+      const loadingAge = loadingStartedAtRef.current
+        ? Date.now() - loadingStartedAtRef.current
+        : 0;
+      if (isLoading && loadingAge >= 15000) {
+        clearStaleLoadingState('window-focus');
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('focus', handleFocus);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [isLoading, clearStaleLoadingState]);
+
+  // Watchdog: if loading exceeds the request timeout, force-reset even without
+  // visibility events (common in native WebView shells).
+  useEffect(() => {
+    if (!isLoading) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      const loadingAge = loadingStartedAtRef.current
+        ? Date.now() - loadingStartedAtRef.current
+        : 0;
+      if (loadingAge >= 46000) {
+        setError('Request timed out. Please try again.');
+        clearStaleLoadingState('loading-watchdog');
+      }
+    }, 5000);
+
+    return () => {
+      window.clearInterval(intervalId);
     };
   }, [isLoading, clearStaleLoadingState]);
 
@@ -1195,6 +1239,10 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       return;
     }
 
+    if (isLoading) {
+      clearStaleLoadingState('send-retry');
+    }
+
     if (quickPromptText) {
       activeQuickPromptRef.current = {
         promptText: quickPromptText,
@@ -1276,7 +1324,20 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
         const isMealIntent = isMealIntentQuery(trimmedText);
         const shouldRequestLocation = isMealIntent;
-        const resolvedLocation = await requestLocationForMealSearch(shouldRequestLocation);
+        const resolvedLocation = await Promise.race([
+          requestLocationForMealSearch(shouldRequestLocation),
+          new Promise<typeof userLocation>((resolve) => {
+            const timer = window.setTimeout(() => resolve(null), 8000);
+            abortController.signal.addEventListener(
+              'abort',
+              () => {
+                window.clearTimeout(timer);
+                resolve(null);
+              },
+              { once: true }
+            );
+          }),
+        ]);
 
         response = await authenticatedFetch('/api/chat', {
           method: 'POST',

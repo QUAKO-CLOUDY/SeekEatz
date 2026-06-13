@@ -9,6 +9,11 @@ const LOCATION_SEARCH_PROMPTED_KEY = "seekeatz_location_search_prompted";
 
 let pendingLocationRequest: Promise<StoredLocation | null> | null = null;
 
+/** Clears a stuck in-flight geolocation promise (e.g. after app background/kill). */
+export function resetPendingLocationRequest(): void {
+  pendingLocationRequest = null;
+}
+
 export function getStoredLocation(): StoredLocation | null {
   if (typeof window === "undefined") {
     return null;

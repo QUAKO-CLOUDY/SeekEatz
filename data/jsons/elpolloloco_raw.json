@@ -1,753 +1,1061 @@
 {
-    "restaurant_name": "El Pollo Loco",
-    "items": [
-      {
-        "name": "Queso Crunch Double Chicken Burrito Bowl",
-        "category": "Curated Bowls",
-        "price_estimate": null,
-        "macros": {
-          "calories": 1080,
-          "protein": 78,
-          "carbs": 96,
-          "fat": 43
-        }
-      },
-      {
-        "name": "Street Corn Double Chicken Burrito Bowl",
-        "category": "Curated Bowls",
-        "price_estimate": null,
-        "macros": {
-          "calories": 1080,
-          "protein": 75,
-          "carbs": 95,
-          "fat": 46
-        }
-      },
-      {
-        "name": "Chicken Leg",
-        "category": "FIRE-GRILLED CHICKEN",
-        "price_estimate": null,
-        "macros": {
-          "calories": 110,
-          "protein": 11,
-          "carbs": 0,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Chicken Thigh",
-        "category": "FIRE-GRILLED CHICKEN",
-        "price_estimate": null,
-        "macros": {
-          "calories": 200,
-          "protein": 21,
-          "carbs": 2,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Chicken Breast",
-        "category": "FIRE-GRILLED CHICKEN",
-        "price_estimate": null,
-        "macros": {
-          "calories": 200,
-          "protein": 34,
-          "carbs": 0,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Chicken Wing",
-        "category": "FIRE-GRILLED CHICKEN",
-        "price_estimate": null,
-        "macros": {
-          "calories": 70,
-          "protein": 10,
-          "carbs": 0,
-          "fat": 3
-        }
-      },
-      {
-        "name": "Pinto Beans (Small)",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 140,
-          "protein": 9,
-          "carbs": 25,
-          "fat": 0.5
-        }
-      },
-      {
-        "name": "Charro Beans (Small)",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 190,
-          "protein": 11,
-          "carbs": 23,
-          "fat": 6
-        }
-      },
-      {
-        "name": "Rice (Small)",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 160,
-          "protein": 3,
-          "carbs": 33,
-          "fat": 1.5
-        }
-      },
-      {
-        "name": "Mashed Potatoes with Gravy (Small)",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 100,
-          "protein": 3,
-          "carbs": 20,
-          "fat": 1.5
-        }
-      },
-      {
-        "name": "Macaroni & Cheese (Small)",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 310,
-          "protein": 9,
-          "carbs": 24,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Loco Side Salad",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 170,
-          "protein": 3,
-          "carbs": 8,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Coleslaw (Small)",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 130,
-          "protein": 1,
-          "carbs": 9,
-          "fat": 10
-        }
-      },
-      {
-        "name": "Corn (Small)",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 140,
-          "protein": 3,
-          "carbs": 27,
-          "fat": 4.5
-        }
-      },
-      {
-        "name": "Broccoli (Small)",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 30,
-          "protein": 2,
-          "carbs": 6,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Creamy Cilantro Dressing",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 310,
-          "protein": 1,
-          "carbs": 2,
-          "fat": 33
-        }
-      },
-      {
-        "name": "Ranch Dressing (packet)",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 190,
-          "protein": 1,
-          "carbs": 2,
-          "fat": 20
-        }
-      },
-      {
-        "name": "Citrus Vinaigrette",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 150,
-          "protein": 1,
-          "carbs": 18,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Creamy Chipotle Sauce",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 170,
-          "protein": 0,
-          "carbs": 1,
-          "fat": 18
-        }
-      },
-      {
-        "name": "Sour Cream",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 80,
-          "protein": 1,
-          "carbs": 1,
-          "fat": 7
-        }
-      },
-      {
-        "name": "Guacamole (small)",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 110,
-          "protein": 2,
-          "carbs": 7,
-          "fat": 10
-        }
-      },
-      {
-        "name": "Guacamole (regular)",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 220,
-          "protein": 3,
-          "carbs": 15,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Queso Blanco (small)",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 160,
-          "protein": 7,
-          "carbs": 3,
-          "fat": 14
-        }
-      },
-      {
-        "name": "Queso Blanco (regular)",
-        "category": "SIDES & SAUCES",
-        "price_estimate": null,
-        "macros": {
-          "calories": 320,
-          "protein": 14,
-          "carbs": 7,
-          "fat": 27
-        }
-      },
-      {
-        "name": "Classic Chicken Tostada",
-        "category": "TOSTADAS & SALADS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 830,
-          "protein": 41,
-          "carbs": 80,
-          "fat": 39
-        }
-      },
-      {
-        "name": "Double Chicken Tostada",
-        "category": "TOSTADAS & SALADS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 1000,
-          "protein": 65,
-          "carbs": 82,
-          "fat": 46
-        }
-      },
-      {
-        "name": "Double Chicken Avocado Salad",
-        "category": "TOSTADAS & SALADS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 350,
-          "protein": 50,
-          "carbs": 13,
-          "fat": 12
-        }
-      },
-      {
-        "name": "Citrus Avocado Fresca Salad",
-        "category": "TOSTADAS & SALADS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 360,
-          "protein": 52,
-          "carbs": 12,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Original Pollo Bowl",
-        "category": "BOWLS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 580,
-          "protein": 41,
-          "carbs": 83,
-          "fat": 10
-        }
-      },
-      {
-        "name": "Double Chicken Bowl",
-        "category": "BOWLS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 930,
-          "protein": 74,
-          "carbs": 87,
-          "fat": 33
-        }
-      },
-      {
-        "name": "Grande Avocado Chicken Bowl",
-        "category": "BOWLS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 790,
-          "protein": 49,
-          "carbs": 90,
-          "fat": 26
-        }
-      },
-      {
-        "name": "Chicken Avocado Taco",
-        "category": "TACOS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 330,
-          "protein": 24,
-          "carbs": 17,
-          "fat": 19
-        }
-      },
-      {
-        "name": "Taco al Carbon",
-        "category": "TACOS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 170,
-          "protein": 15,
-          "carbs": 17,
-          "fat": 5
-        }
-      },
-      {
-        "name": "Shredded Chicken Crunchy Taco",
-        "category": "TACOS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 210,
-          "protein": 14,
-          "carbs": 22,
-          "fat": 8
-        }
-      },
-      {
-        "name": "Guacamole Chicken Burrito",
-        "category": "BURRITOS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 920,
-          "protein": 59,
-          "carbs": 67,
-          "fat": 47
-        }
-      },
-      {
-        "name": "Chipotle Guacamole Chicken Burrito",
-        "category": "BURRITOS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 1020,
-          "protein": 61,
-          "carbs": 83,
-          "fat": 51
-        }
-      },
-      {
-        "name": "Queso Guacamole Chicken Burrito",
-        "category": "BURRITOS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 790,
-          "protein": 40,
-          "carbs": 90,
-          "fat": 31
-        }
-      },
-      {
-        "name": "Chipotle Chicken Quesadilla",
-        "category": "QUESADILLAS & NACHOS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 930,
-          "protein": 51,
-          "carbs": 54,
-          "fat": 57
-        }
-      },
-      {
-        "name": "Salsa Verde Chicken Quesadilla",
-        "category": "QUESADILLAS & NACHOS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 820,
-          "protein": 51,
-          "carbs": 54,
-          "fat": 44
-        }
-      },
-      {
-        "name": "Shredded Chicken Nachos",
-        "category": "QUESADILLAS & NACHOS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 1090,
-          "protein": 34,
-          "carbs": 94,
-          "fat": 65
-        }
-      },
-      {
-        "name": "Chips & Guacamole (small)",
-        "category": "SNACKS & SWEETS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 490,
-          "protein": 6,
-          "carbs": 49,
-          "fat": 32
-        }
-      },
-      {
-        "name": "Chips & Guacamole (regular)",
-        "category": "SNACKS & SWEETS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 980,
-          "protein": 11,
-          "carbs": 98,
-          "fat": 63
-        }
-      },
-      {
-        "name": "Chips & Queso Blanco (small)",
-        "category": "SNACKS & SWEETS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 540,
-          "protein": 11,
-          "carbs": 45,
-          "fat": 36
-        }
-      },
-      {
-        "name": "Chips & Queso Blanco (regular)",
-        "category": "SNACKS & SWEETS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 1080,
-          "protein": 22,
-          "carbs": 90,
-          "fat": 71
-        }
-      },
-      {
-        "name": "Tortilla Chips (side)",
-        "category": "SNACKS & SWEETS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 200,
-          "protein": 2,
-          "carbs": 22,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Tortilla Chips (small)",
-        "category": "SNACKS & SWEETS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 380,
-          "protein": 4,
-          "carbs": 42,
-          "fat": 22
-        }
-      },
-      {
-        "name": "Tortilla Chips (regular)",
-        "category": "SNACKS & SWEETS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 760,
-          "protein": 8,
-          "carbs": 83,
-          "fat": 44
-        }
-      },
-      {
-        "name": "Corn Tortillas (2)",
-        "category": "SNACKS & SWEETS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 90,
-          "protein": 2,
-          "carbs": 19,
-          "fat": 1
-        }
-      },
-      {
-        "name": "Flour Tortillas (2)",
-        "category": "SNACKS & SWEETS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 170,
-          "protein": 4,
-          "carbs": 27,
-          "fat": 5
-        }
-      },
-      {
-        "name": "Chicken Tortilla Soup",
-        "category": "SNACKS & SWEETS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 240,
-          "protein": 23,
-          "carbs": 19,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Original BRC Burrito",
-        "category": "SNACKS & SWEETS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 410,
-          "protein": 13,
-          "carbs": 63,
-          "fat": 11
-        }
-      },
-      {
-        "name": "Cinnamon Churro (1)",
-        "category": "SNACKS & SWEETS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 150,
-          "protein": 1,
-          "carbs": 15,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Cinnamon Churros (2)",
-        "category": "SNACKS & SWEETS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 300,
-          "protein": 3,
-          "carbs": 31,
-          "fat": 18
-        }
-      },
-      {
-        "name": "Caramel Flan Cup",
-        "category": "SNACKS & SWEETS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 230,
-          "protein": 10,
-          "carbs": 27,
-          "fat": 9
-        }
-      },
-      {
-        "name": "Tacos al Carbon (3) Combo",
-        "category": "FIRE-GRILLED COMBOS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 510,
-          "protein": 46,
-          "carbs": 50,
-          "fat": 15
-        }
-      },
-      {
-        "name": "Chicken Classic Burrito Combo",
-        "category": "FIRE-GRILLED COMBOS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 480,
-          "protein": 25,
-          "carbs": 66,
-          "fat": 13
-        }
-      },
-      {
-        "name": "Chicken Legs (2) Kids Meal",
-        "category": "KIDS MEALS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 220,
-          "protein": 22,
-          "carbs": 0,
-          "fat": 15
-        }
-      },
-      {
-        "name": "Salsa Fresca",
-        "category": "SALSAS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 5,
-          "protein": 0,
-          "carbs": 2,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Avocado Salsa",
-        "category": "SALSAS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 20,
-          "protein": 0,
-          "carbs": 1,
-          "fat": 1.5
-        }
-      },
-      {
-        "name": "Salsa Roja",
-        "category": "SALSAS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 15,
-          "protein": 0,
-          "carbs": 2,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Jalapeno Hot Sauce (packet)",
-        "category": "SALSAS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 5,
-          "protein": 0,
-          "carbs": 1,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Coca-Cola (Regular)",
-        "category": "DRINKS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 180,
-          "protein": 0,
-          "carbs": 48,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Horchata (Regular)",
-        "category": "DRINKS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 170,
-          "protein": 0,
-          "carbs": 28,
-          "fat": 6
-        }
-      },
-      {
-        "name": "Minute Maid Aguas Frescas Mango Lime (Regular)",
-        "category": "DRINKS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 100,
-          "protein": 0,
-          "carbs": 27,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Minute Maid Aguas Frescas Strawberry Hibiscus (Regular)",
-        "category": "DRINKS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 90,
-          "protein": 0,
-          "carbs": 23,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Minute Maid Lemonade (Regular)",
-        "category": "DRINKS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 170,
-          "protein": 0,
-          "carbs": 44,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Minute Maid Strawberry Lemonade (Regular)",
-        "category": "DRINKS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 170,
-          "protein": 0,
-          "carbs": 44,
-          "fat": 0
-        }
-      },
-      {
-        "name": "Coca-Cola de Mexico (Bottle)",
-        "category": "DRINKS",
-        "price_estimate": null,
-        "macros": {
-          "calories": 150,
-          "protein": 0,
-          "carbs": 39,
-          "fat": 0
-        }
+  "restaurant_name": "El Pollo Loco",
+  "items": [
+    {
+      "name": "2 pc Loco Tenders™ – Classic",
+      "category": "Featured",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 320,
+        "protein": 17,
+        "carbs": 24,
+        "fat": 17
       }
-    ]
-  }
+    },
+    {
+      "name": "2 pc Loco Tenders™ – Spicy",
+      "category": "Featured",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 330,
+        "protein": 18,
+        "carbs": 28,
+        "fat": 17
+      }
+    },
+    {
+      "name": "3 pc Loco Tenders™ – Classic",
+      "category": "Featured",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 470,
+        "protein": 26,
+        "carbs": 36,
+        "fat": 25
+      }
+    },
+    {
+      "name": "3 pc Loco Tenders™ – Spicy",
+      "category": "Featured",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 500,
+        "protein": 26,
+        "carbs": 42,
+        "fat": 25
+      }
+    },
+    {
+      "name": "4 pc Loco Tenders™ – Classic",
+      "category": "Featured",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 630,
+        "protein": 34,
+        "carbs": 48,
+        "fat": 34
+      }
+    },
+    {
+      "name": "4 pc Loco Tenders™ – Spicy",
+      "category": "Featured",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 670,
+        "protein": 35,
+        "carbs": 56,
+        "fat": 34
+      }
+    },
+    {
+      "name": "Double Chicken Bowl",
+      "category": "Protein-Packed",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 930,
+        "protein": 74,
+        "carbs": 87,
+        "fat": 33
+      }
+    },
+    {
+      "name": "Original Pollo Bowl®",
+      "category": "Protein-Packed",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 580,
+        "protein": 41,
+        "carbs": 83,
+        "fat": 10
+      }
+    },
+    {
+      "name": "Guacamole Chicken Burrito",
+      "category": "Protein-Packed",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 920,
+        "protein": 59,
+        "carbs": 65,
+        "fat": 48
+      }
+    },
+    {
+      "name": "Chopped Breast Side",
+      "category": "Protein-Packed",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 120,
+        "protein": 23,
+        "carbs": 0,
+        "fat": 3
+      }
+    },
+    {
+      "name": "2 pc Breast & Wing Meal w/Corn Tortillas Pinto Beans & Rice",
+      "category": "Protein-Packed",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 660,
+        "protein": 58,
+        "carbs": 77,
+        "fat": 14
+      }
+    },
+    {
+      "name": "2 pc Breast & Wing Meal w/Flour Tortillas Pinto Beans & Rice",
+      "category": "Protein-Packed",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 740,
+        "protein": 59,
+        "carbs": 85,
+        "fat": 18
+      }
+    },
+    {
+      "name": "2 pc Breast & Wing Meal w/Corn Tortillas Charro Beans & Rice",
+      "category": "Protein-Packed",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 710,
+        "protein": 60,
+        "carbs": 75,
+        "fat": 19
+      }
+    },
+    {
+      "name": "2 pc Breast & Wing Meal w/Flour Tortillas Charro Beans & Rice",
+      "category": "Protein-Packed",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 790,
+        "protein": 62,
+        "carbs": 83,
+        "fat": 23
+      }
+    },
+    {
+      "name": "Chicken Leg",
+      "category": "Fire-Grilled Chicken",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 110,
+        "protein": 11,
+        "carbs": 0,
+        "fat": 7
+      }
+    },
+    {
+      "name": "Chicken Thigh",
+      "category": "Fire-Grilled Chicken",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 200,
+        "protein": 21,
+        "carbs": 2,
+        "fat": 12
+      }
+    },
+    {
+      "name": "Chicken Breast",
+      "category": "Fire-Grilled Chicken",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 200,
+        "protein": 34,
+        "carbs": 0,
+        "fat": 8
+      }
+    },
+    {
+      "name": "Chicken Wing",
+      "category": "Fire-Grilled Chicken",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 70,
+        "protein": 10,
+        "carbs": 0,
+        "fat": 3
+      }
+    },
+    {
+      "name": "Pinto Beans",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 140,
+        "protein": 9,
+        "carbs": 25,
+        "fat": 0.5
+      }
+    },
+    {
+      "name": "Charro Beans",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 190,
+        "protein": 11,
+        "carbs": 23,
+        "fat": 6
+      }
+    },
+    {
+      "name": "Rice",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 160,
+        "protein": 3,
+        "carbs": 33,
+        "fat": 1.5
+      }
+    },
+    {
+      "name": "Mashed Potatoes with Gravy",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 100,
+        "protein": 3,
+        "carbs": 20,
+        "fat": 1.5
+      }
+    },
+    {
+      "name": "Macaroni & Cheese",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 310,
+        "protein": 9,
+        "carbs": 24,
+        "fat": 19
+      }
+    },
+    {
+      "name": "Loco Side Salad",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 180,
+        "protein": 3,
+        "carbs": 8,
+        "fat": 15
+      }
+    },
+    {
+      "name": "Coleslaw",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 130,
+        "protein": 1,
+        "carbs": 9,
+        "fat": 10
+      }
+    },
+    {
+      "name": "Corn",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 140,
+        "protein": 3,
+        "carbs": 27,
+        "fat": 4.5
+      }
+    },
+    {
+      "name": "Broccoli",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 30,
+        "protein": 2,
+        "carbs": 6,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Creamy Cilantro Dressing",
+      "category": "Dressing",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 330,
+        "protein": 1,
+        "carbs": 2,
+        "fat": 36
+      }
+    },
+    {
+      "name": "House Ranch, Regular",
+      "category": "Dressing",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 390,
+        "protein": 2,
+        "carbs": 5,
+        "fat": 41
+      }
+    },
+    {
+      "name": "House Ranch, Small",
+      "category": "Dressing",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 170,
+        "protein": 1,
+        "carbs": 2,
+        "fat": 18
+      }
+    },
+    {
+      "name": "Mexican Caesar Dressing",
+      "category": "Dressing",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 440,
+        "protein": 3,
+        "carbs": 4,
+        "fat": 47
+      }
+    },
+    {
+      "name": "Creamy Chipotle Sauce",
+      "category": "Sauce",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 170,
+        "protein": 0,
+        "carbs": 1,
+        "fat": 18
+      }
+    },
+    {
+      "name": "Pollo Loco Sauce™",
+      "category": "Sauce",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 180,
+        "protein": 1,
+        "carbs": 4,
+        "fat": 18
+      }
+    },
+    {
+      "name": "Baja Lime Sauce",
+      "category": "Sauce",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 190,
+        "protein": 1,
+        "carbs": 2,
+        "fat": 20
+      }
+    },
+    {
+      "name": "Sour Cream",
+      "category": "Sauce",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 80,
+        "protein": 1,
+        "carbs": 1,
+        "fat": 7
+      }
+    },
+    {
+      "name": "Guacamole (small)",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 110,
+        "protein": 2,
+        "carbs": 7,
+        "fat": 10
+      }
+    },
+    {
+      "name": "Guacamole (regular)",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 220,
+        "protein": 3,
+        "carbs": 15,
+        "fat": 19
+      }
+    },
+    {
+      "name": "Queso Blanco (small)",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 160,
+        "protein": 7,
+        "carbs": 3,
+        "fat": 14
+      }
+    },
+    {
+      "name": "Queso Blanco (regular)",
+      "category": "Sides",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 320,
+        "protein": 14,
+        "carbs": 7,
+        "fat": 27
+      }
+    },
+    {
+      "name": "Classic Chicken Tostada*",
+      "category": "Tostadas & Salads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 820,
+        "protein": 42,
+        "carbs": 80,
+        "fat": 38
+      }
+    },
+    {
+      "name": "Double Chicken Tostada*",
+      "category": "Tostadas & Salads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 990,
+        "protein": 65,
+        "carbs": 82,
+        "fat": 45
+      }
+    },
+    {
+      "name": "Baja Double Chicken Tostada*",
+      "category": "Tostadas & Salads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1140,
+        "protein": 66,
+        "carbs": 84,
+        "fat": 61
+      }
+    },
+    {
+      "name": "Street Corn Salad*",
+      "category": "Tostadas & Salads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 390,
+        "protein": 52,
+        "carbs": 17,
+        "fat": 14
+      }
+    },
+    {
+      "name": "Mexican Caesar Salad*",
+      "category": "Tostadas & Salads",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 420,
+        "protein": 52,
+        "carbs": 18,
+        "fat": 17
+      }
+    },
+    {
+      "name": "Grande Avocado Chicken Bowl",
+      "category": "Bowls",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 790,
+        "protein": 49,
+        "carbs": 90,
+        "fat": 26
+      }
+    },
+    {
+      "name": "Queso Crunch Double Chicken Burrito Bowl",
+      "category": "Bowls",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1080,
+        "protein": 78,
+        "carbs": 96,
+        "fat": 43
+      }
+    },
+    {
+      "name": "Street Corn Double Chicken Burrito Bowl",
+      "category": "Bowls",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1080,
+        "protein": 75,
+        "carbs": 95,
+        "fat": 46
+      }
+    },
+    {
+      "name": "Chicken Avocado Taco",
+      "category": "Tacos",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 330,
+        "protein": 24,
+        "carbs": 17,
+        "fat": 19
+      }
+    },
+    {
+      "name": "Taco al Carbón",
+      "category": "Tacos",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 170,
+        "protein": 15,
+        "carbs": 17,
+        "fat": 5
+      }
+    },
+    {
+      "name": "Shredded Chicken Crunchy Taco",
+      "category": "Tacos",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 210,
+        "protein": 14,
+        "carbs": 22,
+        "fat": 8
+      }
+    },
+    {
+      "name": "Chipotle Guacamole Chicken Burrito",
+      "category": "Burritos",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1010,
+        "protein": 60,
+        "carbs": 81,
+        "fat": 50
+      }
+    },
+    {
+      "name": "Queso Guacamole Chicken Burrito",
+      "category": "Burritos",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 780,
+        "protein": 40,
+        "carbs": 88,
+        "fat": 30
+      }
+    },
+    {
+      "name": "Chipotle Chicken Quesadilla",
+      "category": "Quesadillas & Nachos",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 930,
+        "protein": 51,
+        "carbs": 53,
+        "fat": 57
+      }
+    },
+    {
+      "name": "Salsa Verde Chicken Quesadilla",
+      "category": "Quesadillas & Nachos",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 810,
+        "protein": 51,
+        "carbs": 53,
+        "fat": 44
+      }
+    },
+    {
+      "name": "Cheese Quesadilla",
+      "category": "Quesadillas & Nachos",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 530,
+        "protein": 25,
+        "carbs": 37,
+        "fat": 30
+      }
+    },
+    {
+      "name": "Chicken Avocado Stuffed Quesadilla",
+      "category": "Quesadillas & Nachos",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 950,
+        "protein": 54,
+        "carbs": 55,
+        "fat": 59
+      }
+    },
+    {
+      "name": "Shredded Chicken Nachos",
+      "category": "Quesadillas & Nachos",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1090,
+        "protein": 34,
+        "carbs": 94,
+        "fat": 65
+      }
+    },
+    {
+      "name": "Chips & Guacamole (small)",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 490,
+        "protein": 6,
+        "carbs": 49,
+        "fat": 32
+      }
+    },
+    {
+      "name": "Chips & Guacamole (regular)",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 980,
+        "protein": 11,
+        "carbs": 98,
+        "fat": 63
+      }
+    },
+    {
+      "name": "Chips & Queso Blanco (small)",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 540,
+        "protein": 11,
+        "carbs": 45,
+        "fat": 36
+      }
+    },
+    {
+      "name": "Chips & Queso Blanco (regular)",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 1080,
+        "protein": 22,
+        "carbs": 90,
+        "fat": 71
+      }
+    },
+    {
+      "name": "Tortilla Chips (side)",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 200,
+        "protein": 2,
+        "carbs": 22,
+        "fat": 11
+      }
+    },
+    {
+      "name": "Tortilla Chips (small)",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 380,
+        "protein": 4,
+        "carbs": 42,
+        "fat": 22
+      }
+    },
+    {
+      "name": "Tortilla Chips (regular)",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 760,
+        "protein": 8,
+        "carbs": 83,
+        "fat": 44
+      }
+    },
+    {
+      "name": "Corn Tortillas (2)",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 90,
+        "protein": 2,
+        "carbs": 19,
+        "fat": 1
+      }
+    },
+    {
+      "name": "Flour Tortillas (2)",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 170,
+        "protein": 4,
+        "carbs": 27,
+        "fat": 5
+      }
+    },
+    {
+      "name": "Hatch Diced Green Chiles",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 10,
+        "protein": 0,
+        "carbs": 2,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Chicken Tortilla Soup",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 240,
+        "protein": 23,
+        "carbs": 19,
+        "fat": 9
+      }
+    },
+    {
+      "name": "Original BRC Burrito®",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 410,
+        "protein": 13,
+        "carbs": 63,
+        "fat": 11
+      }
+    },
+    {
+      "name": "Cinnamon Churro (1)",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 170,
+        "protein": 1,
+        "carbs": 16,
+        "fat": 11
+      }
+    },
+    {
+      "name": "Cinnamon Churros (2)",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 330,
+        "protein": 3,
+        "carbs": 32,
+        "fat": 22
+      }
+    },
+    {
+      "name": "Caramel Flan Cup",
+      "category": "Snacks & Sweets",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 230,
+        "protein": 10,
+        "carbs": 27,
+        "fat": 9
+      }
+    },
+    {
+      "name": "Tacos al Carbón (3) Combo",
+      "category": "Combos",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 510,
+        "protein": 46,
+        "carbs": 50,
+        "fat": 15
+      }
+    },
+    {
+      "name": "Chicken Classic Burrito Combo",
+      "category": "Combos",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 480,
+        "protein": 25,
+        "carbs": 66,
+        "fat": 13
+      }
+    },
+    {
+      "name": "Chicken Legs (2) Kids Meal",
+      "category": "Kids Meals",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 220,
+        "protein": 22,
+        "carbs": 0,
+        "fat": 15
+      }
+    },
+    {
+      "name": "Salsa Fresca",
+      "category": "Salsa",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 5,
+        "protein": 0,
+        "carbs": 2,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Avocado Salsa",
+      "category": "Salsa",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 20,
+        "protein": 0,
+        "carbs": 1,
+        "fat": 1.5
+      }
+    },
+    {
+      "name": "Salsa Roja",
+      "category": "Salsa",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 15,
+        "protein": 0,
+        "carbs": 2,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Jalapeño Hot Sauce (packet)",
+      "category": "Salsa",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 5,
+        "protein": 0,
+        "carbs": 1,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Horchata Regular",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 340,
+        "protein": 0,
+        "carbs": 56,
+        "fat": 12
+      }
+    },
+    {
+      "name": "Horchata Large",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 530,
+        "protein": 0,
+        "carbs": 88,
+        "fat": 19
+      }
+    },
+    {
+      "name": "Minute Maid® Aguas Frescas Mango Lime Regular",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 150,
+        "protein": 0,
+        "carbs": 40,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Minute Maid® Aguas Frescas Mango Lime Large",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 230,
+        "protein": 0,
+        "carbs": 62,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Minute Maid® Aguas Frescas Strawberry Hibiscus Regular",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 130,
+        "protein": 0,
+        "carbs": 34,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Minute Maid® Aguas Frescas Strawberry Hibiscus Large",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 200,
+        "protein": 0,
+        "carbs": 53,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Coca-Cola® Regular",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 260,
+        "protein": 0,
+        "carbs": 72,
+        "fat": 0
+      }
+    },
+    {
+      "name": "Coca-Cola® Large",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 400,
+        "protein": 0,
+        "carbs": 109,
+        "fat": 0
+      }
+    },
+    {
+      "name": "VitaminWater® XXX Regular",
+      "category": "Drinks",
+      "price_estimate": null,
+      "image_url": null,
+      "macros": {
+        "calories": 130,
+        "protein": 0,
+        "carbs": 33,
+        "fat": 0
+      }
+    }
+  ]
+}

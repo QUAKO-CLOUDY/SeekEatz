@@ -444,8 +444,27 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const [loadMoreDividerBreakpoints, setLoadMoreDividerBreakpoints] = useState<Record<string, number[]>>({});
   const [loadMoreClickCounts, setLoadMoreClickCounts] = useState<Record<string, number>>({});
   const abortControllerRef = useRef<AbortController | null>(null);
+  const loadingStartedAtRef = useRef<number | null>(null);
+  const hiddenAtRef = useRef<number | null>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  const clearStaleLoadingState = useCallback((reason: string) => {
+    if (!isLoading && !abortControllerRef.current) {
+      return;
+    }
+    console.log(`[AIChat] Clearing stale loading state (${reason})`);
+    if (abortControllerRef.current) {
+      try {
+        abortControllerRef.current.abort();
+      } catch {
+        // ignore
+      }
+      abortControllerRef.current = null;
+    }
+    loadingStartedAtRef.current = null;
+    setIsLoading(false);
+  }, [isLoading, setIsLoading]);
 
   // Safety: Reset isLoading on mount in case a previous in-flight request
   // was killed by a browser refresh (the finally block never ran).
@@ -453,8 +472,43 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     setIsLoading(false);
     // Also abort any lingering request (ref is reset on remount)
     abortControllerRef.current = null;
+    loadingStartedAtRef.current = null;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Mobile WebViews often preserve React state without remounting after the app
+  // is backgrounded/killed. In-flight fetches may never reach finally(), leaving
+  // isLoading stuck true. Clear stale loading when the app resumes.
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        hiddenAtRef.current = Date.now();
+        return;
+      }
+      if (document.visibilityState !== 'visible') {
+        return;
+      }
+      const hiddenMs = hiddenAtRef.current ? Date.now() - hiddenAtRef.current : 0;
+      hiddenAtRef.current = null;
+      if (hiddenMs >= 1000 && (isLoading || abortControllerRef.current)) {
+        clearStaleLoadingState('app-resume');
+      }
+    };
+
+    const handlePageShow = () => {
+      if (isLoading || abortControllerRef.current) {
+        clearStaleLoadingState('pageshow');
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pageshow', handlePageShow);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, [isLoading, clearStaleLoadingState]);
 
   // User location state (for nearby meal filtering)
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(() => {
@@ -1202,6 +1256,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     setInputText('');
 
     // Set loading
+    loadingStartedAtRef.current = Date.now();
     setIsLoading(true);
 
     // Use try/finally to ensure loading is always set to false
@@ -1601,6 +1656,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       // Always set loading to false, regardless of success or error
       // Only clear loading state if this is still the active request
       if (abortControllerRef.current === abortController) {
+        loadingStartedAtRef.current = null;
         setIsLoading(false);
         abortControllerRef.current = null;
       }
@@ -1615,7 +1671,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
   // Handle quick prompt
   const sendQuickPrompt = async (promptText: string, visibleText?: string) => {
-    if (isLoading) return;
+    if (isLoading) {
+      clearStaleLoadingState('quick-prompt-retry');
+    }
 
     const userFacingText = visibleText?.trim() || promptText;
     const quickPromptKey = promptText.trim().toLowerCase();
@@ -1641,11 +1699,15 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
   // Load more meals for pagination
   const loadMoreMeals = async (messageId: string, context: MealSearchContext) => {
-    if (isLoading || !context.hasMore) return;
+    if (!context.hasMore) return;
+    if (isLoading) {
+      clearStaleLoadingState('load-more-retry');
+    }
 
     // Record activity when user loads more meals
     recordActivity();
 
+    loadingStartedAtRef.current = Date.now();
     setIsLoading(true);
     setError(null);
 
@@ -1798,6 +1860,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             : 'Failed to load more meals';
       setError(errorMessage);
     } finally {
+      loadingStartedAtRef.current = null;
       setIsLoading(false);
     }
   };

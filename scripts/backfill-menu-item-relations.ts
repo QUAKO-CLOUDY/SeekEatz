@@ -338,6 +338,48 @@ function inferMenuItemUpdate(item: MenuItemRow): MenuItemUpdate | null {
     });
   } else if (
     restaurant === 'el pollo loco' &&
+    (/^sides$/.test(category) || /^dressing$/.test(category) || /^sauce$/.test(category) || /^salsa$/.test(category))
+  ) {
+    const isSauceLike = /^(dressing|sauce|salsa)$/.test(category);
+    apply({
+      item_type: isSauceLike ? 'sauce' : 'side',
+      is_modifier: true,
+      is_searchable: false,
+      modifier_unit_label: isSauceLike ? 'serving' : 'side',
+      modifier_unit_default_qty: 1,
+      modifier_unit_max_qty: isSauceLike ? 3 : 1,
+    });
+  } else if (
+    restaurant === 'el pollo loco' &&
+    (/^featured$/.test(category) ||
+      /^protein-packed$/.test(category) ||
+      /^bowls$/.test(category) ||
+      /^burritos$/.test(category) ||
+      /^tacos$/.test(category) ||
+      /^tostadas & salads$/.test(category) ||
+      /^quesadillas & nachos$/.test(category) ||
+      /^combos$/.test(category) ||
+      /^kids meals$/.test(category))
+  ) {
+    const normalizedCategory =
+      /^bowls$/.test(category) || /^protein-packed$/.test(category) ? 'bowl' :
+      /^burritos$/.test(category) ? 'burrito' :
+      /^tacos$/.test(category) ? 'taco' :
+      /salad/.test(category) ? 'salad' :
+      /^quesadillas & nachos$/.test(category) ? 'quesadilla' :
+      'entree';
+
+    apply({
+      normalized_category: normalizedCategory,
+      item_type: 'meal',
+      is_modifier: false,
+      is_searchable: true,
+      modifier_unit_label: null,
+      modifier_unit_default_qty: null,
+      modifier_unit_max_qty: null,
+    });
+  } else if (
+    restaurant === 'el pollo loco' &&
     (/^drinks$/.test(category) || /^snacks & sweets$/.test(category))
   ) {
     apply({
@@ -1032,31 +1074,69 @@ const RESTAURANT_RULES: Record<string, RestaurantRuleSet> = {
   'El Pollo Loco': {
     relationTemplates: [
       {
-        mealCategoryPatterns: [/^curated bowls$/i, /^bowls$/i, /^burritos$/i, /^tacos$/i, /^tostadas & salads$/i],
+        mealCategoryPatterns: [
+          /^featured$/i,
+          /^protein-packed$/i,
+          /^bowls$/i,
+          /^burritos$/i,
+          /^tacos$/i,
+          /^tostadas & salads$/i,
+          /^quesadillas & nachos$/i,
+          /^combos$/i,
+          /^kids meals$/i,
+        ],
         childCategoryPatterns: [/^fire-grilled chicken$/i],
         relationType: 'protein_option',
         groupName: 'Protein Options',
         maxQuantity: 2,
       },
       {
-        mealCategoryPatterns: [/^curated bowls$/i, /^bowls$/i, /^burritos$/i, /^tacos$/i, /^tostadas & salads$/i],
-        childCategoryPatterns: [/^salsas$/i],
+        mealCategoryPatterns: [
+          /^featured$/i,
+          /^protein-packed$/i,
+          /^bowls$/i,
+          /^burritos$/i,
+          /^tacos$/i,
+          /^tostadas & salads$/i,
+          /^quesadillas & nachos$/i,
+          /^combos$/i,
+          /^kids meals$/i,
+        ],
+        childCategoryPatterns: [/^salsa$/i],
         relationType: 'sauce_option',
         groupName: 'Salsas',
         maxQuantity: 3,
       },
       {
-        mealCategoryPatterns: [/^curated bowls$/i, /^bowls$/i, /^burritos$/i, /^tacos$/i, /^tostadas & salads$/i],
-        childCategoryPatterns: [/^sides & sauces$/i],
-        childNamePatterns: [/dressing|sauce|sour cream|guacamole|queso/i],
+        mealCategoryPatterns: [
+          /^featured$/i,
+          /^protein-packed$/i,
+          /^bowls$/i,
+          /^burritos$/i,
+          /^tacos$/i,
+          /^tostadas & salads$/i,
+          /^quesadillas & nachos$/i,
+          /^combos$/i,
+          /^kids meals$/i,
+        ],
+        childCategoryPatterns: [/^sauce$/i, /^dressing$/i],
         relationType: 'sauce_option',
-        groupName: 'Sauces',
-        maxQuantity: 2,
+        groupName: 'Sauces & Dressings',
+        maxQuantity: 3,
       },
       {
-        mealCategoryPatterns: [/^curated bowls$/i, /^bowls$/i, /^burritos$/i, /^tacos$/i, /^tostadas & salads$/i],
-        childCategoryPatterns: [/^sides & sauces$/i],
-        childExcludeNamePatterns: [/dressing|sauce|sour cream|guacamole|queso/i],
+        mealCategoryPatterns: [
+          /^featured$/i,
+          /^protein-packed$/i,
+          /^bowls$/i,
+          /^burritos$/i,
+          /^tacos$/i,
+          /^tostadas & salads$/i,
+          /^quesadillas & nachos$/i,
+          /^combos$/i,
+          /^kids meals$/i,
+        ],
+        childCategoryPatterns: [/^sides$/i],
         relationType: 'side_option',
         groupName: 'Sides',
         maxQuantity: 2,

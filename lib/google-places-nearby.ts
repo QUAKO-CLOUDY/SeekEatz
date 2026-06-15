@@ -3,11 +3,59 @@ import { calculateDistanceMiles } from '@/lib/distance-utils';
 import { normalizeRestaurantName } from '@/lib/restaurant-resolver';
 
 const PLACES_BASE = 'https://places.googleapis.com/v1';
-const CACHE_TYPE = 'live_brand_nearby_v1';
-const AGGREGATE_CACHE_TYPE = 'live_brand_nearby_aggregate_v1';
+const CACHE_TYPE = 'live_brand_nearby_v2';
+const AGGREGATE_CACHE_TYPE = 'live_brand_nearby_aggregate_v2';
 const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const MISS_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const BRAND_SEARCH_CONCURRENCY = 12;
+
+const BRAND_NAME_STOP_WORDS = new Set([
+  'restaurant',
+  'restaurants',
+  'bar',
+  'bars',
+  'grill',
+  'grills',
+  'cafe',
+  'kitchen',
+  'and',
+  'the',
+  'a',
+  'an',
+  'of',
+  'inc',
+  'llc',
+  'co',
+  'company',
+]);
+
+function extractBrandTokens(name: string): string[] {
+  return normalizeRestaurantName(name)
+    .split(' ')
+    .filter((token) => token.length > 0 && !BRAND_NAME_STOP_WORDS.has(token));
+}
+
+export function placeNameMatchesBrand(brandName: string, placeDisplayName: string): boolean {
+  const normalizedBrand = normalizeRestaurantName(brandName);
+  const normalizedPlace = normalizeRestaurantName(placeDisplayName);
+  if (!normalizedBrand || !normalizedPlace) {
+    return false;
+  }
+
+  if (
+    normalizedPlace.includes(normalizedBrand) ||
+    normalizedBrand.includes(normalizedPlace)
+  ) {
+    return true;
+  }
+
+  const brandTokens = extractBrandTokens(brandName);
+  if (brandTokens.length === 0) {
+    return normalizedPlace.includes(normalizedBrand);
+  }
+
+  return brandTokens.every((token) => normalizedPlace.includes(token));
+}
 
 export type LiveNearbyRestaurantMatch = {
   restaurantId?: string;
@@ -191,13 +239,14 @@ async function searchBrandNearLocation(
       },
       body: JSON.stringify({
         textQuery: brandName,
+        includedType: 'restaurant',
         locationBias: {
           circle: {
             center: { latitude: lat, longitude: lng },
             radius: radiusMeters,
           },
         },
-        maxResultCount: 3,
+        maxResultCount: 5,
       }),
       signal: AbortSignal.timeout(10_000),
     });
@@ -227,6 +276,10 @@ async function searchBrandNearLocation(
       const placeId = place.id?.trim();
 
       if (!displayName || latitude === undefined || longitude === undefined || !placeId) {
+        continue;
+      }
+
+      if (!placeNameMatchesBrand(brandName, displayName)) {
         continue;
       }
 

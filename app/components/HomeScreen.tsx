@@ -14,7 +14,7 @@ import { motion } from "framer-motion";
 import { AnimatedNumber } from "./AnimatedNumber";
 import { diversifyMealsByRestaurant } from "@/lib/restaurant-diversity";
 import { getStoredLocation, ensureSearchLocation, resetPendingLocationRequest } from "@/lib/location";
-import { APP_SUSPEND_RESUME_EVENT } from "@/lib/app-suspend-recovery";
+import { markInflightLoading, registerAppRequestReset } from "@/lib/app-suspend-recovery";
 import { SearchRadiusSelect } from "./SearchRadiusSelect";
 import {
   Popover,
@@ -312,13 +312,9 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
   }, []);
 
   useEffect(() => {
-    const handleSuspendResume = () => {
-      resetHomeSearchState('js-resumed');
-    };
-    window.addEventListener(APP_SUSPEND_RESUME_EVENT, handleSuspendResume);
-    return () => {
-      window.removeEventListener(APP_SUSPEND_RESUME_EVENT, handleSuspendResume);
-    };
+    return registerAppRequestReset((reason) => {
+      resetHomeSearchState(reason);
+    });
   }, [resetHomeSearchState]);
   
   // Prevent browser scroll restoration
@@ -811,6 +807,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
     if (isLoadingMeals) {
       resetHomeSearchState('find-meals-retry');
     }
+    markInflightLoading(true);
     setIsLoadingMeals(true);
     setHasSearched(true);
     setSearchError(null);
@@ -942,6 +939,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         : 'Search failed. Please try again.';
       setSearchError(message);
     } finally {
+      markInflightLoading(false);
       setIsLoadingMeals(false);
     }
   };
@@ -951,6 +949,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       resetHomeSearchState('load-more-retry');
     }
     updateActivity();
+    markInflightLoading(true);
     setIsLoadingMeals(true);
     setLoadMoreNotice(null);
 
@@ -1055,6 +1054,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         : 'Failed to load more meals. Please try again.';
       setSearchError(message);
     } finally {
+      markInflightLoading(false);
       setIsLoadingMeals(false);
     }
   };
@@ -1346,7 +1346,6 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         <motion.button
           type="button"
           onClick={handleFindMeals}
-          disabled={isLoadingMeals}
           whileHover={!isLoadingMeals ? { scale: 1.02 } : {}}
           whileTap={!isLoadingMeals ? { scale: 0.98 } : {}}
           className="mt-4 sm:mt-5 w-full max-w-md mx-auto h-12 sm:h-14 rounded-2xl bg-gradient-to-r from-[#3A8BFF] to-[#4DDDF9] text-white text-sm sm:text-base font-semibold flex items-center justify-center gap-2 shadow-lg shadow-[#3A8BFF]/30 hover:shadow-[#3A8BFF]/40 hover:opacity-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"

@@ -676,7 +676,7 @@ export async function retrieveMealsWithClient(
   const hasNoLocalRestaurantCoverage =
     nearbyFilter.requested && nearbyFilter.matches.length === 0;
 
-  const allowOutsideRadiusFallback = nearbyFilter.requested && !macroOnlyHomeFiltering;
+  const allowOutsideRadiusFallback = false;
 
   if (ranked.length === 0 && hasNoLocalRestaurantCoverage && allowOutsideRadiusFallback) {
     const outsideRadiusDeterministic = applyPostRetrievalFilters(
@@ -803,7 +803,7 @@ export async function retrieveMealsWithClient(
 
   if (nearbyFilter.requested && nearbyFilter.radiusMiles) {
     meals = meals.filter(
-      (meal) => meal.distance === undefined || meal.distance <= nearbyFilter.radiusMiles!
+      (meal) => meal.distance !== undefined && meal.distance <= nearbyFilter.radiusMiles!
     );
   }
   const hasMore = offset + limit < totalCount;

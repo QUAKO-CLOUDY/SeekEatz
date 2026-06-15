@@ -114,7 +114,7 @@ export class ResponseFormatter {
       }
     }
 
-    if (distance === undefined && userLocation && restaurantMeta.latitude !== undefined && restaurantMeta.longitude !== undefined) {
+    if (distance === undefined && !nearbyDistances && userLocation && restaurantMeta.latitude !== undefined && restaurantMeta.longitude !== undefined) {
       distance = calculateDistanceMiles(
         { latitude: userLocation.lat, longitude: userLocation.lng },
         { latitude: restaurantMeta.latitude, longitude: restaurantMeta.longitude }

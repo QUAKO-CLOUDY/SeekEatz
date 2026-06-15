@@ -44,7 +44,7 @@ import {
   migrateLegacyLoggedMealsStorage,
 } from '@/lib/logged-meals-storage';
 import { clearChatState } from '@/lib/chatStorage';
-import { startAppSuspendRecovery } from '@/lib/app-suspend-recovery';
+import { markInflightLoading, registerAppRequestReset, startAppSuspendRecovery } from '@/lib/app-suspend-recovery';
 
 type View = 'main' | 'meal-detail';
 

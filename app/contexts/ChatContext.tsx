@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { registerAppRequestReset } from '@/lib/app-suspend-recovery';
 import type { Meal } from '../types';
 import { loadChatState, saveChatState, clearChatState } from '@/lib/chatStorage';
 
@@ -142,6 +143,11 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    const unregisterReset = registerAppRequestReset(() => {
+      loadingSinceRef.current = null;
+      setState((prev) => (prev.isLoading ? { ...prev, isLoading: false } : prev));
+    });
+
     const checkInactivity = () => {
       setState(prev => {
         const now = Date.now();
@@ -182,6 +188,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     checkInactivity();
 
     return () => {
+      unregisterReset();
       window.clearInterval(intervalId);
     };
   }, []);

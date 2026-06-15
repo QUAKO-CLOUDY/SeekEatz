@@ -12,7 +12,7 @@ import { useChat } from "../contexts/ChatContext";
 import { getGuestSessionId, getGuestChatMessages, saveGuestChatMessages, touchGuestActivity, clearGuestSession } from "@/lib/guest-session";
 import { getRestaurantLogoUrl } from "@/lib/image-utils";
 import { getStoredLocation, ensureSearchLocation, resetPendingLocationRequest } from "@/lib/location";
-import { APP_SUSPEND_RESUME_EVENT } from "@/lib/app-suspend-recovery";
+import { markInflightLoading, registerAppRequestReset } from "@/lib/app-suspend-recovery";
 import { extractMacroConstraintsFromText } from "@/lib/extractMacroConstraintsFromText";
 import { UpgradeModal } from "./UpgradeModal";
 import {
@@ -446,17 +446,8 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
   const [loadMoreClickCounts, setLoadMoreClickCounts] = useState<Record<string, number>>({});
   const abortControllerRef = useRef<AbortController | null>(null);
   const loadingStartedAtRef = useRef<number | null>(null);
-  const hiddenAtRef = useRef<number | null>(null);
-  const isLoadingRef = useRef(isLoading);
-  const prevVisibilityRef = useRef(
-    typeof document !== 'undefined' ? document.visibilityState : 'visible'
-  );
   const [isAtBottom, setIsAtBottom] = useState(true);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    isLoadingRef.current = isLoading;
-  }, [isLoading]);
 
   const resetChatRequestState = useCallback((reason: string) => {
     console.log(`[AIChat] resetChatRequestState (${reason})`);
@@ -484,77 +475,9 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Mobile WebViews (especially iOS React Native) often suspend JS without firing
-  // visibility events reliably. Abort in-flight work when backgrounded so the UI
-  // is never stuck on "Thinking..." when the user returns.
+  // Central suspend/resume recovery (visibility, heartbeat, native events).
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        hiddenAtRef.current = Date.now();
-        resetChatRequestState('visibility-hidden');
-        return;
-      }
-      hiddenAtRef.current = null;
-      if (isLoadingRef.current) {
-        resetChatRequestState('visibility-visible');
-      }
-    };
-
-    const handlePageShow = () => {
-      if (isLoadingRef.current) {
-        resetChatRequestState('pageshow');
-      }
-    };
-
-    const handleFocus = () => {
-      if (isLoadingRef.current) {
-        resetChatRequestState('window-focus');
-      }
-    };
-
-    const handleNativeAppState = (event: Event) => {
-      const state = (event as CustomEvent<{ state?: string }>).detail?.state;
-      if (state === 'background' || state === 'inactive') {
-        resetChatRequestState('native-background');
-        return;
-      }
-      if (state === 'active' && isLoadingRef.current) {
-        resetChatRequestState('native-active');
-      }
-    };
-
-    const handleSuspendResume = () => {
-      resetChatRequestState('js-resumed');
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('pageshow', handlePageShow);
-    window.addEventListener('focus', handleFocus);
-    window.addEventListener('seekeatz:app-state', handleNativeAppState as EventListener);
-    window.addEventListener(APP_SUSPEND_RESUME_EVENT, handleSuspendResume);
-
-    // Poll visibility — WKWebView does not always emit visibilitychange on resume.
-    const pollId = window.setInterval(() => {
-      const current = document.visibilityState;
-      const previous = prevVisibilityRef.current;
-      if (current !== previous) {
-        prevVisibilityRef.current = current;
-        if (current === 'hidden') {
-          resetChatRequestState('visibility-poll-hidden');
-        } else if (isLoadingRef.current) {
-          resetChatRequestState('visibility-poll-visible');
-        }
-      }
-    }, 400);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('pageshow', handlePageShow);
-      window.removeEventListener('focus', handleFocus);
-      window.removeEventListener('seekeatz:app-state', handleNativeAppState as EventListener);
-      window.removeEventListener(APP_SUSPEND_RESUME_EVENT, handleSuspendResume);
-      window.clearInterval(pollId);
-    };
+    return registerAppRequestReset(resetChatRequestState);
   }, [resetChatRequestState]);
 
   // Watchdog: if loading exceeds the request timeout, force-reset even without
@@ -1330,6 +1253,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
     // Set loading
     loadingStartedAtRef.current = Date.now();
+    markInflightLoading(true);
     setIsLoading(true);
 
     // Use try/finally to ensure loading is always set to false
@@ -1743,6 +1667,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       // Only clear loading state if this is still the active request
       if (abortControllerRef.current === abortController) {
         loadingStartedAtRef.current = null;
+        markInflightLoading(false);
         setIsLoading(false);
         abortControllerRef.current = null;
       }
@@ -1794,6 +1719,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     recordActivity();
 
     loadingStartedAtRef.current = Date.now();
+    markInflightLoading(true);
     setIsLoading(true);
     setError(null);
 
@@ -1947,6 +1873,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       setError(errorMessage);
     } finally {
       loadingStartedAtRef.current = null;
+      markInflightLoading(false);
       setIsLoading(false);
     }
   };

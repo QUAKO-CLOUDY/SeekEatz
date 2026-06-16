@@ -185,8 +185,8 @@ export function Settings({ userProfile, onUpdateProfile }: Props) {
     typeof window !== 'undefined' ? (window as { __APP_VERSION__?: string }).__APP_VERSION__ : undefined;
   const nativeAppBuild =
     typeof window !== 'undefined' ? (window as { __APP_BUILD__?: string }).__APP_BUILD__ : undefined;
-  const appVersion = nativeAppVersion || process.env.NEXT_PUBLIC_APP_VERSION || '1.1';
-  const appBuild = nativeAppBuild || process.env.NEXT_PUBLIC_APP_BUILD || '18';
+  const appVersion = nativeAppVersion || process.env.NEXT_PUBLIC_APP_VERSION || '1.0.1';
+  const appBuild = nativeAppBuild || process.env.NEXT_PUBLIC_APP_BUILD || '20';
   const appVersionLabel = `${appVersion} (${appBuild})`;
 
   const applyNotificationPreferences = (preferences: NotificationPreferences) => {

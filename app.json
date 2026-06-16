@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "SeekEatz",
-    "version": "1.1",
+    "version": "1.0.1",
     "extra": {
       "eas": {
         "projectId": "bb1eee24-f509-4d2f-9a34-e13148f99473"
@@ -11,7 +11,7 @@
     "slug": "seekeatz",
     "ios": {
       "bundleIdentifier": "com.seekeatz.app",
-      "buildNumber": "19",
+      "buildNumber": "20",
       "supportsTablet": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "SeekEatz uses your location to find nearby restaurants and menu items that match your nutrition goals.",

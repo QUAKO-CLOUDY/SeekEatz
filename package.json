@@ -21,6 +21,7 @@
     "audit:chat-routing": "node scripts/run-ts-script.cjs scripts/audit-chat-routing.ts",
     "audit:swap-relations": "node scripts/run-ts-script.cjs scripts/audit-swap-relations.ts",
     "audit:db-quality": "node scripts/run-ts-script.cjs scripts/audit-db-quality.ts",
+    "audit:user-analytics": "node scripts/run-ts-script.cjs scripts/audit-user-analytics.ts",
     "audit:searchable-non-cards": "node scripts/run-ts-script.cjs scripts/audit-searchable-non-card-rows.ts",
     "cleanup:searchable-non-cards": "node scripts/run-ts-script.cjs scripts/cleanup-searchable-non-card-rows.ts",
     "cleanup:ambiguous-searchable-rows": "node scripts/run-ts-script.cjs scripts/cleanup-ambiguous-searchable-rows.ts",

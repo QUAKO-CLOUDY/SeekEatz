@@ -19,6 +19,7 @@ import {
   clearLoggedMealsStorageForUser,
   getLoggedMealsStorageKey,
 } from "@/lib/logged-meals-storage";
+import { CHAT_PERSISTENCE_ENABLED } from "@/lib/chat-persistence";
 
 const THIRTY_MINUTES = 30 * 60 * 1000;
 const EMAIL_OTP_LENGTH = 6;
@@ -315,7 +316,8 @@ function SignupPageContent() {
         localStorage.removeItem('seekeatz_signup_from_chat_gate');
       }
 
-      // Migrate guest chat messages to Supabase
+      // Migrate guest chat messages to Supabase (only when persistence is enabled)
+      if (CHAT_PERSISTENCE_ENABLED) {
       try {
         const { sessionId, messages: guestMessages } = getGuestChatForMigration();
         if (sessionId && guestMessages.length > 0) {
@@ -341,6 +343,7 @@ function SignupPageContent() {
         }
       } catch (migrationError) {
         console.warn('Guest chat migration skipped:', migrationError);
+      }
       }
 
       // Wait for auth/profile propagation before bootstrap.

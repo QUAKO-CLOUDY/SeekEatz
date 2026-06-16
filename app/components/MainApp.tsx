@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback, startTransition } from 'reac
 import { useRouter } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
+import { recordFunnelEvent } from '@/lib/telemetry/recordFunnelEvent';
 import { Navigation, type Screen } from './Navigation';
 import { HomeScreen } from './HomeScreen';
 import { LogScreen } from './LogScreen';
@@ -1185,6 +1186,20 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
       date: todayStr,
     };
     applyLoggedMeals([...loggedMeals, loggedMeal]);
+
+    if (currentUserId) {
+      void recordFunnelEvent({
+        supabase,
+        userId: currentUserId,
+        eventType: 'first_meal_logged',
+        metadata: {
+          meal_id: meal.id,
+          meal_name: meal.name,
+          restaurant: meal.restaurant ?? meal.restaurant_name,
+          calories: meal.calories,
+        },
+      });
+    }
 
     const returnScreen: 'home' | 'chat' = currentScreen === 'chat' ? 'chat' : 'home';
     setPostLogChoice({

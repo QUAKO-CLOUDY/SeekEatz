@@ -6,12 +6,18 @@ import {
   confirmPremiumBeforeLimitBlock,
   loadEntitlementData,
 } from '@/lib/request-entitlement';
+import { recordSearchRequest } from '@/lib/telemetry/recordSearchRequest';
 
 export const dynamic = 'force-dynamic';
 
 const SEARCH_TIMEOUT_MS = 22000; // 22s server timeout (client uses 25s)
 
 export async function POST(req: Request) {
+  const startedAt = Date.now();
+  let searchParams: Awaited<ReturnType<typeof buildSearchParams>> | undefined;
+  let queryText = '';
+  let userId: string | null = null;
+
   try {
     const body = await req.json();
     const includeDebug = process.env.NODE_ENV === 'development' && body?.debug === true;
@@ -20,12 +26,14 @@ export async function POST(req: Request) {
       query: body.query || body.message || '',
     };
 
-    const searchParams = await buildSearchParams(normalizedInput);
+    queryText = String(normalizedInput.query ?? '').trim();
+    searchParams = await buildSearchParams(normalizedInput);
 
     const { getRequestUser } = await import('@/utils/supabase/request-user');
     const { hasRemainingUsage, incrementUsageCount } = await import('@/lib/usage-cookie');
 
     const { supabase, user } = await getRequestUser(req);
+    userId = user?.id ?? null;
 
     let shouldRecordMeteredUsage = false;
 
@@ -80,6 +88,20 @@ export async function POST(req: Request) {
       ),
     ]);
 
+    void recordSearchRequest({
+      userId,
+      source: 'api_search',
+      queryText,
+      searchParams,
+      resultsReturned: result.meals?.length ?? 0,
+      hasMore: result.hasMore ?? false,
+      nextOffset: result.nextOffset,
+      durationMs: Date.now() - startedAt,
+      success: true,
+      strategy: typeof result.debugInfo?.strategy === 'string' ? result.debugInfo.strategy : undefined,
+      restaurantName: searchParams.restaurant,
+    });
+
     if (shouldRecordMeteredUsage) {
       try {
         if (user) {
@@ -100,6 +122,15 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Search Route API Error:', error);
     const isTimeout = error instanceof Error && error.message === 'Search timeout';
+    void recordSearchRequest({
+      userId,
+      source: 'api_search',
+      queryText,
+      searchParams,
+      durationMs: Date.now() - startedAt,
+      success: false,
+      failureReason: isTimeout ? 'timeout' : error instanceof Error ? error.message : 'unknown_error',
+    });
     return Response.json(
       { error: isTimeout ? 'Request timed out' : 'Internal Server Error' },
       { status: isTimeout ? 504 : 500 }

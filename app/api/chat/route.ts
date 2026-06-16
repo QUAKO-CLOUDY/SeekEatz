@@ -16,6 +16,7 @@ import {
   confirmPremiumBeforeLimitBlock,
   loadEntitlementData,
 } from '@/lib/request-entitlement';
+import { recordSearchRequest } from '@/lib/telemetry/recordSearchRequest';
 import type { Meal } from '@/app/types';
 
 export const maxDuration = 30;
@@ -1671,6 +1672,9 @@ export async function POST(req: Request) {
         canonicalRestaurant: canonicalRestaurant || undefined,
       });
 
+      let searchStartedAt = 0;
+      let mealSearchParams: Awaited<ReturnType<typeof buildSearchParams>> | undefined;
+
       try {
         // Log state flags before building search params
         console.log('[api/chat] State flags before buildSearchParams:', {
@@ -1735,6 +1739,7 @@ export async function POST(req: Request) {
           excludedRestaurants,
           isPagination: false,
         });
+        mealSearchParams = searchParams;
 
         // Debug log: Log final constraints being passed to searchHandler
         if (isDev) {
@@ -1755,6 +1760,7 @@ export async function POST(req: Request) {
 
         // Call searchHandler with a hard timeout to prevent API from hanging if DB is slow or network changes
         const SEARCH_TIMEOUT_MS = 25000;
+        searchStartedAt = Date.now();
         const searchTimeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('SEARCH_TIMEOUT: DB query exceeded 25 seconds')), SEARCH_TIMEOUT_MS)
         );
@@ -1868,11 +1874,36 @@ export async function POST(req: Request) {
         });
 
         await recordUsageIfNeeded();
+        void recordSearchRequest({
+          userId: user?.id ?? null,
+          source: 'chat',
+          queryText: message,
+          searchParams: mealSearchParams,
+          resultsReturned: result.meals?.length ?? 0,
+          hasMore: result.hasMore ?? false,
+          nextOffset: result.nextOffset,
+          durationMs: Date.now() - searchStartedAt,
+          success: true,
+          strategy: 'MEAL_SEARCH',
+          restaurantId,
+          restaurantName: canonicalRestaurant,
+        });
         return NextResponse.json(responseData, {
           headers: createResponseHeaders(usedLLMRouter, 'MEAL_SEARCH', heuristicMode || 'none')
         });
       } catch (searchError) {
         console.error('searchHandler error:', searchError);
+        void recordSearchRequest({
+          userId: user?.id ?? null,
+          source: 'chat',
+          queryText: message,
+          searchParams: mealSearchParams,
+          durationMs: Date.now() - searchStartedAt,
+          success: false,
+          failureReason:
+            searchError instanceof Error ? searchError.message : 'search_failed',
+          strategy: 'MEAL_SEARCH',
+        });
         return NextResponse.json({
           error: true,
           message: "Failed to search for meals.",

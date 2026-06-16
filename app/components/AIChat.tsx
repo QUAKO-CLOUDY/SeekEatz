@@ -20,6 +20,7 @@ import {
   type RestaurantDiversityHistory,
 } from "@/lib/restaurant-diversity";
 import { SearchRadiusSelect } from "./SearchRadiusSelect";
+import { CHAT_PERSISTENCE_ENABLED } from "@/lib/chat-persistence";
 
 interface AIChatProps {
   userId?: string;
@@ -404,7 +405,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
         // Claim the current session (define inline to avoid dependency issues)
         const sessionId = currentSessionId;
-        if (sessionId) {
+        if (CHAT_PERSISTENCE_ENABLED && sessionId) {
           try {
             const supabaseClient = createClient();
             await supabaseClient
@@ -519,7 +520,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
 
 
   // Track if Supabase chat persistence is available (avoid repeated RLS errors)
-  const supabaseChatAvailable = useRef(true);
+  const supabaseChatAvailable = useRef(CHAT_PERSISTENCE_ENABLED);
 
   // Ensure chat session is owned by authenticated user
   const ensureChatSessionOwned = useCallback(async (userId: string, sessionId: string) => {
@@ -577,8 +578,10 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     }
   }, []);
 
-  // Load messages from Supabase for authenticated users
+  // Load messages from Supabase for authenticated users (optional; off by default)
   useEffect(() => {
+    if (!CHAT_PERSISTENCE_ENABLED) return;
+
     const loadMessagesFromSupabase = async () => {
       if (!isSignedIn || !userId || !currentSessionId) return;
 
@@ -636,6 +639,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
       meals?: Meal[],
       mealSearchContext?: MealSearchContext
     ) => {
+      if (!CHAT_PERSISTENCE_ENABLED) return;
       if (!isSignedIn || !userId || !currentSessionId || !supabaseChatAvailable.current) return;
 
       try {
@@ -1207,6 +1211,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
     if (isSignedIn) {
       logUsageEvent('chat_submit', {
         source: 'chat_composer',
+        queryText: trimmedText,
         queryLength: trimmedText.length,
         isMealIntent: isMealIntentQuery(trimmedText),
       }).catch(() => { });

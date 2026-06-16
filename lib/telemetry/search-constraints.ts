@@ -13,6 +13,8 @@ export function searchParamsHaveConstraints(
     return true;
   }
 
+  const macroFilters = searchParams.macroFilters;
+
   return Boolean(
     searchParams.calorieCap ||
       searchParams.minCalories ||
@@ -22,10 +24,19 @@ export function searchParamsHaveConstraints(
       searchParams.minCarbs ||
       searchParams.maxCarbs ||
       searchParams.maxFat ||
+      searchParams.maxFats ||
       searchParams.minFats ||
       searchParams.restaurant ||
-      searchParams.dietType ||
-      (searchParams.dietaryOptions && searchParams.dietaryOptions.length > 0)
+      searchParams.diet ||
+      searchParams.location ||
+      macroFilters?.proteinMin ||
+      macroFilters?.proteinMax ||
+      macroFilters?.caloriesMax ||
+      macroFilters?.caloriesMin ||
+      macroFilters?.carbsMax ||
+      macroFilters?.carbsMin ||
+      macroFilters?.fatsMax ||
+      macroFilters?.fatsMin
   );
 }
 
@@ -44,9 +55,11 @@ export function buildConstraintsPayload(
     minCarbs: searchParams.minCarbs,
     maxCarbs: searchParams.maxCarbs,
     maxFat: searchParams.maxFat,
+    maxFats: searchParams.maxFats,
     minFats: searchParams.minFats,
     restaurant: searchParams.restaurant,
-    dietType: searchParams.dietType,
-    dietaryOptions: searchParams.dietaryOptions,
+    diet: searchParams.diet,
+    location: searchParams.location,
+    macroFilters: searchParams.macroFilters,
   };
 }

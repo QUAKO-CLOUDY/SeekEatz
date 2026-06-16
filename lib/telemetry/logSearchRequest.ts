@@ -1,22 +1,24 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   recordSearchRequest,
-  type RecordSearchRequestOptions,
   type SearchRequestSource,
 } from '@/lib/telemetry/recordSearchRequest';
 
 export type { SearchRequestSource };
-export type SearchRequestTelemetryPayload = Omit<
-  RecordSearchRequestOptions,
-  'userId' | 'source' | 'queryText' | 'durationMs' | 'success' | 'searchParams'
-> & {
+export type SearchRequestTelemetryPayload = {
   source: SearchRequestSource;
   query_text: string;
   results_returned: number;
   has_more: boolean;
+  next_offset?: number;
   duration_ms: number;
   success: boolean;
   failure_reason?: string;
+  intent?: string;
+  strategy?: string;
+  restaurant_id?: string;
+  restaurant_name?: string;
+  applied_filters?: Record<string, unknown>;
   constraints?: Record<string, unknown>;
 };
 

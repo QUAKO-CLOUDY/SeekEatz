@@ -98,7 +98,6 @@ export async function POST(req: Request) {
       nextOffset: result.nextOffset,
       durationMs: Date.now() - startedAt,
       success: true,
-      strategy: typeof result.debugInfo?.strategy === 'string' ? result.debugInfo.strategy : undefined,
       restaurantName: searchParams.restaurant,
     });
 

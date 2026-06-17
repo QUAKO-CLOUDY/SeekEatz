@@ -9,6 +9,7 @@ import {
 import { getWaitlistTrialExpiresAtIso } from "@/lib/waitlist-trial";
 import { normalizeEmail } from "@/lib/full-access";
 import { sendWaitlistFreeMonthGrantedEmail } from "@/lib/email/resend";
+import { recordFunnelEvent } from "@/lib/telemetry/recordFunnelEvent";
 
 type BootstrapBody = {
   profile?: {
@@ -159,6 +160,12 @@ export async function POST(request: Request) {
       console.error("Failed to upsert profile during bootstrap:", profileUpsertError);
       throw profileUpsertError;
     }
+
+    void recordFunnelEvent({
+      userId: user.id,
+      eventType: "account_created",
+      metadata: { source: "bootstrap" },
+    });
 
     if (waitlistGrantApplied && waitlistEntryId) {
       const { error: waitlistUpdateError } = await adminDb

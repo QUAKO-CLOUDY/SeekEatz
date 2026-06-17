@@ -81,6 +81,7 @@ CREATE POLICY "user_funnel_events_authenticated_insert"
   WITH CHECK (auth.uid() = user_id);
 
 -- Record account_created when a profile row is created (via existing auth trigger).
+-- Profile only — funnel events are recorded from /api/account/bootstrap (RLS-safe).
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -92,14 +93,6 @@ BEGIN
     NOW()
   )
   ON CONFLICT (id) DO NOTHING;
-
-  INSERT INTO public.user_funnel_events (user_id, event_type, metadata)
-  VALUES (
-    NEW.id,
-    'account_created',
-    jsonb_build_object('source', 'auth_signup')
-  )
-  ON CONFLICT (user_id, event_type) DO NOTHING;
 
   RETURN NEW;
 END;

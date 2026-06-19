@@ -455,8 +455,8 @@ export function LogScreen({
           <div className="rounded-2xl border border-border bg-gradient-to-br from-card to-muted/50 overflow-hidden">
             <div className="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 flex items-center justify-center flex-shrink-0">
-                  <Apple className="w-5 h-5 text-cyan-500" />
+                <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-400/15 to-cyan-300/20 border border-sky-300/40 flex items-center justify-center flex-shrink-0 dark:from-sky-400/10 dark:to-cyan-400/10 dark:border-sky-500/20">
+                  <Apple className="w-5 h-5 text-sky-500 dark:text-sky-300" />
                 </div>
                 <div>
                   <p className="font-medium text-foreground">Log your own food</p>
@@ -472,7 +472,7 @@ export function LogScreen({
                   setEditingLogId(null);
                   setShowManualEntry(true);
                 }}
-                className="shrink-0 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white rounded-xl shadow-lg shadow-cyan-500/20"
+                className="shrink-0 bg-gradient-to-r from-sky-400 to-cyan-400 hover:from-sky-500 hover:to-cyan-500 text-white rounded-xl shadow-md shadow-sky-300/25 dark:shadow-sky-500/15"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 {isReadOnly ? "Premium only" : "Add entry"}

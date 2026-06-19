@@ -1,11 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { X, Check } from "lucide-react";
+import { X, Plus } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import type { Meal } from "../types";
+import {
+  buildManualMealFromForm,
+  canSubmitManualMeal,
+  getManualLogButtonClassName,
+} from "@/lib/manual-meal-utils";
 
 type Props = {
   onAddMeal: (meal: Meal) => void;
@@ -15,6 +20,9 @@ type Props = {
   initialMeal?: Meal;
   onUpdateMeal?: (logId: string, meal: Meal) => void;
 };
+
+const inputClassName =
+  "h-12 rounded-xl bg-muted/50 border border-sky-200/70 text-foreground placeholder:text-muted-foreground focus-visible:border-sky-400 focus-visible:ring-sky-400/25 dark:border-sky-500/20 dark:bg-muted/40";
 
 function getInitialFieldValue(value?: string | number | null): string {
   if (value === undefined || value === null) {
@@ -34,20 +42,15 @@ export function ManualMealEntry({ onAddMeal, onClose, editLogId, initialMeal, on
   const isEdit = Boolean(editLogId && initialMeal && onUpdateMeal);
 
   const handleSubmit = () => {
-    if (!mealName || !calories || !protein || !carbs || !fats) return;
+    const values = { name: mealName, calories, protein, carbs, fats };
+    if (!canSubmitManualMeal(values)) return;
 
-    const meal: Meal = {
-      id: initialMeal?.id ?? `manual-${Date.now()}`,
-      name: mealName,
-      restaurant: initialMeal?.restaurant ?? "Manual Entry",
-      rating: initialMeal?.rating ?? 0,
-      category: "restaurant",
-      image: initialMeal?.image ?? "/logos/default.png",
-      calories: parseInt(calories, 10) || 0,
-      protein: parseInt(protein, 10) || 0,
-      carbs: parseInt(carbs, 10) || 0,
-      fats: parseInt(fats, 10) || 0,
-    };
+    const meal = buildManualMealFromForm(values, {
+      id: initialMeal?.id,
+      restaurant: initialMeal?.restaurant,
+      image: initialMeal?.image,
+      rating: initialMeal?.rating,
+    });
 
     if (isEdit && editLogId && onUpdateMeal) {
       onUpdateMeal(editLogId, meal);
@@ -57,19 +60,26 @@ export function ManualMealEntry({ onAddMeal, onClose, editLogId, initialMeal, on
     onClose();
   };
 
-  const isValid = mealName && calories && protein && carbs && fats;
+  const isValid = canSubmitManualMeal({ name: mealName, calories, protein, carbs, fats });
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end justify-center">
-      <div className="w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-800 border-t border-gray-700 rounded-t-3xl p-6 animate-slide-up">
+    <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-end justify-center">
+      <div className="w-full max-w-md max-h-[90vh] overflow-y-auto bg-gradient-to-br from-card via-card to-sky-50/40 border-t border-sky-200/60 rounded-t-3xl p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] animate-slide-up dark:from-card dark:via-card dark:to-sky-950/20 dark:border-sky-500/15">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-white">{isEdit ? "Edit meal" : "Add meal manually"}</h2>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-sky-600/80 dark:text-sky-300/80">
+              Manual entry
+            </p>
+            <h2 className="text-card-foreground font-semibold">
+              {isEdit ? "Edit meal" : "Add meal manually"}
+            </h2>
+          </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="text-gray-400 hover:text-white hover:bg-white/10 rounded-full"
+            className="text-muted-foreground hover:text-foreground hover:bg-sky-100/60 dark:hover:bg-sky-500/10 rounded-full"
           >
             <X className="w-5 h-5" />
           </Button>
@@ -78,7 +88,7 @@ export function ManualMealEntry({ onAddMeal, onClose, editLogId, initialMeal, on
         {/* Form */}
         <div className="space-y-4">
           <div>
-            <Label htmlFor="meal-name" className="text-white mb-2 block">
+            <Label htmlFor="meal-name" className="text-foreground/80 mb-2 block text-xs ml-1">
               Meal Name
             </Label>
             <Input
@@ -86,12 +96,12 @@ export function ManualMealEntry({ onAddMeal, onClose, editLogId, initialMeal, on
               value={mealName}
               onChange={(e) => setMealName(e.target.value)}
               placeholder="e.g., Grilled Chicken Salad"
-              className="h-12 rounded-xl bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+              className={inputClassName}
             />
           </div>
 
           <div>
-            <Label htmlFor="calories" className="text-white mb-2 block">
+            <Label htmlFor="calories" className="text-foreground/80 mb-2 block text-xs ml-1">
               Calories
             </Label>
             <Input
@@ -100,13 +110,13 @@ export function ManualMealEntry({ onAddMeal, onClose, editLogId, initialMeal, on
               value={calories}
               onChange={(e) => setCalories(e.target.value)}
               placeholder="500"
-              className="h-12 rounded-xl bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+              className={inputClassName}
             />
           </div>
 
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <Label htmlFor="protein" className="text-white mb-2 block">
+              <Label htmlFor="protein" className="text-foreground/80 mb-2 block text-xs ml-1">
                 Protein (g)
               </Label>
               <Input
@@ -115,12 +125,12 @@ export function ManualMealEntry({ onAddMeal, onClose, editLogId, initialMeal, on
                 value={protein}
                 onChange={(e) => setProtein(e.target.value)}
                 placeholder="30"
-                className="h-12 rounded-xl bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                className={inputClassName}
               />
             </div>
 
             <div>
-              <Label htmlFor="carbs" className="text-white mb-2 block">
+              <Label htmlFor="carbs" className="text-foreground/80 mb-2 block text-xs ml-1">
                 Carbs (g)
               </Label>
               <Input
@@ -129,12 +139,12 @@ export function ManualMealEntry({ onAddMeal, onClose, editLogId, initialMeal, on
                 value={carbs}
                 onChange={(e) => setCarbs(e.target.value)}
                 placeholder="40"
-                className="h-12 rounded-xl bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                className={inputClassName}
               />
             </div>
 
             <div>
-              <Label htmlFor="fats" className="text-white mb-2 block">
+              <Label htmlFor="fats" className="text-foreground/80 mb-2 block text-xs ml-1">
                 Fats (g)
               </Label>
               <Input
@@ -143,7 +153,7 @@ export function ManualMealEntry({ onAddMeal, onClose, editLogId, initialMeal, on
                 value={fats}
                 onChange={(e) => setFats(e.target.value)}
                 placeholder="15"
-                className="h-12 rounded-xl bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                className={inputClassName}
               />
             </div>
           </div>
@@ -151,21 +161,28 @@ export function ManualMealEntry({ onAddMeal, onClose, editLogId, initialMeal, on
 
         {/* Actions */}
         <div className="flex gap-3 mt-6">
-          <Button
-            variant="outline"
+          <button
+            type="button"
             onClick={onClose}
-            className="flex-1 h-12 rounded-full bg-gray-800 border-gray-700 text-white hover:bg-gray-700"
+            className="flex-1 h-12 rounded-full bg-muted/50 border border-border text-foreground font-medium hover:bg-muted"
           >
             Cancel
-          </Button>
-          <Button
+          </button>
+          <button
+            type="button"
             onClick={handleSubmit}
             disabled={!isValid}
-            className="flex-1 h-12 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 shadow-lg shadow-cyan-500/30 disabled:opacity-50 disabled:shadow-none"
+            className={getManualLogButtonClassName(isValid)}
           >
-            <Check className="mr-2 w-5 h-5" />
-            {isEdit ? "Save changes" : "Add meal"}
-          </Button>
+            {isEdit ? (
+              "Save changes"
+            ) : (
+              <>
+                <Plus className="w-5 h-5 shrink-0" />
+                Log meal
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>

@@ -27,6 +27,11 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { useTheme } from '../contexts/ThemeContext';
 import { useNutrition } from '../contexts/NutritionContext';
 import { getRestaurantLogoUrl } from '@/lib/image-utils';
+import {
+  buildManualMealFromForm,
+  canSubmitManualMeal,
+  getManualLogButtonClassName,
+} from '@/lib/manual-meal-utils';
 
 // --- TYPES ---
 type Props = {
@@ -1366,12 +1371,39 @@ export function MealDetail({
   };
 
   const handleManualSubmit = () => {
-    // Just close for now, logically would pass data to parent
+    const values = {
+      name: manualName,
+      calories: manualCals,
+      protein: manualPro,
+      carbs: manualCarbs,
+      fats: manualFats,
+    };
+
+    if (!canSubmitManualMeal(values)) {
+      return;
+    }
+
+    if (!isPremium) {
+      onPremiumFeatureAttempt?.();
+      return;
+    }
+
+    onLogMeal(buildManualMealFromForm(values));
     setShowManualModal(false);
-    setManualName(''); setManualCals(''); setManualPro(''); setManualCarbs(''); setManualFats('');
+    setManualName('');
+    setManualCals('');
+    setManualPro('');
+    setManualCarbs('');
+    setManualFats('');
   };
 
-  const isManualValid = manualName && manualCals;
+  const isManualValid = canSubmitManualMeal({
+    name: manualName,
+    calories: manualCals,
+    protein: manualPro,
+    carbs: manualCarbs,
+    fats: manualFats,
+  });
 
   return (
     <div className="h-full w-full bg-background text-foreground flex flex-col relative overflow-hidden font-sans">
@@ -1843,10 +1875,10 @@ export function MealDetail({
 
               <button
                 onClick={() => setShowManualModal(true)}
-                className="mt-2.5 flex w-full items-center justify-between rounded-2xl border border-cyan-200/80 bg-gradient-to-r from-white to-cyan-50/80 px-4 py-3.5 text-left text-slate-900 shadow-sm transition-all hover:border-cyan-300 hover:shadow-md active:scale-[0.98] dark:border-cyan-500/20 dark:bg-gradient-to-r dark:from-slate-900 dark:to-cyan-950/40 dark:text-white"
+                className="mt-2.5 flex w-full items-center justify-between rounded-2xl border border-sky-200/80 bg-gradient-to-r from-white to-sky-50/90 px-4 py-3.5 text-left text-slate-900 shadow-sm transition-all hover:border-sky-300 hover:shadow-md active:scale-[0.98] dark:border-sky-500/15 dark:bg-gradient-to-r dark:from-slate-900 dark:to-sky-950/25 dark:text-white"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-700 ring-1 ring-cyan-500/15 dark:bg-cyan-500/15 dark:text-cyan-300 dark:ring-cyan-400/10">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-400/10 text-sky-600 ring-1 ring-sky-300/30 dark:bg-sky-400/10 dark:text-sky-300 dark:ring-sky-400/15">
                     <Plus className="h-4 w-4" />
                   </div>
                   <div className="min-w-0">
@@ -1856,7 +1888,7 @@ export function MealDetail({
                     </p>
                   </div>
                 </div>
-                <span className="rounded-full border border-cyan-200/80 bg-white/80 px-2.5 py-1 text-[11px] font-semibold text-cyan-700 dark:border-cyan-400/20 dark:bg-slate-900/70 dark:text-cyan-300">
+                <span className="rounded-full border border-sky-200/80 bg-white/80 px-2.5 py-1 text-[11px] font-semibold text-sky-600 dark:border-sky-400/20 dark:bg-slate-900/70 dark:text-sky-300">
                   Custom
                 </span>
               </button>
@@ -2116,7 +2148,7 @@ export function MealDetail({
       {/* --- MANUAL ADD MODAL --- */}
       {showManualModal && (
         <div className="absolute inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-gradient-to-br from-card to-muted border-t border-border rounded-t-3xl p-6 animate-slide-up">
+          <div className="w-full max-w-md bg-gradient-to-br from-card via-card to-sky-50/40 border-t border-sky-200/60 rounded-t-3xl p-6 animate-slide-up dark:from-card dark:via-card dark:to-sky-950/20 dark:border-sky-500/15">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-card-foreground font-semibold">Add Meal Manually</h2>
               <button onClick={() => setShowManualModal(false)} className="text-muted-foreground hover:text-foreground p-2">
@@ -2131,7 +2163,7 @@ export function MealDetail({
                   value={manualName}
                   onChange={e => setManualName(e.target.value)}
                   placeholder="e.g. Grilled Chicken Salad"
-                  className="w-full h-12 rounded-xl bg-muted/50 border border-border text-foreground px-4 placeholder:text-muted-foreground focus:outline-none focus:border-cyan-500"
+                  className="w-full h-12 rounded-xl bg-muted/50 border border-sky-200/70 text-foreground px-4 placeholder:text-muted-foreground focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 dark:border-sky-500/20 dark:bg-muted/40"
                 />
               </div>
               <div>
@@ -2141,21 +2173,21 @@ export function MealDetail({
                   value={manualCals}
                   onChange={e => setManualCals(e.target.value)}
                   placeholder="500"
-                  className="w-full h-12 rounded-xl bg-muted/50 border border-border text-foreground px-4 placeholder:text-muted-foreground focus:outline-none focus:border-cyan-500"
+                  className="w-full h-12 rounded-xl bg-muted/50 border border-sky-200/70 text-foreground px-4 placeholder:text-muted-foreground focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 dark:border-sky-500/20 dark:bg-muted/40"
                 />
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="text-foreground/80 text-xs mb-1.5 block ml-1">Protein (g)</label>
-                  <input type="number" value={manualPro} onChange={e => setManualPro(e.target.value)} placeholder="30" className="w-full h-12 rounded-xl bg-muted/50 border border-border text-foreground px-3 placeholder:text-muted-foreground focus:outline-none focus:border-cyan-500" />
+                  <input type="number" value={manualPro} onChange={e => setManualPro(e.target.value)} placeholder="30" className="w-full h-12 rounded-xl bg-muted/50 border border-sky-200/70 text-foreground px-3 placeholder:text-muted-foreground focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 dark:border-sky-500/20 dark:bg-muted/40" />
                 </div>
                 <div>
                   <label className="text-foreground/80 text-xs mb-1.5 block ml-1">Carbs (g)</label>
-                  <input type="number" value={manualCarbs} onChange={e => setManualCarbs(e.target.value)} placeholder="40" className="w-full h-12 rounded-xl bg-muted/50 border border-border text-foreground px-3 placeholder:text-muted-foreground focus:outline-none focus:border-cyan-500" />
+                  <input type="number" value={manualCarbs} onChange={e => setManualCarbs(e.target.value)} placeholder="40" className="w-full h-12 rounded-xl bg-muted/50 border border-sky-200/70 text-foreground px-3 placeholder:text-muted-foreground focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 dark:border-sky-500/20 dark:bg-muted/40" />
                 </div>
                 <div>
                   <label className="text-foreground/80 text-xs mb-1.5 block ml-1">Fats (g)</label>
-                  <input type="number" value={manualFats} onChange={e => setManualFats(e.target.value)} placeholder="15" className="w-full h-12 rounded-xl bg-muted/50 border border-border text-foreground px-3 placeholder:text-muted-foreground focus:outline-none focus:border-cyan-500" />
+                  <input type="number" value={manualFats} onChange={e => setManualFats(e.target.value)} placeholder="15" className="w-full h-12 rounded-xl bg-muted/50 border border-sky-200/70 text-foreground px-3 placeholder:text-muted-foreground focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/20 dark:border-sky-500/20 dark:bg-muted/40" />
                 </div>
               </div>
             </div>
@@ -2165,12 +2197,12 @@ export function MealDetail({
                 Cancel
               </button>
               <button
-                onClick={handleManualSubmit}
+                onClick={isPremium ? handleManualSubmit : () => onPremiumFeatureAttempt?.()}
                 disabled={!isManualValid}
-                className={`flex-1 h-12 rounded-full font-medium shadow-lg flex items-center justify-center transition-all ${isManualValid ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-cyan-500/30 hover:shadow-cyan-500/50' : 'bg-muted text-muted-foreground cursor-not-allowed'}`}
+                className={getManualLogButtonClassName(isManualValid)}
               >
-                <Check className="mr-2 w-5 h-5" />
-                Add Meal
+                <Plus className="w-5 h-5 shrink-0" />
+                {isPremium ? 'Log meal' : 'Unlock to log'}
               </button>
             </div>
           </div>

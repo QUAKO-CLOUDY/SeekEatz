@@ -13,6 +13,7 @@ import { claimAnonymousData } from "@/lib/claim-anon-data";
 import { AuthProviders } from "@/app/components/AuthProviders";
 import { bootstrapAccount } from "@/lib/bootstrap-account";
 import { resolveSignupDestination } from "@/lib/post-auth-routing";
+import { POST_ONBOARDING_PLAN_PICKER_PATH } from "@/lib/onboarding-flow";
 import { getFreeTierSignupDescription } from "@/lib/free-tier";
 import type { UserProfile } from "@/app/types";
 import {
@@ -49,7 +50,7 @@ function SignupPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const supabase = createClient();
-  const redirectTo = searchParams.get("redirectTo") || "/upgrade?fromSignup=1";
+  const redirectTo = searchParams.get("redirectTo") || POST_ONBOARDING_PLAN_PICKER_PATH;
   const isMasterMode = searchParams.get("master") === "1";
   const isSwitchAccountMode = searchParams.get("switch") === "1";
   const shouldStartTutorial = searchParams.get("tutorial") === "1";

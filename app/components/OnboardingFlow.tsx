@@ -1,39 +1,101 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import { ChevronRight, MapPin, Sparkles, ShieldCheck } from "lucide-react";
+import { useCallback, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ChevronRight, MapPin, ShieldCheck, Sparkles } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { createClient } from "@/utils/supabase/client";
 import { bootstrapAccount } from "@/lib/bootstrap-account";
 import type { UserProfile } from "@/app/types";
+import {
+  ONBOARDING_QUESTION_COUNT,
+  OnboardingProfileQuestions,
+} from "./onboarding/OnboardingProfileQuestions";
+import {
+  NUTRITION_INPUT_COUNT,
+  NUTRITION_QUESTION_COUNT,
+  OnboardingNutritionQuestions,
+} from "./onboarding/OnboardingNutritionQuestions";
+import { OnboardingNutritionProfileIntro } from "./onboarding/OnboardingNutritionProfileIntro";
+import { OnboardingProfileProgressScreen } from "./onboarding/OnboardingProfileProgressScreen";
+import { OnboardingRecommendedTargets } from "./onboarding/OnboardingRecommendedTargets";
+import { applyNutritionTargetsToProfile } from "./onboarding/apply-nutrition-targets";
+import {
+  BENEFIT_SLIDE_COUNT,
+  FIRST_QUESTION_STEP,
+  getFirstNutritionStep,
+  getProfileProgressStep,
+  getRecommendedTargetsStep,
+  PERSONALIZATION_INTRO_STEP,
+} from "./onboarding/onboarding-steps";
+import { onboardingTransition, onboardingScreenVariants } from "./onboarding/onboarding-motion";
+import { mergeOnboardingProfileDraft, readOnboardingProfileDraft } from "./onboarding/onboarding-profile";
+import { OnboardingNav } from "./onboarding/OnboardingNav";
+import { OnboardingShell } from "./onboarding/OnboardingShell";
+import { OnboardingStepCard } from "./onboarding/OnboardingStepCard";
 
 type Props = {
   onComplete: () => void;
+  onSkipToSignup?: () => void;
   initialStep?: number;
 };
 
-const TOTAL_STEPS = 3;
-type ProgressDotsProps = {
-  activeStep: number;
+const PROFILE_PROGRESS_STEP = getProfileProgressStep(ONBOARDING_QUESTION_COUNT);
+const FIRST_NUTRITION_STEP = getFirstNutritionStep(ONBOARDING_QUESTION_COUNT);
+const RECOMMENDED_TARGETS_STEP = getRecommendedTargetsStep(
+  ONBOARDING_QUESTION_COUNT,
+  NUTRITION_QUESTION_COUNT,
+);
+
+type BenefitSlide = {
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  accent: string;
+  glow: string;
+  buttonClass: string;
 };
 
-function ProgressDots({ activeStep }: ProgressDotsProps) {
+const benefitSlides: BenefitSlide[] = [
+  {
+    title: "Eat Anywhere",
+    description:
+      "Whether you're on the go, in a new city, or eating out locally, SeekEatz finds meals that fit your goals.",
+    icon: MapPin,
+    accent: "text-teal-500",
+    glow: "from-teal-500 to-blue-500",
+    buttonClass: "from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 shadow-teal-500/20",
+  },
+  {
+    title: "AI Menu Scraper",
+    description:
+      "Our AI scans restaurant menus and highlights the best meals for your calorie and macro goals.",
+    icon: Sparkles,
+    accent: "text-purple-500",
+    glow: "from-purple-500 to-pink-500",
+    buttonClass: "from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-purple-500/20",
+  },
+  {
+    title: "No Guesswork",
+    description:
+      "SeekEatz pulls nutrition from real restaurant nutritional menus and databases, eliminating crowdsourced guesses, made up numbers, and AI hallucinations.",
+    icon: ShieldCheck,
+    accent: "text-orange-500",
+    glow: "from-orange-500 to-amber-500",
+    buttonClass: "from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 shadow-orange-500/20",
+  },
+];
+
+function BenefitProgressDots({ activeStep }: { activeStep: number }) {
   return (
-    <div className="flex gap-2 justify-center mb-8">
-      {Array.from({ length: TOTAL_STEPS }).map((_, index) => (
+    <div className="mb-8 flex justify-center gap-2">
+      {benefitSlides.map((slide, index) => (
         <div
-          key={index}
-          className={`h-2 w-12 rounded-full transition-all ${
-            index === activeStep
-              ? index === 0
-                ? "bg-gradient-to-r from-teal-500 to-blue-500"
-                : index === 1
-                ? "bg-gradient-to-r from-purple-500 to-pink-500"
-                : index === 2
-                ? "bg-gradient-to-r from-orange-500 to-amber-500"
-                : "bg-gradient-to-r from-green-500 to-emerald-500"
-              : "bg-muted"
+          key={slide.title}
+          className={`h-1.5 rounded-full transition-all duration-300 ${
+            index === activeStep ? "w-10 bg-gradient-to-r " + slide.glow : "w-6 bg-muted"
           }`}
         />
       ))}
@@ -41,19 +103,110 @@ function ProgressDots({ activeStep }: ProgressDotsProps) {
   );
 }
 
-export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
+export function OnboardingFlow({ onComplete, onSkipToSignup, initialStep = -1 }: Props) {
   const supabase = createClient();
-  const [step, setStep] = useState(initialStep); // -1 = Welcome, 0-2 = onboarding slides
+  const reduceMotion = useReducedMotion();
+  const [step, setStep] = useState(initialStep);
+  const [direction, setDirection] = useState(1);
 
+  const goToStep = useCallback((next: number) => {
+    setStep((current) => {
+      setDirection(next >= current ? 1 : -1);
+      return next;
+    });
+  }, []);
 
-  if (step === -1) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-50 via-background to-blue-50 dark:from-slate-950 dark:via-background dark:to-slate-900" />
-        <div className="absolute -top-24 right-[-4rem] h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
-        <div className="absolute -bottom-24 left-[-4rem] h-56 w-56 rounded-full bg-blue-500/20 blur-3xl" />
+  const finishOnboarding = useCallback(async () => {
+    try {
+      const now = Date.now();
+      let user = null;
 
-        <div className="relative z-10 w-full max-w-md rounded-[2rem] border border-white/40 bg-white/90 p-8 text-center shadow-2xl backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
+      try {
+        const {
+          data: { user: fetchedUser },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError && userError.message && !userError.message.includes("Auth session missing")) {
+          console.warn("Auth error (non-session):", userError);
+        }
+
+        if (fetchedUser) {
+          user = fetchedUser;
+        }
+      } catch (error: unknown) {
+        if (
+          !(error instanceof Error) ||
+          (!error.message.includes("Auth session missing") && error.name !== "AuthSessionMissingError")
+        ) {
+          console.warn("Unexpected auth error:", error);
+        }
+      }
+
+      const pendingProfile = mergeOnboardingProfileDraft({});
+      if (Object.keys(pendingProfile).length > 0) {
+        localStorage.setItem("userProfile", JSON.stringify(pendingProfile));
+        localStorage.setItem("seekEatz_onboardingQuestionsComplete", "true");
+      }
+
+      localStorage.setItem("hasCompletedOnboarding", "true");
+      localStorage.setItem("onboarded", "true");
+      localStorage.setItem("onboardingCompletedTimestamp", now.toString());
+      localStorage.setItem("seekeatz_current_screen", "home");
+      localStorage.setItem("seekeatz_nav_history", JSON.stringify(["home"]));
+
+      if (user) {
+        try {
+          let userProfile: Partial<UserProfile> | null = null;
+          try {
+            const savedProfile = localStorage.getItem("userProfile");
+            if (savedProfile) {
+              userProfile = JSON.parse(savedProfile) as Partial<UserProfile>;
+            }
+          } catch (e) {
+            console.warn("Failed to parse userProfile from localStorage:", e);
+          }
+
+          await bootstrapAccount({
+            profile: userProfile,
+            hasCompletedOnboarding: true,
+          });
+        } catch (error) {
+          console.error("Error updating profile:", error);
+        }
+
+        localStorage.setItem(`seekEatz_hasCompletedOnboarding_${user.id}`, "true");
+        localStorage.setItem(`seekEatz_lastLogin_${user.id}`, now.toString());
+        localStorage.setItem("seekEatz_lastLogin", now.toString());
+      } else {
+        localStorage.setItem("seekEatz_lastLogin", now.toString());
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      onComplete();
+    } catch (error) {
+      console.error("Error completing onboarding:", error);
+      onComplete();
+    }
+  }, [onComplete, supabase]);
+
+  const advanceFromBenefitSlides = useCallback(() => {
+    goToStep(PERSONALIZATION_INTRO_STEP);
+  }, [goToStep]);
+
+  const advanceFromPersonalizationIntro = useCallback(() => {
+    goToStep(FIRST_QUESTION_STEP);
+  }, [goToStep]);
+
+  const renderWelcome = () => (
+    <OnboardingShell>
+      <OnboardingStepCard stepKey="welcome">
+        <motion.div
+          initial={{ opacity: reduceMotion ? 1 : 0, y: reduceMotion ? 0 : 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={onboardingTransition(reduceMotion, 0.04)}
+          className="text-center"
+        >
           <div className="mx-auto mb-8 flex justify-center">
             <div className="relative h-24 w-24">
               <Image
@@ -77,226 +230,197 @@ export function OnboardingFlow({ onComplete, initialStep = -1 }: Props) {
           </p>
 
           <Button
-            onClick={() => setStep(0)}
+            onClick={() => goToStep(0)}
             className="mt-10 h-14 w-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-base font-semibold text-white shadow-lg shadow-cyan-500/20 hover:from-cyan-600 hover:to-blue-700"
           >
             Get Started
             <ChevronRight className="ml-2 h-5 w-5" />
           </Button>
-        </div>
-      </div>
-    );
-  }
+        </motion.div>
+      </OnboardingStepCard>
+    </OnboardingShell>
+  );
 
-  // STEP 0: Eat Anywhere (First onboarding screen after welcome)
-  if (step === 0) {
+  const renderBenefitSlide = (slideIndex: number) => {
+    const slide = benefitSlides[slideIndex];
+    const Icon = slide.icon;
+
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-50 via-background to-blue-50 dark:from-slate-950 dark:via-background dark:to-slate-900" />
-        <div className="absolute -top-24 right-[-4rem] h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
-        <div className="absolute -bottom-24 left-[-4rem] h-56 w-56 rounded-full bg-blue-500/20 blur-3xl" />
-
-        <div className="relative z-10 w-full max-w-md rounded-[2rem] border border-white/40 bg-white/90 p-8 text-center shadow-2xl backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
-          <div className="mb-8 flex justify-center">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-blue-500 rounded-full blur-2xl opacity-20 animate-pulse" />
-              <MapPin className="w-20 h-20 text-teal-500 relative" strokeWidth={1.5} />
-            </div>
-          </div>
-
-          <h1 className="text-3xl font-bold text-foreground mb-4">Eat Anywhere</h1>
-          <p className="text-muted-foreground text-lg mb-12 leading-relaxed">
-          Whether you&apos;re on the go, in a new city, or eating out locally, SeekEatz finds meals that fit your goals.
-          </p>
-
-          <ProgressDots activeStep={step} />
-
-          <div className="flex gap-3">
-            <Button
-              onClick={() => setStep(1)}
-              className="h-14 rounded-full bg-gradient-to-r from-teal-500 to-blue-500 hover:from-teal-600 hover:to-blue-600 text-white shadow-lg shadow-teal-500/20 w-full text-lg"
+      <OnboardingShell>
+        <OnboardingStepCard stepKey={`benefit-${slideIndex}`}>
+          <div className="text-center">
+            <motion.div
+              initial={{ opacity: reduceMotion ? 1 : 0, scale: reduceMotion ? 1 : 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={onboardingTransition(reduceMotion, 0.06)}
+              className="mb-8 flex justify-center"
             >
-              Next
-              <ChevronRight className="ml-2 w-5 h-5" />
-            </Button>
+              <div className="relative">
+                <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${slide.glow} blur-2xl opacity-20`} />
+                <Icon className={`relative h-20 w-20 ${slide.accent}`} strokeWidth={1.5} />
+              </div>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: reduceMotion ? 1 : 0, y: reduceMotion ? 0 : 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={onboardingTransition(reduceMotion, 0.1)}
+              className="mb-4 text-3xl font-bold text-foreground"
+            >
+              {slide.title}
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: reduceMotion ? 1 : 0, y: reduceMotion ? 0 : 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={onboardingTransition(reduceMotion, 0.14)}
+              className="mb-12 text-lg leading-relaxed text-muted-foreground"
+            >
+              {slide.description}
+            </motion.p>
+
+            <BenefitProgressDots activeStep={slideIndex} />
+
+            <OnboardingNav
+              showBack={slideIndex > 0}
+              onBack={slideIndex > 0 ? () => goToStep(slideIndex - 1) : undefined}
+              onNext={() => {
+                if (slideIndex < BENEFIT_SLIDE_COUNT - 1) {
+                  goToStep(slideIndex + 1);
+                  return;
+                }
+
+                advanceFromBenefitSlides();
+              }}
+              nextLabel={slideIndex === BENEFIT_SLIDE_COUNT - 1 ? "Continue" : "Next"}
+              primaryClassName={`bg-gradient-to-r ${slide.buttonClass} text-white shadow-lg`}
+            />
           </div>
-        </div>
-      </div>
+        </OnboardingStepCard>
+      </OnboardingShell>
+    );
+  };
+
+  const renderQuestionStep = (questionIndex: number) => (
+    <OnboardingProfileQuestions
+      questionIndex={questionIndex}
+      onBack={() => {
+        if (questionIndex === 0) {
+          goToStep(PERSONALIZATION_INTRO_STEP);
+          return;
+        }
+
+        goToStep(FIRST_QUESTION_STEP + questionIndex - 1);
+      }}
+      onAdvance={() => {
+        if (questionIndex < ONBOARDING_QUESTION_COUNT - 1) {
+          goToStep(FIRST_QUESTION_STEP + questionIndex + 1);
+          return;
+        }
+
+        goToStep(PROFILE_PROGRESS_STEP);
+      }}
+      onComplete={() => {
+        goToStep(PROFILE_PROGRESS_STEP);
+      }}
+    />
+  );
+
+  const renderNutritionStep = (questionIndex: number) => (
+    <OnboardingNutritionQuestions
+      questionIndex={questionIndex}
+      onBack={() => {
+        if (questionIndex === 0) {
+          goToStep(PROFILE_PROGRESS_STEP);
+          return;
+        }
+
+        goToStep(FIRST_NUTRITION_STEP + questionIndex - 1);
+      }}
+      onSkip={() => {
+        if (onSkipToSignup) {
+          void onSkipToSignup();
+          return;
+        }
+
+        void finishOnboarding();
+      }}
+      onAdvance={() => {
+        if (questionIndex < NUTRITION_QUESTION_COUNT - 1) {
+          goToStep(FIRST_NUTRITION_STEP + questionIndex + 1);
+          return;
+        }
+
+        if (NUTRITION_QUESTION_COUNT >= NUTRITION_INPUT_COUNT) {
+          goToStep(RECOMMENDED_TARGETS_STEP);
+          return;
+        }
+
+        void finishOnboarding();
+      }}
+      onComplete={() => {
+        if (NUTRITION_QUESTION_COUNT >= NUTRITION_INPUT_COUNT) {
+          goToStep(RECOMMENDED_TARGETS_STEP);
+          return;
+        }
+
+        void finishOnboarding();
+      }}
+    />
+  );
+
+  let content = null;
+
+  if (step === -1) {
+    content = renderWelcome();
+  } else if (step >= 0 && step < BENEFIT_SLIDE_COUNT) {
+    content = renderBenefitSlide(step);
+  } else if (step === PERSONALIZATION_INTRO_STEP) {
+    content = (
+      <OnboardingNutritionProfileIntro
+        onBack={() => goToStep(BENEFIT_SLIDE_COUNT - 1)}
+        onContinue={advanceFromPersonalizationIntro}
+      />
+    );
+  } else if (step >= FIRST_QUESTION_STEP && step < FIRST_QUESTION_STEP + ONBOARDING_QUESTION_COUNT) {
+    content = renderQuestionStep(step - FIRST_QUESTION_STEP);
+  } else if (step === PROFILE_PROGRESS_STEP) {
+    content = (
+      <OnboardingProfileProgressScreen
+        onBack={() => goToStep(FIRST_QUESTION_STEP + ONBOARDING_QUESTION_COUNT - 1)}
+        onContinue={() => goToStep(FIRST_NUTRITION_STEP)}
+      />
+    );
+  } else if (
+    step >= FIRST_NUTRITION_STEP &&
+    step < FIRST_NUTRITION_STEP + NUTRITION_QUESTION_COUNT
+  ) {
+    content = renderNutritionStep(step - FIRST_NUTRITION_STEP);
+  } else if (step === RECOMMENDED_TARGETS_STEP) {
+    content = (
+      <OnboardingRecommendedTargets
+        onBack={() => goToStep(FIRST_NUTRITION_STEP + NUTRITION_QUESTION_COUNT - 1)}
+        onContinue={() => {
+          applyNutritionTargetsToProfile(readOnboardingProfileDraft());
+          void finishOnboarding();
+        }}
+      />
     );
   }
 
-  // STEP 1: AI Menu Scraper
-  if (step === 1) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-50 via-background to-blue-50 dark:from-slate-950 dark:via-background dark:to-slate-900" />
-        <div className="absolute -top-24 right-[-4rem] h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
-        <div className="absolute -bottom-24 left-[-4rem] h-56 w-56 rounded-full bg-blue-500/20 blur-3xl" />
-
-        <div className="relative z-10 w-full max-w-md rounded-[2rem] border border-white/40 bg-white/90 p-8 text-center shadow-2xl backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
-          <div className="mb-8 flex justify-center">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full blur-2xl opacity-20 animate-pulse" />
-              <Sparkles className="w-20 h-20 text-purple-500 relative" strokeWidth={1.5} />
-            </div>
-          </div>
-
-          <h1 className="text-3xl font-bold text-foreground mb-4">AI Menu Scraper</h1>
-          <p className="text-muted-foreground text-lg mb-12 leading-relaxed">
-          Our AI scans restaurant menus and highlights the best meals for your calorie and macro goals.
-          </p>
-
-          <ProgressDots activeStep={step} />
-
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={() => setStep(0)}
-              className="h-14 rounded-full border-muted-foreground/20 text-foreground hover:bg-muted flex-1"
-            >
-              Back
-            </Button>
-            <Button
-              onClick={() => setStep(2)}
-              className="h-14 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg shadow-purple-500/20 flex-[2] text-lg"
-            >
-              Next
-              <ChevronRight className="ml-2 w-5 h-5" />
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // STEP 2: No Guesswork
-  if (step === 2) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-50 via-background to-blue-50 dark:from-slate-950 dark:via-background dark:to-slate-900" />
-        <div className="absolute -top-24 right-[-4rem] h-56 w-56 rounded-full bg-cyan-400/20 blur-3xl" />
-        <div className="absolute -bottom-24 left-[-4rem] h-56 w-56 rounded-full bg-blue-500/20 blur-3xl" />
-
-        <div className="relative z-10 w-full max-w-md rounded-[2rem] border border-white/40 bg-white/90 p-8 text-center shadow-2xl backdrop-blur dark:border-slate-800 dark:bg-slate-950/85">
-          <div className="mb-8 flex justify-center">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full blur-2xl opacity-20 animate-pulse" />
-              <ShieldCheck className="w-20 h-20 text-orange-500 relative" strokeWidth={1.5} />
-            </div>
-          </div>
-
-          <h1 className="text-3xl font-bold text-foreground mb-4">No Guesswork</h1>
-          <p className="text-muted-foreground text-lg mb-12 leading-relaxed">
-          SeekEatz pulls nutrition from real restaurant nutritional menus and databases, eliminating crowdsourced guesses, made up numbers, and AI hallucinations.
-          </p>
-
-          <ProgressDots activeStep={step} />
-
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={() => setStep(1)}
-              className="h-14 rounded-full border-muted-foreground/20 text-foreground hover:bg-muted flex-1"
-            >
-              Back
-            </Button>
-            <Button
-              onClick={() => { void completeOnboarding(); }}
-              className="h-14 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-lg shadow-orange-500/20 flex-[2] text-lg"
-            >
-              Next
-              <ChevronRight className="ml-2 w-5 h-5" />
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  async function completeOnboarding() {
-    try {
-      const now = Date.now();
-      
-      // Try to get user, but treat AuthSessionMissingError as "no user" (signed-out preview)
-      let user = null;
-      try {
-        const { data: { user: fetchedUser }, error: userError } = await supabase.auth.getUser();
-        // Only treat as error if it's NOT AuthSessionMissingError (which is expected when signed out)
-        if (userError && userError.message && !userError.message.includes('Auth session missing')) {
-          console.warn("Auth error (non-session):", userError);
-        }
-        // If we got a user, use it; otherwise user stays null (signed-out preview)
-        if (fetchedUser) {
-          user = fetchedUser;
-        }
-      } catch (error: unknown) {
-        // AuthSessionMissingError is expected when signed out - treat as no user
-        if (
-          error instanceof Error &&
-          (error.message.includes('Auth session missing') || error.name === 'AuthSessionMissingError')
-        ) {
-          // This is expected for signed-out users - continue with guest preview
-          console.log("No auth session (signed-out preview mode)");
-        } else {
-          console.warn("Unexpected auth error:", error);
-        }
-        // Continue with user = null (guest preview)
-      }
-
-      // ALWAYS set onboarding completion flags (for both signed-in and signed-out users)
-      localStorage.setItem("hasCompletedOnboarding", "true");
-      localStorage.setItem("onboarded", "true");
-      localStorage.setItem("onboardingCompletedTimestamp", now.toString());
-      localStorage.removeItem("seekEatz_onboardingQuestionsComplete");
-      
-      // Default to home once the app shell is reached after onboarding.
-      localStorage.setItem("seekeatz_current_screen", "home");
-      localStorage.setItem("seekeatz_nav_history", JSON.stringify(["home"]));
-
-      // If we have a user, also update database and set user-specific flags
-      if (user) {
-        // Mark onboarding as complete in database
-        try {
-          // Load user profile from localStorage if it exists
-          let userProfile: Partial<UserProfile> | null = null;
-          try {
-            const savedProfile = localStorage.getItem("userProfile");
-            if (savedProfile) {
-              userProfile = JSON.parse(savedProfile) as Partial<UserProfile>;
-            }
-          } catch (e) {
-            console.warn("Failed to parse userProfile from localStorage:", e);
-          }
-
-          await bootstrapAccount({
-            profile: userProfile,
-            hasCompletedOnboarding: true,
-          });
-        } catch (error) {
-          console.error("Error updating profile:", error);
-        }
-
-        // Set user-specific localStorage flags
-        localStorage.setItem(`seekEatz_hasCompletedOnboarding_${user.id}`, "true");
-        localStorage.setItem(`seekEatz_lastLogin_${user.id}`, now.toString());
-        localStorage.setItem("seekEatz_lastLogin", now.toString());
-      } else {
-        // Signed-out user - set generic lastLogin
-        localStorage.setItem("seekEatz_lastLogin", now.toString());
-      }
-
-      // Wait a moment to ensure all state is saved
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      // Notify parent that onboarding is complete
-      onComplete();
-    } catch (error) {
-      console.error("Error completing onboarding:", error);
-      // On error, still notify parent so it can decide how to handle navigation
-      onComplete();
-    }
-  }
-
-  return null;
+  return (
+    <AnimatePresence mode="wait" custom={{ reduceMotion, direction }}>
+      <motion.div
+        key={step}
+        custom={{ reduceMotion, direction }}
+        variants={onboardingScreenVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        transition={onboardingTransition(reduceMotion, 0, 0.38)}
+      >
+        {content}
+      </motion.div>
+    </AnimatePresence>
+  );
 }
-

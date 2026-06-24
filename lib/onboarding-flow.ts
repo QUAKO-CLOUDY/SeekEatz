@@ -1,5 +1,13 @@
 export type SubscriptionTier = 'free' | 'premium' | 'lifetime';
 
+/** Plan picker — shown after account creation in the new-user onboarding path. */
+export const POST_ONBOARDING_PLAN_PICKER_PATH = '/upgrade?fromSignup=1&tutorial=1';
+
+export function getPostOnboardingSignupPath(): string {
+  const redirectTo = encodeURIComponent(POST_ONBOARDING_PLAN_PICKER_PATH);
+  return `/auth/signup?redirectTo=${redirectTo}&switch=1`;
+}
+
 export const GUEST_QUERY_LIMIT = 2;
 export const FREE_ACCOUNT_DAILY_QUERY_LIMIT = 3;
 

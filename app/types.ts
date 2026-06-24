@@ -16,6 +16,36 @@ export type UserProfile = {
   search_distance_miles?: number; // Default search radius in miles (0.5, 1, 2, 5, or 10)
   preferredMealTypes?: string[]; // Optional array of preferred meal types
   goal?: 'lose-fat' | 'build-muscle' | 'maintain'; // Fitness goal: lose weight, build muscle, or maintain
+  eat_out_frequency?: 'rarely' | '1-2' | '3-5' | '6-9' | '10-14' | '15-plus';
+  social_skip_frequency?: 'never' | 'once-or-twice' | 'occasionally' | 'frequently' | 'all-the-time';
+  eating_out_experiences?: Array<
+    | 'checked-menus-before-going-out'
+    | 'ordered-healthy-regretted'
+    | 'spent-10-min-comparing'
+    | 'logged-meal-uncertain-data'
+    | 'felt-guilty-after-eating-out'
+    | 'no-idea-what-fit-macros'
+  >;
+  macro_confidence_impact?: 'yes-significantly' | 'yes-somewhat' | 'not-sure' | 'probably-not' | 'no';
+  gender?: 'male' | 'female';
+  age?: number;
+  height_ft?: number;
+  height_in?: number;
+  weight_lbs?: number;
+  bmr?: number;
+  activity_level?:
+    | 'sedentary'
+    | 'lightly-active'
+    | 'moderately-active'
+    | 'very-active'
+    | 'extremely-active';
+  daily_steps_range?:
+    | 'under-5000'
+    | '5000-7000'
+    | '7000-10000'
+    | '10000-15000'
+    | '15000-20000'
+    | '20000-plus';
   allergens?: string[];
 };
 

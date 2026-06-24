@@ -1,4 +1,5 @@
 import { bootstrapAccount } from "@/lib/bootstrap-account";
+import { POST_ONBOARDING_PLAN_PICKER_PATH } from "@/lib/onboarding-flow";
 import type { AppEntitlement } from "@/lib/entitlements";
 import {
   WAITLIST_WELCOME_PATH,
@@ -31,7 +32,7 @@ export async function resolveSignupDestination(args: {
   fallbackRedirect?: string;
   bootstrapResult?: BootstrapResult;
 }): Promise<string> {
-  const fallback = args.fallbackRedirect ?? "/upgrade?fromSignup=1";
+  const fallback = args.fallbackRedirect ?? POST_ONBOARDING_PLAN_PICKER_PATH;
   let bootstrapResult = args.bootstrapResult ?? null;
 
   if (!bootstrapResult) {

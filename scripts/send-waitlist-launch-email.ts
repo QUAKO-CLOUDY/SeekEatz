@@ -42,6 +42,10 @@ function normalizeEmail(value: string): string {
   return value.trim().toLowerCase();
 }
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const admin = createAdminClient();
@@ -115,6 +119,8 @@ async function main() {
         error: err instanceof Error ? err.message : "Unknown error",
       });
     }
+
+    await sleep(250);
   }
 
   console.log(`Waitlist launch send complete. Sent: ${sent}. Failed: ${failed}.`);

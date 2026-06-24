@@ -4,6 +4,11 @@ import { Suspense, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { OnboardingFlow } from "@/app/components/OnboardingFlow";
+import {
+  getPostOnboardingSignupPath,
+  POST_ONBOARDING_PLAN_PICKER_PATH,
+} from "@/lib/onboarding-flow";
+import { mergeOnboardingProfileDraft } from "@/app/components/onboarding/onboarding-profile";
 import { resolveSigninDestination } from "@/lib/post-auth-routing";
 
 function OnboardingPageContent() {
@@ -11,11 +16,10 @@ function OnboardingPageContent() {
   const searchParams = useSearchParams();
   const isPostSignupFlow = searchParams.get("afterSignup") === "1";
   const routeToPlanSelection = useCallback(() => {
-    router.replace("/upgrade?flow=onboarding&tutorial=1");
+    router.replace(POST_ONBOARDING_PLAN_PICKER_PATH);
   }, [router]);
   const routeToCreateAccount = useCallback(() => {
-    const redirectTo = encodeURIComponent("/upgrade?fromSignup=1");
-    router.replace(`/auth/signup?redirectTo=${redirectTo}&switch=1`);
+    router.replace(getPostOnboardingSignupPath());
   }, [router]);
   const routeToAppTutorial = useCallback(() => {
     if (typeof window !== "undefined") {
@@ -81,6 +85,31 @@ function OnboardingPageContent() {
     checkOnboardingStatus();
   }, [isPostSignupFlow, routeToPlanSelection]);
 
+  const persistOnboardingForSignup = useCallback(() => {
+    const pendingProfile = mergeOnboardingProfileDraft({});
+    if (Object.keys(pendingProfile).length > 0) {
+      localStorage.setItem("userProfile", JSON.stringify(pendingProfile));
+      localStorage.setItem("seekEatz_onboardingQuestionsComplete", "true");
+    }
+
+    localStorage.setItem("hasCompletedOnboarding", "true");
+    localStorage.setItem("onboarded", "true");
+    localStorage.setItem("onboardingCompletedTimestamp", Date.now().toString());
+  }, []);
+
+  const handleSkipToSignup = useCallback(async () => {
+    persistOnboardingForSignup();
+
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch {
+      // Still route to signup even if sign-out fails.
+    }
+
+    routeToCreateAccount();
+  }, [persistOnboardingForSignup, routeToCreateAccount]);
+
   const handleComplete = async () => {
     if (isPostSignupFlow) {
       routeToAppTutorial();
@@ -99,7 +128,7 @@ function OnboardingPageContent() {
       }
 
       const destination = await resolveSigninDestination({
-        fallbackRedirect: "/upgrade?fromSignup=1",
+        fallbackRedirect: POST_ONBOARDING_PLAN_PICKER_PATH,
         isReturningUser: false,
       });
       router.replace(destination);
@@ -111,7 +140,11 @@ function OnboardingPageContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      <OnboardingFlow onComplete={handleComplete} initialStep={-1} />
+      <OnboardingFlow
+        onComplete={handleComplete}
+        onSkipToSignup={handleSkipToSignup}
+        initialStep={-1}
+      />
     </div>
   );
 }

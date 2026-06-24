@@ -28,6 +28,10 @@ import {
   shouldShowWaitlistWelcomeScreen,
 } from "@/lib/waitlist-welcome";
 import { PREMIUM_PLAN_BENEFITS } from "@/lib/premium-benefits";
+import {
+  getPostOnboardingSignupPath,
+  POST_ONBOARDING_PLAN_PICKER_PATH,
+} from "@/lib/onboarding-flow";
 
 const PRIVACY_POLICY_URL = "https://seekeatz.com/legal/privacy";
 const TERMS_OF_USE_URL =
@@ -104,8 +108,9 @@ function UpgradePageContent() {
     [setEntitlement],
   );
   const isMasterMode = searchParams.get("master") === "1";
+  const isOnboardingFlow = searchParams.get("flow") === "onboarding";
   const shouldStartTutorial = searchParams.get("tutorial") === "1";
-  const postSignupUpgradePath = "/upgrade?fromSignup=1";
+  const postSignupUpgradePath = POST_ONBOARDING_PLAN_PICKER_PATH;
   const postAuthRedirect = "/upgrade?fromSignin=1";
   const encodedPostAuthRedirect = encodeURIComponent(postAuthRedirect);
   const encodedPostSignupUpgradePath = encodeURIComponent(postSignupUpgradePath);
@@ -132,6 +137,20 @@ function UpgradePageContent() {
         localStorage.getItem("onboarded") === "true"),
     [],
   );
+
+  useEffect(() => {
+    if (!isOnboardingFlow) {
+      return;
+    }
+
+    const supabase = createClient();
+
+    void supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) {
+        router.replace(getPostOnboardingSignupPath());
+      }
+    });
+  }, [isOnboardingFlow, router]);
 
   useEffect(() => {
     const supabase = createClient();

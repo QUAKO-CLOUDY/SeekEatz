@@ -21,7 +21,12 @@ import type { UserProfile, Meal } from '../types';
 import type { LoggedMeal } from './LogScreen';
 import { useSessionActivity } from '../hooks/useSessionActivity';
 import { useNutrition } from '../contexts/NutritionContext'; // Import to sync loggedMeals with context
-import { hasDevFullAccess, setDevFullAccess } from '@/lib/onboarding-flow';
+import {
+  getPostOnboardingSignupPath,
+  hasDevFullAccess,
+  POST_ONBOARDING_PLAN_PICKER_PATH,
+  setDevFullAccess,
+} from '@/lib/onboarding-flow';
 import {
   buildEntitlement,
   clearCachedEntitlement,
@@ -969,32 +974,38 @@ export function MainApp({ initialScreen = 'home' }: MainAppProps) {
     }
 
     let shouldBypassUpgrade = hasFullAccess || isMasterAccount;
+    let signedInUser = null;
     if (!shouldBypassUpgrade) {
       try {
         const {
           data: { user },
         } = await supabase.auth.getUser();
+        signedInUser = user;
         shouldBypassUpgrade = isFullAccessEmail(user?.email);
       } catch {
         shouldBypassUpgrade = false;
       }
     }
 
-    if (shouldBypassUpgrade && typeof window !== 'undefined') {
-      localStorage.setItem('seekeatz_start_app_tutorial', 'true');
-      localStorage.removeItem(tutorialCompletionKey);
-    }
-
-    setAppState(shouldBypassUpgrade ? 'app' : 'auth');
-    setCurrentScreen('home');
-    setNavHistory(['home']);
-
     if (shouldBypassUpgrade) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('seekeatz_start_app_tutorial', 'true');
+        localStorage.removeItem(tutorialCompletionKey);
+      }
+
+      setAppState('app');
+      setCurrentScreen('home');
+      setNavHistory(['home']);
       router.push('/chat');
       return;
     }
 
-    router.push('/upgrade?flow=onboarding&tutorial=1');
+    if (signedInUser) {
+      router.replace(POST_ONBOARDING_PLAN_PICKER_PATH);
+      return;
+    }
+
+    router.replace(getPostOnboardingSignupPath());
   };
 
   // Handle auth success (fallback, but onAuthStateChange should handle it)

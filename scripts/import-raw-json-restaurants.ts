@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
-import { normalizeItems } from './ingest/normalizer';
+import { normalizeItems, explainSkipReason } from './ingest/normalizer';
 import { upsertMenuItems } from './ingest/upserter';
 import type { RawIngestionItem } from './ingest/types';
 
@@ -28,6 +28,7 @@ type RawJsonRestaurantFile = {
 
 const args = process.argv.slice(2);
 const isDryRun = args.includes('--dry-run');
+const listSkips = args.includes('--list-skips');
 const batchLabel = args.find((value) => value.startsWith('--batch-label='))?.split('=')[1] ?? 'raw-json-import';
 const requestedRestaurants = args
   .filter((value) => value.startsWith('--restaurant='))
@@ -130,13 +131,26 @@ async function main() {
       .map((item) => mapRawItem(target.restaurantName, item))
       .filter((item): item is RawIngestionItem => item !== null);
 
-    const { items, skipped } = normalizeItems(rawItems, {
+    const normalizeOptions = {
       batchLabel,
       calorieFloor: 150,
       skipLargePortions: true,
-      skipModifiers: true,
+      skipModifiers: false,
       skipDrinks: false,
-    });
+    };
+
+    const { items, skipped } = normalizeItems(rawItems, normalizeOptions);
+
+    if (listSkips && skipped > 0) {
+      console.log('  Skipped items:');
+      for (const rawItem of rawItems) {
+        const reason = explainSkipReason(rawItem, normalizeOptions);
+        if (reason) {
+          const calories = Number(rawItem.calories ?? rawItem.macros?.calories ?? 0);
+          console.log(`    • ${rawItem.name} — ${reason}${calories ? `, ${calories} cal` : ''}`);
+        }
+      }
+    }
 
     console.log(`\n[import-raw-json] ${target.restaurantName}`);
     console.log(`  Raw items: ${rawItems.length}`);

@@ -19,6 +19,7 @@ const SIDE_KEYWORDS = [
   'side salad', 'side of', 'small side', 'coleslaw', 'apple slices',
   'house salad', 'cup of soup', 'breadstick', 'garlic bread',
   'corn on the cob', 'mashed potato side', 'mac side',
+  'broccoli', 'spinach', 'sweet potato', 'quinoa', 'jasmine rice',
 ];
 
 const MODIFIER_KEYWORDS = [
@@ -41,6 +42,9 @@ const LARGE_PORTION_KEYWORDS = [
   'serves 4', 'serves 6', 'serves 8', 'feeds',
 ];
 
+const SIDE_CATEGORY_REGEX = /\bsides?\b/i;
+const DRINK_CATEGORY_REGEX = /\b(smoothies?|juices?|drinks?|shakes?|beverages?)\b/i;
+
 export function detectItemType(
   name: string,
   description: string = '',
@@ -48,6 +52,23 @@ export function detectItemType(
   rawCategory: string = ''
 ): 'meal' | 'side' | 'drink' | 'snack' | 'modifier' {
   const text = `${name} ${description} ${rawCategory}`.toLowerCase();
+
+  if (SIDE_CATEGORY_REGEX.test(rawCategory)) {
+    if (MODIFIER_KEYWORDS.some((keyword) => text.includes(keyword) && !COMPOSED_MEAL_REGEX.test(text))) {
+      return 'side';
+    }
+    return 'side';
+  }
+
+  if (DRINK_CATEGORY_REGEX.test(rawCategory)) {
+    return 'drink';
+  }
+
+  if (COMPOSED_MEAL_REGEX.test(text)) {
+    return 'meal';
+  }
+
+  if (DRINK_KEYWORDS.some(k => text.includes(k))) return 'drink';
 
   // Hard-disqualify: tiny items are almost certainly modifiers
   if (calories > 0 && calories < 50) return 'modifier';
@@ -57,7 +78,6 @@ export function detectItemType(
   }
 
   if (MODIFIER_KEYWORDS.some(k => text.includes(k))) return 'modifier';
-  if (DRINK_KEYWORDS.some(k => text.includes(k))) return 'drink';
   if (SNACK_KEYWORDS.some(k => text.includes(k) && calories < 400)) return 'snack';
   if (SIDE_KEYWORDS.some(k => text.includes(k))) return 'side';
 

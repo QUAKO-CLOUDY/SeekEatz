@@ -435,6 +435,37 @@ function inferMenuItemUpdate(item: MenuItemRow): MenuItemUpdate | null {
       modifier_unit_default_qty: 1,
       modifier_unit_max_qty: isSauceLike ? 3 : /^add /.test(name) ? 2 : 1,
     });
+  } else if (restaurant === 'fit foodz cafe') {
+    if (/^sides$/i.test(category)) {
+      apply({
+        normalized_category: 'side',
+        item_type: 'side',
+        is_modifier: true,
+        is_searchable: false,
+        modifier_unit_label: 'side',
+        modifier_unit_default_qty: 1,
+        modifier_unit_max_qty: 2,
+      });
+    } else if (/^(smoothies|juices)$/i.test(category)) {
+      apply({
+        normalized_category: 'drink',
+        item_type: 'drink',
+        is_modifier: false,
+        is_searchable: true,
+        modifier_unit_label: null,
+        modifier_unit_default_qty: null,
+        modifier_unit_max_qty: null,
+      });
+    } else {
+      apply({
+        item_type: 'meal',
+        is_modifier: false,
+        is_searchable: true,
+        modifier_unit_label: null,
+        modifier_unit_default_qty: null,
+        modifier_unit_max_qty: null,
+      });
+    }
   } else if (
     restaurant === "moe's southwest grill" &&
     (/^fillings$/.test(category) ||
@@ -988,6 +1019,29 @@ const RESTAURANT_RULES: Record<string, RestaurantRuleSet> = {
         childNamePatterns: [/rice|veggies|salad|dumplings|ocado/i],
         relationType: 'side_option',
         groupName: 'Sides & Bases',
+        maxQuantity: 2,
+      },
+    ],
+  },
+  'Fit Foodz Cafe': {
+    relationTemplates: [
+      {
+        mealCategoryPatterns: [
+          /^salads$/i,
+          /^energy bowlz$/i,
+          /^pastabilities & bowlz$/i,
+          /^lean 'n' clean$/i,
+          /^comfort food$/i,
+          /^açaí bowlz$/i,
+          /^no bun burgers$/i,
+          /^wraps & sandwiches$/i,
+          /^whole wheat hoagies$/i,
+          /^breakfast$/i,
+          /^appetizers$/i,
+        ],
+        childCategoryPatterns: [/^sides$/i],
+        relationType: 'side_option',
+        groupName: 'Sides',
         maxQuantity: 2,
       },
     ],

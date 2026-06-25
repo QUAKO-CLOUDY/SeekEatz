@@ -148,21 +148,17 @@ export function normalizeItem(
   if (!name) return null;
 
   const calories = safeNum(raw.calories) ?? 0;
-
-  // ── Calorie floor ────────────────────────────────────────────────────────────
-  if (calories < calorieFloor) return null;
-
   const description = sanitize(raw.description);
   const rawCategory = raw.rawCategory ?? '';
-  const classificationText = [name, description, rawCategory, raw.rawMealType, raw.restaurantName].filter(Boolean).join(' ');
-
-  // ── Classify ─────────────────────────────────────────────────────────────────
   const item_type = detectItemType(name, description, calories, rawCategory);
+
+  // Calorie floor applies to full meals only — sides/modifiers/drinks stay for swaps.
+  if (item_type === 'meal' && calories < calorieFloor) return null;
 
   if (skipModifiers && item_type === 'modifier') return null;
   if (skipDrinks    && item_type === 'drink')    return null;
 
-  // ── Food tags ─────────────────────────────────────────────────────────────────
+  const classificationText = [name, description, rawCategory, raw.rawMealType, raw.restaurantName].filter(Boolean).join(' ');
   const food_tags = detectFoodTags(name, description, calories, rawCategory);
 
   // ── Skip catering / large portions ────────────────────────────────────────────
@@ -269,4 +265,50 @@ export function normalizeItems(
   }
 
   return { items, skipped };
+}
+
+/** Why an item would be dropped by normalizeItem (for import diagnostics). */
+export function explainSkipReason(
+  raw: RawIngestionItem,
+  options: NormalizerOptions,
+): string | null {
+  const {
+    calorieFloor = 150,
+    skipLargePortions = true,
+    skipDrinks = false,
+    skipModifiers = true,
+  } = options;
+
+  const name = sanitizeName(raw.name);
+  if (!name) {
+    return 'empty_name';
+  }
+
+  const calories = safeNum(raw.calories) ?? 0;
+  const description = sanitize(raw.description);
+  const rawCategory = raw.rawCategory ?? '';
+  const item_type = detectItemType(name, description, calories, rawCategory);
+
+  if (item_type === 'meal' && calories < calorieFloor) {
+    return `below_calorie_floor (${calories} < ${calorieFloor})`;
+  }
+
+  if (skipModifiers && item_type === 'modifier') {
+    return 'modifier';
+  }
+  if (skipDrinks && item_type === 'drink') {
+    return 'drink';
+  }
+
+  const food_tags = detectFoodTags(name, description, calories, rawCategory);
+  if (skipLargePortions) {
+    const largeTag = food_tags.find((tag) =>
+      ['large_portion', 'catering', 'multi_serving'].includes(tag),
+    );
+    if (largeTag) {
+      return `large_portion (${largeTag})`;
+    }
+  }
+
+  return null;
 }

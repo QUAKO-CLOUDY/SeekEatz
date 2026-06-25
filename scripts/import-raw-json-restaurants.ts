@@ -146,7 +146,7 @@ async function main() {
       for (const rawItem of rawItems) {
         const reason = explainSkipReason(rawItem, normalizeOptions);
         if (reason) {
-          const calories = Number(rawItem.calories ?? rawItem.macros?.calories ?? 0);
+          const calories = Number(rawItem.calories ?? 0);
           console.log(`    • ${rawItem.name} — ${reason}${calories ? `, ${calories} cal` : ''}`);
         }
       }

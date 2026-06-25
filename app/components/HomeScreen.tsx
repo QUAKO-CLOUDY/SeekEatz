@@ -14,6 +14,11 @@ import { motion } from "framer-motion";
 import { AnimatedNumber } from "./AnimatedNumber";
 import { diversifyMealsByRestaurant } from "@/lib/restaurant-diversity";
 import { getStoredLocation, ensureSearchLocation, resetPendingLocationRequest } from "@/lib/location";
+import {
+  buildNearbySearchRequestFields,
+  persistNearbyCacheFromResponse,
+} from "@/lib/nearby-search-client";
+import type { NearbyCacheResponse } from "../types";
 import { markInflightLoading, registerAppRequestReset } from "@/lib/app-suspend-recovery";
 import { SearchRadiusSelect } from "./SearchRadiusSelect";
 import {
@@ -124,6 +129,7 @@ type SearchApiResponse = {
   nextOffset?: number;
   message?: string;
   usageLimit?: boolean;
+  nearbyCache?: NearbyCacheResponse;
 };
 
 const NO_MORE_MEALS_MESSAGE =
@@ -643,6 +649,15 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
         console.log(`🔍 Search: query="${query}", radius=${distance} miles, hasLocation=${!!effectiveLocation}`, constraints);
       }
 
+      const nearbyFields =
+        effectiveLocation && distance && !searchKey
+          ? buildNearbySearchRequestFields(
+              effectiveLocation.latitude,
+              effectiveLocation.longitude,
+              distance,
+            )
+          : {};
+
       const res = await authenticatedFetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -658,6 +673,7 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           ...(searchKey
             ? { searchKey, isPagination: true, offset: nextOffset ?? 0 }
             : { shuffleNonce: createHomeSearchShuffleNonce() }),
+          ...nearbyFields,
           ...(effectiveLocation ? {
             user_location_lat: effectiveLocation.latitude,
             user_location_lng: effectiveLocation.longitude,
@@ -713,6 +729,10 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
       
       // Trust server-side radius filtering; avoid double-filtering by distance on the client.
       const meals = normalizedResults.map(convertToMeal);
+
+      if (!Array.isArray(data) && data?.nearbyCache) {
+        persistNearbyCacheFromResponse(data.nearbyCache);
+      }
       
       return {
         meals,
@@ -916,6 +936,8 @@ export function HomeScreen({ userProfile, onMealSelect, favoriteMeals = [], onTo
           mealsResult.message ||
           buildEmptyStateMessage(activeDistance, resultsConstraintSummary || undefined)
         );
+      } else if (mealsResult.message) {
+        setLoadMoreNotice(mealsResult.message);
       }
 
       setTimeout(() => {

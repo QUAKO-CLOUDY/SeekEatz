@@ -86,12 +86,7 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO public.profiles (id, email, created_at, updated_at)
-  VALUES (
-    NEW.id,
-    NEW.email,
-    NOW(),
-    NOW()
-  )
+  VALUES (NEW.id, NEW.email, NOW())
   ON CONFLICT (id) DO NOTHING;
 
   RETURN NEW;

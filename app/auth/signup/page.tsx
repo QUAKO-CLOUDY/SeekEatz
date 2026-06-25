@@ -149,8 +149,10 @@ function SignupPageContent() {
     try {
       setIsLoading(true);
 
+      const normalizedEmail = email.trim().toLowerCase();
+
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email,
+        email: normalizedEmail,
         password,
         options: {
           data: {
@@ -171,6 +173,12 @@ function SignupPageContent() {
           errorMessage.includes("already been registered")) {
           setError("An account with this email already exists. Please sign in instead.");
           // Don't clear pending onboarding profile - user can use it when they sign in
+          return;
+        }
+        if (errorMessage.includes("database error saving new user")) {
+          setError(
+            "Account setup failed on our server. Please try again in a minute or contact support@seekeatz.com.",
+          );
           return;
         }
         setError(signUpError.message);
@@ -271,7 +279,7 @@ function SignupPageContent() {
 
     try {
       const { data: verifyData, error: verifyError } = await supabase.auth.verifyOtp({
-        email,
+        email: email.trim().toLowerCase(),
         token: otpCode,
         type: 'signup',
       });
@@ -424,7 +432,7 @@ function SignupPageContent() {
     try {
       const { error: resendError } = await supabase.auth.resend({
         type: 'signup',
-        email,
+        email: email.trim().toLowerCase(),
       });
 
       if (resendError) {

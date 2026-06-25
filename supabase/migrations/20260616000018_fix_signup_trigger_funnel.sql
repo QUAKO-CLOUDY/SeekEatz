@@ -3,22 +3,22 @@
 -- auth.uid() is null and RLS blocked the insert (rolling back the new user).
 --
 -- Restore profile-only trigger; account_created funnel is recorded in bootstrap API.
+-- Use id, email, updated_at only — production profiles has no created_at column.
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, created_at, updated_at)
-  VALUES (
-    NEW.id,
-    NEW.email,
-    NOW(),
-    NOW()
-  )
+  INSERT INTO public.profiles (id, email, updated_at)
+  VALUES (NEW.id, NEW.email, NOW())
   ON CONFLICT (id) DO NOTHING;
 
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+$$;
 
 -- Ensure signup trigger still exists (no-op if already present).
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;

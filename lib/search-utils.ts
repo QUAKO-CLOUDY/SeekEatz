@@ -344,6 +344,8 @@ export interface SearchInput {
     };
     calorieMode?: "UNDER" | "OVER";
     isHomepage?: boolean;
+    nearbyContextKey?: string;
+    nearbyMatchesSnapshot?: SearchParams['nearbyMatchesSnapshot'];
 }
 
 /**
@@ -510,6 +512,12 @@ export async function buildSearchParams(input: SearchInput): Promise<SearchParam
         userContext: Object.keys(normalizedUserContext).length > 0 ? normalizedUserContext : undefined,
         isHomepage: input.isHomepage ?? false,
         calorieMode: input.calorieMode,
+        ...(!input.searchKey && input.nearbyContextKey && input.nearbyMatchesSnapshot?.length
+            ? {
+                nearbyContextKey: input.nearbyContextKey,
+                nearbyMatchesSnapshot: input.nearbyMatchesSnapshot,
+              }
+            : {}),
     };
 
     return params;

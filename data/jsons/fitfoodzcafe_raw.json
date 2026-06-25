@@ -1,0 +1,1325 @@
+{
+    "restaurant_name": "Fit Foodz Kitchen",
+    "items": [
+      {
+        "name": "Breakfast Sandwich",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 455,
+          "protein": 41,
+          "carbs": 28,
+          "fat": 20
+        }
+      },
+      {
+        "name": "EGG WHITE D'LITE",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 370,
+          "protein": 33,
+          "carbs": 30,
+          "fat": 13
+        }
+      },
+      {
+        "name": "POWER PANCAKES",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 477,
+          "protein": 18,
+          "carbs": 48,
+          "fat": 13
+        }
+      },
+      {
+        "name": "TURKEY SCRAMBLE",
+        "category": "Breakfast",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 330,
+          "protein": 43,
+          "carbs": 4,
+          "fat": 15
+        }
+      },
+      {
+        "name": "STUFFED AVOCADO",
+        "category": "Appetizers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 468,
+          "protein": 26,
+          "carbs": 15,
+          "fat": 34
+        }
+      },
+      {
+        "name": "TURKEY CHILI",
+        "category": "Appetizers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 350,
+          "protein": 29,
+          "carbs": 26,
+          "fat": 11
+        }
+      },
+      {
+        "name": "Meatballs & Ricotta",
+        "category": "Appetizers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 344,
+          "protein": 32,
+          "carbs": 11,
+          "fat": 16
+        }
+      },
+      {
+        "name": "ZUCCHINI CHEESE BITES",
+        "category": "Appetizers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 410,
+          "protein": 22,
+          "carbs": 35,
+          "fat": 22
+        }
+      },
+      {
+        "name": "QUINOA CHEESE STICKS",
+        "category": "Appetizers",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 358,
+          "protein": 24,
+          "carbs": 47,
+          "fat": 9
+        }
+      },
+      {
+        "name": "TOFU BOWL",
+        "category": "ENERGY BOWLZ",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 371,
+          "protein": 27,
+          "carbs": 60,
+          "fat": 15
+        }
+      },
+      {
+        "name": "CHICKEN BOWL",
+        "category": "ENERGY BOWLZ",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 470,
+          "protein": 47,
+          "carbs": 58,
+          "fat": 17
+        }
+      },
+      {
+        "name": "STEAK BOWL",
+        "category": "ENERGY BOWLZ",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 509,
+          "protein": 45,
+          "carbs": 58,
+          "fat": 22
+        }
+      },
+      {
+        "name": "MEDITERRANEAN Salad",
+        "category": "SALADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 527,
+          "protein": 16,
+          "carbs": 31,
+          "fat": 37
+        }
+      },
+      {
+        "name": "FIT COBB",
+        "category": "SALADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 698,
+          "protein": 38,
+          "carbs": 22,
+          "fat": 53
+        }
+      },
+      {
+        "name": "THAI CRUNCH",
+        "category": "SALADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 685,
+          "protein": 30,
+          "carbs": 90,
+          "fat": 20
+        }
+      },
+      {
+        "name": "FIT RANCH SALAD",
+        "category": "SALADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 650,
+          "protein": 65,
+          "carbs": 44,
+          "fat": 25
+        }
+      },
+      {
+        "name": "POWER BOWL (Salad)",
+        "category": "SALADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 531,
+          "protein": 21,
+          "carbs": 39,
+          "fat": 34
+        }
+      },
+      {
+        "name": "DIJON PISTACHIO CRUSTED CHICKEN",
+        "category": "SALADS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 806,
+          "protein": 50,
+          "carbs": 34,
+          "fat": 52
+        }
+      },
+      {
+        "name": "SPICY AVOCADO (Veggie Patty)",
+        "category": "NO BUN BURGERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 425,
+          "protein": 14,
+          "carbs": 47,
+          "fat": 18
+        }
+      },
+      {
+        "name": "SPICY AVOCADO (Turkey Patty)",
+        "category": "NO BUN BURGERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 543,
+          "protein": 40,
+          "carbs": 11,
+          "fat": 32
+        }
+      },
+      {
+        "name": "SPICY AVOCADO (Angus Patty)",
+        "category": "NO BUN BURGERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 792,
+          "protein": 45,
+          "carbs": 11,
+          "fat": 60
+        }
+      },
+      {
+        "name": "GOING GREEN (Veggie Patty)",
+        "category": "NO BUN BURGERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 338,
+          "protein": 17,
+          "carbs": 38,
+          "fat": 17
+        }
+      },
+      {
+        "name": "GOING GREEN (Turkey Patty)",
+        "category": "NO BUN BURGERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 457,
+          "protein": 43,
+          "carbs": 3,
+          "fat": 31
+        }
+      },
+      {
+        "name": "GOING GREEN (Angus Patty)",
+        "category": "NO BUN BURGERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 706,
+          "protein": 42,
+          "carbs": 3,
+          "fat": 59
+        }
+      },
+      {
+        "name": "BACON ARUGULA (Veggie Patty)",
+        "category": "NO BUN BURGERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 395,
+          "protein": 21,
+          "carbs": 39,
+          "fat": 17
+        }
+      },
+      {
+        "name": "BACON ARUGULA (Turkey Patty)",
+        "category": "NO BUN BURGERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 514,
+          "protein": 47,
+          "carbs": 3,
+          "fat": 31
+        }
+      },
+      {
+        "name": "BACON ARUGULA (Angus Patty)",
+        "category": "NO BUN BURGERS",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 765,
+          "protein": 45,
+          "carbs": 3,
+          "fat": 59
+        }
+      },
+      {
+        "name": "TURKEY, TURKEY CLUB",
+        "category": "WRAPS & SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 442,
+          "protein": 20,
+          "carbs": 18,
+          "fat": 11
+        }
+      },
+      {
+        "name": "PESTO CHICKEN WRAP",
+        "category": "WRAPS & SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 483,
+          "protein": 39,
+          "carbs": 33,
+          "fat": 21
+        }
+      },
+      {
+        "name": "CHICKEN SALAD SANDWICH",
+        "category": "WRAPS & SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 520,
+          "protein": 30,
+          "carbs": 21,
+          "fat": 15
+        }
+      },
+      {
+        "name": "TUNA SALAD SANDWICH",
+        "category": "WRAPS & SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 490,
+          "protein": 30,
+          "carbs": 21,
+          "fat": 10
+        }
+      },
+      {
+        "name": "Thai Chicken Lettuce Wrap",
+        "category": "WRAPS & SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 433,
+          "protein": 41,
+          "carbs": 28,
+          "fat": 18
+        }
+      },
+      {
+        "name": "BURRITO: CHICKEN",
+        "category": "WRAPS & SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 668,
+          "protein": 53,
+          "carbs": 82,
+          "fat": 21
+        }
+      },
+      {
+        "name": "BURRITO: STEAK",
+        "category": "WRAPS & SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 707,
+          "protein": 51,
+          "carbs": 82,
+          "fat": 26
+        }
+      },
+      {
+        "name": "BURRITO: TOFU",
+        "category": "WRAPS & SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 556,
+          "protein": 32,
+          "carbs": 82,
+          "fat": 19
+        }
+      },
+      {
+        "name": "CHICKEN CAESAR WRAP",
+        "category": "WRAPS & SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 564,
+          "protein": 48,
+          "carbs": 37,
+          "fat": 26
+        }
+      },
+      {
+        "name": "BUFFALO CAULIFLOWER WRAP",
+        "category": "WRAPS & SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 540,
+          "protein": 19,
+          "carbs": 65,
+          "fat": 24
+        }
+      },
+      {
+        "name": "BUFFALO CHICKEN FINGER RANCH WRAP",
+        "category": "WRAPS & SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 660,
+          "protein": 61,
+          "carbs": 55,
+          "fat": 25
+        }
+      },
+      {
+        "name": "CHIPOTLE CHICKEN WRAP",
+        "category": "WRAPS & SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 612,
+          "protein": 48,
+          "carbs": 45,
+          "fat": 26
+        }
+      },
+      {
+        "name": "GRILLED SHRIMP WRAP",
+        "category": "WRAPS & SANDWICHES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 532,
+          "protein": 48,
+          "carbs": 35,
+          "fat": 23
+        }
+      },
+      {
+        "name": "CHICKEN PHILLY SUB",
+        "category": "WHOLE WHEAT HOAGIES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 624,
+          "protein": 54,
+          "carbs": 67,
+          "fat": 19
+        }
+      },
+      {
+        "name": "CHICKEN MEATBALL PARM HOAGIE",
+        "category": "WHOLE WHEAT HOAGIES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 645,
+          "protein": 50,
+          "carbs": 56,
+          "fat": 17
+        }
+      },
+      {
+        "name": "TURKEY MEATBALL PARM HOAGIE",
+        "category": "WHOLE WHEAT HOAGIES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 661,
+          "protein": 44,
+          "carbs": 66,
+          "fat": 21
+        }
+      },
+      {
+        "name": "SLIM CHICKEN",
+        "category": "WHOLE WHEAT HOAGIES",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 645,
+          "protein": 45,
+          "carbs": 59,
+          "fat": 22
+        }
+      },
+      {
+        "name": "ZOODLES WITH SALMON",
+        "category": "PASTABILITIES & BOWLZ",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 438,
+          "protein": 32,
+          "carbs": 27,
+          "fat": 25
+        }
+      },
+      {
+        "name": "ZOODLES WITH CHICKEN",
+        "category": "PASTABILITIES & BOWLZ",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 462,
+          "protein": 35,
+          "carbs": 26,
+          "fat": 27
+        }
+      },
+      {
+        "name": "CHICKEN PAD THAI",
+        "category": "PASTABILITIES & BOWLZ",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 777,
+          "protein": 45,
+          "carbs": 86,
+          "fat": 28
+        }
+      },
+      {
+        "name": "STIR FRY",
+        "category": "PASTABILITIES & BOWLZ",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 477,
+          "protein": 13,
+          "carbs": 63,
+          "fat": 21
+        }
+      },
+      {
+        "name": "QUINOA FRIED RICE",
+        "category": "PASTABILITIES & BOWLZ",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 487,
+          "protein": 28,
+          "carbs": 58,
+          "fat": 11
+        }
+      },
+      {
+        "name": "ZOODLES BOLOGNESE",
+        "category": "PASTABILITIES & BOWLZ",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 378,
+          "protein": 36,
+          "carbs": 18,
+          "fat": 15
+        }
+      },
+      {
+        "name": "TURKEY MEATLOAF",
+        "category": "COMFORT FOOD",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 488,
+          "protein": 49,
+          "carbs": 33,
+          "fat": 18
+        }
+      },
+      {
+        "name": "TURKEY BOLOGNESE",
+        "category": "COMFORT FOOD",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 348,
+          "protein": 26,
+          "carbs": 21,
+          "fat": 10
+        }
+      },
+      {
+        "name": "BAKED CHICKEN FINGERS",
+        "category": "COMFORT FOOD",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 390,
+          "protein": 34,
+          "carbs": 18,
+          "fat": 14
+        }
+      },
+      {
+        "name": "PROTEIN OVERLOAD",
+        "category": "COMFORT FOOD",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 595,
+          "protein": 76,
+          "carbs": 17,
+          "fat": 31
+        }
+      },
+      {
+        "name": "GRILLED CHICKEN PARM",
+        "category": "COMFORT FOOD",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 380,
+          "protein": 39,
+          "carbs": 4,
+          "fat": 15
+        }
+      },
+      {
+        "name": "Garden Chicken",
+        "category": "LEAN 'N' CLEAN",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 499,
+          "protein": 33,
+          "carbs": 14,
+          "fat": 16
+        }
+      },
+      {
+        "name": "Grilled Salmon",
+        "category": "LEAN 'N' CLEAN",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 447,
+          "protein": 42,
+          "carbs": 7,
+          "fat": 27
+        }
+      },
+      {
+        "name": "CHICKEN PAILLARD",
+        "category": "LEAN 'N' CLEAN",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 474,
+          "protein": 34,
+          "carbs": 5,
+          "fat": 22
+        }
+      },
+      {
+        "name": "CLEAN ROUTINE",
+        "category": "LEAN 'N' CLEAN",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 443,
+          "protein": 36,
+          "carbs": 30,
+          "fat": 20
+        }
+      },
+      {
+        "name": "Berry BEE Licious",
+        "category": "AÇAÍ BOWLZ",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 618,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "Crunch N Munch",
+        "category": "AÇAÍ BOWLZ",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 754,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "The Forbidden Bean",
+        "category": "AÇAÍ BOWLZ",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 662,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "KIDZ CHICKEN FINGERS (2 pcs.)",
+        "category": "Kidz Food",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": null,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "KIDZ CHICKEN & CHEESE QUESADILLA",
+        "category": "Kidz Food",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": null,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "KIDZ GRILLED CHEESE SANDWICH",
+        "category": "Kidz Food",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": null,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "Baked Sweet Potato Rounds",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 75,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "Quinoa",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 222,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "Jasmine Rice",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 216,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "Side Salad",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 20,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "Side Salad w/ House Vinaigrette",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 175,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "Broccoli (Steamed)",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 30,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "Broccoli (Sauteed)",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 156,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "Spinach (Steamed)",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 14,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "Spinach (Sauteed)",
+        "category": "Sides",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 120,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "ROOT-TINE (16oz)",
+        "category": "Juices",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 210,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "ROOT-TINE (24oz)",
+        "category": "Juices",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 420,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "CUCUMBER CLEANSE (16oz)",
+        "category": "Juices",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 185,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "CUCUMBER CLEANSE (24oz)",
+        "category": "Juices",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 277,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "FRUIT REFRESHER (16oz)",
+        "category": "Juices",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 220,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "FRUIT REFRESHER (24oz)",
+        "category": "Juices",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 330,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "PINE & SHINE (16oz)",
+        "category": "Juices",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 165,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "PINE & SHINE (24oz)",
+        "category": "Juices",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 225,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "FIELD OF GREENS (16oz)",
+        "category": "Juices",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 200,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "FIELD OF GREENS (24oz)",
+        "category": "Juices",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 300,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "RE-BOOT (16oz)",
+        "category": "Juices",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 175,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "RE-BOOT (24oz)",
+        "category": "Juices",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 262,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "FRENCH TOAST (16oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 205,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "FRENCH TOAST (24oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 350,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "BLUEBERRY CHEESECAKE (16oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 286,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "BLUEBERRY CHEESECAKE (24oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 349,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "PEANUT BUTTER BANANA CRUNCH (16oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 175,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "PEANUT BUTTER BANANA CRUNCH (24oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 245,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "S'MORES (16oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 260,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "S'MORES (24oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 371,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "SLIM DOWN (16oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 191,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "SLIM DOWN (24oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 286,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "ALMOND BUTTER COOKIE (16oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 220,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "ALMOND BUTTER COOKIE (24oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 316,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "BLUE RADIANCE (16oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 318,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "BLUE RADIANCE (24oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 381,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "Glow-Berry Matcha (16oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 386,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "Glow-Berry Matcha (24oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 462,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "Fit Cloud (16oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 389,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "Fit Cloud (24oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 472,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "DUBAI (16oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 362,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "DUBAI (24oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 452,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "BERRY ACAI (16oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 150,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "BERRY ACAI (24oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 180,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "CHOCOLATE PEANUT BUTTER (16oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 200,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      },
+      {
+        "name": "CHOCOLATE PEANUT BUTTER (24oz)",
+        "category": "Smoothies",
+        "price_estimate": null,
+        "image_url": null,
+        "macros": {
+          "calories": 320,
+          "protein": null,
+          "carbs": null,
+          "fat": null
+        }
+      }
+    ]
+  }

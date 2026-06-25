@@ -126,7 +126,7 @@ export interface SearchParams {
   isPagination?: boolean;
   isHomepage?: boolean;
   calorieMode?: "UNDER" | "OVER";
-  /** Frozen nearby restaurant matches from the first page — reused on pagination. */
+  /** Frozen nearby restaurant matches — reused on pagination or client cache hits. */
   nearbyMatchesSnapshot?: Array<{
     restaurantId?: string;
     restaurantName: string;
@@ -134,4 +134,14 @@ export interface SearchParams {
     latitude: number;
     longitude: number;
   }>;
+  /** Client/server location bucket key: lat(2dp):lng(2dp):radius */
+  nearbyContextKey?: string;
 }
+
+export type NearbyCacheResponse = {
+  contextKey: string;
+  fetchRadiusMiles: number;
+  lat: number;
+  lng: number;
+  matches: NonNullable<SearchParams['nearbyMatchesSnapshot']>;
+};

@@ -97,8 +97,11 @@ export function calculateMaintenanceCalories(
   return roundToNearest25(bmr * getActivityMultiplier(activityLevel, dailyStepsRange));
 }
 
+/** Grams of protein per pound of body weight for recommended targets. */
+export const PROTEIN_GRAMS_PER_LB = 0.9;
+
 export function calculateMacroTargets(maintenanceCalories: number, weightLbs: number) {
-  const proteinG = Math.round(weightLbs * 0.8);
+  const proteinG = Math.round(weightLbs * PROTEIN_GRAMS_PER_LB);
   const proteinCalories = proteinG * 4;
   const fatCalories = maintenanceCalories * 0.25;
   const fatG = Math.round(fatCalories / 9);

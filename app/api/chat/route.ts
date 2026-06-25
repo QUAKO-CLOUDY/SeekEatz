@@ -1738,6 +1738,11 @@ export async function POST(req: Request) {
           shuffleNonce: quickPromptNonce,
           excludedRestaurants,
           isPagination: false,
+          nearbyContextKey:
+            typeof body?.nearbyContextKey === 'string' ? body.nearbyContextKey : undefined,
+          nearbyMatchesSnapshot: Array.isArray(body?.nearbyMatchesSnapshot)
+            ? body.nearbyMatchesSnapshot
+            : undefined,
         });
         mealSearchParams = searchParams;
 

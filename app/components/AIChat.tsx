@@ -4,7 +4,7 @@ import { Send, AlertCircle, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { MealCard } from "./MealCard";
-import type { Meal, UserProfile } from "../types";
+import type { Meal, UserProfile, NearbyCacheResponse } from "../types";
 import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { createClient } from "@/utils/supabase/client";
 import { useTheme } from "../contexts/ThemeContext";
@@ -12,6 +12,10 @@ import { useChat } from "../contexts/ChatContext";
 import { getGuestSessionId, getGuestChatMessages, saveGuestChatMessages, touchGuestActivity, clearGuestSession } from "@/lib/guest-session";
 import { getRestaurantLogoUrl } from "@/lib/image-utils";
 import { getStoredLocation, ensureSearchLocation, resetPendingLocationRequest } from "@/lib/location";
+import {
+  buildNearbySearchRequestFields,
+  persistNearbyCacheFromResponse,
+} from "@/lib/nearby-search-client";
 import { markInflightLoading, registerAppRequestReset } from "@/lib/app-suspend-recovery";
 import { extractMacroConstraintsFromText } from "@/lib/extractMacroConstraintsFromText";
 import { UpgradeModal } from "./UpgradeModal";
@@ -90,6 +94,7 @@ type SearchApiResponse = {
   searchKey?: string;
   summary?: string;
   message?: string;
+  nearbyCache?: NearbyCacheResponse;
   debugInfo?: unknown;
   error?: boolean | string;
   answer?: string;
@@ -1293,6 +1298,15 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           }),
         ]);
 
+        const nearbyFields =
+          isMealIntent && resolvedLocation
+            ? buildNearbySearchRequestFields(
+                resolvedLocation.latitude,
+                resolvedLocation.longitude,
+                activeDistance,
+              )
+            : {};
+
         response = await authenticatedFetch('/api/chat', {
           method: 'POST',
           headers: {
@@ -1305,6 +1319,7 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
             excludedRestaurants: quickPromptExcludedRestaurants.length > 0 ? quickPromptExcludedRestaurants : undefined,
             limit: CHAT_MEALS_PAGE_SIZE,
             offset: 0, // Default offset
+            ...nearbyFields,
             userContext: {
               diet_type: userProfile?.diet_type,
               dietary_options: userProfile?.dietary_options,
@@ -1479,6 +1494,10 @@ export default function AIChat({ userId, userProfile, favoriteMeals, onMealSelec
           // Empty meals array is still a meal response (may have a message explaining why)
           if (jsonData.meals !== undefined && Array.isArray(jsonData.meals)) {
             const { meals: mealItems = [], hasMore, nextOffset, searchKey: responseSearchKey, summary: serverSummary, message } = jsonData;
+
+            if (jsonData.nearbyCache) {
+              persistNearbyCacheFromResponse(jsonData.nearbyCache);
+            }
 
             // Convert to Meal format (prefer flattened fields from backend)
             const parsedMeals: Meal[] = mealItems.map(mapSearchItemToMeal);

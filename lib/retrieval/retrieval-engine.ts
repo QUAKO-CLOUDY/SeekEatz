@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { openai } from '@ai-sdk/openai';
 import { embed } from 'ai';
-import type { Meal, SearchParams } from '@/app/types';
+import type { Meal, NearbyCacheResponse, SearchParams } from '@/app/types';
 import { parseQuery, isSQLSufficient, type ParsedQuery } from './query-parser';
 import { buildFilters, applyDietaryFilter, type RPCParams } from './filter-builder';
 import {
@@ -14,6 +14,10 @@ import { ResponseFormatter } from './response-formatter';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { calculateDistanceMiles } from '@/lib/distance-utils';
 import { resolveLiveNearbyRestaurantMatches } from '@/lib/google-places-nearby';
+import {
+  buildNearbyCachePayload,
+  validateClientNearbySnapshot,
+} from '@/lib/nearby-context';
 import { hasMacroConstraints, isSmoothieLikeText } from '@/lib/smoothie-search';
 
 const DEFAULT_LIMIT = 5;
@@ -170,6 +174,7 @@ export interface RetrievalResult {
   usedVector: boolean;
   parsedQuery: ParsedQuery;
   message?: string;
+  nearbyCache?: NearbyCacheResponse;
   debugInfo?: RetrievalDebugInfo;
 }
 
@@ -219,7 +224,13 @@ export interface RetrievalDebugInfo {
   location?: {
     requested: boolean;
     radiusMiles?: number;
-    source: 'disabled' | 'google_places_live' | 'find_restaurants_near' | 'restaurants_table' | 'no_matches';
+    source:
+      | 'disabled'
+      | 'client_snapshot'
+      | 'google_places_live'
+      | 'find_restaurants_near'
+      | 'restaurants_table'
+      | 'no_matches';
     matchedRestaurantCount: number;
     filteredOutCount: number;
     returnedWithinRadius: number;
@@ -294,7 +305,13 @@ interface NearbyRestaurantMatch {
 interface NearbyFilterContext {
   requested: boolean;
   radiusMiles?: number;
-  source: 'disabled' | 'google_places_live' | 'find_restaurants_near' | 'restaurants_table' | 'no_matches';
+  source:
+    | 'disabled'
+    | 'client_snapshot'
+    | 'google_places_live'
+    | 'find_restaurants_near'
+    | 'restaurants_table'
+    | 'no_matches';
   matches: NearbyRestaurantMatch[];
   byRestaurantId: Map<string, NearbyRestaurantMatch>;
   byRestaurantName: Map<string, NearbyRestaurantMatch>;
@@ -355,6 +372,7 @@ export async function retrieveMealsWithClient(
   const nearbyFilter = requestedLocation
     ? await resolveNearbyRestaurants(supabase, requestedLocation, {
         nearbyMatchesSnapshot: searchParams.nearbyMatchesSnapshot,
+        nearbyContextKey: searchParams.nearbyContextKey,
         skipLiveLookup: Boolean(searchParams.isPagination),
       })
     : createDisabledNearbyFilter();
@@ -676,7 +694,9 @@ export async function retrieveMealsWithClient(
   const hasNoLocalRestaurantCoverage =
     nearbyFilter.requested && nearbyFilter.matches.length === 0;
 
-  const allowOutsideRadiusFallback = false;
+  // Home macro search: when we can't resolve any nearby restaurants (API/DB coverage
+  // gaps), still return macro-matching meals instead of an empty radius state.
+  const allowOutsideRadiusFallback = macroOnlyHomeFiltering;
 
   if (ranked.length === 0 && hasNoLocalRestaurantCoverage && allowOutsideRadiusFallback) {
     const outsideRadiusDeterministic = applyPostRetrievalFilters(
@@ -706,7 +726,7 @@ export async function retrieveMealsWithClient(
       ranked = outsideRadiusRanked;
       outsideRadiusFallbackUsed = true;
       fallbackMessage = macroOnlyHomeFiltering
-        ? 'No restaurants found near you yet. Showing popular meals while we expand coverage in your area.'
+        ? 'We could not verify restaurants near you. Showing meals that match your macros.'
         : 'Showing meals outside your radius.';
     }
   }
@@ -734,7 +754,7 @@ export async function retrieveMealsWithClient(
       ranked = fallback.items;
       fallbackMessage = nearbyFilter.requested
         ? macroOnlyHomeFiltering
-          ? `No restaurants found near you yet. Showing popular meals while we expand coverage in your area.${fallback.message ? ` ${fallback.message}` : ''}`
+          ? `We could not verify restaurants near you. Showing meals that match your macros.${fallback.message ? ` ${fallback.message}` : ''}`
           : `Showing meals outside your radius.${fallback.message ? ` ${fallback.message}` : ''}`
         : fallback.message;
       outsideRadiusFallbackUsed = nearbyFilter.requested;
@@ -801,7 +821,7 @@ export async function retrieveMealsWithClient(
     : undefined;
   let meals = await formatter.format(paged, formatterLocation, nearbyDistances);
 
-  if (nearbyFilter.requested && nearbyFilter.radiusMiles) {
+  if (nearbyFilter.requested && nearbyFilter.radiusMiles && !outsideRadiusFallbackUsed) {
     meals = meals.filter(
       (meal) => meal.distance !== undefined && meal.distance <= nearbyFilter.radiusMiles!
     );
@@ -872,6 +892,27 @@ export async function retrieveMealsWithClient(
     searchParams.isPagination,
   );
 
+  const nearbyCache =
+    requestedLocation && nearbyFilter.matches.length > 0
+      ? buildNearbyCachePayload({
+          lat: requestedLocation.lat,
+          lng: requestedLocation.lng,
+          fetchRadiusMiles: requestedLocation.radiusMiles,
+          matches: nearbyFilter.matches
+            .filter(
+              (match): match is NearbyRestaurantMatch & { latitude: number; longitude: number } =>
+                match.latitude !== undefined && match.longitude !== undefined,
+            )
+            .map((match) => ({
+              restaurantId: match.restaurantId,
+              restaurantName: match.restaurantName,
+              distanceMiles: match.distanceMiles,
+              latitude: match.latitude,
+              longitude: match.longitude,
+            })),
+        })
+      : undefined;
+
   return {
     meals,
     totalCount,
@@ -880,6 +921,7 @@ export async function retrieveMealsWithClient(
     searchKey: responseSearchKey,
     usedVector,
     parsedQuery: parsed,
+    nearbyCache,
     message:
       fallbackMessage ??
       (meals.length === 0 ? buildNoMatchesMessage(parsed, nearbyFilter) : undefined),
@@ -943,6 +985,7 @@ async function resolveNearbyRestaurants(
   location: RequestedLocation,
   options: {
     nearbyMatchesSnapshot?: SearchParams['nearbyMatchesSnapshot'];
+    nearbyContextKey?: string;
     skipLiveLookup?: boolean;
   } = {},
 ): Promise<NearbyFilterContext> {
@@ -956,8 +999,27 @@ async function resolveNearbyRestaurants(
     filteredOutCount: 0,
   };
 
-  if (options.nearbyMatchesSnapshot?.length) {
-    return buildNearbyFilterFromSnapshot(baseContext, options.nearbyMatchesSnapshot);
+  const validatedClientSnapshot = validateClientNearbySnapshot({
+    contextKey: options.nearbyContextKey,
+    snapshot: options.nearbyMatchesSnapshot,
+    lat: location.lat,
+    lng: location.lng,
+    radiusMiles: location.radiusMiles,
+  });
+  if (validatedClientSnapshot) {
+    return buildNearbyFilterFromSnapshot(
+      baseContext,
+      validatedClientSnapshot,
+      'client_snapshot',
+    );
+  }
+
+  if (options.nearbyMatchesSnapshot?.length && options.skipLiveLookup) {
+    return buildNearbyFilterFromSnapshot(
+      baseContext,
+      options.nearbyMatchesSnapshot,
+      'client_snapshot',
+    );
   }
 
   if (!options.skipLiveLookup) {
@@ -3406,6 +3468,7 @@ export async function searchHandler(
   nextOffset: number;
   searchKey: string;
   message?: string;
+  nearbyCache?: NearbyCacheResponse;
   debugInfo?: RetrievalDebugInfo;
 }> {
   const result = await retrieveMeals(searchParams, {
@@ -3420,6 +3483,7 @@ export async function searchHandler(
     nextOffset: result.nextOffset,
     searchKey: result.searchKey,
     message: result.message,
+    nearbyCache: result.nearbyCache,
     debugInfo: result.debugInfo,
   };
 }

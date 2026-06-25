@@ -277,6 +277,12 @@ const RESTAURANT_LOGO_MAP: Record<string, string> = {
   'einstein bagels': 'Einstein Bros Bagels',
   'einstein brothers bagels': 'Einstein Bros Bagels',
 
+  // Fit Foodz variations
+  'fit foodz kitchen': 'Fit Foodz Cafe',
+  'fit foodz cafe': 'Fit Foodz Cafe',
+  'fit_foodz_kitchen': 'Fit Foodz Cafe',
+  'fit_foodz_cafe': 'Fit Foodz Cafe',
+
   // Flower Child variations
   'flower child': 'Flower child',
 

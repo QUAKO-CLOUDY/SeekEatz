@@ -24,7 +24,7 @@ assert.ok(maleBmr > 1500 && maleBmr < 2500);
 const maintenance = roundToNearest25(maleBmr * 1.55);
 const macros = calculateMacroTargets(maintenance, weightLbs);
 
-assert.equal(macros.proteinG, 160);
+assert.equal(macros.proteinG, 180);
 assert.ok(macros.fatG > 0);
 assert.ok(macros.carbsG > 0);
 
@@ -38,7 +38,7 @@ const targets = calculateNutritionTargets({
 });
 
 assert.equal(targets.maintenanceCalories % 25, 0);
-assert.equal(targets.proteinG, 160);
+assert.equal(targets.proteinG, 180);
 
 const withoutSteps = calculateNutritionTargets({
   gender: "male",

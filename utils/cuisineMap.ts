@@ -10,7 +10,7 @@ export const CUISINES = {
 
   Chicken: ['Chick-fil-A', 'Raising Cane\'s', 'Popeyes', 'KFC', 'Zaxby\'s', 'Wingstop', 'Pollo Tropical', 'Chicken Kitchen'],
 
-  Bowls: ['Sweetgreen', 'CAVA', 'Chopt', 'Just Salad', 'Bolay', 'Fresh Kitchen', 'Dig'],
+  Bowls: ['Sweetgreen', 'CAVA', 'Chopt', 'Just Salad', 'Bolay', 'Fresh Kitchen', 'Dig', 'Fit Foodz Kitchen'],
 
   Asian: ['Panda Express', 'Pei Wei', 'Teriyaki Madness'],
 

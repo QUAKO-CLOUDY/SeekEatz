@@ -1,3 +1,5 @@
+import { clearNearbyContext, getStoredNearbyContext, isSameNearbyLocation } from '@/lib/nearby-context';
+
 export type StoredLocation = {
   latitude: number;
   longitude: number;
@@ -39,6 +41,14 @@ export function getStoredLocation(): StoredLocation | null {
 export function storeLocation(latitude: number, longitude: number) {
   if (typeof window === "undefined") {
     return;
+  }
+
+  const nearbyContext = getStoredNearbyContext();
+  if (
+    nearbyContext &&
+    !isSameNearbyLocation(nearbyContext.lat, nearbyContext.lng, latitude, longitude)
+  ) {
+    clearNearbyContext();
   }
 
   const payload: StoredLocation = {
@@ -131,6 +141,7 @@ export function clearLocationSearchPrompt(): void {
 
 export async function refreshSearchLocation(): Promise<StoredLocation | null> {
   clearLocationSearchPrompt();
+  clearNearbyContext();
   return requestAndStoreLocation();
 }
 
